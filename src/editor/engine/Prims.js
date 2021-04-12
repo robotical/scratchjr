@@ -22,6 +22,7 @@ export default class Prims {
         Prims.table.ontouch = Prims.OnTouch;
         Prims.table.onchat = Prims.Ignore;
         Prims.table.repeat = Prims.Repeat;
+        Prims.table.getReady = Prims.getReady;
         Prims.table.forward = Prims.Forward;
         Prims.table.back = Prims.Back;
         Prims.table.up = Prims.Up;
@@ -299,6 +300,10 @@ export default class Prims {
         Prims.moveAtSpeed(strip);
     }
 
+    static getReady(strip) {
+        // console.log(strip)
+    }
+
     static Forward (strip) {
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 24;
@@ -405,6 +410,8 @@ export default class Prims {
         alert('Left');
 
         OS.martyTest({ cmd: 'left', steps: num });
+        console.log("martyTest iOS.js");
+        
 
         if (strip.count < 0) {
             strip.count = Math.floor(Math.abs(num) / s.speed * 0.25);

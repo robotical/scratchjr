@@ -60,6 +60,7 @@ export default class OS {
 
     // Marty test
     static martyTest (json, fcn) {
+        console.log("martyTest OS.js");
         tabletInterface.martyTest(json, fcn);
     }
 

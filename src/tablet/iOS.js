@@ -51,6 +51,7 @@ export default class iOS {
     static martyTest (json, fcn) {
         (async () => {
             var result = await iOS.call('marty_test', JSON.stringify(json));
+            console.log("martyTest iOS.js");
             if (typeof (fcn) !== 'undefined') {
                 fcn(result);
             }
