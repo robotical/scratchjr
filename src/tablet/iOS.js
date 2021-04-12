@@ -57,6 +57,17 @@ export default class iOS {
         })();
     }
 
+    static martyRESTCmd (json, fcn) {
+        (async () => {
+            console.log("iOS: martyREST");
+            console.log(json);
+            var result = await iOS.call('martyRESTcmd', JSON.stringify(json));
+            if (typeof (fcn) !== 'undefined') {
+                fcn(result);
+            }
+        })();
+    }
+
     // Database functions
     static stmt (json, fcn) {
         (async () => {

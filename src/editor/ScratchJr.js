@@ -134,10 +134,10 @@ export default class ScratchJr {
         return editmode;
     }
 
-    //returns bool martymode
-    static get martymode () {
-        return martymode;
-    }
+    // //returns bool martymode
+    // static get martymode () {
+    //     return martymode;
+    // }
 
     static set editmode (newEditmode) {
         editmode = newEditmode;
@@ -230,6 +230,10 @@ export default class ScratchJr {
     static storyStart (/*eventName*/) {
         // console.log("Story started: " + eventName);
         storyStarted = true;
+    }
+
+    static getMartyMode(){
+        return martymode;
     }
 
     static editorEvents () {

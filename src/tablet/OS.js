@@ -59,6 +59,13 @@ export default class OS {
     }
 
     // Marty test
+    static martyRESTCmd (json, fcn) {
+        console.log("OS: martyREST");
+        console.log(json);
+        tabletInterface.martyRESTCmd(json, fcn);
+    }
+
+    // Marty test
     static martyCmd (json, fcn) {
         tabletInterface.martyCmd(json, fcn);
     }

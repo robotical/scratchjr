@@ -3,6 +3,8 @@ import ScratchAudio from '../../utils/ScratchAudio';
 import Grid from '../ui/Grid';
 import Vector from '../../geom/Vector';
 import {gn} from '../../utils/lib';
+import OS from '../../tablet/OS';
+
 
 let tinterval = 1;
 let hopList = [-48, -30, -22, -14, -6, 0, 6, 14, 22, 30, 48];
@@ -299,9 +301,72 @@ export default class Prims {
         Prims.moveAtSpeed(strip);
     }
 
+    static Marty_Forward (strip) {
+        console.log("MARTY MODE");
+        
+
+        // var s = strip.spr;
+        // const moveTime = 1500;
+        // let steps = Number(strip.thisblock.getArgValue());
+        // steps = Math.min(Math.max(steps, 1), 20);
+        // const stepLength = 25;
+        // console.log(`traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`);
+ 
+        // strip.thisblock = strip.thisblock.next;
+        // // mv2.send_REST(`traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`);
+        // // return new Promise(resolve =>
+        // //     setTimeout(resolve, moveTime * steps));
+        // setTimeout(() => {  console.log("MARTY FORWARD!"); }, moveTime);
+
+        
+        //  else if (strip.distance < 0) {
+        //     strip.distance = distance;
+        //     strip.vector = {
+        //         x: 2,
+        //         y: 0
+        //     };
+        //     Prims.setTime(strip);
+        // }
+        // Prims.moveAtSpeed(strip);
+        
+    }
+
     static Forward (strip) {
+        
+        var martyMode = ScratchJr.getMartyMode();
+
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 24;
+        Prims.setTime(strip);
+
+        if (martyMode == true){
+            // Marty_Forward(strip);
+            // var s = strip.spr;
+
+            const moveTime = 1500;
+            let steps = Number(strip.thisblock.getArgValue());
+            steps = Math.min(Math.max(steps, 1), 20);
+            const stepLength = 25;
+            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`
+            console.log(marty_cmd);
+            OS.martyRESTCmd({ cmd: marty_cmd, steps: num });
+            strip.waitTimer = tinterval*15;
+
+            setTimeout(() => { console.log('the timeout')  }, moveTime);
+            
+
+
+            
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+
+
+            strip.thisblock = strip.thisblock.next;
+            console.log('the return')
+            return;
+        }
+
+        
         var distance = Math.abs(num);
         if (s.flip) {
             s.flip = false;
@@ -404,7 +469,7 @@ export default class Prims {
         var num = Number(strip.thisblock.getArgValue()) * 30;
         alert('Left');
 
-        OS.martyTest({ cmd: 'left', steps: num });
+        
 
         if (strip.count < 0) {
             strip.count = Math.floor(Math.abs(num) / s.speed * 0.25);
