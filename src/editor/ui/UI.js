@@ -32,6 +32,11 @@ let infoBoxOpen = false;
 const EMAILSHARE = 0;
 const AIRDROPSHARE = 1;
 
+var intervalId = window.setInterval(function(){
+    UI.checkForMarty();
+}, 1500);
+
+
 export default class UI {
     static get infoBoxOpen () {
         return infoBoxOpen;
@@ -99,14 +104,25 @@ export default class UI {
         martyConn.setAttribute('id', 'martyConnection');
         martyConn.ontouchstart = function(evt) {
           //document.getElementById('martyConnection').innerHTML = "pressed";
-          const command = mv2.isConnected ? 'disconnect' : 'connect';
-          OS.martyCmd({cmd: command}, connCB);
+            ScratchAudio.sndFX('keydown.wav');
+            const command = mv2.isConnected ? 'disconnect' : 'connect';
+            OS.martyCmd({cmd: command}, connCB);
         }
         function connCB(str){
-          mv2.updateConnectionInfo();
+            mv2.updateConnectionInfo();
+            ScratchJr.setMartyConnected(mv2.isConnected);
+            console.log('ScratchJr.getMartyConnected()');
+            console.log(ScratchJr.getMartyConnected());
         }
+        hideHTML('martyConnection');
 
         UI.layoutLibrary(sl);
+    }
+
+    static checkForMarty () {
+        ScratchJr.setMartyConnected(mv2.isConnected);
+        console.log('ScratchJr.getMartyConnected()');
+        console.log(ScratchJr.getMartyConnected());
     }
 
     static middleSection () {
@@ -806,6 +822,10 @@ export default class UI {
 
         ScratchAudio.sndFX('keydown.wav');
         if(!ScratchJr.isMartyMode()){
+
+            //Marty connection button
+            showHTML('martyConnection');
+
             //left hand elements
             hideHTML('libwrapper');
             //right hand elements
@@ -829,6 +849,8 @@ export default class UI {
 
         ScratchAudio.sndFX('keydown.wav');
         if(ScratchJr.isMartyMode()){
+            //Marty connection button
+            hideHTML('martyConnection');
 
             //left hand elements
             showHTML('libwrapper');

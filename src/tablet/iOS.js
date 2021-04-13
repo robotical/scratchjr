@@ -61,7 +61,7 @@ export default class iOS {
         (async () => {
             console.log("iOS: martyREST");
             console.log(json);
-            var result = await iOS.call('martyRESTcmd', JSON.stringify(json));
+            var result = await iOS.call('marty_cmd', JSON.stringify(json));
             if (typeof (fcn) !== 'undefined') {
                 fcn(result);
             }

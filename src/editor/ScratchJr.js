@@ -50,6 +50,7 @@ let dragginLayer = 7000;
 let currentProject = undefined;
 let editmode;
 let martymode;
+let martyConnected;
 
 let isDebugging = false;
 let time;
@@ -199,6 +200,8 @@ export default class ScratchJr {
         currentProject = urlvars.pmd5;
         editmode = urlvars.mode;
         martymode = false;
+        martyConnected = false;
+
         libInit();
         Project.init();
         ScratchJr.log('Start ui init', ScratchJr.getTime(), 'sec');
@@ -234,6 +237,14 @@ export default class ScratchJr {
 
     static getMartyMode(){
         return martymode;
+    }
+
+    static getMartyConnected(){
+        return martyConnected;
+    }
+
+    static setMartyConnected(connected){
+        martyConnected = connected;
     }
 
     static editorEvents () {

@@ -215,7 +215,7 @@ static setupCategories () {
     static setupPalettesDef () {
 
         return [['onflag'],
-            ['forward', 'back', 'up', 'down', 'right', 'left'],
+            ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance'],
             ['wait', 'stopmine', 'repeat'],
             ['endstack', 'forever']];
     }
@@ -264,7 +264,10 @@ static setupCategories () {
 
             'repeat': ['repeat', BlockSpecs.getImageFrom('assets/blockicons/Repeat', 'svg'),
                 BlockSpecs.cShape, 'n', 4, BlockSpecs.cShapeH, 0, 24, BlockSpecs.repeatS],
-
+            'getReady': ['getReady', BlockSpecs.getImageFrom('assets/blockicons/GetReady', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -10, 10, BlockSpecs.cmdS],
+            'martyDance': ['martyDance', BlockSpecs.getImageFrom('assets/blockicons/MartyDance', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -10, 10, BlockSpecs.cmdS],
             'forward': ['forward', BlockSpecs.getImageFrom('assets/blockicons/Foward', 'svg'),
                 BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
             'back': ['back', BlockSpecs.getImageFrom('assets/blockicons/Back', 'svg'),
@@ -341,6 +344,8 @@ static setupCategories () {
                 COLOR: Localization.localize('BLOCK_DESC_MESSAGE_COLOR_ORANGE')
             }),
             'repeat': Localization.localize('BLOCK_DESC_REPEAT'),
+            'getReady': Localization.localize('BLOCK_DESC_MOVE_GETREADY'),
+            'martyDance': Localization.localize('BLOCK_DESC_MOVE_MARTYDANCE'),
             'forward': Localization.localize('BLOCK_DESC_MOVE_RIGHT'),
             'back': Localization.localize('BLOCK_DESC_MOVE_LEFT'),
             'up': Localization.localize('BLOCK_DESC_MOVE_UP'),
