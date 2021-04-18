@@ -264,10 +264,10 @@ static setupCategories () {
 
             'repeat': ['repeat', BlockSpecs.getImageFrom('assets/blockicons/Repeat', 'svg'),
                 BlockSpecs.cShape, 'n', 4, BlockSpecs.cShapeH, 0, 24, BlockSpecs.repeatS],
-            'getReady': ['getReady', BlockSpecs.getImageFrom('assets/blockicons/GetReady', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -10, 10, BlockSpecs.cmdS],
+            'getReady': ['getReady', BlockSpecs.getImageFrom('assets/blockicons/MartyGetReady', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
             'martyDance': ['martyDance', BlockSpecs.getImageFrom('assets/blockicons/MartyDance', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -10, 10, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
             'forward': ['forward', BlockSpecs.getImageFrom('assets/blockicons/Foward', 'svg'),
                 BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
             'back': ['back', BlockSpecs.getImageFrom('assets/blockicons/Back', 'svg'),
