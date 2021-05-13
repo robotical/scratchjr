@@ -256,13 +256,12 @@ export default class Prims {
     }
 
     static Down (strip) {
-        var martyMode = ScratchJr.getMartyMode();
-
+        const martyConnected = ScratchJr.getMartyConnected();
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 24;
         Prims.setTime(strip);
 
-        if (martyMode == true){
+        if (martyConnected){
 
             const moveTime = 1500;
             let steps = Number(strip.thisblock.getArgValue());
@@ -306,13 +305,12 @@ export default class Prims {
 
     static Up (strip) {
         
-        var martyMode = ScratchJr.getMartyMode();
-
+        const martyConnected = ScratchJr.getMartyConnected();
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 24;
         Prims.setTime(strip);
 
-        if (martyMode == true){
+        if (martyConnected){
 
             const moveTime = 1500;
             let steps = Number(strip.thisblock.getArgValue());
@@ -356,13 +354,12 @@ export default class Prims {
         const martyConnected = ScratchJr.getMartyConnected();
 
         console.log('LETS DANCE!!')
-        var martyMode = ScratchJr.getMartyMode();
         var s = strip.spr;
         Prims.setTime(strip);
 
         var num = Number(strip.thisblock.getArgValue()) * 24;
 
-        if (martyMode == true && martyConnected){
+        if (martyConnected){
 
             const moveTime = 3000;
             let steps = Number(strip.thisblock.getArgValue());
@@ -378,7 +375,7 @@ export default class Prims {
             console.log('the return')
             return;
         } else {
-            ScratchAudio.sndFX('boing.wav');
+            // ScratchAudio.sndFX('boing.wav');
             strip.thisblock = strip.thisblock.next;
             return;
         }
@@ -386,7 +383,6 @@ export default class Prims {
 
     static getReady (strip) {
         console.log('GET READY!!')
-        var martyMode = ScratchJr.getMartyMode();
         const martyConnected = ScratchJr.getMartyConnected();
 
         var s = strip.spr;
@@ -394,7 +390,7 @@ export default class Prims {
 
         var num = Number(strip.thisblock.getArgValue()) * 24;
 
-        if (martyMode == true && martyConnected){
+        if (martyConnected){
 
             const moveTime = 3000;
             let steps = Number(strip.thisblock.getArgValue());
@@ -410,7 +406,7 @@ export default class Prims {
             console.log('the return')
             return;
         } else {
-            ScratchAudio.sndFX('boing.wav');
+            // ScratchAudio.sndFX('boing.wav');
             strip.thisblock = strip.thisblock.next;
             return;
         }
@@ -419,13 +415,13 @@ export default class Prims {
 
     static Forward (strip) {
         
-        var martyMode = ScratchJr.getMartyMode();
+        const martyConnected = ScratchJr.getMartyConnected();
 
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 24;
         Prims.setTime(strip);
 
-        if (martyMode == true){
+        if (martyConnected){
 
             const moveTime = 1000;
             let steps = Number(strip.thisblock.getArgValue());
@@ -473,13 +469,12 @@ export default class Prims {
 
     static Back (strip) {
 
-        var martyMode = ScratchJr.getMartyMode();
-
+        const martyConnected = ScratchJr.getMartyConnected();
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 24;
         Prims.setTime(strip);
 
-        if (martyMode == true){
+        if (martyConnected){
 
             const moveTime = 1000;
             let steps = Number(strip.thisblock.getArgValue());
@@ -554,10 +549,10 @@ export default class Prims {
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 30;
 
-        var martyMode = ScratchJr.getMartyMode();
+        const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
-        if (martyMode == true){
+        if (martyConnected){
 
             const moveTime = 1500;
             let steps = Number(strip.thisblock.getArgValue());
@@ -597,10 +592,11 @@ export default class Prims {
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 30;
 
-        var martyMode = ScratchJr.getMartyMode();
+        const martyConnected = ScratchJr.getMartyConnected();
+
         Prims.setTime(strip);
 
-        if (martyMode == true){
+        if (martyConnected == true){
 
             const moveTime = 1500;
             let steps = Number(strip.thisblock.getArgValue());

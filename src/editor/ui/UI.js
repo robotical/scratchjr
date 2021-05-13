@@ -114,7 +114,7 @@ export default class UI {
             console.log('ScratchJr.getMartyConnected()');
             console.log(ScratchJr.getMartyConnected());
         }
-        hideHTML('martyConnection');
+        // hideHTML('martyConnection');
 
         UI.layoutLibrary(sl);
     }
@@ -519,10 +519,10 @@ export default class UI {
         }
 
         var btnwrapper = newHTML('div', 'buttonwrapper', sprites);
-        var mmode = newHTML('div', 'martymode', btnwrapper);
-        mmode.ontouchstart = UI.martyUIOn;
-        var stdmode = newHTML('div', 'standardmode', btnwrapper);
-        stdmode.ontouchstart = UI.martyUIOff;
+        // var mmode = newHTML('div', 'martymode', btnwrapper);
+        // mmode.ontouchstart = UI.martyUIOn;
+        // var stdmode = newHTML('div', 'standardmode', btnwrapper);
+        // stdmode.ontouchstart = UI.martyUIOff;
     }
 
     static mascotData (page) {
@@ -762,7 +762,7 @@ export default class UI {
          // Green Flag
         UI.creatTopBarClicky(div, 'go', 'go on', UI.toggleRun);
 
-        if (!ScratchJr.isMartyMode()) {
+        // if (!ScratchJr.isMartyMode()) {
             if (ScratchJr.isEditable()) {
                 UI.creatTopBarClicky(div, 'addtext', 'addText', UI.addText);
                 UI.creatTopBarClicky(div, 'setbkg', 'changeBkg', UI.addBackground);
@@ -773,7 +773,7 @@ export default class UI {
 
             UI.creatTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
             UI.setShowGrid(false);
-        }
+        // }
     }
 
     static resetAllSprites (e) {
