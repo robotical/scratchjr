@@ -114,7 +114,6 @@ export default class UI {
             console.log('ScratchJr.getMartyConnected()');
             console.log(ScratchJr.getMartyConnected());
         }
-        // hideHTML('martyConnection');
 
         UI.layoutLibrary(sl);
     }
@@ -498,31 +497,23 @@ export default class UI {
         var sprites = newHTML('div', 'thumbpanel', sl);
         sprites.setAttribute('id', 'library');
 
-        var stdmode = newHTML('div', 'stdmodewrapper', sprites);
-        stdmode.setAttribute('id', 'libwrapper');
         //scrolling area
-        var p = newHTML('div', 'spritethumbs', stdmode);
+        var p = newHTML('div', 'spritethumbs', sprites);
         var div = newHTML('div', 'spritecc', p);
         div.setAttribute('id', 'spritecc');
         div.ontouchstart = UI.spriteThumbsActions;
 
         // scrollbar
-        var sb = newHTML('div', 'scrollbar', stdmode);
+        var sb = newHTML('div', 'scrollbar', sprites);
         sb.setAttribute('id', 'scrollbar');
         var sbthumb = newHTML('div', 'sbthumb', sb);
         sbthumb.setAttribute('id', 'sbthumb');
 
         // new sprite
         if (ScratchJr.isEditable()) {
-            var ns = newHTML('div', 'addsprite', stdmode);
+            var ns = newHTML('div', 'addsprite', sprites);
             ns.ontouchstart = UI.addSprite;
         }
-
-        var btnwrapper = newHTML('div', 'buttonwrapper', sprites);
-        // var mmode = newHTML('div', 'martymode', btnwrapper);
-        // mmode.ontouchstart = UI.martyUIOn;
-        // var stdmode = newHTML('div', 'standardmode', btnwrapper);
-        // stdmode.ontouchstart = UI.martyUIOff;
     }
 
     static mascotData (page) {

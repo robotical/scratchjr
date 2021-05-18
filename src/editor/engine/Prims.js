@@ -549,6 +549,7 @@ export default class Prims {
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 30;
 
+
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
@@ -571,6 +572,9 @@ export default class Prims {
             return;
             
         }
+
+        // OS.martyCmd({ cmd: 'rotate_right', steps: num });
+
 
         if (strip.count < 0) {
             strip.count = Math.floor(Math.abs(num) / s.speed * 0.25);
@@ -614,6 +618,8 @@ export default class Prims {
             
         }
         
+        // OS.martyCmd({ cmd: 'rotate_left', steps: num });
+
 
         if (strip.count < 0) {
             strip.count = Math.floor(Math.abs(num) / s.speed * 0.25);

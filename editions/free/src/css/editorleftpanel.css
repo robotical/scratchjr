@@ -24,20 +24,22 @@
     margin: 0px;
     padding: 0px;
     background-color: #f9e3e5;
-    background-image: url('../assets/ui/marty-not-connected.svg');
+    /*background-image: url('../assets/ui/marty-not-connected.svg');*/
+    background-image: url('../assets/ui/marty-not-connected-light.png');
     background-repeat: no-repeat;
     background-position: right center;
     background-size: contain;
     border-radius: 5px;
     margin: 5px;
     padding: 10px;
-    font-size: 1em;
+    font-size: 0.7em;
     font-weight: bold;
     top: ${css_vh(0.13)};
     left: ${css_vh(1.69+10)};
     /*width: ${css_vh(29.95)};*/
-    width: ${css_vh(19.95)};
-    height: ${css_vh(5.20)};
+    width: ${css_vh(21.95)};
+    /*height: ${css_vh(5.20)};*/
+    height: ${css_vh(8.38)};
 }
 
 .martyConnected {
@@ -76,7 +78,8 @@
     display: inline-block;
     margin: 0px;
     padding: 0px;
-    top: ${css_vh(9.38)};
+    /*top: ${css_vh(9.38)};*/
+    top: ${css_vh(19.38)};
     width: ${css_vh(33.85)};
     overflow-x: hidden;
 }
@@ -129,7 +132,7 @@
 #library .buttonwrapper {
     position: fixed;
     top: ${css_vh(50)};
-    left: ${css_vh(2.34)};
+    /*left: ${css_vh(2.34)};*/
 }
 
 
