@@ -7,6 +7,7 @@ import OS from '../../tablet/OS';
 
 
 let martyInterval = 33;
+const intervalToSeconds = 31.25; // runtime tick is set at 32ms by Runtime.js. 32*31.25 = 1s
 let tinterval = 1;
 let hopList = [-48, -30, -22, -14, -6, 0, 6, 14, 22, 30, 48];
 
@@ -262,19 +263,15 @@ export default class Prims {
         Prims.setTime(strip);
 
         if (martyConnected){
-
             const moveTime = 1500;
             let steps = Number(strip.thisblock.getArgValue());
             steps = Math.min(Math.max(steps, 1), 20);
             const stepLength = -25;
             let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`
-            console.log(marty_cmd);
-            OS.martyRESTCmd({ cmd: marty_cmd, steps: num });
-            strip.waitTimer = tinterval*martyInterval;
-            setTimeout(() => { console.log('the timeout')  }, moveTime);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
-            console.log('the return')
             return;
         }
 
@@ -306,7 +303,6 @@ export default class Prims {
     static Up (strip) {
         
         const martyConnected = ScratchJr.getMartyConnected();
-        var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 24;
         Prims.setTime(strip);
 
@@ -317,13 +313,10 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             const stepLength = 25;
             let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`
-            console.log(marty_cmd);
-            OS.martyRESTCmd({ cmd: marty_cmd, steps: num });
-            strip.waitTimer = tinterval*martyInterval;
-            setTimeout(() => { console.log('the timeout')  }, moveTime);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
-            console.log('the return')
             return;
         }
 
@@ -354,7 +347,6 @@ export default class Prims {
         const martyConnected = ScratchJr.getMartyConnected();
 
         console.log('LETS DANCE!!')
-        var s = strip.spr;
         Prims.setTime(strip);
 
         var num = Number(strip.thisblock.getArgValue()) * 24;
@@ -362,17 +354,14 @@ export default class Prims {
         if (martyConnected){
 
             const moveTime = 3000;
-            let steps = Number(strip.thisblock.getArgValue());
+            let reps = Number(strip.thisblock.getArgValue());
    
-            let marty_cmd = `traj/dance/`;
+            let marty_cmd = `traj/dance/${reps}?moveTime=${moveTime}`;
             
-            console.log(marty_cmd);
-            OS.martyRESTCmd({ cmd: marty_cmd, steps: num });
-            strip.waitTimer = tinterval*martyInterval*3;
-            setTimeout(() => { console.log('the timeout')  }, moveTime);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*reps);;
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
-            console.log('the return')
             return;
         } else {
             // ScratchAudio.sndFX('boing.wav');
@@ -385,25 +374,19 @@ export default class Prims {
         console.log('GET READY!!')
         const martyConnected = ScratchJr.getMartyConnected();
 
-        var s = strip.spr;
         Prims.setTime(strip);
-
-        var num = Number(strip.thisblock.getArgValue()) * 24;
 
         if (martyConnected){
 
             const moveTime = 3000;
-            let steps = Number(strip.thisblock.getArgValue());
    
             let marty_cmd = `traj/getReady/?moveTime=${moveTime}`;
             
             console.log(marty_cmd);
-            OS.martyRESTCmd({ cmd: marty_cmd, steps: num });
-            strip.waitTimer = tinterval*martyInterval*3;
-            setTimeout(() => { console.log('the timeout')  }, moveTime);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
-            console.log('the return')
             return;
         } else {
             // ScratchAudio.sndFX('boing.wav');
@@ -417,7 +400,6 @@ export default class Prims {
         
         const martyConnected = ScratchJr.getMartyConnected();
 
-        var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 24;
         Prims.setTime(strip);
 
@@ -428,15 +410,13 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             const stepLength = 25;
             const side = 1;
-            let marty_cmd = `traj/sidestep/${steps}/?side= ${side}&moveTime=${moveTime}`
+            let marty_cmd = `traj/sidestep/${steps}/?side=${side}&moveTime=${moveTime}&stepLength=${stepLength}`
             
             console.log(marty_cmd);
-            OS.martyRESTCmd({ cmd: marty_cmd, steps: num });
-            strip.waitTimer = tinterval*martyInterval;
-            setTimeout(() => { console.log('the timeout')  }, moveTime);
+            OS.martyCmd({ cmd: marty_cmd, steps: num });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
-            console.log('the return')
             return;
             
         }
@@ -470,7 +450,6 @@ export default class Prims {
     static Back (strip) {
 
         const martyConnected = ScratchJr.getMartyConnected();
-        var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 24;
         Prims.setTime(strip);
 
@@ -481,15 +460,12 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             const stepLength = 25;
             const side = 0;
-            let marty_cmd = `traj/sidestep/${steps}/?side= ${side}&moveTime=${moveTime}`
+            let marty_cmd = `traj/sidestep/${steps}/?side=${side}&moveTime=${moveTime}&stepLength=${stepLength}`
             
-            console.log(marty_cmd);
-            OS.martyRESTCmd({ cmd: marty_cmd, steps: num });
-            strip.waitTimer = tinterval*martyInterval;
-            setTimeout(() => { console.log('the timeout')  }, moveTime);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
-            console.log('the return')
             return;
             
         }
@@ -546,9 +522,7 @@ export default class Prims {
     }
 
     static Right (strip) {
-        var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 30;
-
 
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
@@ -559,22 +533,15 @@ export default class Prims {
             let steps = Number(strip.thisblock.getArgValue());
             steps = Math.min(Math.max(steps, 1), 20);
             const stepLength = 25;
-            const side = 1;
             let turn = -20;
             let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&turn=${turn}&stepLength=1`
-            console.log(marty_cmd);
-            OS.martyRESTCmd({ cmd: marty_cmd, steps: num });
-            strip.waitTimer = tinterval*martyInterval*1.5;
-            setTimeout(() => { console.log('the timeout')  }, moveTime);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
-            console.log('the return')
             return;
             
         }
-
-        // OS.martyCmd({ cmd: 'rotate_right', steps: num });
-
 
         if (strip.count < 0) {
             strip.count = Math.floor(Math.abs(num) / s.speed * 0.25);
@@ -593,7 +560,6 @@ export default class Prims {
     }
 
     static Left (strip) {
-        var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 30;
 
         const martyConnected = ScratchJr.getMartyConnected();
@@ -607,20 +573,14 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             let turn = 20;
             let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&turn=${turn}&stepLength=1`
-            console.log(marty_cmd);
-            OS.martyRESTCmd({ cmd: marty_cmd, steps: num });
-            strip.waitTimer = tinterval*martyInterval*1.5;
-            setTimeout(() => { console.log('the timeout')  }, moveTime);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
-            console.log('the return')
             return;
             
         }
         
-        // OS.martyCmd({ cmd: 'rotate_left', steps: num });
-
-
         if (strip.count < 0) {
             strip.count = Math.floor(Math.abs(num) / s.speed * 0.25);
             strip.angleStep = -s.speed * 4 * Math.abs(num) / num;
