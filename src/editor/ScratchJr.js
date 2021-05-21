@@ -201,6 +201,7 @@ export default class ScratchJr {
         editmode = urlvars.mode;
         martymode = false;
         martyConnected = false;
+        mv2.addEventListener('onIsConnectedChange', ScratchJr.onMartyConnectedChange);
 
         libInit();
         Project.init();
@@ -241,6 +242,10 @@ export default class ScratchJr {
 
     static getMartyConnected(){
         return martyConnected;
+    }
+
+    static onMartyConnectedChange(event){
+        ScratchJr.setMartyConnected(event.isConnected);
     }
 
     static setMartyConnected(connected){

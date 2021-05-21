@@ -32,10 +32,6 @@ let infoBoxOpen = false;
 const EMAILSHARE = 0;
 const AIRDROPSHARE = 1;
 
-var intervalId = window.setInterval(function(){
-    UI.checkForMarty();
-}, 1500);
-
 
 export default class UI {
     static get infoBoxOpen () {
@@ -116,12 +112,6 @@ export default class UI {
         }
 
         UI.layoutLibrary(sl);
-    }
-
-    static checkForMarty () {
-        ScratchJr.setMartyConnected(mv2.isConnected);
-        console.log('ScratchJr.getMartyConnected()');
-        console.log(ScratchJr.getMartyConnected());
     }
 
     static middleSection () {
