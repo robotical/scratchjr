@@ -267,7 +267,7 @@ export default class Prims {
             let steps = Number(strip.thisblock.getArgValue());
             steps = Math.min(Math.max(steps, 1), 20);
             const stepLength = -25;
-            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`
+            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`;
             OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
             Prims.showTime(strip);
@@ -312,7 +312,7 @@ export default class Prims {
             let steps = Number(strip.thisblock.getArgValue());
             steps = Math.min(Math.max(steps, 1), 20);
             const stepLength = 25;
-            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`
+            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`;
             OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
             Prims.showTime(strip);
@@ -359,7 +359,7 @@ export default class Prims {
             let marty_cmd = `traj/dance/${reps}?moveTime=${moveTime}`;
             
             OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*reps);;
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*reps);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
             return;
@@ -399,7 +399,7 @@ export default class Prims {
     static Forward (strip) {
         
         const martyConnected = ScratchJr.getMartyConnected();
-
+        var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 24;
         Prims.setTime(strip);
 
@@ -410,7 +410,7 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             const stepLength = 25;
             const side = 1;
-            let marty_cmd = `traj/sidestep/${steps}/?side=${side}&moveTime=${moveTime}&stepLength=${stepLength}`
+            let marty_cmd = `traj/sidestep/${steps}/?side=${side}&moveTime=${moveTime}&stepLength=${stepLength}`;
             
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd, steps: num });
@@ -450,6 +450,7 @@ export default class Prims {
     static Back (strip) {
 
         const martyConnected = ScratchJr.getMartyConnected();
+        var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 24;
         Prims.setTime(strip);
 
@@ -460,7 +461,7 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             const stepLength = 25;
             const side = 0;
-            let marty_cmd = `traj/sidestep/${steps}/?side=${side}&moveTime=${moveTime}&stepLength=${stepLength}`
+            let marty_cmd = `traj/sidestep/${steps}/?side=${side}&moveTime=${moveTime}&stepLength=${stepLength}`;
             
             OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
@@ -523,7 +524,7 @@ export default class Prims {
 
     static Right (strip) {
         var num = Number(strip.thisblock.getArgValue()) * 30;
-
+        var s = strip.spr;
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
@@ -534,7 +535,7 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             const stepLength = 25;
             let turn = -20;
-            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&turn=${turn}&stepLength=1`
+            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&turn=${turn}&stepLength=1`;
             OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
             Prims.showTime(strip);
@@ -561,7 +562,7 @@ export default class Prims {
 
     static Left (strip) {
         var num = Number(strip.thisblock.getArgValue()) * 30;
-
+        var s = strip.spr;
         const martyConnected = ScratchJr.getMartyConnected();
 
         Prims.setTime(strip);
@@ -572,7 +573,7 @@ export default class Prims {
             let steps = Number(strip.thisblock.getArgValue());
             steps = Math.min(Math.max(steps, 1), 20);
             let turn = 20;
-            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&turn=${turn}&stepLength=1`
+            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&turn=${turn}&stepLength=1`;
             OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
             Prims.showTime(strip);
