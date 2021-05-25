@@ -196,7 +196,8 @@ export default class Prims {
 
     static Wait (strip) {
         var n = strip.thisblock.getArgValue();
-        strip.waitTimer = Math.round(n * 3.125); // thenth of a second
+        // strip.waitTimer = Math.round(n * 3.125); // thenth of a second
+        strip.waitTimer = Math.round(n * 3.125 * 10); // A second
         Prims.setTime(strip);
         strip.thisblock = strip.thisblock.next;
     }
