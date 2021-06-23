@@ -57,6 +57,7 @@ class Marty2 extends EventDispatcher {
 //        this.onCommandReply = this.onCommandReply.bind(this);
 //        this.sendCommand = this.sendCommand.bind(this);
         this.setRSSI = this.setRSSI.bind(this);
+        this.setIsConnected = this.setIsConnected.bind(this);
     }
 
     setName(martyName){

@@ -50,6 +50,7 @@ let dragginLayer = 7000;
 let currentProject = undefined;
 let editmode;
 let martymode;
+let martyConnected;
 
 let isDebugging = false;
 let time;
@@ -134,10 +135,10 @@ export default class ScratchJr {
         return editmode;
     }
 
-    //returns bool martymode
-    static get martymode () {
-        return martymode;
-    }
+    // //returns bool martymode
+    // static get martymode () {
+    //     return martymode;
+    // }
 
     static set editmode (newEditmode) {
         editmode = newEditmode;
@@ -199,6 +200,9 @@ export default class ScratchJr {
         currentProject = urlvars.pmd5;
         editmode = urlvars.mode;
         martymode = false;
+        martyConnected = false;
+        mv2.addEventListener('onIsConnectedChange', ScratchJr.onMartyConnectedChange);
+
         libInit();
         Project.init();
         ScratchJr.log('Start ui init', ScratchJr.getTime(), 'sec');
@@ -230,6 +234,22 @@ export default class ScratchJr {
     static storyStart (/*eventName*/) {
         // console.log("Story started: " + eventName);
         storyStarted = true;
+    }
+
+    static getMartyMode(){
+        return martymode;
+    }
+
+    static getMartyConnected(){
+        return martyConnected;
+    }
+
+    static onMartyConnectedChange(event){
+        ScratchJr.setMartyConnected(event.isConnected);
+    }
+
+    static setMartyConnected(connected){
+        martyConnected = connected;
     }
 
     static editorEvents () {

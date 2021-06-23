@@ -32,6 +32,7 @@ let infoBoxOpen = false;
 const EMAILSHARE = 0;
 const AIRDROPSHARE = 1;
 
+
 export default class UI {
     static get infoBoxOpen () {
         return infoBoxOpen;
@@ -99,11 +100,15 @@ export default class UI {
         martyConn.setAttribute('id', 'martyConnection');
         martyConn.ontouchstart = function(evt) {
           //document.getElementById('martyConnection').innerHTML = "pressed";
-          const command = mv2.isConnected ? 'disconnect' : 'connect';
-          OS.martyCmd({cmd: command}, connCB);
+            ScratchAudio.sndFX('keydown.wav');
+            const command = mv2.isConnected ? 'disconnect' : 'connect';
+            OS.martyCmd({cmd: command}, connCB);
         }
         function connCB(str){
-          mv2.updateConnectionInfo();
+            mv2.updateConnectionInfo();
+            ScratchJr.setMartyConnected(mv2.isConnected);
+            console.log('ScratchJr.getMartyConnected()');
+            console.log(ScratchJr.getMartyConnected());
         }
 
         UI.layoutLibrary(sl);
@@ -482,31 +487,23 @@ export default class UI {
         var sprites = newHTML('div', 'thumbpanel', sl);
         sprites.setAttribute('id', 'library');
 
-        var stdmode = newHTML('div', 'stdmodewrapper', sprites);
-        stdmode.setAttribute('id', 'libwrapper');
         //scrolling area
-        var p = newHTML('div', 'spritethumbs', stdmode);
+        var p = newHTML('div', 'spritethumbs', sprites);
         var div = newHTML('div', 'spritecc', p);
         div.setAttribute('id', 'spritecc');
         div.ontouchstart = UI.spriteThumbsActions;
 
         // scrollbar
-        var sb = newHTML('div', 'scrollbar', stdmode);
+        var sb = newHTML('div', 'scrollbar', sprites);
         sb.setAttribute('id', 'scrollbar');
         var sbthumb = newHTML('div', 'sbthumb', sb);
         sbthumb.setAttribute('id', 'sbthumb');
 
         // new sprite
         if (ScratchJr.isEditable()) {
-            var ns = newHTML('div', 'addsprite', stdmode);
+            var ns = newHTML('div', 'addsprite', sprites);
             ns.ontouchstart = UI.addSprite;
         }
-
-        var btnwrapper = newHTML('div', 'buttonwrapper', sprites);
-        var mmode = newHTML('div', 'martymode', btnwrapper);
-        mmode.ontouchstart = UI.martyUIOn;
-        var stdmode = newHTML('div', 'standardmode', btnwrapper);
-        stdmode.ontouchstart = UI.martyUIOff;
     }
 
     static mascotData (page) {
@@ -746,7 +743,7 @@ export default class UI {
          // Green Flag
         UI.creatTopBarClicky(div, 'go', 'go on', UI.toggleRun);
 
-        if (!ScratchJr.isMartyMode()) {
+        // if (!ScratchJr.isMartyMode()) {
             if (ScratchJr.isEditable()) {
                 UI.creatTopBarClicky(div, 'addtext', 'addText', UI.addText);
                 UI.creatTopBarClicky(div, 'setbkg', 'changeBkg', UI.addBackground);
@@ -757,7 +754,7 @@ export default class UI {
 
             UI.creatTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
             UI.setShowGrid(false);
-        }
+        // }
     }
 
     static resetAllSprites (e) {
@@ -806,6 +803,10 @@ export default class UI {
 
         ScratchAudio.sndFX('keydown.wav');
         if(!ScratchJr.isMartyMode()){
+
+            //Marty connection button
+            showHTML('martyConnection');
+
             //left hand elements
             hideHTML('libwrapper');
             //right hand elements
@@ -829,6 +830,8 @@ export default class UI {
 
         ScratchAudio.sndFX('keydown.wav');
         if(ScratchJr.isMartyMode()){
+            //Marty connection button
+            hideHTML('martyConnection');
 
             //left hand elements
             showHTML('libwrapper');
