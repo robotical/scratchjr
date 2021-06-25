@@ -10,11 +10,13 @@ export function gettingStartedMain () {
         // On iOS we can load from server
         videoObj.src = 'assets/lobby/intro.mp4';
     } else {
-        // On Android we need to copy to a temporary directory first:
-        setTimeout(function () {
-            videoObj.type = 'video/mp4';
-            videoObj.src = AndroidInterface.scratchjr_getgettingstartedvideopath();
-        }, 1000);
+        videoObj.src = 'assets/lobby/intro.mp4';
+        
+        // // On Android we need to copy to a temporary directory first:
+        // setTimeout(function () {
+        //     videoObj.type = 'video/mp4';
+        //     videoObj.src = AndroidInterface.scratchjr_getgettingstartedvideopath();
+        // }, 1000);
     }
     videoObj.poster = 'assets/lobby/poster.png';
 
