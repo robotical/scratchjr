@@ -138,50 +138,99 @@ export default class BlockSpecs {
         }
     }
 
-    static setupCategories () {
+
+static setupCategories () {
         return new Array(
             [
                 BlockSpecs.getImageFrom('assets/categories/StartOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/StartOff', 'svg'),
-                window.Settings.categoryStartColor
+                window.Settings.categoryStartColor,
+                'start'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/MotionOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/MotionOff', 'svg'),
-                window.Settings.categoryMotionColor
-            ],
-            [
-                BlockSpecs.getImageFrom('assets/categories/LooksOn', 'svg'),
-                BlockSpecs.getImageFrom('assets/categories/LooksOff', 'svg'),
-                window.Settings.categoryLooksColor
-            ],
-            [
-                BlockSpecs.getImageFrom('assets/categories/SoundOn', 'svg'),
-                BlockSpecs.getImageFrom('assets/categories/SoundOff', 'svg'),
-                window.Settings.categorySoundColor
+                window.Settings.categoryMotionColor,
+                'motion'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/FlowOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/FlowOff', 'svg'),
-                window.Settings.categoryFlowColor
+                window.Settings.categoryFlowColor,
+                'flow'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/StopOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/StopOff', 'svg'),
-                window.Settings.categoryStopColor
+                window.Settings.categoryStopColor,
+                'stop'
             ]
         );
     }
 
 
+    // static setupCategories () {
+    //     return new Array(
+    //         [
+    //             BlockSpecs.getImageFrom('assets/categories/StartOn', 'svg'),
+    //             BlockSpecs.getImageFrom('assets/categories/StartOff', 'svg'),
+    //             window.Settings.categoryStartColor,
+    //             'start'
+    //         ],
+    //         [
+    //             BlockSpecs.getImageFrom('assets/categories/MotionOn', 'svg'),
+    //             BlockSpecs.getImageFrom('assets/categories/MotionOff', 'svg'),
+    //             window.Settings.categoryMotionColor,
+    //             'motion'
+    //         ],
+    //         [
+    //             BlockSpecs.getImageFrom('assets/categories/LooksOn', 'svg'),
+    //             BlockSpecs.getImageFrom('assets/categories/LooksOff', 'svg'),
+    //             window.Settings.categoryLooksColor,
+    //             'looks'
+    //         ],
+    //         [
+    //             BlockSpecs.getImageFrom('assets/categories/SoundOn', 'svg'),
+    //             BlockSpecs.getImageFrom('assets/categories/SoundOff', 'svg'),
+    //             window.Settings.categorySoundColor,
+    //             'sound'
+    //         ],
+    //         [
+    //             BlockSpecs.getImageFrom('assets/categories/FlowOn', 'svg'),
+    //             BlockSpecs.getImageFrom('assets/categories/FlowOff', 'svg'),
+    //             window.Settings.categoryFlowColor,
+    //             'flow'
+    //         ],
+    //         [
+    //             BlockSpecs.getImageFrom('assets/categories/StopOn', 'svg'),
+    //             BlockSpecs.getImageFrom('assets/categories/StopOff', 'svg'),
+    //             window.Settings.categoryStopColor,
+    //             'stop'
+    //         ]
+    //     );
+    // }
+
+
+
     static setupPalettesDef () {
-        return [['onflag', 'onclick', 'ontouch', 'onmessage', 'message'],
-            ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'],
-            ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'],
-            [],
-            ['wait', 'stopmine', 'setspeed', 'repeat'],
+
+        return [['onflag'],
+            ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance'],
+            ['wait', 'stopmine', 'repeat'],
             ['endstack', 'forever']];
     }
+
+
+    // static setupPalettesDef () {
+
+
+    //     return [['onflag', 'onclick', 'ontouch', 'onmessage', 'message'],
+    //         ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'],
+    //         ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'],
+    //         [],
+    //         ['wait', 'stopmine', 'setspeed', 'repeat'],
+    //         ['endstack', 'forever']];
+    // }
 
     ///////////////////////////////
     // Data Structure
@@ -215,7 +264,10 @@ export default class BlockSpecs {
 
             'repeat': ['repeat', BlockSpecs.getImageFrom('assets/blockicons/Repeat', 'svg'),
                 BlockSpecs.cShape, 'n', 4, BlockSpecs.cShapeH, 0, 24, BlockSpecs.repeatS],
-
+            'getReady': ['getReady', BlockSpecs.getImageFrom('assets/blockicons/MartyGetReady', 'svg'),
+                BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
+            'martyDance': ['martyDance', BlockSpecs.getImageFrom('assets/blockicons/MartyDance', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
             'forward': ['forward', BlockSpecs.getImageFrom('assets/blockicons/Foward', 'svg'),
                 BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
             'back': ['back', BlockSpecs.getImageFrom('assets/blockicons/Back', 'svg'),
@@ -292,6 +344,8 @@ export default class BlockSpecs {
                 COLOR: Localization.localize('BLOCK_DESC_MESSAGE_COLOR_ORANGE')
             }),
             'repeat': Localization.localize('BLOCK_DESC_REPEAT'),
+            'getReady': Localization.localize('BLOCK_DESC_MOVE_GETREADY'),
+            'martyDance': Localization.localize('BLOCK_DESC_MOVE_MARTYDANCE'),
             'forward': Localization.localize('BLOCK_DESC_MOVE_RIGHT'),
             'back': Localization.localize('BLOCK_DESC_MOVE_LEFT'),
             'up': Localization.localize('BLOCK_DESC_MOVE_UP'),

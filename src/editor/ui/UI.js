@@ -20,7 +20,7 @@ import Paint from '../../painteditor/Paint';
 import Events from '../../utils/Events';
 import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
-import {frame, gn, CSSTransition, localx, newHTML, scaleMultiplier, fullscreenScaleMultiplier,
+import {frame, gn, CSSTransition, localx, newHTML, getIDByClass, hideHTML, showHTML, scaleMultiplier, fullscreenScaleMultiplier,
     getIdFor, isTablet, newDiv, newTextInput, isAndroid, getDocumentWidth, getDocumentHeight,
     setProps, globalx} from '../../utils/lib';
 
@@ -31,6 +31,7 @@ let infoBoxOpen = false;
 
 const EMAILSHARE = 0;
 const AIRDROPSHARE = 1;
+
 
 export default class UI {
     static get infoBoxOpen () {
@@ -95,6 +96,21 @@ export default class UI {
         flip.ontouchstart = function (evt) {
             ScratchJr.saveAndFlip(evt);
         }; // move to project
+        var martyConn = newHTML('div', 'martyConnection', sl);
+        martyConn.setAttribute('id', 'martyConnection');
+        martyConn.ontouchstart = function(evt) {
+          //document.getElementById('martyConnection').innerHTML = "pressed";
+            ScratchAudio.sndFX('keydown.wav');
+            const command = mv2.isConnected ? 'disconnect' : 'connect';
+            OS.martyCmd({cmd: command}, connCB);
+        }
+        function connCB(str){
+            mv2.updateConnectionInfo();
+            ScratchJr.setMartyConnected(mv2.isConnected);
+            console.log('ScratchJr.getMartyConnected()');
+            console.log(ScratchJr.getMartyConnected());
+        }
+
         UI.layoutLibrary(sl);
     }
 
@@ -470,6 +486,7 @@ export default class UI {
     static layoutLibrary (sl) {
         var sprites = newHTML('div', 'thumbpanel', sl);
         sprites.setAttribute('id', 'library');
+
         //scrolling area
         var p = newHTML('div', 'spritethumbs', sprites);
         var div = newHTML('div', 'spritecc', p);
@@ -722,15 +739,22 @@ export default class UI {
         div.setAttribute('id', 'stageframe');
         ScratchJr.stage = new Stage(div);
         Grid.init(div);
-        if (ScratchJr.isEditable()) {
-            UI.creatTopBarClicky(div, 'addtext', 'addText', UI.addText);
-            UI.creatTopBarClicky(div, 'setbkg', 'changeBkg', UI.addBackground);
-        }
-        UI.creatTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
+
+         // Green Flag
         UI.creatTopBarClicky(div, 'go', 'go on', UI.toggleRun);
-        UI.creatTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
-        UI.creatTopBarClicky(div, 'full', 'fullscreen', ScratchJr.fullScreen);
-        UI.setShowGrid(false);
+
+        // if (!ScratchJr.isMartyMode()) {
+            if (ScratchJr.isEditable()) {
+                UI.creatTopBarClicky(div, 'addtext', 'addText', UI.addText);
+                UI.creatTopBarClicky(div, 'setbkg', 'changeBkg', UI.addBackground);
+            }
+
+            UI.creatTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
+            UI.creatTopBarClicky(div, 'full', 'fullscreen', ScratchJr.fullScreen);
+
+            UI.creatTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
+            UI.setShowGrid(false);
+        // }
     }
 
     static resetAllSprites (e) {
@@ -758,7 +782,9 @@ export default class UI {
     static switchGrid () {
         ScratchAudio.sndFX('tap.wav');
         UI.setShowGrid(Grid.hidden);
+
         OS.analyticsEvent('editor', Grid.hidden ? 'hide_grid' : 'show_grid');
+        console.log('build updated')
     }
 
     static setShowGrid (b) {
@@ -766,11 +792,64 @@ export default class UI {
         gn('grid').className = Grid.hidden ? 'gridToggle off' : 'gridToggle on';
     }
 
+    // UI.creatTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
     static creatTopBarClicky (p, str, mstyle, fcn) {
         var toggle = newHTML('div', mstyle, p);
         toggle.ontouchstart = fcn;
         toggle.setAttribute('id', str);
     }
+
+    static martyUIOn () {
+
+        ScratchAudio.sndFX('keydown.wav');
+        if(!ScratchJr.isMartyMode()){
+
+            //Marty connection button
+            showHTML('martyConnection');
+
+            //left hand elements
+            hideHTML('libwrapper');
+            //right hand elements
+            hideHTML('pages');
+            //toolbar elements
+            hideHTML('full');
+            hideHTML('grid');
+            hideHTML('addtext');
+            hideHTML('setbkg');
+            hideHTML('resetall');
+            hideHTML('pages');
+
+            //workspace
+            //TODO WE SHOULD SET WATERMARK TO MARTY RATHER THAN HIDE IT
+            hideHTML('watermark');
+            ScratchJr.toggleMartyMode();
+        }
+    }
+
+    static martyUIOff () {
+
+        ScratchAudio.sndFX('keydown.wav');
+        if(ScratchJr.isMartyMode()){
+            //Marty connection button
+            hideHTML('martyConnection');
+
+            //left hand elements
+            showHTML('libwrapper');
+            //right hand elements
+            showHTML('pages');
+            //toolbar elements
+            showHTML('full');
+            showHTML('grid');
+            showHTML('addtext');
+            showHTML('setbkg');
+            showHTML('resetall');
+            showHTML('watermark');
+
+            ScratchJr.toggleMartyMode();
+
+        }
+    }
+
 
     static fullscreenControls () {
         UI.nextpage = newHTML('div', 'nextpage off', frame);

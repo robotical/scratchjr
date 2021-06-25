@@ -19,6 +19,7 @@ import Runtime from './engine/Runtime';
 import Localization from '../utils/Localization';
 import {libInit, gn, scaleMultiplier, newHTML,
     isAndroid, isTablet, getUrlVars, CSSTransition3D, frame} from '../utils/lib';
+import Marty2 from '../utils/Marty2';
 
 let workingCanvas = document.createElement('canvas');
 let workingCanvas2 = document.createElement('canvas');
@@ -48,6 +49,8 @@ let dragginLayer = 7000;
 
 let currentProject = undefined;
 let editmode;
+let martymode;
+let martyConnected;
 
 let isDebugging = false;
 let time;
@@ -132,6 +135,11 @@ export default class ScratchJr {
         return editmode;
     }
 
+    // //returns bool martymode
+    // static get martymode () {
+    //     return martymode;
+    // }
+
     static set editmode (newEditmode) {
         editmode = newEditmode;
     }
@@ -191,6 +199,10 @@ export default class ScratchJr {
         ScratchJr.log('blocks init', ScratchJr.getTime(), 'sec', BlockSpecs.loadCount);
         currentProject = urlvars.pmd5;
         editmode = urlvars.mode;
+        martymode = false;
+        martyConnected = false;
+        mv2.addEventListener('onIsConnectedChange', ScratchJr.onMartyConnectedChange);
+
         libInit();
         Project.init();
         ScratchJr.log('Start ui init', ScratchJr.getTime(), 'sec');
@@ -222,6 +234,22 @@ export default class ScratchJr {
     static storyStart (/*eventName*/) {
         // console.log("Story started: " + eventName);
         storyStarted = true;
+    }
+
+    static getMartyMode(){
+        return martymode;
+    }
+
+    static getMartyConnected(){
+        return martyConnected;
+    }
+
+    static onMartyConnectedChange(event){
+        ScratchJr.setMartyConnected(event.isConnected);
+    }
+
+    static setMartyConnected(connected){
+        martyConnected = connected;
     }
 
     static editorEvents () {
@@ -312,9 +340,21 @@ export default class ScratchJr {
     static isSampleOrStarter () {
         return editmode == 'look' || editmode == 'storyStarter';
     }
+
     static isEditable () {
         return editmode != 'look';
     }
+
+    //to manage the toggle between regular mode and sprite mode
+    static isMartyMode () {
+        return martymode;
+    }
+
+    static toggleMartyMode () {
+        martymode = !martymode;
+    }
+
+
 
     // Called when ScratchJr is brought back to focus
     // Here, we fix up some UI elements that may not have been properly shut down when the app was paused.
@@ -935,3 +975,4 @@ export default class ScratchJr {
 
 // Expose ScratchJr to global
 window.ScratchJr = ScratchJr;
+window.mv2 = new Marty2();

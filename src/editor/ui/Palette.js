@@ -299,6 +299,9 @@ export default class Palette {
         var div = newDiv(parent, dx, dy, pxWidth, pxHeight, {
             position: 'absolute'
         });
+        div.setAttribute('id', spec[3]);
+
+
         div.index = n;
         var officon = spec[1].cloneNode(true);
         officon.width = pxWidth;
@@ -376,9 +379,11 @@ export default class Palette {
         if ((n == (BlockSpecs.categories.length - 1)) && (ScratchJr.stage.pages.length > 1)) {
             Palette.addPagesBlocks(dx);
         }
-        if ((n == 3) && (ScratchJr.getSprite().sounds.length > 0)) {
-            Palette.addSoundsBlocks(dxblocks);
-        }
+        //TODO: they hard coded n==3 to be sound, but we don't want the sound blocks for alpha release
+        //need to clean this up before we re-add in the sound blocks
+        // if ((n == 3) && (ScratchJr.getSprite().sounds.length > 0)) {
+        //     Palette.addSoundsBlocks(dxblocks);
+        // }
     }
 
     static reset () {

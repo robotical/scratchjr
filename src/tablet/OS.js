@@ -58,6 +58,18 @@ export default class OS {
         return;
     }
 
+    // Marty test
+    static martyRESTCmd (json, fcn) {
+        console.log("OS: martyREST");
+        console.log(json);
+        tabletInterface.martyRESTCmd(json, fcn);
+    }
+
+    // Marty test
+    static martyCmd (json, fcn) {
+        tabletInterface.martyCmd(json, fcn);
+    }
+
     // Database functions
     static stmt (json, fcn) {
         tabletInterface.stmt(json, fcn);
