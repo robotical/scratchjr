@@ -1,7 +1,7 @@
 #import "ScratchJr.h"
 #import <WebKit/WebKit.h>
 // @import MessageUI;
-@import Firebase;
+//@import Firebase;
 
 WKWebView *webview;
 NSDate* startDate;

@@ -7,7 +7,7 @@
 
 #import "ScratchJr.h"
 #import <WebKit/WebKit.h>
-@import Firebase;
+// @import Firebase;
 
 @implementation JsBridge
 
@@ -189,24 +189,23 @@
     if (![request.params[2] isEqual:[NSNull null]]) {
         label = request.params[2];
     }
-    [FIRAnalytics logEventWithName:request.params[1] // action
-    parameters:@{
-                 kFIRParameterItemName:label, // label
-                 kFIRParameterItemCategory:request.params[0] // category
-    }];
+    // // [FIRAnalytics logEventWithName:request.params[1] // action
+    // parameters:@{
+    //              kFIRParameterItemName:label, // label
+    //              kFIRParameterItemCategory:request.params[0] // category
+    // }];
     [request callback:@"ok"];
 }
 
 -(void) setAnalyticsPlacePref: (JsRequest *) request {
-    [FIRAnalytics setUserPropertyString:request.params[0] forName:@"place_preference"];
+    // [FIRAnalytics setUserPropertyString:request.params[0] forName:@"place_preference"];
     [request callback:@"ok"];
 }
 
-// @param request like [name, propertyString]
 -(void) setAnalyticsPref: (JsRequest *) request {
     NSString *name = [NSString stringWithFormat:@"%@", request.params[0]];
     NSString *propertyString = [NSString stringWithFormat:@"%@", request.params[1]];
-    [FIRAnalytics setUserPropertyString:propertyString forName:name];
+    // [FIRAnalytics setUserPropertyString:propertyString forName:name];
     [request callback:@"ok"];
 }
 

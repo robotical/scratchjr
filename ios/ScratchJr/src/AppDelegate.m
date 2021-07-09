@@ -1,6 +1,6 @@
 #import "AppDelegate.h"
 #import "ScratchJr.h"
-@import Firebase;
+// @import Firebase;
 
 @implementation AppDelegate
 
