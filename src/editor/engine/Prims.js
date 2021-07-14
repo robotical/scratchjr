@@ -410,30 +410,30 @@ export default class Prims {
     //     return;
     // }
 
-    static eyesTraj (strip, eyeCommand) {
-        console.log('Excited Eyes!!');
-        const martyConnected = ScratchJr.getMartyConnected();
+    // static eyesTraj (strip, eyeCommand) {
+    //     console.log('Excited Eyes!!');
+    //     const martyConnected = ScratchJr.getMartyConnected();
 
-        Prims.setTime(strip);
+    //     Prims.setTime(strip);
 
-        if (martyConnected){
+    //     if (martyConnected){
 
-            //this is the movetime set in the .trj file on RIC
-            const moveTime = 1000;
-            let marty_cmd = `traj/${eyeCommand}`;
+    //         //this is the movetime set in the .trj file on RIC
+    //         const moveTime = 1000;
+    //         let marty_cmd = `traj/${eyeCommand}`;
             
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
+    //         console.log(marty_cmd);
+    //         OS.martyCmd({ cmd: marty_cmd });
+    //         strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+    //         Prims.showTime(strip);
+    //         strip.thisblock = strip.thisblock.next;
+    //         return;
+    //     } else {
 
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
-    }
+    //         strip.thisblock = strip.thisblock.next;
+    //         return;
+    //     }
+    // }
 
     static eyesExcited (strip) {
         console.log('GET READY!!')
@@ -461,7 +461,7 @@ export default class Prims {
     }
 
     static eyesWide (strip) {
-        console.log('GET READY!!')
+        console.log('Eyes Wide!!')
         const martyConnected = ScratchJr.getMartyConnected();
 
         Prims.setTime(strip);
@@ -485,17 +485,80 @@ export default class Prims {
         }
     }
 
+    static eyesAngry (strip) {
+        console.log('Eyes Wide!!')
+        const martyConnected = ScratchJr.getMartyConnected();
 
+        Prims.setTime(strip);
 
-// if (eyeCommand === 'wiggleEyes'){
-//             moveTime = 2000;
-//         }
+        if (martyConnected){
 
-// Prims.table.eyesExcited = Prims.eyesExcited;
-// Prims.table.eyesWide = Prims.eyesWide;
-// Prims.table.eyesAngry = Prims.eyesAngry;
-// Prims.table.eyesNormal = Prims.eyesNormal;
-// Prims.table.eyesWiggle = Prims.eyesWiggle;
+            const moveTime = 1000;
+   
+            let marty_cmd = `traj/eyesAngry`;
+            
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            // ScratchAudio.sndFX('boing.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static eyesNormal (strip) {
+        console.log('Eyes Normal!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 1000;
+   
+            let marty_cmd = `traj/eyesNormal`;
+            
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            // ScratchAudio.sndFX('boing.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static eyesWiggle (strip) {
+        console.log('Eyes Wiggle!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 2000;
+   
+            let marty_cmd = `traj/wiggleEyes`;
+            
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            // ScratchAudio.sndFX('boing.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
 
 
     static Forward (strip) {

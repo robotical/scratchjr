@@ -222,7 +222,7 @@ static setupCategories () {
 
         return [['onflag'],
             ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance'],
-            ['eyesExcited'],
+            ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle'],
             ['wait', 'stopmine', 'repeat'],
             ['endstack', 'forever']];
     }
@@ -301,7 +301,15 @@ static setupCategories () {
                 BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
 
 
-            'eyesExcited': ['eyesExcited', BlockSpecs.getImageFrom('assets/blockicons/MartyEyesNormal', 'svg'),
+            'eyesExcited': ['eyesExcited', BlockSpecs.getImageFrom('assets/blockicons/MartyExcited', 'svg'),
+                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, -20, 20, BlockSpecs.cmdS],
+            'eyesWide': ['eyesWide', BlockSpecs.getImageFrom('assets/blockicons/MartyWide', 'svg'),
+                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, -20, 20, BlockSpecs.cmdS],
+            'eyesAngry': ['eyesAngry', BlockSpecs.getImageFrom('assets/blockicons/MartyAngry', 'svg'),
+                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, -20, 20, BlockSpecs.cmdS],
+            'eyesNormal': ['eyesNormal', BlockSpecs.getImageFrom('assets/blockicons/MartyNormal', 'svg'),
+                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, -20, 20, BlockSpecs.cmdS],
+            'eyesWiggle': ['eyesWiggle', BlockSpecs.getImageFrom('assets/blockicons/MartyWiggle', 'svg'),
                 BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, -20, 20, BlockSpecs.cmdS],
 
             'say': ['say', BlockSpecs.getImageFrom('assets/blockicons/Say', 'svg'),
