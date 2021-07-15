@@ -8,7 +8,8 @@ import OS from '../tablet/OS';
 
 let uiSounds = {};
 let defaultSounds = ['cut.wav', 'snap.wav', 'copy.wav', 'grab.wav', 'boing.wav', 'tap.wav',
-    'keydown.wav', 'entertap.wav', 'exittap.wav', 'splash.wav'];
+    'keydown.wav', 'entertap.wav', 'exittap.wav', 'splash.wav', 'confused.wav', 'disbelief.wav', 
+    'excited.wav', 'no_way.wav', 'no.wav', 'whistle.wav'];
 let projectSounds = {};
 
 export default class ScratchAudio {

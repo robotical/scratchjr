@@ -154,6 +154,12 @@ static setupCategories () {
                 'motion'
             ],
             [
+                BlockSpecs.getImageFrom('assets/categories/SoundOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/SoundOff', 'svg'),
+                window.Settings.categorySoundColor,
+                'sound'
+            ],
+            [
                 BlockSpecs.getImageFrom('assets/categories/FlowOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/FlowOff', 'svg'),
                 window.Settings.categoryFlowColor,
@@ -216,6 +222,7 @@ static setupCategories () {
 
         return [['onflag'],
             ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance'],
+            ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
             ['wait', 'stopmine', 'repeat'],
             ['endstack', 'forever']];
     }
@@ -306,6 +313,21 @@ static setupCategories () {
                 BlockSpecs.pinkCmd, 'n', 2, BlockSpecs.pinkCmdH, -10, 10, BlockSpecs.cmdS],
             'same': ['same', BlockSpecs.getImageFrom('assets/blockicons/Reset', 'svg'),
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+
+                
+
+            'confusion': ['confusion', BlockSpecs.getImageFrom('assets/blockicons/MartyConfusion', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
+            'disbelief': ['disbelief', BlockSpecs.getImageFrom('assets/blockicons/MartyDisbelief', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
+            'excitement': ['excitement', BlockSpecs.getImageFrom('assets/blockicons/MartyExcitment', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
+            'noway': ['noway', BlockSpecs.getImageFrom('assets/blockicons/MartyNoWay', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
+            'no': ['no', BlockSpecs.getImageFrom('assets/blockicons/MartyNo', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
+            'whistle': ['whistle', BlockSpecs.getImageFrom('assets/blockicons/MartyWhistle', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
 
             'playsnd': ['playsnd', BlockSpecs.getImageFrom('assets/blockicons/Speaker', 'svg'),
                 BlockSpecs.limeCmd, 's', 'pop.mp3', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],

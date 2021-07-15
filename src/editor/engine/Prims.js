@@ -59,6 +59,13 @@ export default class Prims {
         Prims.table.shrink = Prims.Shrink;
         Prims.table.same = Prims.Same;
         Prims.table.say = Prims.Say;
+
+        Prims.table.confusion = Prims.playConfusion;
+        Prims.table.disbelief = Prims.playDisbelief;
+        Prims.table.excitement = Prims.playExcitement;
+        Prims.table.noway = Prims.playNoway;
+        Prims.table.no = Prims.playNo;
+        Prims.table.whistle = Prims.playWhistle;
     }
 
     static Done (strip) {
@@ -740,6 +747,153 @@ export default class Prims {
             s.div.style.opacity = Math.max(0, Number(s.div.style.opacity) - (s.speed / 15));
             strip.waitTimer = tinterval * 2;
             strip.count = strip.count - 1;
+        }
+    }
+
+
+    static playConfusion (strip) {
+        console.log('Play Confusion!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 1000;
+
+            let marty_cmd = `filerun/spiffs/confused.raw`;
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            ScratchAudio.sndFX('confused.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static playDisbelief (strip) {
+        console.log('Play Disbelief!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 500;
+
+            let marty_cmd = `filerun/spiffs/disbelief.raw`;
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            ScratchAudio.sndFX('disbelief.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    
+
+    static playExcitement (strip) {
+        console.log('Play No Way!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 1000;
+
+            let marty_cmd = `filerun/spiffs/excited.raw`;
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            ScratchAudio.sndFX('excited.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static playNoway (strip) {
+        console.log('Play No Way!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 1000;
+
+            let marty_cmd = `filerun/spiffs/no_way.raw`;
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            ScratchAudio.sndFX('no_way.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static playNo (strip) {
+        console.log('Play No!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 500;
+
+            let marty_cmd = `filerun/spiffs/no.raw`;
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            ScratchAudio.sndFX('no.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static playWhistle (strip) {
+        console.log('Play Whistle!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 500;
+
+            let marty_cmd = `filerun/spiffs/whistle.raw`;
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            ScratchAudio.sndFX('whistle.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
         }
     }
 
