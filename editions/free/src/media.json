@@ -4,7 +4,9 @@
 	       "samples/Star.txt"
     ],
     "backgrounds": [
-        {"md5":"Farm.svg","width":480,"height":360,"ext":"svg","name":"Farm"}
+        {"md5":"Farm.svg","width":480,"height":360,"ext":"svg","name":"Farm"},
+        {"md5":"RedCarpet.svg","width":480,"height":360,"ext":"svg","name":"RedCarpet"},
+        {"md5":"WoodenFloor.svg","width":480,"height":360,"ext":"svg","name":"WoodenFloor"}
     ],
     "sprites": [
         {"md5":"Star.svg","width":80,"height":101,"ext":"svg","name":"Star","order":"characters,07 weather","tags":["characters","07 weather"]}
