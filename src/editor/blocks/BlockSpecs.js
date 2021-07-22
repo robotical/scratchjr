@@ -380,6 +380,14 @@ static setupCategories () {
             'stopmine': Localization.localize('BLOCK_DESC_STOP', {
                 CHARACTER_NAME: spr.name ? spr.name : spr.str
             }),
+
+            // ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle'],
+
+            'eyesExcited': Localization.localize('BLOCK_DESC_EYES_EXCITED'),
+            'eyesWide': Localization.localize('BLOCK_DESC_EYES_WIDE'),
+            'eyesAngry': Localization.localize('BLOCK_DESC_EYES_ANGRY'),
+            'eyesNormal': Localization.localize('BLOCK_DESC_EYES_NORMAL'),
+            'eyesWiggle': Localization.localize('BLOCK_DESC_EYES_WIGGLE'),
             'say': Localization.localize('BLOCK_DESC_SAY'),
             'show': Localization.localize('BLOCK_DESC_SHOW'),
             'hide': Localization.localize('BLOCK_DESC_HIDE'),
