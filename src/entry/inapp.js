@@ -176,16 +176,18 @@ export function inappBlocksGuide () {
         'BLOCKS_HIDE_DESCRIPTION',
         'BLOCKS_SHOW',
         'BLOCKS_SHOW_DESCRIPTION',
-        'BLOCK_DESC_PLAY_CONFUSION_SOUND',
-        'BLOCK_DESC_PLAY_DISBELIEF_SOUND',
-        'BLOCK_DESC_PLAY_EXCITEMENT_SOUND',
-        'BLOCK_DESC_PLAY_NOWAY_SOUND',
-        'BLOCK_DESC_PLAY_NO_SOUND',
-        'BLOCK_DESC_PLAY_WHISTLE_SOUND',
-        'BLOCKS_POP',
-        'BLOCKS_POP_DESCRIPTION',
-        'BLOCKS_PLAY_RECORDED',
-        'BLOCKS_PLAY_RECORDED_DESCRIPTION',
+        'BLOCK_PLAY_CONFUSION_SOUND',
+        'BLOCK_PLAY_CONFUSION_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_DISBELIEF_SOUND',
+        'BLOCK_PLAY_DISBELIEF_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_EXCITEMENT_SOUND',
+        'BLOCK_PLAY_EXCITEMENT_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_NOWAY_SOUND',
+        'BLOCK_PLAY_NOWAY_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_NO_SOUND',
+        'BLOCK_PLAY_NO_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_WHISTLE_SOUND',
+        'BLOCK_PLAY_WHISTLE_SOUND_DESCRIPTION',
         'BLOCKS_WAIT',
         'BLOCKS_WAIT_DESCRIPTION',
         'BLOCKS_STOP',
@@ -201,6 +203,9 @@ export function inappBlocksGuide () {
         'BLOCKS_GO_TO_PAGE',
         'BLOCKS_GO_TO_PAGE_DESCRIPTION'
     ];
+
+
+    
 
     for (let i = 0; i < blockDescriptionKeys.length; i++) {
         gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);

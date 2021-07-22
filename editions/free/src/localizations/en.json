@@ -58,7 +58,7 @@
     "BLOCKS_SHOW_DESCRIPTION": "Fades in the character until it is fully visible.",
     "BLOCKS_SOUND_BLOCKS": "Sound Blocks",
     "BLOCK_PLAY_CONFUSION_SOUND": "Play 'Confusion' sound",
-    "BLOCK_PLAY_CONFUSION_SOUND_DESCRIPTION": "Plays a 'Confusion' sound. This will either play through the robot when connected or through the phone if the robot is disconnected.",
+    "BLOCK_PLAY_CONFUSION_SOUND_DESCRIPTION": "Plays the 'Confusion' sound. This will play through the robot when connected e robot is disconnected.",
     "BLOCK_PLAY_DISBELIEF_SOUND": "Play 'Disbelief' sound",
     "BLOCK_PLAY_DISBELIEF_SOUND_DESCRIPTION": "Plays a 'Disbelief' sound. This will either play through the robot when connected or through the phone if the robot is disconnected.",
     "BLOCK_PLAY_EXCITEMENT_SOUND": "Play 'Excitement' sound",
