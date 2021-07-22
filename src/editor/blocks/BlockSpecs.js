@@ -345,7 +345,7 @@ static setupCategories () {
             }),
             'repeat': Localization.localize('BLOCK_DESC_REPEAT'),
             'getReady': Localization.localize('BLOCK_DESC_MOVE_GETREADY'),
-            'martyDance': Localization.localize('BLOCK_DESC_MOVE_MARTYDANCE'),
+            'martyDance': Localization.localize('BLOCK_DESC_MOVE_DANCE'),
             'forward': Localization.localize('BLOCK_DESC_MOVE_RIGHT'),
             'back': Localization.localize('BLOCK_DESC_MOVE_LEFT'),
             'up': Localization.localize('BLOCK_DESC_MOVE_UP'),
