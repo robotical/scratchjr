@@ -314,7 +314,6 @@ static setupCategories () {
             'same': ['same', BlockSpecs.getImageFrom('assets/blockicons/Reset', 'svg'),
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
 
-                
 
             'confusion': ['confusion', BlockSpecs.getImageFrom('assets/blockicons/MartyConfusion', 'svg'),
                 BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
@@ -390,6 +389,16 @@ static setupCategories () {
             'playsnd': Localization.localize('BLOCK_DESC_PLAY_SOUND', {
                 SOUND_NAME: Localization.localize('BLOCK_DESC_PLAY_SOUND_POP')
             }),
+
+                // ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
+
+            
+            'confusion': Localization.localize('BLOCK_DESC_PLAY_CONFUSION_SOUND'),
+            'disbelief': Localization.localize('BLOCK_DESC_PLAY_DISBELIEF_SOUND'),
+            'excitement': Localization.localize('BLOCK_DESC_PLAY_EXCITEMENT_SOUND'),
+            'noway': Localization.localize('BLOCK_DESC_PLAY_NOWAY_SOUND'),
+            'no': Localization.localize('BLOCK_DESC_PLAY_NO_SOUND'),
+            'whistle': Localization.localize('BLOCK_DESC_PLAY_WHISTLE_SOUND'),
             'playusersnd': Localization.localize('BLOCK_DESC_PLAY_RECORDED_SOUND'),
             'endstack': Localization.localize('BLOCK_DESC_END'),
             'stopall': Localization.localize('BLOCK_DESC_STOP', {
