@@ -4,11 +4,10 @@
 	       "samples/Star.txt"
     ],
     "backgrounds": [
-        {"md5":"Alien.svg","width":480,"height":360,"ext":"svg","name":"Alien"},
         {"md5":"Checkered.svg","width":480,"height":360,"ext":"svg","name":"Checkered"},
-        // {"md5":"Farm.svg","width":480,"height":360,"ext":"svg","name":"Farm"},
         {"md5":"Grass.svg","width":480,"height":360,"ext":"svg","name":"Grass"},
         {"md5":"Marble.svg","width":480,"height":360,"ext":"svg","name":"Marble"},
+        {"md5":"Paper.svg","width":480,"height":360,"ext":"svg","name":"Paper"},
         {"md5":"RedCarpet.svg","width":480,"height":360,"ext":"svg","name":"RedCarpet"},
         {"md5":"Sand.svg","width":480,"height":360,"ext":"svg","name":"Sand"},
         {"md5":"Tiles.svg","width":480,"height":360,"ext":"svg","name":"Tiles"},
