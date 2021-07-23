@@ -273,7 +273,8 @@ export default class Prims {
     static Down (strip) {
         const martyConnected = ScratchJr.getMartyConnected();
         var s = strip.spr;
-        var num = Number(strip.thisblock.getArgValue()) * 24;
+        // var num = Number(strip.thisblock.getArgValue()) * 24;
+        var num = Number(strip.thisblock.getArgValue());
         Prims.setTime(strip);
 
         if (martyConnected){
@@ -305,7 +306,7 @@ export default class Prims {
             strip.distance = 0;
         } else if (strip.distance < 0) {
             // strip.distance = distance;
-            distance = 1;
+            // distance = 1;
             let s = strip.spr;
             var res = {};
             var rad = s.angle * (Math.PI / 180);
@@ -326,7 +327,8 @@ export default class Prims {
     static Up (strip) {
         
         const martyConnected = ScratchJr.getMartyConnected();
-        var num = Number(strip.thisblock.getArgValue()) * 24;
+        // var num = Number(strip.thisblock.getArgValue()) * 24;
+        var num = Number(strip.thisblock.getArgValue());
         Prims.setTime(strip);
 
         if (martyConnected){
@@ -356,7 +358,7 @@ export default class Prims {
             return;
         } else if (strip.distance < 0) {
             // strip.distance = distance;
-            distance = 1;
+            // distance = 1;
             let s = strip.spr;
             var res = {};
             var rad = s.angle * (Math.PI / 180);
@@ -587,7 +589,8 @@ export default class Prims {
         
         const martyConnected = ScratchJr.getMartyConnected();
         var s = strip.spr;
-        var num = Number(strip.thisblock.getArgValue()) * 24;
+        // var num = Number(strip.thisblock.getArgValue()) * 24;
+        var num = Number(strip.thisblock.getArgValue());
         Prims.setTime(strip);
 
         if (martyConnected){
@@ -625,7 +628,7 @@ export default class Prims {
             return;
         } else if (strip.distance < 0) {
             // strip.distance = distance;
-            distance = 1;
+            // distance = 1;
             let s = strip.spr;
             var res = {};
             var rad = (s.angle + 90) * (Math.PI / 180);
@@ -645,7 +648,8 @@ export default class Prims {
 
         const martyConnected = ScratchJr.getMartyConnected();
         var s = strip.spr;
-        var num = Number(strip.thisblock.getArgValue()) * 24;
+        // var num = Number(strip.thisblock.getArgValue()) * 24;
+        var num = Number(strip.thisblock.getArgValue());
         Prims.setTime(strip);
 
         if (martyConnected){
@@ -684,7 +688,7 @@ export default class Prims {
             strip.distance = 0;
         } else if (strip.distance < 0) {
             // strip.distance = distance;
-            distance = 1;
+            // distance = 1;
             let s = strip.spr;
             var res = {};
             var rad = (s.angle - 90) * (Math.PI / 180);
