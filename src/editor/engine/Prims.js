@@ -65,6 +65,8 @@ export default class Prims {
         Prims.table.eyesAngry = Prims.eyesAngry;
         Prims.table.eyesNormal = Prims.eyesNormal;
         Prims.table.eyesWiggle = Prims.eyesWiggle;
+        Prims.table.waveLeft = Prims.waveLeft;
+        Prims.table.waveRight = Prims.waveRight;
 
         Prims.table.confusion = Prims.playConfusion;
         Prims.table.disbelief = Prims.playDisbelief;
@@ -567,6 +569,38 @@ export default class Prims {
         }
     }
 
+    static waveLeft (strip){
+        const reps = Number(strip.thisblock.getArgValue());
+        const marty_cmd = `traj/wave/${reps}`;
+        const moveTime = 2500;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps);
+    }
+
+    static waveRight (strip){
+        const reps = Number(strip.thisblock.getArgValue());
+        const marty_cmd = `traj/wave/${reps}?side=1`;
+        const moveTime = 2500;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps);
+    }
+
+    static doMartyCmd(strip, marty_cmd, waitTimeMs){
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(waitTimeMs/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            // ScratchAudio.sndFX('boing.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
 
     static Forward (strip) {
         
