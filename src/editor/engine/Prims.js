@@ -544,6 +544,7 @@ export default class Prims {
     static eyesWiggle (strip) {
         console.log('Eyes Wiggle!!')
         const martyConnected = ScratchJr.getMartyConnected();
+        const reps = Number(strip.thisblock.getArgValue());
 
         Prims.setTime(strip);
 
@@ -551,11 +552,11 @@ export default class Prims {
 
             const moveTime = 2000;
    
-            let marty_cmd = `traj/wiggleEyes`;
+            let marty_cmd = `traj/wiggleEyes/${reps}`;
             
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*reps);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
             return;
