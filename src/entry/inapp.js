@@ -174,10 +174,18 @@ export function inappBlocksGuide () {
         'BLOCK_EYES_NORMAL_DESCRIPTION',
         'BLOCK_EYES_WIGGLE',
         'BLOCK_EYES_WIGGLE_DESCRIPTION',
-        'BLOCKS_POP',
-        'BLOCKS_POP_DESCRIPTION',
-        'BLOCKS_PLAY_RECORDED',
-        'BLOCKS_PLAY_RECORDED_DESCRIPTION',
+        'BLOCK_PLAY_CONFUSION_SOUND',
+        'BLOCK_PLAY_CONFUSION_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_DISBELIEF_SOUND',
+        'BLOCK_PLAY_DISBELIEF_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_EXCITEMENT_SOUND',
+        'BLOCK_PLAY_EXCITEMENT_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_NOWAY_SOUND',
+        'BLOCK_PLAY_NOWAY_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_NO_SOUND',
+        'BLOCK_PLAY_NO_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_WHISTLE_SOUND',
+        'BLOCK_PLAY_WHISTLE_SOUND_DESCRIPTION',
         'BLOCKS_WAIT',
         'BLOCKS_WAIT_DESCRIPTION',
         'BLOCKS_STOP',
@@ -193,6 +201,9 @@ export function inappBlocksGuide () {
         'BLOCKS_GO_TO_PAGE',
         'BLOCKS_GO_TO_PAGE_DESCRIPTION'
     ];
+
+
+    
 
     for (let i = 0; i < blockDescriptionKeys.length; i++) {
         gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);

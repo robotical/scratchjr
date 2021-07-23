@@ -160,6 +160,12 @@ static setupCategories () {
                 'looks'
             ],
             [
+                BlockSpecs.getImageFrom('assets/categories/SoundOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/SoundOff', 'svg'),
+                window.Settings.categorySoundColor,
+                'sound'
+            ],
+            [
                 BlockSpecs.getImageFrom('assets/categories/FlowOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/FlowOff', 'svg'),
                 window.Settings.categoryFlowColor,
@@ -223,6 +229,7 @@ static setupCategories () {
         return [['onflag'],
             ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance'],
             ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle'],
+            ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
             ['wait', 'stopmine', 'repeat'],
             ['endstack', 'forever']];
     }
@@ -326,6 +333,20 @@ static setupCategories () {
             'same': ['same', BlockSpecs.getImageFrom('assets/blockicons/Reset', 'svg'),
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
 
+
+            'confusion': ['confusion', BlockSpecs.getImageFrom('assets/blockicons/MartyConfusion', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
+            'disbelief': ['disbelief', BlockSpecs.getImageFrom('assets/blockicons/MartyDisbelief', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
+            'excitement': ['excitement', BlockSpecs.getImageFrom('assets/blockicons/MartyExcitment', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
+            'noway': ['noway', BlockSpecs.getImageFrom('assets/blockicons/MartyNoWay', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
+            'no': ['no', BlockSpecs.getImageFrom('assets/blockicons/MartyNo', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
+            'whistle': ['whistle', BlockSpecs.getImageFrom('assets/blockicons/MartyWhistle', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, -20, 20, BlockSpecs.cmdS],
+
             'playsnd': ['playsnd', BlockSpecs.getImageFrom('assets/blockicons/Speaker', 'svg'),
                 BlockSpecs.limeCmd, 's', 'pop.mp3', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
             'playusersnd': ['playusersnd', BlockSpecs.getImageFrom('assets/blockicons/Microphone', 'svg'),
@@ -395,6 +416,16 @@ static setupCategories () {
             'playsnd': Localization.localize('BLOCK_DESC_PLAY_SOUND', {
                 SOUND_NAME: Localization.localize('BLOCK_DESC_PLAY_SOUND_POP')
             }),
+
+                // ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
+
+            
+            'confusion': Localization.localize('BLOCK_PLAY_CONFUSION_SOUND'),
+            'disbelief': Localization.localize('BLOCK_PLAY_DISBELIEF_SOUND'),
+            'excitement': Localization.localize('BLOCK_PLAY_EXCITEMENT_SOUND'),
+            'noway': Localization.localize('BLOCK_PLAY_NOWAY_SOUND'),
+            'no': Localization.localize('BLOCK_PLAY_NO_SOUND'),
+            'whistle': Localization.localize('BLOCK_PLAY_WHISTLE_SOUND'),
             'playusersnd': Localization.localize('BLOCK_DESC_PLAY_RECORDED_SOUND'),
             'endstack': Localization.localize('BLOCK_DESC_END'),
             'stopall': Localization.localize('BLOCK_DESC_STOP', {
