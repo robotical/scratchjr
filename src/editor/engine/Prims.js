@@ -291,10 +291,19 @@ export default class Prims {
         if (num == 0) {
             strip.distance = 0;
         } else if (strip.distance < 0) {
-            strip.distance = distance;
+            // strip.distance = distance;
+            distance = 1;
+            let s = strip.spr;
+            var res = {};
+            var rad = s.angle * (Math.PI / 180);
+            res.x = distance * Math.sin(rad) * -1;
+            res.y = distance * Math.cos(rad);
+            // let str = res.x.toString();
+            // s.openBalloon(str);
+            strip.distance = 10;
             strip.vector = {
-                x: 0,
-                y: 2
+                x: res.x,
+                y: res.y
             };
             Prims.setTime(strip);
         }
@@ -333,10 +342,17 @@ export default class Prims {
             };
             return;
         } else if (strip.distance < 0) {
-            strip.distance = distance;
+            // strip.distance = distance;
+            distance = 1;
+            let s = strip.spr;
+            var res = {};
+            var rad = s.angle * (Math.PI / 180);
+            res.x = distance * Math.sin(rad);
+            res.y = distance * Math.cos(rad) * -1;
+            strip.distance = 10;
             strip.vector = {
-                x: 0,
-                y: -2
+                x: res.x,
+                y: res.y
             };
             Prims.setTime(strip);
         }
@@ -438,10 +454,17 @@ export default class Prims {
             strip.distance = -1;
             return;
         } else if (strip.distance < 0) {
-            strip.distance = distance;
+            // strip.distance = distance;
+            distance = 1;
+            let s = strip.spr;
+            var res = {};
+            var rad = (s.angle + 90) * (Math.PI / 180);
+            res.x = distance * Math.sin(rad) ;
+            res.y = distance * Math.cos(rad) * -1;
+            strip.distance = 10;
             strip.vector = {
-                x: 2,
-                y: 0
+                x: res.x,
+                y: res.y
             };
             Prims.setTime(strip);
         }
@@ -490,10 +513,17 @@ export default class Prims {
         if (num == 0) {
             strip.distance = 0;
         } else if (strip.distance < 0) {
-            strip.distance = distance;
+            // strip.distance = distance;
+            distance = 1;
+            let s = strip.spr;
+            var res = {};
+            var rad = (s.angle - 90) * (Math.PI / 180);
+            res.x = distance * Math.sin(rad) ;
+            res.y = distance * Math.cos(rad) * -1;
+            strip.distance = 10;
             strip.vector = {
-                x: -2,
-                y: 0
+                x: res.x,
+                y: res.y
             };
             Prims.setTime(strip);
         }
@@ -566,6 +596,8 @@ export default class Prims {
         var s = strip.spr;
         const martyConnected = ScratchJr.getMartyConnected();
 
+
+
         Prims.setTime(strip);
 
         if (martyConnected == true){
@@ -576,6 +608,7 @@ export default class Prims {
             let turn = 20;
             let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&turn=${turn}&stepLength=1`;
             OS.martyCmd({ cmd: marty_cmd });
+
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
