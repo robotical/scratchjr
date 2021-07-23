@@ -60,6 +60,12 @@ export default class Prims {
         Prims.table.same = Prims.Same;
         Prims.table.say = Prims.Say;
 
+        Prims.table.eyesExcited = Prims.eyesExcited;
+        Prims.table.eyesWide = Prims.eyesWide;
+        Prims.table.eyesAngry = Prims.eyesAngry;
+        Prims.table.eyesNormal = Prims.eyesNormal;
+        Prims.table.eyesWiggle = Prims.eyesWiggle;
+
         Prims.table.confusion = Prims.playConfusion;
         Prims.table.disbelief = Prims.playDisbelief;
         Prims.table.excitement = Prims.playExcitement;
@@ -389,6 +395,163 @@ export default class Prims {
             const moveTime = 3000;
    
             let marty_cmd = `traj/getReady/?moveTime=${moveTime}`;
+            
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            // ScratchAudio.sndFX('boing.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+
+    // static eyesExcited (strip) {
+    //     console.log('Excited Eyes!!');
+    //     eyesTraj(strip, 'eyesExcited');
+    //     return;
+    // }
+
+    // static eyesTraj (strip, eyeCommand) {
+    //     console.log('Excited Eyes!!');
+    //     const martyConnected = ScratchJr.getMartyConnected();
+
+    //     Prims.setTime(strip);
+
+    //     if (martyConnected){
+
+    //         //this is the movetime set in the .trj file on RIC
+    //         const moveTime = 1000;
+    //         let marty_cmd = `traj/${eyeCommand}`;
+            
+    //         console.log(marty_cmd);
+    //         OS.martyCmd({ cmd: marty_cmd });
+    //         strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+    //         Prims.showTime(strip);
+    //         strip.thisblock = strip.thisblock.next;
+    //         return;
+    //     } else {
+
+    //         strip.thisblock = strip.thisblock.next;
+    //         return;
+    //     }
+    // }
+
+    static eyesExcited (strip) {
+        console.log('GET READY!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 1000;
+   
+            let marty_cmd = `traj/eyesExcited`;
+            
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            // ScratchAudio.sndFX('boing.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static eyesWide (strip) {
+        console.log('Eyes Wide!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 1000;
+   
+            let marty_cmd = `traj/eyesWide`;
+            
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            // ScratchAudio.sndFX('boing.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static eyesAngry (strip) {
+        console.log('Eyes Wide!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 1000;
+   
+            let marty_cmd = `traj/eyesAngry`;
+            
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            // ScratchAudio.sndFX('boing.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static eyesNormal (strip) {
+        console.log('Eyes Normal!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 1000;
+   
+            let marty_cmd = `traj/eyesNormal`;
+            
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            // ScratchAudio.sndFX('boing.wav');
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static eyesWiggle (strip) {
+        console.log('Eyes Wiggle!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 2000;
+   
+            let marty_cmd = `traj/wiggleEyes`;
             
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });

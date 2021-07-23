@@ -80,7 +80,6 @@ body {
     margin-top: ${css_vh(2.96)};
     margin-left: ${css_vh(15.95)};
     margin-right: ${css_vh(15.95)};
-    /* height: ${css_vh(23.03)}; */
     height: ${css_vh(33.03)};
     color: #808080;
     margin-bottom: ${css_vh(3.29)};
