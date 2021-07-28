@@ -228,7 +228,7 @@ static setupCategories () {
 
         return [['onflag'],
             ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance'],
-            ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle'],
+            ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle', 'waveLeft', 'waveRight'],
             ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
             ['wait', 'stopmine', 'repeat'],
             ['endstack', 'forever']];
@@ -317,6 +317,10 @@ static setupCategories () {
             'eyesNormal': ['eyesNormal', BlockSpecs.getImageFrom('assets/blockicons/MartyNormal', 'svg'),
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'eyesWiggle': ['eyesWiggle', BlockSpecs.getImageFrom('assets/blockicons/MartyWiggle', 'svg'),
+                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
+            'waveLeft': ['waveLeft', BlockSpecs.getImageFrom('assets/blockicons/MartyWaveLeft', 'svg'),
+                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
+            'waveRight': ['waveRight', BlockSpecs.getImageFrom('assets/blockicons/MartyWaveRight', 'svg'),
                 BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
 
             'say': ['say', BlockSpecs.getImageFrom('assets/blockicons/Say', 'svg'),
@@ -407,6 +411,8 @@ static setupCategories () {
             'eyesAngry': Localization.localize('BLOCK_EYES_ANGRY'),
             'eyesNormal': Localization.localize('BLOCK_EYES_NORMAL'),
             'eyesWiggle': Localization.localize('BLOCK_EYES_WIGGLE'),
+            'waveLeft': Localization.localize('BLOCK_WAVE_LEFT'),
+            'waveRight': Localization.localize('BLOCK_WAVE_RIGHT'),
             'say': Localization.localize('BLOCK_DESC_SAY'),
             'show': Localization.localize('BLOCK_DESC_SHOW'),
             'hide': Localization.localize('BLOCK_DESC_HIDE'),
