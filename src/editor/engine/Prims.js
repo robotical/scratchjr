@@ -10,6 +10,7 @@ let martyInterval = 33;
 const intervalToSeconds = 31.25; // runtime tick is set at 32ms by Runtime.js. 32*31.25 = 1s
 let tinterval = 1;
 let hopList = [-48, -30, -22, -14, -6, 0, 6, 14, 22, 30, 48];
+const turnSize = 18;
 
 export default class Prims {
     static get hopList () {
@@ -27,12 +28,12 @@ export default class Prims {
         Prims.table.onchat = Prims.Ignore;
         Prims.table.repeat = Prims.Repeat;
         Prims.table.getReady = Prims.getReady;
-        Prims.table.forward = Prims.Forward;
-        Prims.table.back = Prims.Back;
-        Prims.table.up = Prims.Up;
-        Prims.table.down = Prims.Down;
-        Prims.table.left = Prims.Left;
-        Prims.table.right = Prims.Right;
+        Prims.table.forward = Prims.StepRight;
+        Prims.table.back = Prims.StepLeft;
+        Prims.table.up = Prims.StepForward;
+        Prims.table.down = Prims.StepBackward;
+        Prims.table.left = Prims.TurnLeft;
+        Prims.table.right = Prims.TurnRight;
         Prims.table.martyDance = Prims.martyDance;
         Prims.table.home = Prims.Home;
         Prims.table.setspeed = Prims.SetSpeed;
@@ -257,7 +258,7 @@ export default class Prims {
         }
     }
 
-    static Down (strip) {
+    static StepBackward (strip) {
         const martyConnected = ScratchJr.getMartyConnected();
         var s = strip.spr;
         // var num = Number(strip.thisblock.getArgValue()) * 24;
@@ -311,7 +312,7 @@ export default class Prims {
         Prims.moveAtSpeed(strip);
     }
 
-    static Up (strip) {
+    static StepForward (strip) {
         
         const martyConnected = ScratchJr.getMartyConnected();
         // var num = Number(strip.thisblock.getArgValue()) * 24;
@@ -415,7 +416,7 @@ export default class Prims {
     }
 
 
-    static Forward (strip) {
+    static StepRight (strip) {
         
         const martyConnected = ScratchJr.getMartyConnected();
         var s = strip.spr;
@@ -474,7 +475,7 @@ export default class Prims {
         Prims.moveAtSpeed(strip);
     }
 
-    static Back (strip) {
+    static StepLeft (strip) {
 
         const martyConnected = ScratchJr.getMartyConnected();
         var s = strip.spr;
@@ -557,8 +558,9 @@ export default class Prims {
         }
     }
 
-    static Right (strip) {
-        var num = Number(strip.thisblock.getArgValue()) * 30;
+    static TurnRight (strip) {
+        // Takes Marty roughly 5 turns to reach 90 degrees so set turnSize parameter to 18 for now
+        var num = Number(strip.thisblock.getArgValue()) * turnSize;
         var s = strip.spr;
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
@@ -595,8 +597,9 @@ export default class Prims {
         Prims.turning(strip);
     }
 
-    static Left (strip) {
-        var num = Number(strip.thisblock.getArgValue()) * 30;
+    static TurnLeft (strip) {
+        // Takes Marty roughly 5 turns to reach 90 degrees so set turnSize parameter to 18 for now
+        var num = Number(strip.thisblock.getArgValue()) * turnSize;
         var s = strip.spr;
         const martyConnected = ScratchJr.getMartyConnected();
 
