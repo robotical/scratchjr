@@ -597,34 +597,50 @@ export default class Prims {
         Prims.turning(strip);
     }
 
+    static MartyDebug (s, debugVariable) {
+        let str = debugVariable.toString();
+        s.openBalloon(str);
+    }
+
+    static MartyCommanded (strip) {
+
+        if (strip.cmdSent == null) {
+            strip.cmdSent = false;
+        }
+            return strip.cmdSent;
+    }
+
     static TurnLeft (strip) {
         // Takes Marty roughly 5 turns to reach 90 degrees so set turnSize parameter to 18 for now
         var num = Number(strip.thisblock.getArgValue()) * turnSize;
         var s = strip.spr;
+        const moveTime = 1500;
+        strip.moveTime = moveTime;
         const martyConnected = ScratchJr.getMartyConnected();
-
-
+        
 
         Prims.setTime(strip);
 
-        if (martyConnected == true){
+        if (martyConnected == true && Prims.MartyCommanded(strip)){
 
-            const moveTime = 1500;
             let steps = Number(strip.thisblock.getArgValue());
             steps = Math.min(Math.max(steps, 1), 20);
             let turn = 20;
             let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&turn=${turn}&stepLength=1`;
             OS.martyCmd({ cmd: marty_cmd });
+            strip.cmdSent = true;
 
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
+            // strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
+            // Prims.showTime(strip);
+            // strip.thisblock = strip.thisblock.next;
+            // return;
             
         }
         
         if (strip.count < 0) {
             strip.count = Math.floor(Math.abs(num) / s.speed * 0.25);
+            strip.moveTime = strip.moveTime/ (strip.count + 1);
+            Prims.MartyDebug(s, strip.count);
             strip.angleStep = -s.speed * 4 * Math.abs(num) / num;
             strip.finalAngle = s.angle - num;
             strip.finalAngle = strip.finalAngle % 360;
@@ -647,10 +663,14 @@ export default class Prims {
             strip.count = -1;
             s.setHeading(strip.finalAngle);
             Prims.showTime(strip);
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(strip.moveTime/1000));
+            strip.cmdSent = false;
             strip.thisblock = strip.thisblock.next;
         } else {
             s.setHeading(s.angle + strip.angleStep);
-            strip.waitTimer = tinterval;
+            // strip.waitTimer = tinterval;
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(strip.moveTime/1000));
+
             strip.count = count;
         }
     }
