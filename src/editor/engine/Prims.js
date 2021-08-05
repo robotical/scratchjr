@@ -497,7 +497,7 @@ export default class Prims {
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
-        if (martyConnected){
+        if (martyConnected == true && !Prims.MartyCommanded(strip)){
 
             steps = Math.min(Math.max(steps, 1), 20);
             const stepLength = stepSize;
