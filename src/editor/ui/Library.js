@@ -107,7 +107,7 @@ export default class Library {
         }, 1000);
     }
 
-    static addThumbnails () {
+    static addThumbnails (type) {
         var div = gn('scrollarea');
         Library.addEmptyThumb(div, (type == 'costumes') ? (118 * scaleMultiplier) : (120 * scaleMultiplier),
             (type == 'costumes') ? (90 * scaleMultiplier) : (90 * scaleMultiplier));
@@ -122,7 +122,7 @@ export default class Library {
         IO.query(key, json, Library.displayAssets);
     }
 
-    static skipUserAssets () {
+    static skipUserAssets (type) {
         var div = gn('scrollarea');
         Library.addEmptyThumb(div, (type == 'costumes') ? (118 * scaleMultiplier) : (120 * scaleMultiplier),
             (type == 'costumes') ? (90 * scaleMultiplier) : (90 * scaleMultiplier));
