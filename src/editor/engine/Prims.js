@@ -344,7 +344,7 @@ export default class Prims {
             return;
 
         } else if (strip.distance < 0) {
-            strip.waitTime = (moveTime + moveTimeBuffer) * steps / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+            strip.waitTime = (moveTime + moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
 
             var res = {};
             var rad = s.angle * (Math.PI / 180);
@@ -401,7 +401,7 @@ export default class Prims {
             };
             return;
         } else if (strip.distance < 0) {
-            strip.waitTime = (moveTime + moveTimeBuffer) * steps / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+            strip.waitTime = (moveTime + moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
 
             var res = {};
             var rad = s.angle * (Math.PI / 180);
@@ -460,7 +460,7 @@ export default class Prims {
             return;
 
         } else if (strip.distance < 0) {
-            strip.waitTime = (moveTime + moveTimeBuffer) * steps / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+            strip.waitTime = (moveTime + moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
 
             var res = {};
             var rad = (s.angle - 90) * (Math.PI / 180);
@@ -519,7 +519,7 @@ export default class Prims {
             return;
 
         } else if (strip.distance < 0) {
-            strip.waitTime = (moveTime + moveTimeBuffer) * steps / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+            strip.waitTime = (moveTime + moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
 
             var res = {};
             var rad = (s.angle + 90) * (Math.PI / 180);
