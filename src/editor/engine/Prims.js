@@ -59,6 +59,7 @@ export default class Prims {
         Prims.table.shrink = Prims.Shrink;
         Prims.table.same = Prims.Same;
         Prims.table.say = Prims.Say;
+        Prims.table.Celebration = Prims.Celebration
     }
 
     static Done (strip) {
@@ -120,6 +121,31 @@ export default class Prims {
         }
         strip.waitTimer = tinterval * 4;
     }
+
+    static Celebration(strip){
+        var b = strip.thisblock;
+        var name = b.getSoundName(strip.spr.sounds);
+        //	console.log ('playSound', name);
+        if (!strip.audio) {
+            var snd = ScratchAudio.projectSounds[name];
+            if (!snd) {
+                strip.thisblock = strip.thisblock.next;
+                return;
+            }
+            strip.audio = snd;
+            snd.play();
+        //	console.log ("playSound", snd, strip.audio, snd.source.playbackState);
+        }
+        if (strip.audio && strip.audio.done()) {
+            strip.audio.clear();
+            strip.thisblock = strip.thisblock.next;
+            strip.audio = undefined;
+        }
+        strip.waitTimer = tinterval * 4;
+
+    }
+
+
 
     static Say (strip) {
         var b = strip.thisblock;

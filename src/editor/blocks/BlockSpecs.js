@@ -215,7 +215,7 @@ static setupCategories () {
     static setupPalettesDef () {
 
         return [['onflag'],
-            ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance'],
+            ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance', 'Celebration'],
             ['wait', 'stopmine', 'repeat'],
             ['endstack', 'forever']];
     }
@@ -309,6 +309,8 @@ static setupCategories () {
 
             'playsnd': ['playsnd', BlockSpecs.getImageFrom('assets/blockicons/Speaker', 'svg'),
                 BlockSpecs.limeCmd, 's', 'pop.mp3', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'Celebration': ['Celebration', BlockSpecs.getImageFrom('assets/blockicons/Speaker', 'svg'),
+                BlockSpecs.limeCmd, null, 'pop.mp3', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
             'playusersnd': ['playusersnd', BlockSpecs.getImageFrom('assets/blockicons/Microphone', 'svg'),
                 BlockSpecs.limeCmd, 'r', '1', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
             'endstack': ['endstack', null, BlockSpecs.redEnd, null, null,
@@ -369,6 +371,7 @@ static setupCategories () {
                 SOUND_NAME: Localization.localize('BLOCK_DESC_PLAY_SOUND_POP')
             }),
             'playusersnd': Localization.localize('BLOCK_DESC_PLAY_RECORDED_SOUND'),
+            'Celebration': Localization.localize('BLOCK_DESC_PLAY_CELEBRATION'),
             'endstack': Localization.localize('BLOCK_DESC_END'),
             'stopall': Localization.localize('BLOCK_DESC_STOP', {
                 CHARACTER_NAME: spr.name ? spr.name : ''
