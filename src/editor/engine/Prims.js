@@ -17,7 +17,63 @@ export default class Prims {
     }
 
     static init () {
-       
+        Prims.table = {};
+        Prims.table.done = Prims.Done;
+        Prims.table.missing = Prims.Ignore;
+        Prims.table.onflag = Prims.Ignore;
+        Prims.table.onmessage = Prims.Ignore;
+        Prims.table.onclick = Prims.Ignore;
+        Prims.table.ontouch = Prims.OnTouch;
+        Prims.table.onchat = Prims.Ignore;
+        Prims.table.repeat = Prims.Repeat;
+        Prims.table.getReady = Prims.getReady;
+        Prims.table.forward = Prims.Forward;
+        Prims.table.back = Prims.Back;
+        Prims.table.up = Prims.Up;
+        Prims.table.down = Prims.Down;
+        Prims.table.left = Prims.Left;
+        Prims.table.right = Prims.Right;
+        Prims.table.martyDance = Prims.martyDance;
+        Prims.table.home = Prims.Home;
+        Prims.table.setspeed = Prims.SetSpeed;
+        Prims.table.message = Prims.Message;
+        Prims.table.setcolor = Prims.SetColor;
+        Prims.table.bigger = Prims.Bigger;
+        Prims.table.smaller = Prims.Smaller;
+        Prims.table.wait = Prims.Wait;
+        Prims.table.caretcmd = Prims.Ignore;
+        Prims.table.caretstart = Prims.Ignore;
+        Prims.table.caretend = Prims.Ignore;
+        Prims.table.caretrepeat = Prims.Ignore;
+        Prims.table.gotopage = Prims.GotoPage;
+        Prims.table.endstack = Prims.DoNextBlock;
+        Prims.table.stopall = Prims.StopAll;
+        Prims.table.stopmine = Prims.StopMine;
+        Prims.table.forever = Prims.Forever;
+        Prims.table.hop = Prims.Hop;
+        Prims.table.show = Prims.Show;
+        Prims.table.hide = Prims.Hide;
+        Prims.table.playsnd = Prims.playSound;
+        Prims.table.playusersnd = Prims.playSound;
+        Prims.table.grow = Prims.Grow;
+        Prims.table.shrink = Prims.Shrink;
+        Prims.table.same = Prims.Same;
+        Prims.table.say = Prims.Say;
+
+        Prims.table.eyesExcited = Prims.eyesExcited;
+        Prims.table.eyesWide = Prims.eyesWide;
+        Prims.table.eyesAngry = Prims.eyesAngry;
+        Prims.table.eyesNormal = Prims.eyesNormal;
+        Prims.table.eyesWiggle = Prims.eyesWiggle;
+        Prims.table.waveLeft = Prims.waveLeft;
+        Prims.table.waveRight = Prims.waveRight;
+
+        Prims.table.confusion = Prims.playConfusion;
+        Prims.table.disbelief = Prims.playDisbelief;
+        Prims.table.excitement = Prims.playExcitement;
+        Prims.table.noway = Prims.playNoway;
+        Prims.table.no = Prims.playNo;
+        Prims.table.whistle = Prims.playWhistle;
     }
 
     static Done (strip) {
