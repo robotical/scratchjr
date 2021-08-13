@@ -77,6 +77,8 @@
     "BLOCK_PLAY_DISBELIEF_SOUND_DESCRIPTION": "Plays a 'Disbelief' sound. This will either play through the robot when connected or through this device if the robot is disconnected.",
     "BLOCK_PLAY_EXCITEMENT_SOUND": "Play 'Excitement' sound",
     "BLOCK_PLAY_EXCITEMENT_SOUND_DESCRIPTION": "Plays a 'Excitement' sound. This will either play through the robot when connected or through this device if the robot is disconnected.",
+    "BLOCK_PLAY_CELEBRATION_SOUND": "Play 'Celebration' sound",
+    "BLOCK_PLAY_CELEBRATION_SOUND_DESCRIPTION": "Plays a 'Celebration' sound. This will either play through the robot when connected or through this device if the robot is disconnected.",
     "BLOCK_PLAY_NOWAY_SOUND": "Play 'No Way!' sound",
     "BLOCK_PLAY_NOWAY_SOUND_DESCRIPTION": "Plays a 'No Way!' sound. This will either play through the robot when connected or through this device if the robot is disconnected.",
     "BLOCK_PLAY_NO_SOUND": "Play 'No!' sound",
