@@ -71,6 +71,7 @@ export default class Prims {
         Prims.table.confusion = Prims.playConfusion;
         Prims.table.disbelief = Prims.playDisbelief;
         Prims.table.excitement = Prims.playExcitement;
+        Prims.table.celebration = Prims.playCelebration;
         Prims.table.noway = Prims.playNoway;
         Prims.table.no = Prims.playNo;
         Prims.table.whistle = Prims.playWhistle;
@@ -969,6 +970,30 @@ export default class Prims {
         } else {
             ScratchAudio.sndFX('confused.wav');
             strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static playCelebration (strip) {
+        console.log('Play Celebration!!')
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+
+            const moveTime = 8000; // change the wait time depending on the length of the audio
+
+            let marty_cmd = `filerun/spiffs/celebration.raw`; // this need to be changed
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            ScratchAudio.sndFX('celebration.wav'); // need to add the audio to the file location
+            strip.thisblock = strip.thisblock.next; // move on to the next block
             return;
         }
     }

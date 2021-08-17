@@ -229,7 +229,7 @@ static setupCategories () {
         return [['onflag'],
             ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance'],
             ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle', 'waveLeft', 'waveRight'],
-            ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
+            ['confusion', 'disbelief', 'excitement', 'celebration', 'noway', 'no', 'whistle'],
             ['wait', 'stopmine', 'repeat'],
             ['endstack', 'forever']];
     }
@@ -344,6 +344,8 @@ static setupCategories () {
                 BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
             'excitement': ['excitement', BlockSpecs.getImageFrom('assets/blockicons/MartyExcitment', 'svg'),
                 BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'celebration': ['celebration', BlockSpecs.getImageFrom('assets/blockicons/MartyCelebration', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
             'noway': ['noway', BlockSpecs.getImageFrom('assets/blockicons/MartyNoWay', 'svg'),
                 BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
             'no': ['no', BlockSpecs.getImageFrom('assets/blockicons/MartyNo', 'svg'),
@@ -423,12 +425,13 @@ static setupCategories () {
                 SOUND_NAME: Localization.localize('BLOCK_DESC_PLAY_SOUND_POP')
             }),
 
-                // ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
+                // ['confusion', 'disbelief', 'excitement', 'celebration', 'noway', 'no', 'whistle'],
 
             
             'confusion': Localization.localize('BLOCK_PLAY_CONFUSION_SOUND'),
             'disbelief': Localization.localize('BLOCK_PLAY_DISBELIEF_SOUND'),
             'excitement': Localization.localize('BLOCK_PLAY_EXCITEMENT_SOUND'),
+            'celebration': Localization.localize('BLOCK_PLAY_CELEBRATION_SOUND'),
             'noway': Localization.localize('BLOCK_PLAY_NOWAY_SOUND'),
             'no': Localization.localize('BLOCK_PLAY_NO_SOUND'),
             'whistle': Localization.localize('BLOCK_PLAY_WHISTLE_SOUND'),
