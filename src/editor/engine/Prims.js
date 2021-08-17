@@ -984,7 +984,7 @@ export default class Prims {
 
             const moveTime = 8000; // change the wait time depending on the length of the audio
 
-            let marty_cmd = `filerun/spiffs/confused.raw`; // this need to be changed
+            let marty_cmd = `filerun/spiffs/celebration.raw`; // this need to be changed
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
