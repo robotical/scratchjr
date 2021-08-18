@@ -34,6 +34,7 @@ export function inappInterfaceGuide () {
 
     var interfaceKeys = [
         'SAVE',
+        'MARTY_CONNECT',
         'STAGE',
         'PRESENTATION_MODE',
         'GRID',
@@ -47,8 +48,8 @@ export function inappInterfaceGuide () {
         'PROGRAMMING_SCRIPT',
         'PROGRAMMING_AREA',
         'BLOCKS_PALETTE',
-        'BLOCKS_CATEGORIES',
-        'CHARACTERS'
+        'BLOCKS_CATEGORIES'
+        // 'CHARACTERS'
     ];
 
     var interfaceDescriptions = [];
@@ -156,22 +157,32 @@ export function inappBlocksGuide () {
         'BLOCK_MOVE_GETREADY_DESCRIPTION',
         'BLOCK_MOVE_DANCE',
         'BLOCK_MOVE_DANCE_DESCRIPTION',
-        'BLOCKS_SAY',
-        'BLOCKS_SAY_DESCRIPTION',
-        'BLOCKS_GROW',
-        'BLOCKS_GROW_DESCRIPTION',
-        'BLOCKS_SHRINK',
-        'BLOCKS_SHRINK_DESCRIPTION',
-        'BLOCKS_RESET_SIZE',
-        'BLOCKS_RESET_SIZE_DESCRIPTION',
-        'BLOCKS_HIDE',
-        'BLOCKS_HIDE_DESCRIPTION',
-        'BLOCKS_SHOW',
-        'BLOCKS_SHOW_DESCRIPTION',
-        'BLOCKS_POP',
-        'BLOCKS_POP_DESCRIPTION',
-        'BLOCKS_PLAY_RECORDED',
-        'BLOCKS_PLAY_RECORDED_DESCRIPTION',
+        'BLOCK_EYES_EXCITED',
+        'BLOCK_EYES_EXCITED_DESCRIPTION',
+        'BLOCK_EYES_WIDE',
+        'BLOCK_EYES_WIDE_DESCRIPTION',
+        'BLOCK_EYES_ANGRY',
+        'BLOCK_EYES_ANGRY_DESCRIPTION',
+        'BLOCK_EYES_NORMAL',
+        'BLOCK_EYES_NORMAL_DESCRIPTION',
+        'BLOCK_EYES_WIGGLE',
+        'BLOCK_EYES_WIGGLE_DESCRIPTION',
+        'BLOCK_WAVE_LEFT',
+        'BLOCK_WAVE_LEFT_DESCRIPTION',
+        'BLOCK_WAVE_RIGHT',
+        'BLOCK_WAVE_RIGHT_DESCRIPTION',
+        'BLOCK_PLAY_CONFUSION_SOUND',
+        'BLOCK_PLAY_CONFUSION_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_DISBELIEF_SOUND',
+        'BLOCK_PLAY_DISBELIEF_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_EXCITEMENT_SOUND',
+        'BLOCK_PLAY_EXCITEMENT_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_NOWAY_SOUND',
+        'BLOCK_PLAY_NOWAY_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_NO_SOUND',
+        'BLOCK_PLAY_NO_SOUND_DESCRIPTION',
+        'BLOCK_PLAY_WHISTLE_SOUND',
+        'BLOCK_PLAY_WHISTLE_SOUND_DESCRIPTION',
         'BLOCKS_WAIT',
         'BLOCKS_WAIT_DESCRIPTION',
         'BLOCKS_STOP',
@@ -183,6 +194,9 @@ export function inappBlocksGuide () {
         'BLOCKS_REPEAT_FOREVER',
         'BLOCKS_REPEAT_FOREVER_DESCRIPTION'
     ];
+
+
+    
 
     for (let i = 0; i < blockDescriptionKeys.length; i++) {
         gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);
