@@ -34,6 +34,7 @@ export function inappInterfaceGuide () {
 
     var interfaceKeys = [
         'SAVE',
+        'MARTY_CONNECT',
         'STAGE',
         'PRESENTATION_MODE',
         'GRID',
@@ -47,8 +48,8 @@ export function inappInterfaceGuide () {
         'PROGRAMMING_SCRIPT',
         'PROGRAMMING_AREA',
         'BLOCKS_PALETTE',
-        'BLOCKS_CATEGORIES',
-        'CHARACTERS'
+        'BLOCKS_CATEGORIES'
+        // 'CHARACTERS'
     ];
 
     var interfaceDescriptions = [];
