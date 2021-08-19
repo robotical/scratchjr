@@ -679,146 +679,51 @@ export default class Prims {
     }
 
     static eyesExcited (strip) {
-        console.log('GET READY!!')
-        const martyConnected = ScratchJr.getMartyConnected();
-
-        Prims.setTime(strip);
-
-        if (martyConnected){
-
-            const moveTime = 1000;
-   
-            let marty_cmd = `traj/eyesExcited`;
-            
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
-            // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
+        const moveTime = 1000;
+        let marty_cmd = `traj/eyesExcited`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime, Prims.playMartyServo);
     }
 
     static eyesWide (strip) {
-        console.log('Eyes Wide!!')
-        const martyConnected = ScratchJr.getMartyConnected();
-
-        Prims.setTime(strip);
-
-        if (martyConnected){
-
-            const moveTime = 1000;
-   
-            let marty_cmd = `traj/eyesWide`;
-            
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
-            // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
+        const moveTime = 1000;
+        let marty_cmd = `traj/eyesWide`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime, Prims.playMartyServo);      
     }
 
     static eyesAngry (strip) {
-        console.log('Eyes Wide!!')
-        const martyConnected = ScratchJr.getMartyConnected();
-
-        Prims.setTime(strip);
-
-        if (martyConnected){
-
-            const moveTime = 1000;
-   
-            let marty_cmd = `traj/eyesAngry`;
-            
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
-            // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
+        const moveTime = 1000;
+        let marty_cmd = `traj/eyesAngry`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime, Prims.playMartyServo);
     }
 
     static eyesNormal (strip) {
-        console.log('Eyes Normal!!')
-        const martyConnected = ScratchJr.getMartyConnected();
-
-        Prims.setTime(strip);
-
-        if (martyConnected){
-
-            const moveTime = 1000;
-   
-            let marty_cmd = `traj/eyesNormal`;
-            
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
-            // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
+        const moveTime = 1000;
+        let marty_cmd = `traj/eyesNormal`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime, Prims.playMartyServo);
     }
 
     static eyesWiggle (strip) {
-        console.log('Eyes Wiggle!!')
-        const martyConnected = ScratchJr.getMartyConnected();
         const reps = Number(strip.thisblock.getArgValue());
-
-        Prims.setTime(strip);
-
-        if (martyConnected){
-
-            const moveTime = 2000;
-   
-            let marty_cmd = `traj/wiggleEyes/${reps}`;
-            
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*reps);
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
-            // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
+        const moveTime = 2000;
+        const marty_cmd = `traj/wiggleEyes/${reps}`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
     }
 
     static waveLeft (strip){
         const reps = Number(strip.thisblock.getArgValue());
-        const marty_cmd = `traj/wave/${reps}`;
         const moveTime = 2500;
-        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps);
+        const marty_cmd = `traj/wave/${reps}`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
     }
 
     static waveRight (strip){
         const reps = Number(strip.thisblock.getArgValue());
-        const marty_cmd = `traj/wave/${reps}?side=1`;
         const moveTime = 2500;
-        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps);
+        const marty_cmd = `traj/wave/${reps}?side=1`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
     }
 
-    static doMartyCmd(strip, marty_cmd, waitTimeMs){
+    static doMartyCmd(strip, marty_cmd, waitTimeMs, disconnectedFunc){
         const martyConnected = ScratchJr.getMartyConnected();
 
         Prims.setTime(strip);
@@ -831,10 +736,21 @@ export default class Prims {
             strip.thisblock = strip.thisblock.next;
             return;
         } else {
-            // ScratchAudio.sndFX('boing.wav');
+            if (disconnectedFunc) {
+                disconnectedFunc(strip);
+                return;
+            }
             strip.thisblock = strip.thisblock.next;
             return;
         }
+    }
+
+    static playMartyServo(strip){
+        const moveTime = 850;
+        ScratchAudio.sndFX('marty_eyes_servo.wav');
+        strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+        strip.thisblock = strip.thisblock.next;
+        return;
     }
 
 
