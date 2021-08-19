@@ -69,7 +69,7 @@ div.frame {
     display: block;
     width: ${css_vh(10)};
     height: ${css_vh(10)};
-    background: url('../assets/lobby/scratchJrlogo.svg');
+    background: url('../assets/lobby/backButton.svg');
     background-size: 101%;
     padding: 0;
     margin: auto auto;
