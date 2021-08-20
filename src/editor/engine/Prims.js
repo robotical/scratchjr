@@ -283,16 +283,14 @@ export default class Prims {
 
     static martyDance (strip) {
 
+        let reps = Math.abs(Number(strip.thisblock.getArgValue()));
         const martyConnected = ScratchJr.getMartyConnected();
         const moveTime = 3000;
         Prims.setTime(strip);
 
         if (martyConnected){
-
-            let reps = Number(strip.thisblock.getArgValue());
    
             let marty_cmd = `traj/dance/${reps}?moveTime=${moveTime}`;
-            
             OS.martyCmd({ cmd: marty_cmd });
             console.log(marty_cmd);
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*reps);
@@ -300,8 +298,7 @@ export default class Prims {
             strip.thisblock = strip.thisblock.next;
             return;
         } else {
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*reps);
-            strip.thisblock = strip.thisblock.next;
+            Prims.playMartyServo(strip);
             return;
         }
     }
@@ -333,7 +330,7 @@ export default class Prims {
         
         let s = strip.spr;
         const moveTime = stepMoveTime;
-        let steps = Number(strip.thisblock.getArgValue());
+        let steps = Math.abs(Number(strip.thisblock.getArgValue()));
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
@@ -391,7 +388,7 @@ export default class Prims {
 
         let s = strip.spr;
         const moveTime = stepMoveTime;
-        let steps = Number(strip.thisblock.getArgValue());
+        let steps = Math.abs(Number(strip.thisblock.getArgValue()));
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
@@ -447,10 +444,9 @@ export default class Prims {
    
     static StepLeft (strip) {
 
-
         let s = strip.spr;
         const moveTime = stepMoveTime;
-        let steps = Number(strip.thisblock.getArgValue());
+        let steps = Math.abs(Number(strip.thisblock.getArgValue()));
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
@@ -509,7 +505,7 @@ export default class Prims {
         
         var s = strip.spr;
         const moveTime = stepMoveTime;
-        var steps = Number(strip.thisblock.getArgValue());
+        var steps = Math.abs(Number(strip.thisblock.getArgValue()));
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
