@@ -891,22 +891,20 @@ export default class Prims {
     static playConfusion (strip) {
         console.log('Play Confusion!!')
         const martyConnected = ScratchJr.getMartyConnected();
-
+        const moveTime = 1000;
         Prims.setTime(strip);
 
         if (martyConnected){
-
-            const moveTime = 1000;
-
             let marty_cmd = `filerun/spiffs/confused.raw`;
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+            
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
             return;
         } else {
             ScratchAudio.sndFX('confused.wav');
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
             strip.thisblock = strip.thisblock.next;
             return;
         }
@@ -915,13 +913,10 @@ export default class Prims {
     static playDisbelief (strip) {
         console.log('Play Disbelief!!')
         const martyConnected = ScratchJr.getMartyConnected();
-
+        const moveTime = 500;
         Prims.setTime(strip);
 
         if (martyConnected){
-
-            const moveTime = 500;
-
             let marty_cmd = `filerun/spiffs/disbelief.raw`;
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
@@ -931,6 +926,7 @@ export default class Prims {
             return;
         } else {
             ScratchAudio.sndFX('disbelief.wav');
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
             strip.thisblock = strip.thisblock.next;
             return;
         }
@@ -941,13 +937,10 @@ export default class Prims {
     static playExcitement (strip) {
         console.log('Play No Way!!')
         const martyConnected = ScratchJr.getMartyConnected();
-
+        const moveTime = 1000;
         Prims.setTime(strip);
 
         if (martyConnected){
-
-            const moveTime = 1000;
-
             let marty_cmd = `filerun/spiffs/excited.raw`;
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
@@ -957,6 +950,7 @@ export default class Prims {
             return;
         } else {
             ScratchAudio.sndFX('excited.wav');
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
             strip.thisblock = strip.thisblock.next;
             return;
         }
@@ -965,13 +959,10 @@ export default class Prims {
     static playNoway (strip) {
         console.log('Play No Way!!')
         const martyConnected = ScratchJr.getMartyConnected();
-
+        const moveTime = 1000;
         Prims.setTime(strip);
 
         if (martyConnected){
-
-            const moveTime = 1000;
-
             let marty_cmd = `filerun/spiffs/no_way.raw`;
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
@@ -981,6 +972,7 @@ export default class Prims {
             return;
         } else {
             ScratchAudio.sndFX('no_way.wav');
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
             strip.thisblock = strip.thisblock.next;
             return;
         }
@@ -989,13 +981,10 @@ export default class Prims {
     static playNo (strip) {
         console.log('Play No!!')
         const martyConnected = ScratchJr.getMartyConnected();
-
+        const moveTime = 500;
         Prims.setTime(strip);
 
         if (martyConnected){
-
-            const moveTime = 500;
-
             let marty_cmd = `filerun/spiffs/no.raw`;
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
@@ -1005,6 +994,7 @@ export default class Prims {
             return;
         } else {
             ScratchAudio.sndFX('no.wav');
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
             strip.thisblock = strip.thisblock.next;
             return;
         }
@@ -1013,13 +1003,10 @@ export default class Prims {
     static playWhistle (strip) {
         console.log('Play Whistle!!')
         const martyConnected = ScratchJr.getMartyConnected();
-
+        const moveTime = 500;
         Prims.setTime(strip);
 
         if (martyConnected){
-
-            const moveTime = 500;
-
             let marty_cmd = `filerun/spiffs/whistle.raw`;
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
@@ -1029,6 +1016,7 @@ export default class Prims {
             return;
         } else {
             ScratchAudio.sndFX('whistle.wav');
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
             strip.thisblock = strip.thisblock.next;
             return;
         }
