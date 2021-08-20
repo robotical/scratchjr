@@ -11,6 +11,7 @@ let defaultSounds = ['boing.wav', 'confused.wav', 'copy.wav', 'cut.wav', 'disbel
                      'entertap.wav', 'excited.wav', 'exittap.wav', 'grab.wav', 'keydown.wav',
                      'marty_eyes_servo.wav', 'no_way.wav', 'no.wav', 'snap.wav', 'splash.wav',
                      'tap.wav', 'whistle.wav'];
+                     
 let projectSounds = {};
 
 export default class ScratchAudio {
