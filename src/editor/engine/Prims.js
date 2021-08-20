@@ -16,6 +16,7 @@ const turnStepCount = 2;    //the number of sprite 'steps' to make in a single t
 const turnMoveTime = 1500;  //the movetime parameter for left and right turns
 const stepMoveTime = 1500;  //the movetime parameter for forward, backward, left and right steps
 const stepSize = 25;        //the size of a step this is used by the sprite and Marty
+const maxStepArgument = 20; //the maxmum number of steps we can make in one REST command
 export default class Prims {
     static get hopList () {
         return hopList;
@@ -281,9 +282,19 @@ export default class Prims {
      *             Marty Movement Blocks
      ****************************************************/
 
+
+    static sanitiseArgument (argValue){
+        if (argValue > maxStepArgument){
+            return maxStepArgument;
+        } else{
+            return argValue;
+        }
+    }
+
     static martyDance (strip) {
 
         let reps = Math.abs(Number(strip.thisblock.getArgValue()));
+        reps = Prims.sanitiseArgument(reps);
         const martyConnected = ScratchJr.getMartyConnected();
         const moveTime = 3000;
         Prims.setTime(strip);
@@ -331,6 +342,7 @@ export default class Prims {
         let s = strip.spr;
         const moveTime = stepMoveTime;
         let steps = Math.abs(Number(strip.thisblock.getArgValue()));
+        steps = Prims.sanitiseArgument(steps);
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
@@ -389,6 +401,7 @@ export default class Prims {
         let s = strip.spr;
         const moveTime = stepMoveTime;
         let steps = Math.abs(Number(strip.thisblock.getArgValue()));
+        steps = Prims.sanitiseArgument(steps);
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
@@ -447,6 +460,7 @@ export default class Prims {
         let s = strip.spr;
         const moveTime = stepMoveTime;
         let steps = Math.abs(Number(strip.thisblock.getArgValue()));
+        steps = Prims.sanitiseArgument(steps);
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
@@ -506,6 +520,7 @@ export default class Prims {
         var s = strip.spr;
         const moveTime = stepMoveTime;
         var steps = Math.abs(Number(strip.thisblock.getArgValue()));
+        steps = Prims.sanitiseArgument(steps);
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
@@ -589,6 +604,7 @@ export default class Prims {
         var s = strip.spr;
         const moveTime = turnMoveTime;
         let steps = Number(strip.thisblock.getArgValue());
+        steps = Prims.sanitiseArgument(steps);
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
@@ -625,6 +641,7 @@ export default class Prims {
         var s = strip.spr;
         const moveTime = turnMoveTime;
         let steps = Number(strip.thisblock.getArgValue());
+        steps = Prims.sanitiseArgument(steps);
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
