@@ -44,7 +44,13 @@ export default class ScriptsPane {
         ScratchJr.stage.currentPage.setCurrentSprite(gn(sprname).owner);
         currentsc.owner.activate();
         currentsc.parentNode.ontouchstart = function (evt) {
-            currentsc.owner.scriptsMouseDown(evt);
+            //this if statment stops users from button bashing
+            var isOff = ScratchJr.runtime.inactive();
+            if (isOff){
+                currentsc.owner.scriptsMouseDown(evt);
+            } else {
+                return;
+            }
         };
         scroll.update();
     }

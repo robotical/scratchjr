@@ -10,7 +10,12 @@ let martyInterval = 33;
 const intervalToSeconds = 31.25; // runtime tick is set at 32ms by Runtime.js. 32*31.25 = 1s
 let tinterval = 1;
 let hopList = [-48, -30, -22, -14, -6, 0, 6, 14, 22, 30, 48];
-
+const moveTimeBuffer = 200; //(in ms) this is a little extra time added to move time to allow Marty to keep up with the Sprite
+const turnSize = 20;        //the angle in degrees that a turn should be, this is both sent to Marty and used in the Sprite
+const turnStepCount = 2;    //the number of sprite 'steps' to make in a single turn
+const turnMoveTime = 1500;  //the movetime parameter for left and right turns
+const stepMoveTime = 1500;  //the movetime parameter for forward, backward, left and right steps
+const stepSize = 25;        //the size of a step this is used by the sprite and Marty
 export default class Prims {
     static get hopList () {
         return hopList;
@@ -26,14 +31,14 @@ export default class Prims {
         Prims.table.ontouch = Prims.OnTouch;
         Prims.table.onchat = Prims.Ignore;
         Prims.table.repeat = Prims.Repeat;
-        Prims.table.getReady = Prims.getReady;
-        Prims.table.forward = Prims.Forward;
-        Prims.table.back = Prims.Back;
-        Prims.table.up = Prims.Up;
-        Prims.table.down = Prims.Down;
-        Prims.table.left = Prims.Left;
-        Prims.table.right = Prims.Right;
         Prims.table.martyDance = Prims.martyDance;
+        Prims.table.getReady = Prims.getReady;
+        Prims.table.up = Prims.StepForward;
+        Prims.table.down = Prims.StepBackward;
+        Prims.table.back = Prims.StepLeft;
+        Prims.table.forward = Prims.StepRight;
+        Prims.table.left = Prims.TurnLeft;
+        Prims.table.right = Prims.TurnRight;
         Prims.table.home = Prims.Home;
         Prims.table.setspeed = Prims.SetSpeed;
         Prims.table.message = Prims.Message;
@@ -272,489 +277,338 @@ export default class Prims {
         }
     }
 
-    static Down (strip) {
-        const martyConnected = ScratchJr.getMartyConnected();
-        var s = strip.spr;
-        var num = Number(strip.thisblock.getArgValue()) * 24;
-        Prims.setTime(strip);
-
-        if (martyConnected){
-            const moveTime = 1500;
-            let steps = Number(strip.thisblock.getArgValue());
-            steps = Math.min(Math.max(steps, 1), 20);
-            const stepLength = -25;
-            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`;
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
-
-
-        var distance = Math.abs(num);
-        if (num == 0) {
-            strip.thisblock = strip.thisblock.next;
-            strip.waitTimer = tinterval;
-            strip.distance = -1;
-            strip.vector = {
-                x: 0,
-                y: 0
-            };
-            return;
-        }
-        if (num == 0) {
-            strip.distance = 0;
-        } else if (strip.distance < 0) {
-            strip.distance = distance;
-            strip.vector = {
-                x: 0,
-                y: 2
-            };
-            Prims.setTime(strip);
-        }
-        Prims.moveAtSpeed(strip);
-    }
-
-    static Up (strip) {
-        
-        const martyConnected = ScratchJr.getMartyConnected();
-        var num = Number(strip.thisblock.getArgValue()) * 24;
-        Prims.setTime(strip);
-
-        if (martyConnected){
-
-            const moveTime = 1500;
-            let steps = Number(strip.thisblock.getArgValue());
-            steps = Math.min(Math.max(steps, 1), 20);
-            const stepLength = 25;
-            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`;
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
-
-
-        var distance = Math.abs(num);
-        if (num == 0) {
-            strip.thisblock = strip.thisblock.next;
-            strip.waitTimer = tinterval;
-            strip.distance = -1;
-            strip.vector = {
-                x: 0,
-                y: 0
-            };
-            return;
-        } else if (strip.distance < 0) {
-            strip.distance = distance;
-            strip.vector = {
-                x: 0,
-                y: -2
-            };
-            Prims.setTime(strip);
-        }
-        Prims.moveAtSpeed(strip);
-    }
+    /****************************************************
+     *             Marty Movement Blocks
+     ****************************************************/
 
     static martyDance (strip) {
 
+        let reps = Math.abs(Number(strip.thisblock.getArgValue()));
         const martyConnected = ScratchJr.getMartyConnected();
-
-        console.log('LETS DANCE!!')
+        const moveTime = 3000;
         Prims.setTime(strip);
 
-        var num = Number(strip.thisblock.getArgValue()) * 24;
-
         if (martyConnected){
-
-            const moveTime = 3000;
-            let reps = Number(strip.thisblock.getArgValue());
    
             let marty_cmd = `traj/dance/${reps}?moveTime=${moveTime}`;
-            
             OS.martyCmd({ cmd: marty_cmd });
+            console.log(marty_cmd);
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*reps);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
             return;
         } else {
-            // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
+            Prims.playMartyServo(strip);
             return;
         }
     }
 
     static getReady (strip) {
-        console.log('GET READY!!')
         const martyConnected = ScratchJr.getMartyConnected();
+        const moveTime = 3000;
 
         Prims.setTime(strip);
 
         if (martyConnected){
 
-            const moveTime = 3000;
-   
             let marty_cmd = `traj/getReady/?moveTime=${moveTime}`;
-            
-            console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
+            console.log(marty_cmd);
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
             return;
         } else {
             // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
-    }
-
-
-    // static eyesExcited (strip) {
-    //     console.log('Excited Eyes!!');
-    //     eyesTraj(strip, 'eyesExcited');
-    //     return;
-    // }
-
-    // static eyesTraj (strip, eyeCommand) {
-    //     console.log('Excited Eyes!!');
-    //     const martyConnected = ScratchJr.getMartyConnected();
-
-    //     Prims.setTime(strip);
-
-    //     if (martyConnected){
-
-    //         //this is the movetime set in the .trj file on RIC
-    //         const moveTime = 1000;
-    //         let marty_cmd = `traj/${eyeCommand}`;
-            
-    //         console.log(marty_cmd);
-    //         OS.martyCmd({ cmd: marty_cmd });
-    //         strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
-    //         Prims.showTime(strip);
-    //         strip.thisblock = strip.thisblock.next;
-    //         return;
-    //     } else {
-
-    //         strip.thisblock = strip.thisblock.next;
-    //         return;
-    //     }
-    // }
-
-    static eyesExcited (strip) {
-        console.log('GET READY!!')
-        const martyConnected = ScratchJr.getMartyConnected();
-
-        Prims.setTime(strip);
-
-        if (martyConnected){
-
-            const moveTime = 1000;
-   
-            let marty_cmd = `traj/eyesExcited`;
-            
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
-            // ScratchAudio.sndFX('boing.wav');
             strip.thisblock = strip.thisblock.next;
             return;
         }
     }
 
-    static eyesWide (strip) {
-        console.log('Eyes Wide!!')
-        const martyConnected = ScratchJr.getMartyConnected();
-
-        Prims.setTime(strip);
-
-        if (martyConnected){
-
-            const moveTime = 1000;
-   
-            let marty_cmd = `traj/eyesWide`;
-            
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
-            // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
-    }
-
-    static eyesAngry (strip) {
-        console.log('Eyes Wide!!')
-        const martyConnected = ScratchJr.getMartyConnected();
-
-        Prims.setTime(strip);
-
-        if (martyConnected){
-
-            const moveTime = 1000;
-   
-            let marty_cmd = `traj/eyesAngry`;
-            
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
-            // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
-    }
-
-    static eyesNormal (strip) {
-        console.log('Eyes Normal!!')
-        const martyConnected = ScratchJr.getMartyConnected();
-
-        Prims.setTime(strip);
-
-        if (martyConnected){
-
-            const moveTime = 1000;
-   
-            let marty_cmd = `traj/eyesNormal`;
-            
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
-            // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
-    }
-
-    static eyesWiggle (strip) {
-        console.log('Eyes Wiggle!!')
-        const martyConnected = ScratchJr.getMartyConnected();
-        const reps = Number(strip.thisblock.getArgValue());
-
-        Prims.setTime(strip);
-
-        if (martyConnected){
-
-            const moveTime = 2000;
-   
-            let marty_cmd = `traj/wiggleEyes/${reps}`;
-            
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*reps);
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
-            // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
-    }
-
-    static waveLeft (strip){
-        const reps = Number(strip.thisblock.getArgValue());
-        const marty_cmd = `traj/wave/${reps}`;
-        const moveTime = 2500;
-        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps);
-    }
-
-    static waveRight (strip){
-        const reps = Number(strip.thisblock.getArgValue());
-        const marty_cmd = `traj/wave/${reps}?side=1`;
-        const moveTime = 2500;
-        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps);
-    }
-
-    static doMartyCmd(strip, marty_cmd, waitTimeMs){
-        const martyConnected = ScratchJr.getMartyConnected();
-
-        Prims.setTime(strip);
-
-        if (martyConnected){
-            console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(waitTimeMs/1000));
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-        } else {
-            // ScratchAudio.sndFX('boing.wav');
-            strip.thisblock = strip.thisblock.next;
-            return;
-        }
-    }
-
-    static Forward (strip) {
+    static StepForward (strip) {
         
+        let s = strip.spr;
+        const moveTime = stepMoveTime;
+        let steps = Math.abs(Number(strip.thisblock.getArgValue()));
         const martyConnected = ScratchJr.getMartyConnected();
-        var s = strip.spr;
-        var num = Number(strip.thisblock.getArgValue()) * 24;
         Prims.setTime(strip);
 
-        if (martyConnected){
+        if (martyConnected == true && !Prims.MartyCommanded(strip)){
 
-            const moveTime = 1000;
-            let steps = Number(strip.thisblock.getArgValue());
             steps = Math.min(Math.max(steps, 1), 20);
-            const stepLength = 25;
-            const side = 1;
-            let marty_cmd = `traj/sidestep/${steps}/?side=${side}&moveTime=${moveTime}&stepLength=${stepLength}`;
-            
+            let stepLength = 1 * stepSize; //positive is forward
+            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`;
+            OS.martyCmd({ cmd: marty_cmd });
             console.log(marty_cmd);
-            OS.martyCmd({ cmd: marty_cmd, steps: num });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-            
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
         }
 
-        
-        var distance = Math.abs(num);
-        if (s.flip) {
-            s.flip = false;
-            s.render();
-        }
-        if (num == 0) {
+        if (steps == 0) {
             strip.thisblock = strip.thisblock.next;
-            strip.waitTimer = tinterval * Math.pow(2, 2 - Math.floor(s.speed / 2));
+            strip.waitTimer = tinterval;
+            strip.distance = -1;
+            strip.cmdSent = false;
             strip.vector = {
                 x: 0,
                 y: 0
             };
-            strip.distance = -1;
             return;
+
         } else if (strip.distance < 0) {
-            strip.distance = distance;
+            strip.waitTime = (moveTime + moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+            var res = {};
+            var rad = s.angle * (Math.PI / 180);
+            res.x = steps * stepSize * 0.5 * Math.sin(rad);
+            res.y = steps * stepSize * 0.5 * Math.cos(rad) * -1;
+
+            strip.distance = steps * stepSize * 0.5;
             strip.vector = {
-                x: 2,
-                y: 0
+                x: res.x,
+                y: res.y
             };
+
+            let finX = res.x + s.xcoor;
+            let finY = res.y + s.ycoor;
+            strip.finalPosition = {
+                x: finX,
+                y: finY
+            }
+ 
+            strip.waitTime = strip.waitTime * 0.1;
+            strip.stepVector = Vector.scale(strip.vector, (0.1/steps));
+
             Prims.setTime(strip);
         }
         Prims.moveAtSpeed(strip);
     }
 
-    static Back (strip) {
+    static StepBackward (strip) {
 
+        let s = strip.spr;
+        const moveTime = stepMoveTime;
+        let steps = Math.abs(Number(strip.thisblock.getArgValue()));
         const martyConnected = ScratchJr.getMartyConnected();
-        var s = strip.spr;
-        var num = Number(strip.thisblock.getArgValue()) * 24;
         Prims.setTime(strip);
 
-        if (martyConnected){
-
-            const moveTime = 1000;
-            let steps = Number(strip.thisblock.getArgValue());
+        if (martyConnected == true && !Prims.MartyCommanded(strip)){
+            
             steps = Math.min(Math.max(steps, 1), 20);
-            const stepLength = 25;
+            let stepLength = -1 * stepSize;
+            let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`;
+            OS.martyCmd({ cmd: marty_cmd });
+            console.log(marty_cmd);
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+        }
+
+        if (steps == 0) {
+            strip.thisblock = strip.thisblock.next;
+            strip.waitTimer = tinterval;
+            strip.distance = -1;
+            strip.cmdSent = false;
+            strip.vector = {
+                x: 0,
+                y: 0
+            };
+            return;
+        } else if (strip.distance < 0) {
+            strip.waitTime = (moveTime + moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+            var res = {};
+            var rad = s.angle * (Math.PI / 180);
+            res.x = steps * stepSize * 0.5 * Math.sin(rad) * -1;
+            res.y = steps * stepSize * 0.5 * Math.cos(rad);
+            
+            strip.distance = steps * stepSize * 0.5;
+            strip.vector = {
+                x: res.x,
+                y: res.y
+            };
+
+            let finX = res.x + s.xcoor;
+            let finY = res.y + s.ycoor;
+            strip.finalPosition = {
+                x: finX,
+                y: finY
+            }
+
+            strip.waitTime = strip.waitTime * 0.1;
+            strip.stepVector = Vector.scale(strip.vector, (0.1/steps));
+
+            Prims.setTime(strip);
+        }
+        Prims.moveAtSpeed(strip);
+    }
+
+   
+    static StepLeft (strip) {
+
+        let s = strip.spr;
+        const moveTime = stepMoveTime;
+        let steps = Math.abs(Number(strip.thisblock.getArgValue()));
+        const martyConnected = ScratchJr.getMartyConnected();
+        Prims.setTime(strip);
+
+        if (martyConnected == true && !Prims.MartyCommanded(strip)){
+
+            steps = Math.min(Math.max(steps, 1), 20);
+            let stepLength = stepSize; 
             const side = 0;
             let marty_cmd = `traj/sidestep/${steps}/?side=${side}&moveTime=${moveTime}&stepLength=${stepLength}`;
-            
             OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-            
+            console.log(marty_cmd);
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
         }
-
-
-        var distance = Math.abs(num);
-        if (!s.flip) {
-            s.flip = true;
-            s.render();
-        }
-        if (num == 0) {
+        
+        if (steps == 0) {
             strip.thisblock = strip.thisblock.next;
+            strip.waitTimer = tinterval;
+            strip.distance = -1;
             strip.vector = {
                 x: 0,
                 y: 0
             };
-            strip.waitTimer = tinterval * Math.pow(2, 2 - Math.floor(s.speed / 2));
             return;
-        }
-        if (num == 0) {
-            strip.distance = 0;
+
         } else if (strip.distance < 0) {
-            strip.distance = distance;
+            strip.waitTime = (moveTime + moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+            var res = {};
+            var rad = (s.angle - 90) * (Math.PI / 180);
+            res.x = steps * stepSize * 0.5 * Math.sin(rad) ;
+            res.y = steps * stepSize * 0.5 * Math.cos(rad) * -1;
+
+            strip.distance = steps * stepSize * 0.5;
             strip.vector = {
-                x: -2,
-                y: 0
+                x: res.x,
+                y: res.y
             };
+
+            let finX = res.x + s.xcoor;
+            let finY = res.y + s.ycoor;
+            strip.finalPosition = {
+                x: finX,
+                y: finY
+            }
+
+            strip.waitTime = strip.waitTime * 0.1;
+            strip.stepVector = Vector.scale(strip.vector, (0.1/steps));
+
             Prims.setTime(strip);
         }
         Prims.moveAtSpeed(strip);
     }
+    
+
+    static StepRight (strip) {
+        
+        var s = strip.spr;
+        const moveTime = stepMoveTime;
+        var steps = Math.abs(Number(strip.thisblock.getArgValue()));
+        const martyConnected = ScratchJr.getMartyConnected();
+        Prims.setTime(strip);
+
+        if (martyConnected == true && !Prims.MartyCommanded(strip)){
+
+            steps = Math.min(Math.max(steps, 1), 20);
+            const stepLength = stepSize;
+            const side = 1;
+            let marty_cmd = `traj/sidestep/${steps}/?side=${side}&moveTime=${moveTime}&stepLength=${stepLength}`;
+            OS.martyCmd({ cmd: marty_cmd });
+            console.log(marty_cmd);
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+        }
+
+        if (steps == 0) {
+            strip.thisblock = strip.thisblock.next;
+            strip.waitTimer = tinterval;
+            strip.distance = -1;
+            strip.vector = {
+                x: 0,
+                y: 0
+            };
+            return;
+
+        } else if (strip.distance < 0) {
+            strip.waitTime = (moveTime + moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+            var res = {};
+            var rad = (s.angle + 90) * (Math.PI / 180);
+            res.x = steps * stepSize * 0.5 * Math.sin(rad) ;
+            res.y = steps * stepSize * 0.5 * Math.cos(rad) * -1;
+            
+            strip.distance = steps * stepSize * 0.5;
+            strip.vector = {
+                x: res.x,
+                y: res.y
+            };
+
+            let finX = res.x + s.xcoor;
+            let finY = res.y + s.ycoor;
+            strip.finalPosition = {
+                x: finX,
+                y: finY
+            }
+
+            strip.waitTime = strip.waitTime * 0.1;
+            strip.stepVector = Vector.scale(strip.vector, (0.1/steps));
+
+            Prims.setTime(strip);
+        }
+        Prims.moveAtSpeed(strip);
+    }
+
+    
 
     static moveAtSpeed (strip) {
         var s = strip.spr;
         var distance = strip.distance;
-        var num = Number(strip.thisblock.getArgValue()) * 12; // 1/2 cell size since vector is double
-        var vector = Vector.scale(strip.vector, s.speed * Math.abs(num) / num);
-        distance -= Math.abs(Vector.len(vector));
+        distance -= Math.abs(Vector.len(strip.stepVector));
+
         if (distance < 0) {
-            vector = Vector.scale(strip.vector, strip.distance);
-            s.setPos(s.xcoor + vector.x, s.ycoor + vector.y);
+            s.setPos(strip.finalPosition.x, strip.finalPosition.y);
             strip.distance = -1;
             strip.vector = {
                 x: 0,
                 y: 0
             };
+            strip.cmdSent = false;
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
+
         } else {
-            s.setPos(s.xcoor + vector.x, s.ycoor + vector.y);
-            strip.waitTimer = tinterval;
+            s.setPos(s.xcoor + strip.stepVector.x, s.ycoor + strip.stepVector.y);
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(strip.waitTime));
             strip.distance = distance;
         }
     }
 
-    static Right (strip) {
-        var num = Number(strip.thisblock.getArgValue()) * 30;
+    static TurnRight (strip) {
+        var num = Number(strip.thisblock.getArgValue()) * turnSize; //Turnsize is set globally to keep left and right consistent
         var s = strip.spr;
+        const moveTime = turnMoveTime;
+        let steps = Number(strip.thisblock.getArgValue());
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
-        if (martyConnected){
+        if (martyConnected == true && !Prims.MartyCommanded(strip)){
 
-            const moveTime = 1500;
-            let steps = Number(strip.thisblock.getArgValue());
             steps = Math.min(Math.max(steps, 1), 20);
-            const stepLength = 25;
-            let turn = -20;
+            let turn = -1 * turnSize; //Negative Direction
             let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&turn=${turn}&stepLength=1`;
             OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-            
+            console.log(marty_cmd);
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
         }
 
         if (strip.count < 0) {
-            strip.count = Math.floor(Math.abs(num) / s.speed * 0.25);
-            strip.angleStep = s.speed * 4 * Math.abs(num) / num;
-            strip.finalAngle = s.angle + num;
-            strip.finalAngle = strip.finalAngle % 360;
+            strip.waitTime = (moveTime + moveTimeBuffer) * steps / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+            strip.count = Math.floor(Math.abs(steps) * turnStepCount);   //how many steps do we want to break the movement down into?
+            strip.waitTime = strip.waitTime / strip.count;
+            strip.angleStep = turnSize / turnStepCount;                  //Break the total turn size down by number of steps the sprite should take
+            strip.finalAngle = s.angle + num;                            //Final position is current angle sub rotation angle
+            strip.finalAngle = strip.finalAngle % 360;                   //Correct for rolling over 360
             if (strip.finalAngle < 0) {
                 strip.finalAngle += 360;
             }
@@ -766,33 +620,31 @@ export default class Prims {
         Prims.turning(strip);
     }
 
-    static Left (strip) {
-        var num = Number(strip.thisblock.getArgValue()) * 30;
+    static TurnLeft (strip) {
+        var num = Number(strip.thisblock.getArgValue()) * turnSize; //Turnsize is set globally to keep left and right consistent
         var s = strip.spr;
+        const moveTime = turnMoveTime;
+        let steps = Number(strip.thisblock.getArgValue());
         const martyConnected = ScratchJr.getMartyConnected();
-
         Prims.setTime(strip);
 
-        if (martyConnected == true){
+        if (martyConnected == true && !Prims.MartyCommanded(strip)){
 
-            const moveTime = 1500;
-            let steps = Number(strip.thisblock.getArgValue());
             steps = Math.min(Math.max(steps, 1), 20);
-            let turn = 20;
+            let turn = 1 * turnSize; //Positive Direction
             let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&turn=${turn}&stepLength=1`;
             OS.martyCmd({ cmd: marty_cmd });
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000)*steps);
-            Prims.showTime(strip);
-            strip.thisblock = strip.thisblock.next;
-            return;
-            
+            console.log(marty_cmd);
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
         }
         
         if (strip.count < 0) {
-            strip.count = Math.floor(Math.abs(num) / s.speed * 0.25);
-            strip.angleStep = -s.speed * 4 * Math.abs(num) / num;
-            strip.finalAngle = s.angle - num;
-            strip.finalAngle = strip.finalAngle % 360;
+            strip.waitTime = (moveTime + moveTimeBuffer) * steps / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+            strip.count = Math.floor(Math.abs(steps) * turnStepCount);   //how many steps do we want to break the movement down into?
+            strip.waitTime = strip.waitTime / strip.count;
+            strip.angleStep = - turnSize / turnStepCount;                //Break the total turn size down by number of steps the sprite should take
+            strip.finalAngle = s.angle - num;                            //Final position is current angle sub rotation angle
+            strip.finalAngle = strip.finalAngle % 360;                   //Correct for rolling over 360
             if (strip.finalAngle < 0) {
                 strip.finalAngle += 360;
             }
@@ -812,12 +664,99 @@ export default class Prims {
             strip.count = -1;
             s.setHeading(strip.finalAngle);
             Prims.showTime(strip);
+            strip.cmdSent = false;
             strip.thisblock = strip.thisblock.next;
         } else {
             s.setHeading(s.angle + strip.angleStep);
-            strip.waitTimer = tinterval;
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(strip.waitTime));
+
             strip.count = count;
         }
+    }
+
+    static eyesExcited (strip) {
+        const moveTime = 1000;
+        let marty_cmd = `traj/eyesExcited`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime, Prims.playMartyServo);
+    }
+
+    static eyesWide (strip) {
+        const moveTime = 1000;
+        let marty_cmd = `traj/eyesWide`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime, Prims.playMartyServo);      
+    }
+
+    static eyesAngry (strip) {
+        const moveTime = 1000;
+        let marty_cmd = `traj/eyesAngry`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime, Prims.playMartyServo);
+    }
+
+    static eyesNormal (strip) {
+        const moveTime = 1000;
+        let marty_cmd = `traj/eyesNormal`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime, Prims.playMartyServo);
+    }
+
+    static eyesWiggle (strip) {
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2000;
+        const marty_cmd = `traj/wiggleEyes/${reps}`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
+    }
+
+    static waveLeft (strip){
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2500;
+        const marty_cmd = `traj/wave/${reps}`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
+    }
+
+    static waveRight (strip){
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2500;
+        const marty_cmd = `traj/wave/${reps}?side=1`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
+    }
+
+    static doMartyCmd(strip, marty_cmd, waitTimeMs, disconnectedFunc){
+        const martyConnected = ScratchJr.getMartyConnected();
+
+        Prims.setTime(strip);
+
+        if (martyConnected){
+            console.log(marty_cmd);
+            OS.martyCmd({ cmd: marty_cmd });
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(waitTimeMs/1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            if (disconnectedFunc) {
+                disconnectedFunc(strip);
+                return;
+            }
+            strip.thisblock = strip.thisblock.next;
+            return;
+        }
+    }
+
+    static playMartyServo(strip){
+        const moveTime = 850;
+        ScratchAudio.sndFX('marty_eyes_servo.wav');
+        strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
+        strip.thisblock = strip.thisblock.next;
+        return;
+    }
+
+
+    static MartyCommanded (strip) {
+        //This variable alows the sprite and robot to move together
+        //It keeps track of when the comman has been sent to the robot as the sprite calls the function many more times
+        if (strip.cmdSent == null) {
+            strip.cmdSent = false;
+        }
+            return strip.cmdSent;
     }
 
     static Same (strip) {

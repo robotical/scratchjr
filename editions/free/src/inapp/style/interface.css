@@ -71,17 +71,35 @@ body {
 /* 1. Save */
 
 #interface-button-save {
-	left: ${css_vh(30.59)};
+	left: ${css_vh(14.59)};
 	top: ${css_vh(-6.25)};
 }
 
 #interface-vertical-line-save {
 	height: ${css_vh(2.47)};
 	top: ${css_vh(-0.82)};
-	left: ${css_vh(33.55)};
+	left: ${css_vh(17.55)};
 }
 
 #interface-dot-save {
+	top: ${css_vh(1.15)};
+	left: ${css_vh(17.22)};
+}
+
+/* 2. Marty Connect */
+
+#interface-button-marty-connect {
+	left: ${css_vh(30.59)};
+	top: ${css_vh(-6.25)};
+}
+
+#interface-vertical-line-marty-connect {
+	height: ${css_vh(2.47)};
+	top: ${css_vh(-0.82)};
+	left: ${css_vh(33.55)};
+}
+
+#interface-dot-marty-connect {
 	top: ${css_vh(1.15)};
 	left: ${css_vh(33.22)};
 }
@@ -388,7 +406,7 @@ body {
 #interface-vertical-line-programming-script-1 {
     height: ${css_vh(1.64)};
     top: ${css_vh(63.32)};
-    left: ${css_vh(65.79)};
+    left: ${css_vh(69.79)};
 }
 
 #interface-vertical-line-programming-script-3 {
@@ -398,9 +416,9 @@ body {
 }
 
 #interface-horizontal-line-programming-script {
-    width: ${css_vh(27.47)};
+    width: ${css_vh(23.47)};
     top: ${css_vh(64.97)};
-    left: ${css_vh(65.79)};
+    left: ${css_vh(69.79)};
 }
 
 #interface-vertical-line-programming-script-2 {

@@ -449,8 +449,9 @@ z-index: 5;
     position: absolute;
     top: ${css_vh(2.60)};
     left: ${css_vh(3.26)};
-    width: ${css_vh(18.88)};
-    height: ${css_vh(18.88)};
+    width: ${css_vh(14.44)};
+    height: ${css_vh(14.44)};
+    filter: opacity(0.25);
 }
 
 .watermark > canvas{

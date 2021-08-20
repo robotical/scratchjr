@@ -858,8 +858,8 @@ export default class SVGTools {
 
     static getWatermark (shape, color) {
         var svg = SVGTools.getCopy(shape);
-        SVGTools.removeExtras(svg);
-        SVGTools.changeShape(svg, color);
+        // SVGTools.removeExtras(svg);
+        // SVGTools.changeShape(svg, color);
         return svg;
     }
 
