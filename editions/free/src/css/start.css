@@ -60,7 +60,7 @@ div.frame {
     margin: 0px;
     height: 22%;
     z-index: 5;
-    background: url('../assets/start/Cat.svg');
+    background: url('../assets/start/MartyExcited.svg');
     width: 100%;
     background-position: center center;
     background-repeat: no-repeat;
@@ -74,7 +74,7 @@ div.frame {
     margin: 0px;
     height: 16%;
     z-index: 10;
-    background: url('../assets/start/ScratchJrLogo.svg');
+    background: url('../assets/start/MartyBlocksLogo.svg');
     background-position: center center;
     background-repeat: no-repeat;
     background-size: auto 100%;
