@@ -331,8 +331,7 @@ export default class Prims {
             return;
         } else {
             // ScratchAudio.sndFX('boing.wav');
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
-            strip.thisblock = strip.thisblock.next;
+            Prims.playMartyServo(strip);
             return;
         }
     }
