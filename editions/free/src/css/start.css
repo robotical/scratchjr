@@ -56,11 +56,12 @@ div.frame {
 
 *.catface {
     position: absolute;
-    top: 18%;
+    top: 10%;
     margin: 0px;
-    height: 28%;
+    height: 35%;
     z-index: 5;
     background: url('../assets/start/MartyFull.svg');
+    transform: rotate(13deg);
     width: 100%;
     background-position: center center;
     background-repeat: no-repeat;
@@ -69,12 +70,12 @@ div.frame {
 
 *.jrlogo {
     position: absolute;
-    top: 39%;
+    top: 27%;
     width: 100%;
     margin: 0px;
-    height: 10%;
+    height: 30%;
     z-index: 10;
-    /* background: url('../assets/start/MartyBlocksLogo.svg'); */
+    background: url('../assets/start/MartyBlocksJr_BasedOnScratchJr.png');
     background-position: center center;
     background-repeat: no-repeat;
     background-size: auto 100%;
