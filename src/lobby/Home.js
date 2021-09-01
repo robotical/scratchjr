@@ -15,6 +15,7 @@ let frame;
 let scrollvalue;
 let version;
 let timeoutEvent;
+let performingAction = false;
 
 export default class Home {
     static init () {
@@ -26,6 +27,8 @@ export default class Home {
         div.setAttribute('id', 'scrollarea');
         frame.ontouchstart = Home.handleTouchStart;
         frame.ontouchend = Home.handleTouchEnd;
+        frame.onmousedown = Home.handleTouchStart;
+        frame.onmouseup = Home.handleTouchEnd;
         Home.displayYourProjects();
     }
 
@@ -44,6 +47,17 @@ export default class Home {
     //////////////////////////
 
     static handleTouchStart (e) {
+        // On my android tablet, when touching a project,
+        // the tablet triggers the mousedown event
+        // after touchstart event about 600ms
+        // --Donald
+        if (performingAction) {
+            return;
+        }
+        performingAction = true;
+        setTimeout(function () {
+            performingAction = false;
+        }, 1000);
         Home.dragging = false;
         Home.holding = false;
         // if ((t.nodeName == "INPUT") || (t.nodeName == "FORM")) return;
@@ -58,6 +72,7 @@ export default class Home {
         }
         function holdit () {
             frame.ontouchmove = Home.handleMove;
+            frame.onmousemove = Home.handleMove;
             var repeat = function () {
                 if (Home.actionTarget && (Home.actionTarget.childElementCount > 2)) {
                     Home.actionTarget.childNodes[Home.actionTarget.childElementCount - 1].style.visibility = 'visible';
@@ -105,11 +120,8 @@ export default class Home {
         if (e.touches && (e.touches.length > 1)) {
             return;
         }
-        if (isTablet) {
-            frame.ontouchmove = undefined;
-        } else {
-            frame.onmousemove = undefined;
-        }
+        frame.ontouchmove = undefined;
+        frame.onmousemove = undefined;
         if (timeoutEvent) {
             clearTimeout(timeoutEvent);
         }

@@ -93,12 +93,12 @@ export default class UI {
         var sl = newHTML('div', 'leftpanel', div);
         var flip = newHTML('div', 'flipme', sl);
         flip.setAttribute('id', 'flip');
-        flip.ontouchstart = function (evt) {
+        flip.onclick = function (evt) {
             ScratchJr.saveAndFlip(evt);
         }; // move to project
         var martyConn = newHTML('div', 'martyConnection', sl);
         martyConn.setAttribute('id', 'martyConnection');
-        martyConn.ontouchstart = function(evt) {
+        martyConn.onclick = function(evt) {
           //document.getElementById('martyConnection').innerHTML = "pressed";
             ScratchAudio.sndFX('keydown.wav');
             const command = mv2.isConnected ? 'disconnect' : 'connect';
@@ -153,7 +153,7 @@ export default class UI {
             var shareEmail = newHTML('div', 'infoboxShareButton', shareButtons);
             shareEmail.id = 'infoboxShareButtonEmail';
             shareEmail.textContent = Localization.localize('SHARING_BY_EMAIL');
-            shareEmail.ontouchstart = function (e) {
+            shareEmail.onclick = function (e) {
                 UI.infoDoShare(e, nameField, shareLoadingGif, EMAILSHARE);
             };
 
@@ -168,7 +168,7 @@ export default class UI {
                 shareAirdrop.id = 'infoboxShareButtonAirdrop';
                 shareAirdrop.textContent = Localization.localize('SHARING_BY_AIRDROP');
                 shareAirdrop.style.float = 'right';
-                shareAirdrop.ontouchstart = function (e) {
+                shareAirdrop.onclick = function (e) {
                     UI.infoDoShare(e, nameField, shareLoadingGif, AIRDROPSHARE);
                 };
             }
@@ -180,16 +180,15 @@ export default class UI {
             var shareLoadingGif = newHTML('img', 'infoboxShareLoading', shareButtons);
             shareLoadingGif.src = './assets/ui/loader.png';
 
-            parentsButton.ontouchstart = function (e) {
+            parentsButton.onclick = function (e) {
                 UI.parentalGate(e, function (e) {
                     UI.showSharing(e, shareButtons, parentsSection);
                 });
             };
         }
 
-        info.ontouchend = UI.showInfoBox;
-        okclicky.ontouchstart = UI.hideInfoBox;
-        okclicky.ontouchstart = function (evt) {
+        info.onclick = UI.showInfoBox;
+        okclicky.onclick = function (evt) {
             UI.hideInfoBox(evt, nameField);
         };
     }
@@ -199,7 +198,7 @@ export default class UI {
         var pgFrame = newHTML('div', 'parentalgate', gn('frame'));
 
         var pgCloseButton = newHTML('div', 'paintdone', pgFrame);
-        pgCloseButton.ontouchstart = function () {
+        pgCloseButton.onclick = function () {
             parentalGateClose(false);
         };
 
@@ -230,13 +229,13 @@ export default class UI {
         pgChoiceB.textContent = theProblem[2];
         pgChoiceC.textContent = theProblem[3];
 
-        pgChoiceA.ontouchstart = function () {
+        pgChoiceA.onclick = function () {
             parentalGateClose(theProblem[4] == 0);
         };
-        pgChoiceB.ontouchstart = function () {
+        pgChoiceB.onclick = function () {
             parentalGateClose(theProblem[4] == 1);
         };
-        pgChoiceC.ontouchstart = function () {
+        pgChoiceC.onclick = function () {
             parentalGateClose(theProblem[4] == 2);
         };
 
@@ -403,7 +402,7 @@ export default class UI {
 
         // Prevent button from thrashing
         setTimeout(function () {
-            okclicky.ontouchend = UI.hideInfoBox;
+            okclicky.onclick = UI.hideInfoBox;
             projectNameTextInput.onblur = function () {
                 if (isAndroid) {
                     AndroidInterface.scratchjr_forceHideKeyboard();
@@ -415,7 +414,7 @@ export default class UI {
                 (document.forms.projectname.myproject).focus();
             }
         };
-        info.ontouchend = null;
+        info.onclick = null;
 
         ScratchJr.onBackButtonCallback.push(function () {
             var e2 = document.createEvent('TouchEvent');
@@ -462,9 +461,9 @@ export default class UI {
         ScratchJr.onBackButtonCallback.pop();
 
         // Prevent button thrashing
-        okclicky.ontouchend = null;
+        okclicky.onclick = null;
         setTimeout(function () {
-            info.ontouchend = UI.showInfoBox;
+            info.onclick = UI.showInfoBox;
         }, 500);
 
         if (ScratchJr.isEditable()) {
@@ -492,6 +491,7 @@ export default class UI {
         var div = newHTML('div', 'spritecc', p);
         div.setAttribute('id', 'spritecc');
         div.ontouchstart = UI.spriteThumbsActions;
+        div.onmousedown = UI.spriteThumbsActions;
 
         // scrollbar
         var sb = newHTML('div', 'scrollbar', sprites);
@@ -502,7 +502,7 @@ export default class UI {
         // // new sprite
         // if (ScratchJr.isEditable()) {
         //     var ns = newHTML('div', 'addsprite', sprites);
-        //     ns.ontouchstart = UI.addSprite;
+        //     ns.onclick = UI.addSprite;
         // }
     }
 
@@ -741,18 +741,18 @@ export default class UI {
         Grid.init(div);
 
          // Green Flag
-        UI.creatTopBarClicky(div, 'go', 'go on', UI.toggleRun);
+        UI.createTopBarClicky(div, 'go', 'go on', UI.toggleRun);
 
         // if (!ScratchJr.isMartyMode()) {
             if (ScratchJr.isEditable()) {
-                UI.creatTopBarClicky(div, 'addtext', 'addText', UI.addText);
-                UI.creatTopBarClicky(div, 'setbkg', 'changeBkg', UI.addBackground);
+                UI.createTopBarClicky(div, 'addtext', 'addText', UI.addText);
+                UI.createTopBarClicky(div, 'setbkg', 'changeBkg', UI.addBackground);
             }
 
-            UI.creatTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
-            UI.creatTopBarClicky(div, 'full', 'fullscreen', ScratchJr.fullScreen);
+            UI.createTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
+            UI.createTopBarClicky(div, 'full', 'fullscreen', ScratchJr.fullScreen);
 
-            UI.creatTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
+            UI.createTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
             UI.setShowGrid(false);
         // }
     }
@@ -792,10 +792,10 @@ export default class UI {
         gn('grid').className = Grid.hidden ? 'gridToggle off' : 'gridToggle on';
     }
 
-    // UI.creatTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
-    static creatTopBarClicky (p, str, mstyle, fcn) {
+    // UI.createTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
+    static createTopBarClicky (p, str, mstyle, fcn) {
         var toggle = newHTML('div', mstyle, p);
-        toggle.ontouchstart = fcn;
+        toggle.onclick = fcn;
         toggle.setAttribute('id', str);
     }
 
@@ -854,16 +854,8 @@ export default class UI {
     static fullscreenControls () {
         UI.nextpage = newHTML('div', 'nextpage off', frame);
         UI.prevpage = newHTML('div', 'nextpage off', frame);
-        if (isTablet) {
-            UI.nextpage.ontouchstart = UI.nextPage;
-        } else {
-            UI.nextpage.onmousedown = UI.nextPage;
-        }
-        if (isTablet) {
-            UI.prevpage.ontouchstart = UI.prevPage;
-        } else {
-            UI.prevpage.onmousedown = UI.prevPage;
-        }
+        UI.nextpage.onclick = UI.nextPage;
+        UI.prevpage.onclick = UI.prevPage;
     }
 
     static updatePageControls () {
@@ -966,9 +958,9 @@ export default class UI {
         });
         tb.setAttribute('id', 'toolbar');
         var addt = newHTML('div', 'addText', tb);
-        addt.ontouchstart = UI.addText;
+        addt.onclick = UI.addText;
         var changebkg = newHTML('div', 'changeBkg', tb);
-        changebkg.ontouchstart = UI.addBackground;
+        changebkg.onclick = UI.addBackground;
     }
 
     static addSprite (e) {
@@ -1048,10 +1040,12 @@ export default class UI {
         var clicky = newHTML('div', 'fontsizeText off', ta);
         clicky.setAttribute('id', 'fontsizebutton');
         clicky.ontouchstart = UI.openFontSizeMenu;
+        clicky.onmousedown = UI.openFontSizeMenu;
         var col = newHTML('div', 'changecolorText off', ta);
         col.setAttribute('id', 'fontcolorbutton');
 
         col.ontouchstart = UI.topLevelColor;
+        col.onmousedown = UI.topLevelColor;
         UI.createColorMenu(tf);
         UI.createTextSizeMenu(tf);
     }
@@ -1071,6 +1065,7 @@ export default class UI {
             Paint.setSplashColor(sf, Paint.splash, swatchlist[i]);
             Paint.addImageUrl(sf, Paint.splashshade);
             colour.ontouchstart = UI.setTextColor;
+            colour.onmousedown = UI.setTextColor;
         }
         UI.setMenuTextColor(gn('textcolormenu').childNodes[9]);
     }
@@ -1085,6 +1080,7 @@ export default class UI {
             var sf = newHTML('span', undefined, textuisize);
             sf.textContent = 'A';
             textuisize.ontouchstart = UI.setTextSize;
+            textuisize.onmousedown = UI.setTextSize;
         }
         UI.setMenuTextSize(gn('textfontsizes').childNodes[5]);
     }

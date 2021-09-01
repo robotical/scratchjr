@@ -52,6 +52,15 @@ export default class ScriptsPane {
                 return;
             }
         };
+        currentsc.parentNode.onmousedown = function (evt) {
+            //this if statment stops users from button bashing
+            var isOff = ScratchJr.runtime.inactive();
+            if (isOff){
+                currentsc.owner.scriptsMouseDown(evt);
+            } else {
+                return;
+            }
+        };
         scroll.update();
     }
 
