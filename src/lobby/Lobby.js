@@ -50,11 +50,11 @@ export default class Lobby {
                 Lobby.setPage('home');
             }
         };
-        gn('helptab').ontouchstart = function () {
-            if (gn('helptab').className != 'help on') {
-                Lobby.setPage('help');
-            }
-        };
+        // gn('helptab').ontouchstart = function () {
+        //     if (gn('helptab').className != 'help on') {
+        //         Lobby.setPage('help');
+        //     }
+        // };
         gn('booktab').ontouchstart = function () {
             if (gn('booktab').className != 'book on') {
                 Lobby.setPage('book');
@@ -119,11 +119,11 @@ export default class Lobby {
             ScratchAudio.sndFX('tap.wav');
             Lobby.loadProjects(div);
             break;
-        case 'help':
-            busy = true;
-            ScratchAudio.sndFX('tap.wav');
-            Lobby.loadSamples(div);
-            break;
+        // case 'help':
+        //     busy = true;
+        //     ScratchAudio.sndFX('tap.wav');
+        //     Lobby.loadSamples(div);
+        //     break;
         case 'book':
             Lobby.loadGuide(div);
             break;
@@ -264,7 +264,8 @@ export default class Lobby {
     }
 
     static selectButton (str) {
-        var list = ['home', 'help', 'book', 'gear'];
+        // var list = ['home', 'help', 'book', 'gear'];
+        var list = ['home', 'book', 'gear'];
         for (var i = 0; i < list.length; i++) {
             if (str == list[i]) {
                 gn(list[i] + 'tab').className = list[i] + ' on';

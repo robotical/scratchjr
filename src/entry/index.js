@@ -111,7 +111,8 @@ function indexSetAnalyticsPrefs () {
 function indexLoadStart () {
     indexHideSplash();
     showLogo();
-    gn('gettings').className = 'gettings show';
+    // gn('gettings').className = 'gettings show';
+    gn('gettings').className = 'gettings hide';
     gn('startcode').className = 'startcode show';
 
     indexSetAnalyticsPrefs();
