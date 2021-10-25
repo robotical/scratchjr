@@ -775,6 +775,8 @@ export default class UI {
         if (isOff) {
             ScratchJr.runStrips(e);
         } else {
+            // stop everything
+            OS.martyCmd({cmd: "robot/stop"}, () => {});
             ScratchJr.stopStripsFromTop(e);
         }
     }
