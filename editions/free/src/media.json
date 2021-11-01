@@ -2,11 +2,14 @@
     "path": "./svglibrary/",
     "samples": [
 	       "samples/Star.txt"
-    ],
+    ], 
     "backgrounds": [
-        {"md5":"Farm.svg","width":480,"height":360,"ext":"svg","name":"Farm"}
+        {"md5":"Mars.svg","width":480,"height":360,"ext":"svg","name":"Mars"},
+        {"md5":"RedCarpet.svg","width":480,"height":360,"ext":"svg","name":"RedCarpet"},
+        {"md5":"WoodenFloor.svg","width":480,"height":360,"ext":"svg","name":"WoodenFloor"}
     ],
     "sprites": [
+        {"md5":"Marty.svg","width":150,"height":80,"ext":"svg","name":"MartyCartoon","order":"characters,05 weather","tags":["characters","05 weather"]},
         {"md5":"Star.svg","width":80,"height":101,"ext":"svg","name":"Star","order":"characters,07 weather","tags":["characters","07 weather"]}
     ],
     "sounds": ["pop.mp3"]

@@ -499,11 +499,11 @@ export default class UI {
         var sbthumb = newHTML('div', 'sbthumb', sb);
         sbthumb.setAttribute('id', 'sbthumb');
 
-        // new sprite
-        if (ScratchJr.isEditable()) {
-            var ns = newHTML('div', 'addsprite', sprites);
-            ns.ontouchstart = UI.addSprite;
-        }
+        // // new sprite
+        // if (ScratchJr.isEditable()) {
+        //     var ns = newHTML('div', 'addsprite', sprites);
+        //     ns.ontouchstart = UI.addSprite;
+        // }
     }
 
     static mascotData (page) {

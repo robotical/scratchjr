@@ -3,7 +3,7 @@
     "scratchJrVersion": "iOSv01",
     "useStoryStarters": false,
     "shareEnabled": true,
-    "defaultSprite": "Star.svg",
+    "defaultSprite": "Marty.svg",
     "spriteOutlineColor": "white",
     "stageColor": "#F5F2F7",
     "textSpriteFont": "Helvetica",
@@ -20,26 +20,7 @@
     "defaultLocale": "en",
     "defaultLocaleShort": "en",
     "supportedLocales": {
-        "Català": "ca",
-        "Cymraeg": "cy",
-        "Dansk": "da",
-        "Deutsch": "de",
-        "Ελληνικά": "el",
-        "English": "en",
-        "Español": "es",
-        "Français": "fr",
-        "Italiano": "it",
-        "Nederlands": "nl",
-        "にほんご": "ja",
-        "Norsk": "no",
-        "Polski": "pl",
-        "Português": "pt",
-        "Português BR": "pt-br",
-        "Svenska": "sv",
-        "ไทย": "th",
-        "Türkçe": "tr",
-        "简体中文": "zh-cn",
-        "繁體中文": "zh-tw"
+        "English": "en"
     },
     "settingsPageDisabled": false
 }

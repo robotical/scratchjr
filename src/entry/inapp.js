@@ -34,6 +34,7 @@ export function inappInterfaceGuide () {
 
     var interfaceKeys = [
         'SAVE',
+        'MARTY_CONNECT',
         'STAGE',
         'PRESENTATION_MODE',
         'GRID',
@@ -47,8 +48,8 @@ export function inappInterfaceGuide () {
         'PROGRAMMING_SCRIPT',
         'PROGRAMMING_AREA',
         'BLOCKS_PALETTE',
-        'BLOCKS_CATEGORIES',
-        'CHARACTERS'
+        'BLOCKS_CATEGORIES'
+        // 'CHARACTERS'
     ];
 
     var interfaceDescriptions = [];
@@ -140,14 +141,6 @@ export function inappBlocksGuide () {
     var blockDescriptionKeys = [
         'BLOCKS_GREEN_FLAG',
         'BLOCKS_GREEN_FLAG_DESCRIPTION',
-        'BLOCKS_ON_TAP',
-        'BLOCKS_ON_TAP_DESCRIPTION',
-        'BLOCKS_ON_TOUCH',
-        'BLOCKS_ON_TOUCH_DESCRIPTION',
-        'BLOCKS_ON_MESSAGE',
-        'BLOCKS_ON_MESSAGE_DESCRIPTION',
-        'BLOCKS_SEND_MESSAGE',
-        'BLOCKS_SEND_MESSAGE_DESCRIPTION',
         'BLOCKS_MOVE_RIGHT',
         'BLOCKS_MOVE_RIGHT_DESCRIPTION',
         'BLOCKS_MOVE_LEFT',
@@ -160,10 +153,10 @@ export function inappBlocksGuide () {
         'BLOCKS_TURN_RIGHT_DESCRIPTION',
         'BLOCKS_TURN_LEFT',
         'BLOCKS_TURN_LEFT_DESCRIPTION',
-        'BLOCKS_HOP',
-        'BLOCKS_HOP_DESCRIPTION',
-        'BLOCKS_GO_HOME',
-        'BLOCKS_GO_HOME_DESCRIPTION',
+        'BLOCK_MOVE_GETREADY',
+        'BLOCK_MOVE_GETREADY_DESCRIPTION',
+        'BLOCK_MOVE_DANCE',
+        'BLOCK_MOVE_DANCE_DESCRIPTION',
         'BLOCK_EYES_EXCITED',
         'BLOCK_EYES_EXCITED_DESCRIPTION',
         'BLOCK_EYES_WIDE',
@@ -194,16 +187,12 @@ export function inappBlocksGuide () {
         'BLOCKS_WAIT_DESCRIPTION',
         'BLOCKS_STOP',
         'BLOCKS_STOP_DESCRIPTION',
-        'BLOCKS_SET_SPEED',
-        'BLOCKS_SET_SPEED_DESCRIPTION',
         'BLOCKS_REPEAT',
         'BLOCKS_REPEAT_DESCRIPTION',
         'BLOCKS_END',
         'BLOCKS_END_DESCRIPTION',
         'BLOCKS_REPEAT_FOREVER',
-        'BLOCKS_REPEAT_FOREVER_DESCRIPTION',
-        'BLOCKS_GO_TO_PAGE',
-        'BLOCKS_GO_TO_PAGE_DESCRIPTION'
+        'BLOCKS_REPEAT_FOREVER_DESCRIPTION'
     ];
 
 
