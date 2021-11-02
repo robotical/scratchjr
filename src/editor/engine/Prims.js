@@ -15,7 +15,8 @@ const turnSize = 20;        //the angle in degrees that a turn should be, this i
 const turnStepCount = 2;    //the number of sprite 'steps' to make in a single turn
 const turnMoveTime = 1500;  //the movetime parameter for left and right turns
 const stepMoveTime = 1500;  //the movetime parameter for forward, backward, left and right steps
-const stepSize = 25;        //the size of a step this is used by the sprite and Marty
+const YStepSize = 25;        //the size of a forward/backward step used by the sprite and Marty
+const XStepSize = 35;        //the size of a left/right step used by the sprite and Marty
 const maxStepArgument = 20; //the maxmum number of steps we can make in one REST command
 export default class Prims {
     static get hopList () {
@@ -348,7 +349,7 @@ export default class Prims {
         if (martyConnected == true && !Prims.MartyCommanded(strip)){
 
             steps = Math.min(Math.max(steps, 1), 20);
-            let stepLength = 1 * stepSize; //positive is forward
+            let stepLength = 1 * YStepSize; //positive is forward
             let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`;
             OS.martyCmd({ cmd: marty_cmd });
             console.log(marty_cmd);
@@ -371,10 +372,10 @@ export default class Prims {
 
             var res = {};
             var rad = s.angle * (Math.PI / 180);
-            res.x = steps * stepSize * 0.5 * Math.sin(rad);
-            res.y = steps * stepSize * 0.5 * Math.cos(rad) * -1;
+            res.x = steps * YStepSize * 0.5 * Math.sin(rad);
+            res.y = steps * YStepSize * 0.5 * Math.cos(rad) * -1;
 
-            strip.distance = steps * stepSize * 0.5;
+            strip.distance = steps * YStepSize * 0.5;
             strip.vector = {
                 x: res.x,
                 y: res.y
@@ -407,7 +408,7 @@ export default class Prims {
         if (martyConnected == true && !Prims.MartyCommanded(strip)){
             
             steps = Math.min(Math.max(steps, 1), 20);
-            let stepLength = -1 * stepSize;
+            let stepLength = -1 * YStepSize;
             let marty_cmd = `traj/step/${steps}/?moveTime=${moveTime}&stepLength=${stepLength}`;
             OS.martyCmd({ cmd: marty_cmd });
             console.log(marty_cmd);
@@ -429,10 +430,10 @@ export default class Prims {
 
             var res = {};
             var rad = s.angle * (Math.PI / 180);
-            res.x = steps * stepSize * 0.5 * Math.sin(rad) * -1;
-            res.y = steps * stepSize * 0.5 * Math.cos(rad);
+            res.x = steps * YStepSize * 0.5 * Math.sin(rad) * -1;
+            res.y = steps * YStepSize * 0.5 * Math.cos(rad);
             
-            strip.distance = steps * stepSize * 0.5;
+            strip.distance = steps * YStepSize * 0.5;
             strip.vector = {
                 x: res.x,
                 y: res.y
@@ -466,7 +467,7 @@ export default class Prims {
         if (martyConnected == true && !Prims.MartyCommanded(strip)){
 
             steps = Math.min(Math.max(steps, 1), 20);
-            let stepLength = stepSize; 
+            let stepLength = XStepSize; 
             const side = 0;
             let marty_cmd = `traj/sidestep/${steps}/?side=${side}&moveTime=${moveTime}&stepLength=${stepLength}`;
             OS.martyCmd({ cmd: marty_cmd });
@@ -489,10 +490,10 @@ export default class Prims {
 
             var res = {};
             var rad = (s.angle - 90) * (Math.PI / 180);
-            res.x = steps * stepSize * 0.5 * Math.sin(rad) ;
-            res.y = steps * stepSize * 0.5 * Math.cos(rad) * -1;
+            res.x = steps * XStepSize * 0.5 * Math.sin(rad) ;
+            res.y = steps * XStepSize * 0.5 * Math.cos(rad) * -1;
 
-            strip.distance = steps * stepSize * 0.5;
+            strip.distance = steps * XStepSize * 0.5;
             strip.vector = {
                 x: res.x,
                 y: res.y
@@ -526,7 +527,7 @@ export default class Prims {
         if (martyConnected == true && !Prims.MartyCommanded(strip)){
 
             steps = Math.min(Math.max(steps, 1), 20);
-            const stepLength = stepSize;
+            const stepLength = XStepSize;
             const side = 1;
             let marty_cmd = `traj/sidestep/${steps}/?side=${side}&moveTime=${moveTime}&stepLength=${stepLength}`;
             OS.martyCmd({ cmd: marty_cmd });
@@ -549,10 +550,10 @@ export default class Prims {
 
             var res = {};
             var rad = (s.angle + 90) * (Math.PI / 180);
-            res.x = steps * stepSize * 0.5 * Math.sin(rad) ;
-            res.y = steps * stepSize * 0.5 * Math.cos(rad) * -1;
+            res.x = steps * XStepSize * 0.5 * Math.sin(rad) ;
+            res.y = steps * XStepSize * 0.5 * Math.cos(rad) * -1;
             
-            strip.distance = steps * stepSize * 0.5;
+            strip.distance = steps * XStepSize * 0.5;
             strip.vector = {
                 x: res.x,
                 y: res.y
