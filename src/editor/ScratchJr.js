@@ -200,7 +200,7 @@ export default class ScratchJr {
         currentProject = urlvars.pmd5;
         editmode = urlvars.mode;
         martymode = false;
-        martyConnected = false;
+        martyConnected = mv2.isConnected;
         mv2.addEventListener('onIsConnectedChange', ScratchJr.onMartyConnectedChange);
 
         libInit();
