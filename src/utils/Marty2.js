@@ -85,7 +85,7 @@ class Marty2 extends EventDispatcher {
         }
     }
 
-    updateConnectionInfo(){
+    updateConnectionInfo(){ 
       let newHTML = "";
       if (this.isConnected){
         newHTML = this.martyName +  "<div style='display:flex;height:50%'>" + this.battery_render() + this.signal_render() + "</div>";
