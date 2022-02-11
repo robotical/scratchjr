@@ -16,8 +16,8 @@ When this code starts up, there are several scenarios:
 let alreadyStartedQuestions = false;
 
 export function indexMain () {
-    gn('gettings').ontouchend = indexGettingstarted;
-    gn('startcode').ontouchend = indexGohome;
+    gn('gettings').onclick = indexGettingstarted;
+    gn('startcode').onclick = indexGohome;
     ScratchAudio.init();
     var urlvars = getUrlVars();
     if (urlvars.back && InitialOptions.allQuestionsAnswered()) {
@@ -31,14 +31,14 @@ export function indexMain () {
         gn('startButton').textContent = Localization.localize('PBS_START');
         gn('gettings').textContent = Localization.localize('PBS_HOW_TO');
 
-        gn('startButton').ontouchend = indexGohome;
-        gn('pbschars').ontouchend = indexGohome;
+        gn('startButton').onclick = indexGohome;
+        gn('pbschars').onclick = indexGohome;
 
-        gn('topbar-moreapps').ontouchstart = indexMoreApps;
-        gn('topbar-settings').ontouchstart = indexGoSettings;
-        gn('topbar-info').ontouchstart = indexInfo;
+        gn('topbar-moreapps').onclick = indexMoreApps;
+        gn('topbar-settings').onclick = indexGoSettings;
+        gn('topbar-info').onclick = indexInfo;
     } else {
-        gn('gear').ontouchstart = indexGoSettings;
+        gn('gear').onclick = indexGoSettings;
     }
 
     setTimeout(function () {
@@ -120,6 +120,9 @@ function indexLoadStart () {
     document.ontouchmove = function (e) {
         e.preventDefault();
     };
+    document.onmousemove = function (e) {
+        e.preventDefault();
+    };
     if (isAndroid) {
         AndroidInterface.notifySplashDone();
     }
@@ -162,10 +165,10 @@ function indexAskPlace () {
     gn('usageHome').className = 'usageHome show';
     gn('usageOther').className = 'usageOther show';
     gn('usageNoanswer').className = 'usageNoanswer show';
-    gn('usageSchool').ontouchend = indexSetPlace;
-    gn('usageHome').ontouchend = indexSetPlace;
-    gn('usageOther').ontouchend = indexSetPlace;
-    gn('usageNoanswer').ontouchend = indexSetPlace;
+    gn('usageSchool').onclick = indexSetPlace;
+    gn('usageHome').onclick = indexSetPlace;
+    gn('usageOther').onclick = indexSetPlace;
+    gn('usageNoanswer').onclick = indexSetPlace;
 }
 
 function indexSetPlace (e) {
@@ -204,7 +207,7 @@ function indexHidePlaceQuestion () {
     gn('usageNoanswer').className = 'usageNoanswer hide';
 }
 
-function optionTouched (elem) {
+function optionSelected (elem) {
     var key = elem.target.getAttribute('data-key');
     var value = elem.target.getAttribute('data-value');
     // sometimes a touch is registered by a child of the relevant parent
@@ -256,7 +259,7 @@ function indexShowQuestion (key) {
             optionElem.setAttribute('data-key', key);
             optionElem.setAttribute('data-value', option);
             optionElem.setAttribute('id', 'option-' + key + '-' + optionNum);
-            optionElem.ontouchend = optionTouched;
+            optionElem.onclick = optionSelected;
             optionsListElem.appendChild(optionElem);
 
             switch (optionType) {
@@ -274,6 +277,15 @@ function indexShowQuestion (key) {
             }
             optionNum = optionNum + 1;
         });
+        // iPad mini has the minimum screen size, it can show 13 items in one column
+        // and we use 3 columns as default
+        if (optionNum > 13 * 5) {
+            gn('optionsList').style['column-count'] = 8;
+        } else if (optionNum > 13 * 3) {
+            gn('optionsList').style['column-count'] = 5;
+        } else {
+            gn('optionsList').style['column-count'] = 3;
+        }
         gn('optionsList').className = 'optionsList show';
     }
 }
