@@ -233,15 +233,12 @@ export default class Page {
         var pq = newHTML('p', undefined, num);
         pq.textContent = this.num;
         newHTML('div', 'deletethumb', tb);
-        if (isTablet) {
-            tb.ontouchstart = function (evt) {
-                Thumbs.pageMouseDown(evt);
-            };
-        } else {
-            tb.onmousedown = function (evt) {
-                Thumbs.pageMouseDown(evt);
-            };
-        }
+        tb.ontouchstart = function (evt) {
+            Thumbs.pageMouseDown(evt);
+        };
+        tb.onmousedown = function (evt) {
+            Thumbs.pageMouseDown(evt);
+        };
         this.thumbnail = tb;
         return tb;
     }

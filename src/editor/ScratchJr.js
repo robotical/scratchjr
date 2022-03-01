@@ -255,11 +255,9 @@ export default class ScratchJr {
     static editorEvents () {
         document.ongesturestart = undefined;
         window.ontouchstart = ScratchJr.unfocus;
-        if (isTablet) {
-            window.ontouchend = undefined;
-        } else {
-            window.onmouseup = undefined;
-        }
+        window.onmousedown = ScratchJr.unfocus;
+        window.ontouchend = undefined;
+        window.onmouseup = undefined;
     }
 
     static unfocus (evt) {
@@ -717,6 +715,7 @@ export default class ScratchJr {
     static setupKeypad () {
         keypad = newHTML('div', 'picokeyboard', frame);
         keypad.ontouchstart = ScratchJr.eatEvent;
+        keypad.onmousedown = ScratchJr.eatEvent;
         var pad = newHTML('div', 'insidekeyboard', keypad);
         for (var i = 1; i < 10; i++) {
             ScratchJr.keyboardAddKey(pad, i, 'onekey');
@@ -738,6 +737,7 @@ export default class ScratchJr {
         var mk = newHTML('span', undefined, keym);
         mk.textContent = str ? str : '';
         keym.ontouchstart = ScratchJr.numEditKey;
+        keym.onmousedown = ScratchJr.numEditKey;
     }
 
 
