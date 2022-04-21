@@ -225,9 +225,6 @@ export default class Paint {
     }
 
     static detectGesture (e) {
-        if (!e.touches) {
-            return;
-        }
         if (Camera.active) {
             return;
         }
