@@ -56,6 +56,9 @@ window.onload = () => {
         preprocessAndLoadCss('css', 'css/font.css');
         preprocessAndLoadCss('css', 'css/base.css');
         preprocessAndLoadCss('css', 'css/editor.css');
+        preprocessAndLoadCss('css', 'css/connect-btn.css');
+        preprocessAndLoadCss('css', 'css/disconnect-btn.css');
+        preprocessAndLoadCss('css', 'css/media-queries.css');
         preprocessAndLoadCss('css', 'css/editorleftpanel.css');
         preprocessAndLoadCss('css', 'css/editorstage.css');
         preprocessAndLoadCss('css', 'css/editormodal.css');
