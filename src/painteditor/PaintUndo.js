@@ -3,7 +3,7 @@ import Path from './Path';
 import Paint from './Paint';
 import Camera from './Camera';
 import SVGTools from './SVGTools';
-import {newHTML, gn, isTablet} from '../utils/lib';
+import {newHTML, gn} from '../utils/lib';
 import ScratchAudio from '../utils/ScratchAudio';
 //////////////////////////////////
 // Undo / Redo Functions
