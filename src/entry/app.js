@@ -9,7 +9,13 @@ import {indexMain} from './index';
 import {homeMain} from './home';
 import {editorMain} from './editor';
 import {gettingStartedMain} from './gettingstarted';
-import {inappInterfaceGuide, inappAbout, inappBlocksGuide, inappPaintEditorGuide} from './inapp';
+import {
+    inappInterfaceGuide,
+    inappAbout,
+    inappBlocksGuide,
+    inappPaintEditorGuide,
+    inappPrivacyPolicy
+} from './inapp';
 
 function loadSettings (settingsRoot, whenDone) {
     IO.requestFromServer(settingsRoot + 'settings.json', (result) => {
@@ -41,7 +47,12 @@ window.onload = () => {
         preprocessAndLoadCss('css', 'css/thumbs.css');
         /* For parental gate. These CSS properties should be refactored */
         preprocessAndLoadCss('css', 'css/editor.css');
+        // entryFunction = () => OS.waitForInterface(function () {
+        //     // var assets = Object.keys(MediaLib.keys).join(',');
+        //     // OS.registerLibraryAssets(MediaLib.version, assets, indexMain);
+        // });
         entryFunction = () => OS.waitForInterface(indexMain);
+
         break;
     case 'home':
         // Lobby pages
@@ -97,6 +108,13 @@ window.onload = () => {
         preprocessAndLoadCss('style', 'style/style.css');
         preprocessAndLoadCss('style', 'style/blocks.css');
         entryFunction = () => inappBlocksGuide();
+        root = '../';
+        break;
+    case 'inappPrivacyPolicy':
+        // Blocks guide in-app help frame
+        preprocessAndLoadCss('style', 'style/style.css');
+        preprocessAndLoadCss('style', 'style/privacy.css');
+        entryFunction = () => inappPrivacyPolicy();
         root = '../';
         break;
     }

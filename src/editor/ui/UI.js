@@ -287,13 +287,17 @@ export default class UI {
                 Alert.close();
 
                 // Package the project as a .sjr file
-                IO.zipProject(ScratchJr.currentProject, function (contents) {
+                IO.compressProject(ScratchJr.currentProject, function (fullName) {
                     ScratchJr.onHold = false; // Unfreeze the editing UI
                     var emailSubject = Localization.localize('SHARING_EMAIL_SUBJECT', {
                         PROJECT_NAME: IO.shareName
                     });
-                    OS.sendSjrToShareDialog(IO.zipFileName, emailSubject, Localization.localize('SHARING_EMAIL_TEXT'),
-                        shareType, contents);
+                    OS.sendSjrToShareDialog(
+                        fullName,
+                        emailSubject,
+                        Localization.localize('SHARING_EMAIL_TEXT'),
+                        shareType
+                    );
 
                     shareLoadingGif.style.visibility = 'hidden';
                 });
@@ -347,10 +351,10 @@ export default class UI {
 
     static handleTextFieldSave (dontHide) {
         // Handle story-starter mode project
-        if (ScratchJr.isEditable() && ScratchJr.editmode == 'storyStarter' && !Project.error) {
+        if (ScratchJr.isEditable() && ScratchJr.editmode == 'storyStarter' && !Project.error && ScratchJr.changed) {
             OS.analyticsEvent('samples', 'story_starter_edited', Project.metadata.name);
             // Get the new project name
-            var sampleName = Localization.localize('SAMPLE_' + Project.metadata.name);
+            var sampleName = Localization.localizeSampleName(Project.metadata.name);
             IO.uniqueProjectName({
                 name: sampleName
             }, function (jsonData) {
@@ -381,7 +385,6 @@ export default class UI {
             ScratchJr.storyStart('UI.handleTextFieldSave');
         }
         Project.metadata.name = pname;
-        ScratchJr.changed = true;
         OS.setfield(OS.database, Project.metadata.id, 'name', pname);
         if (!dontHide) {
             ScratchAudio.sndFX('exittap.wav');
@@ -399,6 +402,9 @@ export default class UI {
         if (ScratchJr.onHold) {
             return;
         }
+
+        var canShare = ScratchJr.editmode != 'storyStarter' || ScratchJr.changed;
+        gn('infoboxParentsSectionButton').style.display = canShare ? 'block' : 'none';
 
         // Prevent button from thrashing
         setTimeout(function () {
@@ -432,7 +438,11 @@ export default class UI {
         }
 
         if (ScratchJr.isEditable()) {
-            (document.forms.projectname.myproject).value = Project.metadata.name;
+            var name = Project.metadata.name;
+            if (ScratchJr.editmode == 'storyStarter') {
+                name = Localization.localizeSampleName(name);
+            }
+            (document.forms.projectname.myproject).value = name;
         } else {
             gn('pname').textContent = Project.metadata.name;
         }
@@ -739,22 +749,15 @@ export default class UI {
         div.setAttribute('id', 'stageframe');
         ScratchJr.stage = new Stage(div);
         Grid.init(div);
-
-         // Green Flag
+        if (ScratchJr.isEditable()) {
+            UI.createTopBarClicky(div, 'addtext', 'addText', UI.addText);
+            UI.createTopBarClicky(div, 'setbkg', 'changeBkg', UI.addBackground);
+        }
+        UI.createTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
         UI.createTopBarClicky(div, 'go', 'go on', UI.toggleRun);
-
-        // if (!ScratchJr.isMartyMode()) {
-            if (ScratchJr.isEditable()) {
-                UI.createTopBarClicky(div, 'addtext', 'addText', UI.addText);
-                UI.createTopBarClicky(div, 'setbkg', 'changeBkg', UI.addBackground);
-            }
-
-            UI.createTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
-            UI.createTopBarClicky(div, 'full', 'fullscreen', ScratchJr.fullScreen);
-
-            UI.createTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
-            UI.setShowGrid(false);
-        // }
+        UI.createTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
+        UI.createTopBarClicky(div, 'full', 'fullscreen', ScratchJr.fullScreen);
+        UI.setShowGrid(false);
     }
 
     static resetAllSprites (e) {
@@ -794,7 +797,6 @@ export default class UI {
         gn('grid').className = Grid.hidden ? 'gridToggle off' : 'gridToggle on';
     }
 
-    // UI.createTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
     static createTopBarClicky (p, str, mstyle, fcn) {
         var toggle = newHTML('div', mstyle, p);
         toggle.onclick = fcn;
@@ -904,7 +906,10 @@ export default class UI {
             gn(list[i]).className = gn(list[i]).className + ' presentationmode';
             frame.appendChild(gn(list[i]));
         }
-        var scale = Math.min((w - (fullscreenScaleMultiplier * scaleMultiplier)) / gn('stage').owner.width, h / gn('stage').owner.height);
+        var scale = Math.min(
+            (w - (fullscreenScaleMultiplier * scaleMultiplier)) / gn('stage').owner.width,
+            h / gn('stage').owner.height
+        );
         var dx = Math.floor((w - (gn('stage').owner.width * scale)) / 2);
         var dy = Math.floor((h - (gn('stage').owner.height * scale)) / 2);
 
@@ -1020,11 +1025,14 @@ export default class UI {
     static createFormForText (p) {
         var tf = newHTML('div', 'pagetext off', p);
         tf.setAttribute('id', 'textbox');
-        if (isAndroid) {
-            tf.onmousedown = function (e) {
-                e.preventDefault();
-            };
-        }
+        // If the textbox background is clicked or touched, the input loses focus,
+        // which causes the text input to close unexpectedly
+        var eatEvent = function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        };
+        tf.ontouchstart = eatEvent;
+        tf.onmousedown = eatEvent;
         var activetb = newHTML('form', 'pageform', tf);
         activetb.name = 'activetextbox';
         activetb.id = 'myform';

@@ -291,6 +291,7 @@ div.languagebuttons {
     margin: auto;
     margin-top: ${css_vh(4)};
     width: 90%;
+    display: inline-block;
 }
 
 div.localizationselect {
@@ -305,8 +306,8 @@ div.localizationselect {
     /* fontsize based on device vertical height doesn't work on 16:9 aspect Android device, just set fixed size font */
     font-size: 34.5px;
     text-align: center;
-    margin-left: ${css_vw(3)};
-    margin-bottom: ${css_vw(2)};
+    /* 1.68 = (87.89 * 0.9 / 3 - 23) / 2 */
+    margin: 0 ${css_vw(1.68)} ${css_vw(2)};
     padding-top: 2%;
     background-image: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.2) 51%);
 }
@@ -368,7 +369,7 @@ div.localizationselect.selected:after {
 
 #footer ul.footer-nav .tab,.tab2  {
     position: absolute;
-    width: ${css_vw(25)};
+    width: ${css_vw(20)};
     height: ${css_vh(10.15)};
 }
 
@@ -376,10 +377,11 @@ div.localizationselect.selected:after {
     border-right: 1px solid #ADACA6;
 }
 
-#abouttab       { left: ${css_vw( 0)}; }
-#interfacetab   { left: ${css_vw(25)}; }
-#painttab       { left: ${css_vw(50)}; }
-#blockstab      { left: ${css_vw(75)}; }
+#abouttab       { left: ${css_vw(0)} }
+#interfacetab   { left: ${css_vw(20)} }
+#painttab       { left: ${css_vw(40)} }
+#blockstab      { left: ${css_vw(60)} }
+#privacytab     { left: ${css_vw(80)} }
 
 #footer ul.footer-nav .tab.off, ul.footer-nav .tab2.off   {background-image: none; top:0px;}
 
@@ -398,13 +400,12 @@ div.localizationselect.selected:after {
 
 #footer ul.footer-nav .tab>span , ul.footer-nav .tab2>span{
     position: relative;
-    top: ${css_vh(-6)};
-    left: ${css_vw(5)};
+    top: ${css_vh(-7)};
+    left: ${css_vw(4)};
     padding: 0px;
-    height: ${css_vh(2.86)};
     line-height: ${css_vh(2.86)};
     cursor: pointer;
-    width: ${css_vw(17.58)};
+    width: ${css_vw(11.58)};
     overflow: visible;
     font-size: ${css_vh(2.34)};
     margin: auto;
@@ -416,13 +417,15 @@ div.localizationselect.selected:after {
 
 #footer ul.footer-nav .tab .about-icon {background: url('../assets/lobby/aboutOff.svg'); background-size: 100.5%;}
 #footer ul.footer-nav .tab .interface-icon { background: url('../assets/lobby/interfaceOff.svg'); background-size: 100.5%;}
-#footer ul.footer-nav .tab2 .blocks-icon {background: url('../assets/lobby/blocksOff.svg'); background-size: 100.5%;}
+#footer ul.footer-nav .tab .blocks-icon {background: url('../assets/lobby/blocksOff.svg'); background-size: 100.5%;}
 #footer ul.footer-nav .tab .paint-icon {background: url('../assets/lobby/paintOff.svg'); background-size: 100.5%;}
+#footer ul.footer-nav .tab2 .privacy-icon {background: url('../assets/lobby/privacyOff.svg'); background-size: 100.5%;}
 
 #footer ul.footer-nav .tab.on .about-icon {background: url('../assets/lobby/aboutOn.svg'); background-size: 100.5%;}
 #footer ul.footer-nav .tab.on .interface-icon { background: url('../assets/lobby/interfaceOn.svg'); background-size: 100.5%;}
-#footer ul.footer-nav .tab2.on .blocks-icon {background: url('../assets/lobby/blocksOn.svg'); background-size: 100.5%;}
+#footer ul.footer-nav .tab.on .blocks-icon {background: url('../assets/lobby/blocksOn.svg'); background-size: 100.5%;}
 #footer ul.footer-nav .tab.on .paint-icon {background: url('../assets/lobby/paintOn.svg'); background-size: 100.5%;}
+#footer ul.footer-nav .tab2.on .privacy-icon {background: url('../assets/lobby/privacyOn.svg'); background-size: 100.5%;}
 
 
 *.contentwrap {
@@ -465,6 +468,7 @@ div.localizationselect.selected:after {
     margin: ${css_vh(2.6)} auto;
     width: ${css_vw(87.89)};
     height: auto;
+    text-align: center;
 }
 
 

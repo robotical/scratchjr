@@ -147,6 +147,14 @@ function showLogo () {
     gn('jrlogo').className = 'jrlogo show';
 }
 
+function hideGear () {
+    gn('gear').className = 'gear hide';
+}
+
+function showGear () {
+    gn('gear').className = 'gear show';
+}
+
 function indexAskPlace () {
     gn('authors').className = 'credits show';
     gn('authorsText').className = 'creditsText hide';
@@ -231,6 +239,7 @@ function optionSelected (elem) {
 function indexShowQuestion (key) {
     indexHideSplash();
     hideLogo();
+    hideGear();
     var optionType = InitialOptions.optionTypeForKey(key);
     if (optionType === 'place_preference') {
         indexAskPlace();

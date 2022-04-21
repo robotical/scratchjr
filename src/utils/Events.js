@@ -120,7 +120,6 @@ export default class Events {
         updatefcn = atdrag;
         if (isTablet) { // startDrag event setting
             delta = 10 * scaleMultiplier;
-            
             window.ontouchleave = function (evt) {
                 Events.mouseUp(evt);
             };
@@ -129,7 +128,6 @@ export default class Events {
             };
         } else {
             delta = 7;
-            
         }
         window.ontouchmove = function (evt) {
             Events.mouseMove(evt);
@@ -146,6 +144,9 @@ export default class Events {
     }
 
     static holdit (c, fcn) {
+        if (timeoutEvent) {
+            return;
+        }
         var repeat = function () {
             Events.clearEvents();
             fcn(dragthumbnail);

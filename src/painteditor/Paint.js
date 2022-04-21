@@ -996,10 +996,9 @@ export default class Paint {
             '#722696', // sarah's violet
             '#141463', '#003399', '#1D40ED',
             '#0079D3', '#009EFF', '#76C8FF',
-            '#ACE0FD', '#11B7BC', '#21F9F3', '#C3FCFC', '#54311E',
-            // '#8E572A', '#E4B69D', '#FFCDA4', '#FFEDD7' // skin colors
+            '#ACE0FD', '#11B7BC', '#21F9F3', '#C3FCFC',
+            // '#54311E', '#8E572A', '#E4B69D', '#FFCDA4', '#FFEDD7' // skin colors
             '#FDDBB4', '#E4B681', '#BF8C5C', '#955D31', '#6B3D1F', '#482D18' // new skin colors
-
         ];
     }
 

@@ -461,7 +461,6 @@ export default class Library {
             setTimeout(function () {
                 selectedOne = tb.id;
             }, 200);
-            selectedOne = tb.id;
             clickThumb = tb;
             if (tb.fieldname) {
                 gn('assetname').textContent = tb.fieldname;

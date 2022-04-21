@@ -15,6 +15,7 @@ let frame;
 let scrollvalue;
 let version;
 let timeoutEvent;
+let performingAction = false;
 
 export default class Home {
     static init () {
@@ -46,6 +47,7 @@ export default class Home {
     //////////////////////////
 
     static handleTouchStart (e) {
+        //TODO: uncomment this and see what happens
         // // On my android tablet, when touching a project,
         // // the tablet triggers the mousedown event
         // // after touchstart event about 600ms

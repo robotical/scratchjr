@@ -8,7 +8,9 @@ export const WINDOW_INNER_WIDTH = window.innerWidth;
 export const scaleMultiplier = WINDOW_INNER_HEIGHT / 768.0;
 export const fullscreenScaleMultiplier = 136;
 
+/* eslint-disable no-console */
 console.log('setting OS flags');
+/* eslint-enable no-console */
 export const isiOS = (typeof AndroidInterface == 'undefined');
 export const isAndroid = (typeof AndroidInterface != 'undefined');
 
@@ -62,9 +64,6 @@ export function preprocessAndLoad (url) {
  */
 export function preprocessAndLoadCss (baseUrl, url) {
     var cssData = preprocessAndLoad(url);
-    // cssData = cssData.replace(/url\('/g, 'url(\'' + baseUrl + '/');
-    // cssData = cssData.replace(/url\(([^'])/g, 'url(' + baseUrl + '/$1');
-
     // search for url("../images") pattern
     cssData = cssData.replace(/url\("/g, 'url(\"' + baseUrl + '/');
     // search for url('../images') pattern

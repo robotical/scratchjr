@@ -229,6 +229,10 @@ export default class OS {
     // Sharing
     ///////////////
 
+    static createZipForProject (projectData, metadata, name, fcn) {
+        tabletInterface.createZipForProject(projectData, metadata, name, fcn);
+    }
+
 
     // Called on the JS side to trigger native UI for project sharing.
     // fileName: name for the file to share
@@ -253,6 +257,14 @@ export default class OS {
             return 0;
         }
         return 1;
+    }
+
+    static registerLibraryAssets (version, assets, fcn) {
+        tabletInterface.registerLibraryAssets(version, assets, fcn);
+    }
+
+    static duplicateAsset (path, name, fcn) {
+        tabletInterface.duplicateAsset(path, name, fcn);
     }
 
     // Name of the device/iPad to display on the sharing dialog page
