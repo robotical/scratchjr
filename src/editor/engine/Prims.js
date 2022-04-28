@@ -41,6 +41,8 @@ export default class Prims {
         Prims.table.forward = Prims.StepRight;
         Prims.table.left = Prims.TurnLeft;
         Prims.table.right = Prims.TurnRight;
+        Prims.table.kickLeft = Prims.kickLeft;
+        Prims.table.kickRight = Prims.kickRight;
         Prims.table.home = Prims.Home;
         Prims.table.setspeed = Prims.SetSpeed;
         Prims.table.message = Prims.Message;
@@ -733,6 +735,20 @@ export default class Prims {
         const reps = Number(strip.thisblock.getArgValue());
         const moveTime = 2500;
         const marty_cmd = `traj/wave/${reps}?side=1`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
+    }
+
+    static kickLeft (strip){
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2500;
+        const marty_cmd = `traj/kick/${reps}`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
+    }
+
+    static kickRight (strip){
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2500;
+        const marty_cmd = `traj/kick/${reps}?side=1`;
         return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
     }
 

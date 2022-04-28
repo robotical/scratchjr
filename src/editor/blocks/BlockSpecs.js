@@ -227,7 +227,7 @@ static setupCategories () {
     static setupPalettesDef () {
 
         return [['onflag'],
-            ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance'],
+            ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance', 'kickLeft', 'kickRight'],
             ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle', 'waveLeft', 'waveRight'],
             ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
             ['wait', 'stopmine', 'repeat'],
@@ -294,6 +294,12 @@ static setupCategories () {
                 BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -12, 12, BlockSpecs.cmdS],
             'left': ['left', BlockSpecs.getImageFrom('assets/blockicons/Left', 'svg'),
                 BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -12, 12, BlockSpecs.cmdS],
+            
+            'kickRight': ['kickRight', BlockSpecs.getImageFrom('assets/blockicons/MartyKickRight', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -12, 12, BlockSpecs.cmdS],
+            'kickLeft': ['kickLeft', BlockSpecs.getImageFrom('assets/blockicons/MartyKickLeft', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -12, 12, BlockSpecs.cmdS],
+
             'home': ['home', BlockSpecs.getImageFrom('assets/blockicons/Home', 'svg'),
                 BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, null, null, BlockSpecs.cmdS],
             'hop': ['hop', BlockSpecs.getImageFrom('assets/blockicons/Hop', 'svg'),
@@ -399,6 +405,8 @@ static setupCategories () {
             'home': Localization.localize('BLOCK_DESC_GO_HOME'),
             'left': Localization.localize('BLOCK_DESC_TURN_LEFT'),
             'right': Localization.localize('BLOCK_DESC_TURN_RIGHT'),
+            'kickLeft': Localization.localize('BLOCK_KICK_LEFT'),
+            'kickRight': Localization.localize('BLOCK_KICK_RIGHT'),
             'hop': Localization.localize('BLOCK_DESC_HOP'),
             'wait': Localization.localize('BLOCK_DESC_WAIT'),
             'setspeed': Localization.localize('BLOCK_DESC_SET_SPEED'),
