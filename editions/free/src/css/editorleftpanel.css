@@ -23,14 +23,14 @@
     position: absolute;
     margin: 0px;
     padding: 0px;
-    background-color: #f9e3e5;
-    background-image: url('../assets/ui/marty-not-connected.svg');
+    /* background-color: #f9e3e5; */
+    /* background-image: url('../assets/ui/marty-not-connected.svg'); */
     background-repeat: no-repeat;
     background-position: right center;
     background-size: contain;
     border-radius: 5px;
     margin: 5px;
-    padding: 10px;
+    /* padding: 10px; */
     font-size: 0.7em;
     font-weight: bold;
     top: ${css_vh(0.13)};
