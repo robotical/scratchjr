@@ -255,7 +255,7 @@ div.frame {
     position: relative;
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0)};
     height: ${64 * scaleMultiplier}px;
-    width: ${659 * scaleMultiplier}px;
+    width: ${678 * scaleMultiplier}px;
     z-index:4;
     overflow: hidden;
 }
