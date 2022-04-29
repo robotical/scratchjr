@@ -296,9 +296,9 @@ static setupCategories () {
                 BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -12, 12, BlockSpecs.cmdS],
             
             'kickRight': ['kickRight', BlockSpecs.getImageFrom('assets/blockicons/MartyKickRight', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -12, 12, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 10, BlockSpecs.cmdS],
             'kickLeft': ['kickLeft', BlockSpecs.getImageFrom('assets/blockicons/MartyKickLeft', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -12, 12, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 10, BlockSpecs.cmdS],
 
             'home': ['home', BlockSpecs.getImageFrom('assets/blockicons/Home', 'svg'),
                 BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, null, null, BlockSpecs.cmdS],
