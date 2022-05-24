@@ -55,11 +55,12 @@ function startQuestionsIfNotAlreadyStarted () {
 }
 
 function indexNewSession () {
-    showSplash();
+    // showSplash();
     OS.askpermission(); // ask for sound recording
+    indexGohome();
     setTimeout(function () {
         OS.hidesplash(addTouchListener);
-    }, 500);
+    }, 200);
     // may be necessary to wait for a touch in some environments
     function addTouchListener () {
         window.addEventListener('touchend', startQuestionsIfNotAlreadyStarted, false);
