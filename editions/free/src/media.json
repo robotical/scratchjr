@@ -4,8 +4,12 @@
 	       "samples/Star.txt"
     ], 
     "backgrounds": [
+        {"md5":"BasketBall.svg","width":480,"height":360,"ext":"svg","name":"BasketBall"},
         {"md5":"Mars.svg","width":480,"height":360,"ext":"svg","name":"Mars"},
+        {"md5":"MarsAliens.svg","width":480,"height":360,"ext":"svg","name":"MarsAliens"},
         {"md5":"RedCarpet.svg","width":480,"height":360,"ext":"svg","name":"RedCarpet"},
+        {"md5":"RoadSmall.svg","width":480,"height":360,"ext":"svg","name":"RoadSmall"},
+        {"md5":"USMap.svg","width":480,"height":360,"ext":"svg","name":"USMap"},
         {"md5":"WoodenFloor.svg","width":480,"height":360,"ext":"svg","name":"WoodenFloor"}
     ],
     "sprites": [
