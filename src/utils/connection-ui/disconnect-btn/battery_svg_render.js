@@ -9,9 +9,19 @@ function battery_getFillColor (batteryPercent) {
     return colour;
 }
 
+const roundBatteryPerc = (battLevel) => {
+    let roundedBattery = battLevel;
+    if (battLevel <= 90 && battLevel >= 71) roundedBattery = 80;
+    if (battLevel <= 70 && battLevel >= 51) roundedBattery = 60;
+    if (battLevel <= 50 && battLevel >= 31) roundedBattery = 40;
+    if (battLevel <= 30 && battLevel >= 11) roundedBattery = 20;
+    return roundedBattery;
+  };
+
 function battery_render (batteryPercent) {
     const batterySvgElement = document.getElementById('marty-battery-svg');
-    const fillColor = battery_getFillColor(batteryPercent);
+    const batteryStrenghtRounded = roundBatteryPerc(batteryStrength);
+    const fillColor = battery_getFillColor(batteryStrenghtRounded);
     const batteryBars = Math.ceil(batteryPercent / 20);
     const svgStartPath = 3;
     for (let i = 0; i < 5; i++) {
