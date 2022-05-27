@@ -101,8 +101,10 @@ class Marty2 extends EventDispatcher {
         document.getElementById('martyConnection').classList.remove("martyConnected");
       }
       document.getElementById('martyConnection').innerHTML = newHTML;
-      battery_render(this.battRemainCapacityPercent);
-      signal_render(this.rssi);
+      if (this.isConnected) {
+        battery_render(this.battRemainCapacityPercent);
+        signal_render(this.rssi);
+      }
     }
 
 }
