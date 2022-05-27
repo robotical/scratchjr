@@ -20,7 +20,7 @@ const roundBatteryPerc = (battLevel) => {
 
 function battery_render (batteryPercent) {
     const batterySvgElement = document.getElementById('marty-battery-svg');
-    const batteryStrenghtRounded = roundBatteryPerc(batteryStrength);
+    const batteryStrenghtRounded = roundBatteryPerc(batteryPercent);
     const fillColor = battery_getFillColor(batteryStrenghtRounded);
     const batteryBars = Math.ceil(batteryPercent / 20);
     const svgStartPath = 3;
