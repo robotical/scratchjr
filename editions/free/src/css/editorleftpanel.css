@@ -3,6 +3,7 @@
 .flipme {
     position: absolute;
     margin: 0px;
+    margin-top: 50px;
     padding: 0px;
     top: ${css_vh(0.13)};
     left: ${css_vh(1.69)};
