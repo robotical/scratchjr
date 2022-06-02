@@ -29,7 +29,7 @@
 .spriteform input{
     text-align: center;
     color: #929497;
-    font-family: Verdana;
+    font-family: Roboto;
     font-size: ${css_vh(2.60)};
     cursor: default;
     padding: ${css_vh(0.26)};
