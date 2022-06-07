@@ -382,7 +382,7 @@ z-index: 5;
 .controlundo {
     position: absolute;
     display: inline-block;
-    top: ${css_vh(0.91)};
+    top: -${css_vh(10)};
     right: ${css_vh(1)};
     margin: ${css_vh(0.00)};
     padding: ${css_vh(0.00)};
