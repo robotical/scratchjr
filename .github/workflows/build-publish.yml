@@ -23,6 +23,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm install
       - run: npm run build-prod:copy
-      - run: npm publish
+      # - run: npm publish
+      - run: ls
+      - run: ls ~/
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_NIK }}
