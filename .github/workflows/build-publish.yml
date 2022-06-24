@@ -24,5 +24,5 @@ jobs:
       - run: npm install
       # - run: npm run build-prod:copy
       - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_NIK }}
+        # env:
+        #   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_NIK }}
