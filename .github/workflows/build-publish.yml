@@ -21,10 +21,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm run build-prod:copy
 
-
-  # publish:
-  #   runs-on: ubuntu-latest
-  #   steps:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      -run: ls src/build/bundles
   #     - uses: actions/checkout@v2
   #     # Setup .npmrc file to publish to npm
   #     - uses: actions/setup-node@v2
