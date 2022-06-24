@@ -1,8 +1,10 @@
 name: 'Build and Publish to NPM'
 
-on:
-  release:
-    types: [published, created]
+on: workflow_dispatch
+
+# on:
+#   release:
+#     types: [published, created]
 
 jobs:
   build:
@@ -24,7 +26,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      -run: ls src/build/bundles
+      - run: ls src/build/bundles
   #     - uses: actions/checkout@v2
   #     # Setup .npmrc file to publish to npm
   #     - uses: actions/setup-node@v2
