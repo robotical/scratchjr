@@ -5,7 +5,7 @@ import Android from './Android';
 import Lobby from '../lobby/Lobby';
 import Alert from '../editor/ui/Alert';
 import ScratchAudio from '../utils/ScratchAudio';
-import Webapp from './webapp';
+import Webapp from './Webapp';
 
 //////////////////////////////////////////////////
 //  Tablet interface functions
