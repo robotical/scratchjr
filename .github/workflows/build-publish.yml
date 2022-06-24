@@ -23,7 +23,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm install
       - run: npm run build-prod:copy
-      # - run: npm publish
+      - run: npm publish
       - run: ls -a
       - run: ls -a ~/
         env:
