@@ -55,7 +55,7 @@ export default class Alert {
                 'translate(' + (w / 2) + 'px, ' + (h / 2) + 'px) '
         });
         Alert.draw(balloon.getContext('2d'), 6, w, h, color);
-        writeText(ctx, 'bold 14px Robot', 'white', label, 20, 8);
+        writeText(ctx, 'bold 14px Roboto', 'white', label, 20, 8);
     }
 
     static draw (ctx, curve, w, h, color) {

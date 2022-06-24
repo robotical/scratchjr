@@ -5,6 +5,7 @@ import Android from './Android';
 import Lobby from '../lobby/Lobby';
 import Alert from '../editor/ui/Alert';
 import ScratchAudio from '../utils/ScratchAudio';
+import Webapp from './webapp';
 
 //////////////////////////////////////////////////
 //  Tablet interface functions
@@ -44,14 +45,21 @@ export default class OS {
             fcn();
             return;
         }
-        if ((isAndroid && typeof AndroidInterface === 'undefined') || (isiOS && typeof (window.tablet) !== 'object')) {
-            // interface not loaded - come back in 100ms
-            setTimeout(function () {
-                OS.waitForInterface(fcn);
-            }, 100);
-        }
+        // if ((isAndroid && typeof AndroidInterface === 'undefined') || (isiOS && typeof (window.tablet) !== 'object')) {
+        //     // interface not loaded - come back in 100ms
+        //     setTimeout(function () {
+        //         OS.waitForInterface(fcn);
+        //     }, 100);
+        // }
 
-        tabletInterface = isiOS ? iOS : Android;
+        if (!isiOS && !isAndroid) {
+            tabletInterface = Webapp;
+            // tabletInterface = isiOS ? iOS : Android;
+
+        } else {
+            tabletInterface = Webapp;
+            // tabletInterface = isiOS ? iOS : Android;
+        }
         if (fcn) {
             fcn();
         }

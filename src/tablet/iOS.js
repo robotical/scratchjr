@@ -31,7 +31,7 @@ export default class iOS {
                 method: method,
                 params: args
             });
-        });
+        }).catch(err => console.log(err))
     }
 
     static resolve (id, res) {

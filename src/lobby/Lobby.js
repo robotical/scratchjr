@@ -10,6 +10,7 @@ import Cookie from '../utils/Cookie';
 
 import Home from './Home';
 import Samples from './Samples';
+import goToLink from '../utils/goToLink';
 
 let version = undefined;
 let busy = false;
@@ -336,7 +337,7 @@ export default class Lobby {
 
     static goHome () {
         if (currentPage === 'home') {
-            window.location.href = 'index.html?back=true';
+            goToLink('index.html?back=true');
         } else {
             Lobby.setPage('home');
         }

@@ -194,10 +194,11 @@ export function inappBlocksGuide () {
         'BLOCKS_REPEAT_FOREVER_DESCRIPTION'
     ];
 
-
-    
-
-    for (let i = 0; i < blockDescriptionKeys.length; i++) {
-        gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);
+    for (const blockDescriptionKey of blockDescriptionKeys) {
+        try {
+            gn(blockDescriptionKey).textContent = Localization.localize(blockDescriptionKey);
+        } catch(e) {
+            console.log("The block", blockDescriptionKey, "doesn't exist", e);
+        }
     }
 }

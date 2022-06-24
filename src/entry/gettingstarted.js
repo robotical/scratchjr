@@ -1,3 +1,4 @@
+import goToLink from '../utils/goToLink';
 import {gn, isiOS, getUrlVars} from '../utils/lib';
 
 let place;
@@ -29,5 +30,5 @@ export function gettingStartedMain () {
 
 
 function gettingStartedCloseMe () {
-    window.location.href = 'home.html?place=' + place;
+    goToLink('home.html?place=' + place);
 }

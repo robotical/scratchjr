@@ -7,8 +7,15 @@ export function editorMain () {
     OS.getsettings(doNext);
     OS.analyticsEvent('editor', 'project_editor_open');
     function doNext (str) {
-        var list = str.split(',');
-        OS.path = list[1] == '0' ? list[0] + '/' : undefined;
+        let list;
+        try {
+            list = str.split(',');
+            OS.path = list[1] == '0' ? list[0] + '/' : undefined;
+        } catch (e) {
+            OS.path = undefined
+            console.log(e);
+            list = [];
+        }
         if (list.length > 2) {
             Record.available = list[2] == 'YES' ? true : false;
         }

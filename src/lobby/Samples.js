@@ -9,6 +9,7 @@ import MediaLib from '../tablet/MediaLib';
 import ScratchAudio from '../utils/ScratchAudio';
 import Localization from '../utils/Localization';
 import {gn, newHTML} from '../utils/lib';
+import goToLink from '../utils/goToLink';
 
 let frame;
 // Should ScratchJr projects be saved when the sample project is changed?
@@ -33,7 +34,7 @@ export default class Samples {
         e.preventDefault();
         e.stopPropagation();
         ScratchAudio.sndFX('tap.wav');
-        window.location.href = 'gettingstarted.html?place=help';
+        goToLink('gettingstarted.html?place=help');
     }
 
     ////////////////////////////
@@ -78,8 +79,8 @@ export default class Samples {
         ScratchAudio.sndFX('tap.wav');
         OS.analyticsEvent('samples', 'sample_opened', mt.textContent);
         var md5 = mt.md5;
-        window.location.href = 'editor.html?pmd5=' + md5 + '&mode='
-            + ((window.Settings.useStoryStarters) ? 'storyStarter' : 'look');
+        goToLink('editor.html?pmd5=' + md5 + '&mode='
+        + ((window.Settings.useStoryStarters) ? 'storyStarter' : 'look'));
     }
 
     static insertThumbnail (img, data) {

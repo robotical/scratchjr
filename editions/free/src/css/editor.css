@@ -382,7 +382,7 @@ z-index: 5;
 .controlundo {
     position: absolute;
     display: inline-block;
-    top: -${css_vh(10)};
+    top: ${css_vh(0.91)};
     right: ${css_vh(1)};
     margin: ${css_vh(0.00)};
     padding: ${css_vh(0.00)};
@@ -398,7 +398,7 @@ z-index: 5;
     padding: ${css_vh(0.00)};
     width: ${css_vh(6.51)};
     height: ${css_vh(6.51)};
-    background: url('../assets/undo/undo.png');
+    background: url('../assets/undo/undo.svg');
     background-size: 101%;
     -webkit-user-select: none;
 }
@@ -410,7 +410,7 @@ z-index: 5;
     padding: ${css_vh(0.00)};
     width: ${css_vh(6.51)};
     height: ${css_vh(6.51)};
-    background: url('../assets/undo/redo.png');
+    background: url('../assets/undo/redo.svg');
     background-size: 101%;
     -webkit-user-select: none;
 }
