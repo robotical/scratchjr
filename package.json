@@ -1,7 +1,11 @@
 {
-  "name": "scratchjr",
-  "version": "1.2.0",
+  "name": "@robotical/martyblocksjr",
+  "version": "1.0.2",
   "description": "ScratchJr",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
   "scripts": {
     "lint": "eslint src/**",
     "watch": "webpack --mode=development --progress --watch",
