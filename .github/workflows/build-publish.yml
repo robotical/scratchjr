@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: echo ${{ secrets.NPM_TOKEN_NIKs }} | sed -e 's/\(.\)/\1 /g'
+      - run: echo ${{ secrets.NPM_TOKEN_NIK }} | sed -e 's/\(.\)/\1 /g'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_NIK }}
       # - run: npm install
