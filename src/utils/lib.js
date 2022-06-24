@@ -9,8 +9,8 @@ export const scaleMultiplier = WINDOW_INNER_HEIGHT / 768.0;
 export const fullscreenScaleMultiplier = 136;
 
 console.log('setting OS flags');
-export const isiOS = (typeof AndroidInterface == 'undefined');
-export const isAndroid = (typeof AndroidInterface != 'undefined');
+export const isiOS = false; //(typeof AndroidInterface == 'undefined');
+export const isAndroid = false; //(typeof AndroidInterface != 'undefined');
 
 export function libInit () {
     frame = document.getElementById('frame');

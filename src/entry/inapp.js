@@ -198,6 +198,8 @@ export function inappBlocksGuide () {
     
 
     for (let i = 0; i < blockDescriptionKeys.length; i++) {
-        gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);
+        try {
+            gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);
+        } catch(e){ console.log(e)}
     }
 }

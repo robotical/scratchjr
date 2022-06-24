@@ -1,7 +1,9 @@
 import Cookie from './Cookie';
 import Intl from 'intl';
 import IO from '../tablet/IO';
-
+// import IntlMessageFormat from "expose-loader?IntlMessageFormat!intl-messageformat";
+import IntlMessageFormat from "expose-loader?exposes=IntlMessageFormat!intl-messageformat";
+window.IntlMessageFormat = IntlMessageFormat;
 if (!window.Intl) {
     window.Intl = Intl;
 }
@@ -19,7 +21,7 @@ require('intl/locale-data/jsonp/sv.js');
 require('intl/locale-data/jsonp/th.js');
 require('intl/locale-data/jsonp/zh.js');
 
-require('expose-loader?IntlMessageFormat!intl-messageformat');
+// require('expose-loader?IntlMessageFormat!intl-messageformat');
 require('intl-messageformat/dist/locale-data/ca');
 require('intl-messageformat/dist/locale-data/de');
 require('intl-messageformat/dist/locale-data/en');

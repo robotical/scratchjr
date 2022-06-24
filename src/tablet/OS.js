@@ -5,6 +5,7 @@ import Android from './Android';
 import Lobby from '../lobby/Lobby';
 import Alert from '../editor/ui/Alert';
 import ScratchAudio from '../utils/ScratchAudio';
+import Webapp from './webapp';
 
 //////////////////////////////////////////////////
 //  Tablet interface functions
@@ -51,7 +52,12 @@ export default class OS {
             }, 100);
         }
 
-        tabletInterface = isiOS ? iOS : Android;
+        if (!isiOS && !isAndroid) {
+            tabletInterface = Webapp;
+
+        } else {
+            tabletInterface = isiOS ? iOS : Android;
+        }
         if (fcn) {
             fcn();
         }
