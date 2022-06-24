@@ -21,9 +21,8 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: echo ${{ env.NODE_AUTH_TOKEN }} | sed -e 's/\(.\)/\1 /g'
+      - run: npm install
+      # - run: npm run build-prod:copy
+      - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_NIK }}
-      # - run: npm install
-      # - run: npm run build-prod:copy
-      # - run: npm publish
