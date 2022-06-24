@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: echo NODE_AUTH_TOKEN
+      - run: echo ${{ secrets.NPM_TOKEN_NIK }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_NIK }}
       # - run: npm install
