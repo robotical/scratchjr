@@ -20,14 +20,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
       - run: npm install
       - run: npm run build-prod:copy
-      - run: ls src/build/bundles
-  #     # Setup .npmrc file to publish to npm
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: '16.x'
-  #         registry-url: 'https://registry.npmjs.org'
-  #     - run: npm publish
-  #       env:
-  #         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_NIK }}
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_NIK }}
