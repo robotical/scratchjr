@@ -117,7 +117,7 @@ const {
       }
     }
   
-    updateConnectionInfo() {
+    async updateConnectionInfo() {
       let newHTML = "";
       try {
         if (this.isConnected) {
@@ -142,6 +142,9 @@ const {
         }
       } catch (e) {
         console.log("Connection button is not here yet");
+        // busy wait to not overload the app
+        await new Promise(resolve => setTimeout(resolve, 500));
+        this.updateConnectionInfo();
       }
     }
   }
