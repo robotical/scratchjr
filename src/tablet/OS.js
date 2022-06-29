@@ -1,4 +1,4 @@
-import {isiOS, isAndroid, gn} from '../utils/lib';
+import {isiOS, isAndroid, isWebapp, gn} from '../utils/lib';
 import IO from './IO';
 import iOS from './iOS';
 import Android from './Android';
@@ -40,6 +40,11 @@ export default class OS {
 
     // Wait for the tablet interface to be injected into the webview
     static waitForInterface (fcn) {
+        if (isAndroid === true && isiOS === true
+            || isWebapp === true && isiOS === true 
+            || isWebapp === true && isAndroid === true) {
+                throw new Error("Platform flags are wrong");
+            }
         // Already loaded the interface
         if (tabletInterface != null) {
             fcn();
@@ -52,9 +57,8 @@ export default class OS {
             }, 100);
         }
 
-        if (!isiOS && !isAndroid) {
+        if (isWebapp) {
             tabletInterface = Webapp;
-
         } else {
             tabletInterface = isiOS ? iOS : Android;
         }

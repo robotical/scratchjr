@@ -1,6 +1,4 @@
 var WebpackNotifierPlugin = require("webpack-notifier");
-// var { FilerWebpackPlugin } = require('filer/webpack');
-// var fallbackConfig = require("./config-overrides");
 
 module.exports = {
   resolve: {

@@ -14,7 +14,7 @@
 
 .fullscreen.presentationmode#full {
     left: 0px;
-    top: 50px;
+    top: ${css_vh(10.65)};
     background:  url('../assets/ui/fullOn2.svg');
     background-size: 100%;
 }

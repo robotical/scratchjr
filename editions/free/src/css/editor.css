@@ -51,12 +51,12 @@ div.frame {
 *.rightpanel {
     position: absolute;
     top: ${css_vh(0)};
-    right: ${css_vh(5.73)};
+    right: ${css_vh_ratio_adj(5.73)};
     margin: ${css_vh(0)};
     padding: ${css_vh(0)};
     display: inline-block;
-    height: ${css_vh(61.20)};
-    width: ${css_vh(21.09)};
+    height: ${css_vh_ratio_adj(61.20)};
+    width: ${css_vh_ratio_adj(21.09)};
 }
 
 /* Pages Thumbnails */
@@ -255,7 +255,7 @@ div.frame {
     position: relative;
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0)};
     height: ${64 * scaleMultiplier}px;
-    width: ${678 * scaleMultiplier}px;
+    width: ${800 * scaleMultiplier}px;
     z-index:4;
     overflow: hidden;
 }
@@ -382,7 +382,7 @@ z-index: 5;
 .controlundo {
     position: absolute;
     display: inline-block;
-    top: -${css_vh(10)};
+    top: ${css_vh(0.91)};
     right: ${css_vh(1)};
     margin: ${css_vh(0.00)};
     padding: ${css_vh(0.00)};
