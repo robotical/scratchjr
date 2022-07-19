@@ -476,7 +476,8 @@ export default class Project {
         function saveDone () {
             saving = false;
             if (whenDone) {
-                whenDone();
+                setTimeout(whenDone, 3000)
+                // whenDone();
             }
         }
     }

@@ -80,15 +80,15 @@ export default class Webapp {
         }
     }
 
-    static setmedia (str, ext, fcn) {
-        var result = WebappInterface.io_setmedia(str, ext);
+    static async setmedia (str, ext, fcn) {
+        var result = await WebappInterface.io_setmedia(str, ext);
         if (fcn) {
             fcn(result);
         }
     }
 
-    static setmedianame (str, name, ext, fcn) {
-        var result = WebappInterface.io_setmedianame(str, name, ext);
+    static async setmedianame (str, name, ext, fcn) {
+        var result = await WebappInterface.io_setmedianame(str, name, ext);
         if (fcn) {
             fcn(result);
         }

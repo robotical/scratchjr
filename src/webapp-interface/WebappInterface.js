@@ -71,11 +71,6 @@ export default class WebappInterface {
     console.log("Analytics Event!", category, action, label);
   }
 
-  static scratchjr_cameracheck() {
-    console.log("scratchjr_cameracheck");
-    return true;
-  }
-
   static deviceName() {
     return "webapp";
   }
@@ -90,10 +85,29 @@ export default class WebappInterface {
     }
   }
 
-  static io_setmedianame(encodedData, key, ext) {
+  /**
+   * Store the given content in a filereadProjectFileAsBase64EncodedString whose filename is constructed using the md5 sum of the base64 content string
+   * followed by the given extension, and return the filename.
+   *
+   * @param base64ContentStr Base64-encoded content to store in the file
+   * @param extension The extension of the filename to store to
+   * @return The filename of the file that was saved.
+   */
+  static async io_setmedia(base64ContentStr, ext) {
+    console.log("io_setmedia - write file", ext);
+
+    const filename = `${dataStoreInstance.getMD5(base64ContentStr)}.${ext}`;
+    await dataStoreInstance.writeProjectFile(filename, base64ContentStr, {
+      encoding: "base64",
+    });
+
+    return filename;
+  }
+
+  static async io_setmedianame(encodedData, key, ext) {
     console.log("io_setmedianame", key, ext);
     const filename = `${key}.${ext}`;
-    dataStoreInstance.writeProjectFile(filename, encodedData, {
+    await dataStoreInstance.writeProjectFile(filename, encodedData, {
       encoding: "base64",
     });
     return filename;
@@ -149,7 +163,47 @@ export default class WebappInterface {
   }
 
   static async marty_cmd(json) {
-    console.log(json, 'WebappInterface.js', 'line: ', '152');
+    console.log(json, "WebappInterface.js", "line: ", "152");
     return window.mv2.send_REST(json.cmd);
+  }
+
+  static scratchjr_stopfeed() {
+    console.log("scratchjr_stopfeed NYI");
+    if (this.cameraPickerDialog) {
+      this.cameraPickerDialog.hide();
+      this.cameraPickerDialog = null;
+    }
+  }
+
+  static scratchjr_choosecamera(mode) {
+    console.log("scratchjr_choosecamera NYI", mode);
+  }
+
+  static scratchjr_captureimage(whenDone) {
+    console.log("scratchjr_captureimage NYI", whenDone);
+
+    if (this.cameraPickerDialog) {
+      let imgData = this.cameraPickerDialog.snapshot();
+      if (imgData) {
+        let base64resultNoDataPrefix = imgData.split(",")[1];
+
+        // Camera.processimage(base64resultNoDataPrefix); // eslint-disable-line no-undef
+      }
+    }
+  }
+
+  static scratchjr_cameracheck() {
+    console.log("scratchjr_cameracheck");
+    return false;
+  }
+
+  static scratchjr_startfeed(str) {
+    console.log("scratchjr_startfeed", str);
+    let data = JSON.parse(str);
+
+    // if (!this.cameraPickerDialog) {
+    //   this.cameraPickerDialog = new CameraPickerDialog(data);
+    //   this.cameraPickerDialog.show();
+    // }
   }
 }

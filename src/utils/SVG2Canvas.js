@@ -501,7 +501,11 @@ export default class SVG2Canvas {
 
     static drawCommand (ctx, cmd) {
         var key = cmd[0];
-        dispatchDrawCmd[key](ctx, cmd);
+        try {
+            dispatchDrawCmd[key](ctx, cmd);
+        } catch(e) {
+            console.log(e);
+        }
         acurve = curveoptions.indexOf(cmd[0]) > -1;
         aqcurve = qcurveoptions.indexOf(cmd[0]) > -1;
     }

@@ -5,7 +5,7 @@
     margin: 0px;
     padding: 0px;
     top: ${css_vh(10.38)};
-    left: ${css_vh(1.69)};
+    left: ${css_vh(0.1)};
     background:  url('../assets/ui/scratchjr-home.svg');
     background-repeat: no-repeat;
     background-size: 100.5%; /* webview pixelates the image unless we do this */
