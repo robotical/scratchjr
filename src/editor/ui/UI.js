@@ -139,12 +139,12 @@ export default class UI {
 
         if (window.Settings.shareEnabled) {
             // For Parents button
-            var parentsSection = newHTML('div', 'infoboxParentsSection', infobox);
-            parentsSection.setAttribute('id', 'parentsection');
+            // var parentsSection = newHTML('div', 'infoboxParentsSection', infobox);
+            // parentsSection.setAttribute('id', 'parentsection');
 
-            var parentsButton = newHTML('div', 'infoboxParentsButton', parentsSection);
-            parentsButton.id = 'infoboxParentsSectionButton';
-            parentsButton.textContent = Localization.localize('FOR_PARENTS');
+            // var parentsButton = newHTML('div', 'infoboxParentsButton', parentsSection);
+            // parentsButton.id = 'infoboxParentsSectionButton';
+            // parentsButton.textContent = Localization.localize('FOR_PARENTS');
 
             // Sharing
             var shareButtons = newHTML('div', 'infoboxShareButtons', infobox);
@@ -180,11 +180,11 @@ export default class UI {
             var shareLoadingGif = newHTML('img', 'infoboxShareLoading', shareButtons);
             shareLoadingGif.src = './assets/ui/loader.png';
 
-            parentsButton.onclick = function (e) {
-                UI.parentalGate(e, function (e) {
-                    UI.showSharing(e, shareButtons, parentsSection);
-                });
-            };
+            // parentsButton.onclick = function (e) {
+            //     UI.parentalGate(e, function (e) {
+            //         UI.showSharing(e, shareButtons, parentsSection);
+            //     });
+            // };
         }
 
         info.onclick = UI.showInfoBox;

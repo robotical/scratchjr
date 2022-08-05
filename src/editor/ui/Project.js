@@ -444,7 +444,8 @@ export default class Project {
             if (thumb.md5.indexOf('samples/') < 0) { // In case we've exited story-starter mode
                 Project.thumbnailUnique(thumb.md5, id, function (isUnique) {
                     if (isUnique) {
-                        OS.remove(thumb.md5, OS.trace); // remove thumb;
+                        // this removes the thubnail when renaming a project so i too it out
+                        // OS.remove(thumb.md5, OS.trace); // remove thumb;
                     }
                 });
             }

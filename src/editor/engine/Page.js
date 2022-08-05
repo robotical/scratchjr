@@ -126,9 +126,10 @@ export default class Page {
         }
         var me = this;
         var url = (MediaLib.keys[name]) ?
-            MediaLib.path + name :
-            (name.indexOf('/') < 0) ? OS.path + name : name;
+        MediaLib.path + name :
+        (name.indexOf('/') < 0) ? OS.path + name : name;
         var md5 = (MediaLib.keys[name]) ? MediaLib.path + name : name;
+       
 
         if (md5.substr(md5.length - 3) == 'png') {
             this.setBackgroundImage(url, fcn);
@@ -177,6 +178,14 @@ export default class Page {
         });
         this.bkg.img = img;
         if (!img.complete) {
+            const loadImgTimeLimit = setTimeout(() => {
+                // if the bckground img doesnt load within 
+                // 5 seconds it means that it doesnt exist
+                // so we move on with empty image
+                this.clearBackground();
+                fcn();
+                clearTimeout(loadImgTimeLimit);
+            }, 5000);
             img.onload = function () {
                 if (gn('backdrop').className == 'modal-backdrop fade in') {
                     Project.setProgress(Project.getMediaLoadRatio(70));

@@ -12,8 +12,6 @@
         {"md5":"Road2.svg","width":480,"height":360,"ext":"svg","name":"Road2"},
         {"md5":"USMap.svg","width":480,"height":360,"ext":"svg","name":"USMap"},
         {"md5":"Beach.svg","width":480,"height":360,"ext":"svg","name":"Beach"},
-        {"md5":"StreetView.svg","width":480,"height":360,"ext":"svg","name":"StreetView"},
-        {"md5":"Basketball.svg","width":480,"height":360,"ext":"svg","name":"Basketball"},
         {"md5":"Racetrack.svg","width":480,"height":360,"ext":"svg","name":"Racetrack"}
     ],
     "sprites": [

@@ -166,7 +166,6 @@ export default class DatabaseManager {
     json.stmt = `select ${json.items} from ${table} where ${json.cond}${
       json.order ? ` order by ${json.order}` : ""
     }`;
-
     const rows = this.query(json);
 
     if (rows.length > 0) {
