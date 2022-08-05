@@ -1,6 +1,6 @@
 {
   "name": "@robotical/martyblocksjr",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "ScratchJr",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
