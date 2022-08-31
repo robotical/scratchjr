@@ -16,6 +16,7 @@ let frame;
 let scrollvalue;
 let version;
 let timeoutEvent;
+let performingAction = false;
 
 export default class Home {
   static init() {

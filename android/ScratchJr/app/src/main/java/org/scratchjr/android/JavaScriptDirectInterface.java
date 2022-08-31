@@ -1,17 +1,19 @@
 package org.scratchjr.android;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,6 +21,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.RectF;
 import android.hardware.Camera;
+import android.media.Image;
 import android.net.Uri;
 import android.text.Html;
 import android.util.Base64;
@@ -27,6 +30,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import androidx.annotation.NonNull;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.ImageProxy;
 
 /**
  * The methods in this inner class are exposed directly to JavaScript in the HTML5 pages
@@ -409,19 +417,24 @@ public class JavaScriptDirectInterface {
 
     @JavascriptInterface
     public void scratchjr_captureimage(final String onCameraCaptureComplete) {
-        _cameraView.captureStillImage(
-            new Camera.PictureCallback() {
-                public void onPictureTaken(byte[] jpegData, Camera camera) {
+        _cameraView.captureStillImage(new ImageCapture.OnImageCapturedCallback() {
+            @Override
+            public void onCaptureSuccess(@NonNull ImageProxy imageProxy) {
+                @SuppressLint("UnsafeOptInUsageError")
+                Image image = imageProxy.getImage();
+                if (image != null) {
+                    byte[] jpegData = _cameraView.imageToByteArray(image);
                     sendBase64Image(onCameraCaptureComplete, jpegData);
                 }
-            },
-            new Runnable() {
-                public void run() {
-                    Log.e(LOG_TAG, "Could not capture picture");
-                    reportImageError(onCameraCaptureComplete);
-                }
+                imageProxy.close();
             }
-        );
+
+            @Override
+            public void onError(@NonNull ImageCaptureException exception) {
+                Log.e(LOG_TAG, "Could not capture picture");
+                reportImageError(onCameraCaptureComplete);
+            }
+        });
     }
 
     @JavascriptInterface
@@ -574,34 +587,110 @@ public class JavaScriptDirectInterface {
     }
 
     @JavascriptInterface
-    public void sendSjrUsingShareDialog(String fileName, String emailSubject,
-                                        String emailBody, int shareType, String b64data) {
-        // Write a temporary file with the project data passed in from JS
-        File tempFile;
-
-        String extension;
-        String mimetype;
-        if (BuildConfig.APPLICATION_ID.equals("org.pbskids.scratchjr")) {
-            extension = ".psjr";
-            mimetype = "application/x-pbskids-scratchjr-project";
-        } else {
-            extension = ".sjr";
-            mimetype = "application/x-scratchjr-project";
-        }
-
+    public String createZipForProject(String projectData, String metadataJson, String name) {
+        // clean up old zip files
+        _activity.getIOManager().cleanZips();
+        // create a temp folder
+        File tempFolder = new File(_activity.getCacheDir() + File.separator + UUID.randomUUID().toString());
+        File projectFolder = new File(tempFolder.getPath() + File.separator + "project");
+        projectFolder.mkdirs();
+        // save data.json
+        // Log.d(LOG_TAG, "writing data.json");
+        File dataFile = new File(projectFolder.getAbsolutePath() + File.separator + "data.json");
         try {
-            fileName = fileName + extension;
-            tempFile = new File(_activity.getCacheDir() + File.separator + fileName);
-            tempFile.createNewFile();
-            BufferedOutputStream bw = new BufferedOutputStream(new FileOutputStream(tempFile));
-            // Decode and write the data
-            bw.write(Base64.decode(b64data, Base64.DEFAULT));
-            bw.flush();
-            bw.close();
+            FileOutputStream outputStream = new FileOutputStream(dataFile);
+            outputStream.write(projectData.getBytes());
+            outputStream.close();
         } catch (IOException e) {
-            return;
+            e.printStackTrace();
+            return "error";
         }
+        // Log.d(LOG_TAG, "writing data.json done");
+        // copy assets to target folder
+        JSONObject metadata;
+        try {
+            metadata = new JSONObject(metadataJson);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return "error";
+        }
+        // Log.d(LOG_TAG, "copying assets");
+        Iterator<String> keys = metadata.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            File folder = new File(projectFolder.getAbsolutePath() + File.separator + key);
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+            JSONArray files = metadata.optJSONArray(key);
+            if (files == null) {
+                continue;
+            }
+            for (int i = 0; i < files.length(); i++) {
+                String file = files.optString(i);
+                if (file != null) {
+                    File targetFile = new File(folder.getAbsolutePath() + File.separator + file);
+                    try {
+                        this.copyAssetTo(file, targetFile);
+                    } catch (IOException e) {
+                        Log.e(LOG_TAG, "Asset for " + file + " copy failed.");
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        // create zip file
+        String extension = ScratchJrUtil.getExtension();
+        String fullName = name + extension;
+        ScratchJrUtil.zipProject(
+            projectFolder.getAbsolutePath(),
+            _activity.getCacheDir() + File.separator + fullName
+        );
+        // remove the temp folder
+        ScratchJrUtil.removeFile(tempFolder);
+        return fullName;
+    }
 
+    private void copyAssetTo(String file, File targetFile) throws IOException {
+        File srcFile = new File(_activity.getFilesDir() + File.separator + file);
+        if (srcFile.exists()) {
+            ScratchJrUtil.copyFile(srcFile, targetFile);
+        } else {
+            InputStream inputStream = _activity.getAssets().open("HTML5/svglibrary/" + file);
+            ScratchJrUtil.copyFile(inputStream, targetFile);
+        }
+    }
+
+    @JavascriptInterface
+    public void registerLibraryAssets(int version, String assets) {
+        _activity.assetLibraryVersion = version;
+        _activity.registerLibraryAssets(assets.split(","));
+    }
+
+    @JavascriptInterface
+    public void duplicateAsset(String path, String fileName) {
+        Log.d(LOG_TAG, "duplicate asset " + path);
+        File toFile = new File(_activity.getFilesDir() + File.separator + fileName);
+        if (!toFile.exists()) {
+            try {
+                if (path.startsWith("./")) {
+                    path = path.substring(2);
+                }
+                InputStream inputStream = _activity.getAssets().open("HTML5/" + path);
+                ScratchJrUtil.copyFile(inputStream, toFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @JavascriptInterface
+    public void sendSjrUsingShareDialog(String fileName, String emailSubject,
+                                        String emailBody, int shareType) {
+        // Write a temporary file with the project data passed in from JS
+        String mimetype = ScratchJrUtil.getMimeType();
+        File file = new File(_activity.getCacheDir() + File.separator + fileName);
+        Log.d(LOG_TAG, file.getAbsolutePath());
         final Intent it = new Intent(Intent.ACTION_SEND);
         it.setType(mimetype);
         it.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] {});
@@ -632,21 +721,13 @@ public class JavaScriptDirectInterface {
 
     /**
      * Record a user property
-     * @param prefObjStr single key-value JSON string, like "{\"school\": \"Central High\"}"
+     * @param key like "school"
+     * @param propertyString like "Central High"
      */
     @JavascriptInterface
-    public void setAnalyticsPref(String prefObjStr) {
-        if (prefObjStr != null) {
-            try {
-                JSONObject jsonObject = new JSONObject(prefObjStr);
-                JSONArray jsonArray = jsonObject.names();
-                String key = jsonArray.getString(0);
-                String value = jsonObject.getString(key);
-                _activity.setAnalyticsPref(key, value);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "JSON error: " + e.getMessage(), e);
-                return;
-            }
+    public void setAnalyticsPref(String key, String propertyString) {
+        if (key != null) {
+            _activity.setAnalyticsPref(key, propertyString);
         }
     }
 }

@@ -346,4 +346,11 @@ export default class Lobby {
       Lobby.setPage("home");
     }
   }
+  static refresh () {
+      if (gn('hometab') !== null) { // Check if we're on the lobby page
+          Lobby.setPage('home');
+      }
+  }
 }
+
+window.Lobby = Lobby;

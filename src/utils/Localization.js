@@ -91,9 +91,9 @@ export default class Localization {
             currentLocale = localizationCookie;
         }
         var topLevel = currentLocale.split('-')[0];
-        if (topLevel === 'zh') {
+        if (topLevel === 'zh' || topLevel === 'pt') {
             // need to handle locale in addition to language code for Chinese,
-            // ensure it's lower case to match filename
+            // and Portuguese, ensure it's lower case to match filename
             topLevel = currentLocale.toLowerCase();
         }
 
@@ -112,6 +112,16 @@ export default class Localization {
             return message.format(formatting);
         }
         return 'String missing: ' + key;
+    }
+
+    static localizeSampleName (key) {
+        var name = Localization.localizeOptional('SAMPLE_' + key);
+        // If the localized name is still started with 'SAMPLE_',
+        // it is not a preset name.
+        if (name.startsWith('SAMPLE_')) {
+            return key;
+        }
+        return name;
     }
 
     // Translate a particular message given the message key and info;
