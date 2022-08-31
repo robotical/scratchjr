@@ -230,6 +230,13 @@ export default class Android {
     // Sharing
     ///////////////
 
+    static createZipForProject (projectData, metadata, name, fcn) {
+        const fullName = AndroidInterface.createZipForProject(projectData, JSON.stringify(metadata), name);
+        // console.log(fullName);
+        if (fcn) {
+            fcn(fullName);
+        }
+    }
 
     // Called on the JS side to trigger native UI for project sharing.
     // fileName: name for the file to share
@@ -238,8 +245,8 @@ export default class Android {
     // shareType: 0 for Email; 1 for Airdrop
     // b64data: base-64 encoded .SJR file to share
 
-    static sendSjrToShareDialog (fileName, emailSubject, emailBody, shareType, b64data) {
-        AndroidInterface.sendSjrUsingShareDialog(fileName, emailSubject, emailBody, shareType, b64data);
+    static sendSjrToShareDialog (fileName, emailSubject, emailBody, shareType) {
+        AndroidInterface.sendSjrUsingShareDialog(fileName, emailSubject, emailBody, shareType);
     }
 
     // // Called on the Objective-C side.  The argument is a base64-encoded .SJR file,
@@ -255,6 +262,16 @@ export default class Android {
     //     }
     //     return 1;
     // }
+
+    static registerLibraryAssets (version, assets, fcn) {
+        AndroidInterface.registerLibraryAssets(version, assets);
+        fcn && fcn();
+    }
+
+    static duplicateAsset (folder, name, fcn) {
+        AndroidInterface.duplicateAsset(folder, name);
+        fcn && fcn();
+    }
 
     // Name of the device/iPad to display on the sharing dialog page
     // fcn is called with the device name as an arg

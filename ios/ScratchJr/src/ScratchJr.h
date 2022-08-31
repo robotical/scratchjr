@@ -16,6 +16,7 @@
 // Exports
 + (NSString *)stmt:(NSString *)json;
 + (NSString *)query:(NSString *)json;
++ (NSString *)insert:(NSString *)table with:(NSDictionary *)data;
 @end
 
 @interface CameraMask : UIView
@@ -125,6 +126,7 @@
 + (NSString *)getpath;
 + (NSString *)removeFile:(NSString *)str;
 + (NSURL *)getDocumentPath:(NSString *)name;
++ (NSURL *)getTmpPath:(NSString *)name;
 + (NSString *)encodeBase64:(NSData *)theData;
 
 // Exports
@@ -140,17 +142,22 @@
 + (NSString *)getmedialen:(NSString *)file :(NSString *)key;
 + (NSString *)getmediadone:(NSString *)filename;
 + (NSString *)remove:(NSString *)filename;
++ (NSString *)createZipForProject: (NSString *)projectData :(NSDictionary *)metadata :(NSString *)name;
 + (NSString *)sendSjrUsingShareDialog:(NSString *)fileName
                                      :(NSString *)emailSubject
                                      :(NSString *)emailBody
-                                     :(int)shareType
-                                     :(NSString *)b64data;
+                                     :(int)shareType;
++ (void) receiveProject: (NSURL *) url;
 + (NSString *)registerSound:(NSString *)dir :(NSString *)name;
 + (NSString *)playSound:(NSString *)name;
 + (NSString *)stopSound:(NSString *)name;
+
++ (void) duplicateAsset: (NSString *)folder :(NSString *)fileName;
 @end
 
 @interface ScratchJr : NSObject
+
+@property (class, nonatomic, assign) NSInteger assetLibraryVersion;
 
 + (void)sendBase64Image:(NSData *)imagedata;
 + (void)reportImageError;
@@ -164,4 +171,10 @@
 + (NSString *)stopfeed;
 + (NSString *)choosecamera:(NSString *)body;
 + (NSString *)captureimage:(NSString *)onCameraCaptureComplete;
+
+// Imports
++ (void) receiveProject:(NSURL *) url;
+
++ (void) registerLibraryAssets: (NSArray<NSString *> *)assets;
++ (BOOL) libraryHasAsset: (NSString *)md5;
 @end

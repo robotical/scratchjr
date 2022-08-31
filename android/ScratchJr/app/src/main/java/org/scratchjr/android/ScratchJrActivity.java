@@ -15,9 +15,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -36,11 +36,9 @@ import android.widget.RelativeLayout;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Vector;
 
 /**
@@ -53,7 +51,7 @@ import java.util.Vector;
  * @author markroth8
  */
 public class ScratchJrActivity
-    extends Activity
+    extends AppCompatActivity
 {
     /** Milliseconds to pan when showing the soft keyboard */
     private static final int SOFT_KEYBOARD_PAN_MS = 250;
@@ -109,6 +107,20 @@ public class ScratchJrActivity
 
     /* Firebase analytics tracking */
     private FirebaseAnalytics _FirebaseAnalytics;
+
+    /**
+     * Project uri that need to be imported.
+     */
+    private ArrayList<Uri> projectUris = new ArrayList<>();
+
+    /**
+     * This set will contain all the library assets.
+     * We are using set here so that we can find the asset
+     * whether in library in O(1) time.
+     */
+    private final HashSet<String> assetList = new HashSet<>(200);
+
+    public int assetLibraryVersion = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -310,7 +322,15 @@ public class ScratchJrActivity
         }
     }
 
-    private void receiveProject(Uri projectUri) {
+    private void receiveProject(final Uri projectUri) {
+        if (!isSplashDone()) {
+            projectUris.add(projectUri);
+            return;
+        }
+        importProject(projectUri);
+    }
+
+    private void importProject(final Uri projectUri) {
         String PROJECT_EXTENSION = getApplicationContext().getString(R.string.share_extension_filter);
         String scheme = projectUri.getScheme();
         Log.i(LOG_TAG, "receiveProject(scheme): " + scheme);
@@ -324,25 +344,16 @@ public class ScratchJrActivity
         if (scheme.equals(ContentResolver.SCHEME_FILE) && !projectUri.getPath().matches(PROJECT_EXTENSION)) {
             return;
         }
-        // Read the project one byte at a time into a buffer
-        ByteArrayOutputStream projectData = new ByteArrayOutputStream();
-        try {
-            InputStream is = getContentResolver().openInputStream(projectUri);
-
-            byte[] readByte = new byte[1];
-            while ((is.read(readByte)) == 1) {
-                projectData.write(readByte[0]);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    _ioManager.receiveProject(ScratchJrActivity.this, projectUri);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (FileNotFoundException e) {
-            Log.i(LOG_TAG, "File not found in project load");
-            return;
-        } catch (IOException e) {
-            Log.i(LOG_TAG, "IOException in project load");
-            return;
-        }
-        // We send the project Base64-encoded to JavaScript where it's processed and unpacked
-        String base64Project = Base64.encodeToString(projectData.toByteArray(), Base64.DEFAULT);
-        runJavaScript("OS.loadProjectFromSjr('" + base64Project + "');");
+        });
     }
 
     public RelativeLayout getContainer() {
@@ -483,6 +494,10 @@ public class ScratchJrActivity
 
     public void setSplashDone(boolean done) {
         _splashDone = done;
+        while (projectUris.size() > 0) {
+            Uri uri = projectUris.remove(0);
+            importProject(uri);
+        }
     }
 
     /**
@@ -548,12 +563,20 @@ public class ScratchJrActivity
 
     /**
      * Height of the status bar at the top of the screen
+     * We should always know the status bar height even if
+     * the status bar is not visible at all.
+     * See https://stackoverflow.com/a/14213035
      */
     private int getStatusBarHeight() {
-        Rect rectangle= new Rect();
-        Window window= getWindow();
-        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
-        int result = rectangle.top;
+        int result = 0;
+        int resourceId = getResources().getIdentifier(
+            "status_bar_height",
+            "dimen",
+            "android"
+        );
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
         return result;
     }
 
@@ -619,7 +642,11 @@ public class ScratchJrActivity
                                 animator.start();
                                 _currentAnimator = animator;
                             }
-                        } else if (currentVisibleHeight > _priorVisibleHeight) {
+                        } else if (currentVisibleHeight > _priorVisibleHeight + getStatusBarHeight()) {
+                            // The status bar will be hidden ONE second after the keyboard is shown,
+                            // on some devices like SM-T280, the `currentVisibleHeight` will increase
+                            // by the status bar height, we don't want it to infect the keyboard.
+                            // -- Yueyu Zhao
                             // Keyboard probably just became hidden
 
                             // Reset pan
@@ -647,5 +674,22 @@ public class ScratchJrActivity
                     }
                 }
             });
+    }
+
+    /**
+     * We record all library assets names when app starts,
+     * so that we can know whether an asset should be marked
+     * as a user created one when importing.
+     * @param assets library asset md5
+     */
+    public void registerLibraryAssets(String[] assets) {
+        int length = assets.length;
+        for (int i = 0; i < length; i++) {
+            assetList.add(assets[i]);
+        }
+    }
+
+    public boolean libraryHasAsset(String md5) {
+        return assetList.contains(md5);
     }
 }

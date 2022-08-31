@@ -6,23 +6,65 @@ CameraView* cameraView;
 CameraMask* cameraMask;
 NSString *cameraAvailable;
 
+// prepare for opening multiple files
+NSMutableArray *zipUrls;
+bool appReady = false;
+
 AVCaptureVideoPreviewLayer* captureVideoPreviewLayer;
 
 @implementation ScratchJr : NSObject
 
+static NSInteger _assetLibraryVersion = 0;
+
++ (NSInteger) assetLibraryVersion {
+    return _assetLibraryVersion;
+}
+
++ (void) setAssetLibraryVersion:(NSInteger)newValue {
+    _assetLibraryVersion = newValue;
+}
+
 NSString *oncomplete;
+
+NSMutableSet *assets;
 
 //////////////////////////
 // Init functions
 /////////////////////////
 
-
 + (NSString *) hideSplash :(NSString *)body{
     UIImageView* splashScreen = [ViewController splashScreen];
+    appReady = true;
     dispatch_async(dispatch_get_main_queue(), ^{
         [splashScreen removeFromSuperview];
     });
+    // import projects
+    if (zipUrls != nil) {
+        while (zipUrls.count > 0) {
+            NSURL *url = zipUrls[0];
+            [zipUrls removeObjectAtIndex:0];
+            [ScratchJr importProject:url];
+        }
+    }
     return @"1";
+}
+
++ (void) receiveProject:(NSURL *)url {
+    if (zipUrls == nil) {
+        zipUrls = [[NSMutableArray alloc] init];
+    }
+    if (appReady) {
+        [ScratchJr importProject:url];
+    } else {
+        [zipUrls addObject:url];
+    }
+}
+
++ (void) importProject:(NSURL *) url {
+    NSLog(@"importing project at %@", url.absoluteString);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [IO receiveProject:url];
+    });
 }
 
 //////////////////////////
@@ -137,6 +179,19 @@ NSString *oncomplete;
     captureVideoPreviewLayer = nil;
     cameraView = nil;
     cameraMask = nil;
+}
+
++ (void) registerLibraryAssets: (NSArray<NSString *> *)assetArr {
+    if (assets == nil) {
+        assets = [[NSMutableSet alloc] init];
+    }
+    for (NSString* md5 in assetArr) {
+        [assets addObject:md5];
+    }
+}
+
++ (BOOL) libraryHasAsset:(NSString *)md5 {
+    return [assets containsObject:md5];
 }
 
 @end

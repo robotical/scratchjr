@@ -42,7 +42,6 @@ NSDate *startDate;
     [self reload];
     [self showSplash];
     [IO init: self];
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:NO];
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
 }
@@ -51,6 +50,7 @@ NSDate *startDate;
     WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
     config.allowsInlineMediaPlayback = true;
     config.allowsAirPlayForMediaPlayback = true;
+    config.allowsPictureInPictureMediaPlayback = false;
     [config.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
 
     WKUserContentController *controller = [[WKUserContentController alloc] init];
@@ -161,30 +161,6 @@ NSDate *startDate;
     startDate = [NSDate date];
 }
 
-- (void) receiveProject:(NSString *)project{
-    NSString *callback = [NSString stringWithFormat:@"OS.loadProjectFromSjr('%@');", project];
-    WKWebView *webview = [ViewController webview];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [webview evaluateJavaScript:callback completionHandler:^(id result, NSError * _Nullable error) {
-            if (error != nil) {
-                return;
-            }
-            NSString *res = [NSString stringWithFormat:@"%@", result];
-            if ([res isEqualToString:@"1"]) {
-                // Success
-                return;
-            } else if ([res isEqualToString:@"0"]) {
-                // Processing error
-                return;
-            } else {
-                // Loading the project failed - reschedule for a time when the WebView has hopefully loaded
-                // A little bit roundabout, but simpler than queueing projects to be loaded
-                [self performSelector:@selector(receiveProject:) withObject:project afterDelay:2.0];
-            }
-        }];
-    });
-}
-
 - (BOOL)prefersStatusBarHidden{
     return YES;
 }
@@ -220,6 +196,24 @@ NSDate *startDate;
     dispatch_async(dispatch_get_main_queue(), ^{
         [webview evaluateJavaScript:callback completionHandler:nil];
     });
+}
+
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+    // All internal urls are started with file:///, if the url scheme is http or https,
+    // the app is trying to open an external link, we should open it in the browser.
+    // For now, only the PBS edition opens an itunes link in the lobby.
+    // If we are going to support more shemes like opening other apps or ftp etc,
+    // this is the right place to go.
+    NSURL *url = navigationAction.request.URL;
+    NSString *scheme = url.scheme;
+    if ([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"]) {
+        if ([UIApplication.sharedApplication canOpenURL:url]) {
+            [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+        }
+        decisionHandler(WKNavigationActionPolicyCancel);
+        return;
+    }
+    decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 // Sharing controllers - if we later decide to unify, use UIActivityViewController

@@ -1143,8 +1143,6 @@ export default class PaintAction {
         screenMatrix.a = Paint.currentZoom;
         screenMatrix.d = Paint.currentZoom;
         var globalPoint = pt2.matrixTransform(screenMatrix.inverse());
-        // screenMatrix should include the currentScale, if it doesn't match, apply scaling
-
         return globalPoint;
     }
 }
