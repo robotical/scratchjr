@@ -5,6 +5,9 @@ import path from "path-browserify";
 export default class WebappInterface {
   constructor() {}
 
+  static assetLibraryVersion;
+  static assetList = [];
+
   static async database_stmt(json) {
     const db = await dataStoreInstance.getDatabaseManager();
     return db.stmt(json);
@@ -205,5 +208,18 @@ export default class WebappInterface {
     //   this.cameraPickerDialog = new CameraPickerDialog(data);
     //   this.cameraPickerDialog.show();
     // }
+  }
+
+  static registerLibraryAssets(version, assets) {
+    WebappInterface.assetLibraryVersion = version;
+    const assetsSplitted = assets.split(",");
+    const length = assetsSplitted.length;
+    for (let i = 0; i < length; i++) {
+      WebappInterface.assetList.push(assetsSplitted[i]);
+    }
+  }
+
+  static libraryHasAsset(md5) {
+    return assetList.includes(md5);
   }
 }
