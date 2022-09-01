@@ -42,53 +42,58 @@ export default class Lobby {
     ScratchAudio.init();
     Lobby.setPage(place ? place : "home");
 
-    if (window.Settings.settingsPageDisabled) {
-      gn("settings").style.visibility = "hidden";
-    }
+        if (window.Settings.settingsPageDisabled) {
+            gn('settings').style.visibility = 'hidden';
+        }
 
-    gn("hometab").onclick = function () {
-      if (gn("hometab").className != "home on") {
-        Lobby.setPage("home");
-      }
-    };
-    // gn('helptab').onclick = function () {
-    //     if (gn('helptab').className != 'help on') {
-    //         Lobby.setPage('help');
-    //     }
-    // };
-    gn("booktab").onclick = function () {
-      if (gn("booktab").className != "book on") {
-        Lobby.setPage("book");
-      }
-    };
-    gn("geartab").onclick = function () {
-      if (gn("geartab").className != "gear on") {
-        Lobby.setPage("gear");
-      }
-    };
-    gn("abouttab").onclick = function () {
-      if (gn("abouttab").className != "tab on") {
-        Lobby.setSubMenu("about");
-      }
-    };
-    gn("interfacetab").onclick = function () {
-      if (gn("interfacetab").className != "tab on") {
-        Lobby.setSubMenu("interface");
-      }
-    };
-    gn("painttab").onclick = function () {
-      if (gn("painttab").className != "tab on") {
-        Lobby.setSubMenu("paint");
-      }
-    };
-    gn("blockstab").onclick = function () {
-      if (gn("booktab").className != "tab2 on") {
-        Lobby.setSubMenu("blocks");
-      }
-    };
-    if (isAndroid) {
-      AndroidInterface.notifyDoneLoading();
-    }
+        gn('hometab').onclick = function () {
+            if (gn('hometab').className != 'home on') {
+                Lobby.setPage('home');
+            }
+        };
+        gn('helptab').onclick = function () {
+            if (gn('helptab').className != 'help on') {
+                Lobby.setPage('help');
+            }
+        };
+        gn('booktab').onclick = function () {
+            if (gn('booktab').className != 'book on') {
+                Lobby.setPage('book');
+            }
+        };
+        gn('geartab').onclick = function () {
+            if (gn('geartab').className != 'gear on') {
+                Lobby.setPage('gear');
+            }
+        };
+        gn('abouttab').onclick = function () {
+            if (gn('abouttab').className != 'tab on') {
+                Lobby.setSubMenu('about');
+            }
+        };
+        gn('interfacetab').onclick = function () {
+            if (gn('interfacetab').className != 'tab on') {
+                Lobby.setSubMenu('interface');
+            }
+        };
+        gn('painttab').onclick = function () {
+            if (gn('painttab').className != 'tab on') {
+                Lobby.setSubMenu('paint');
+            }
+        };
+        gn('blockstab').onclick = function () {
+            if (gn('blockstab').className != 'tab on') {
+                Lobby.setSubMenu('blocks');
+            }
+        };
+        gn('privacytab').onclick = function () {
+            if (gn('privacytab').className != 'tab2 on') {
+                Lobby.setSubMenu('privacy');
+            }
+        };
+        if (isAndroid) {
+            AndroidInterface.notifyDoneLoading();
+        }
   }
 
   static setPage(page) {
@@ -193,89 +198,89 @@ export default class Lobby {
     var title = newHTML("h1", "localizationtitle", div);
     title.textContent = Localization.localize("SELECT_LANGUAGE");
 
-    var languageButtons = newHTML("div", "languagebuttons", div);
+    var languageButtons = newHTML('div', 'languagebuttons', div);
 
     var languageButton;
     for (var l in window.Settings.supportedLocales) {
-      var selected = "";
-      if (window.Settings.supportedLocales[l] == Localization.currentLocale) {
-        selected = " selected";
-      }
-      languageButton = newHTML(
-        "div",
-        "localizationselect" + selected,
-        languageButtons
-      );
-      languageButton.textContent = l;
+        var selected = '';
+        if (window.Settings.supportedLocales[l] == Localization.currentLocale) {
+            selected = ' selected';
+        }
+        languageButton = newHTML('div', 'localizationselect' + selected, languageButtons);
+        languageButton.textContent = l;
 
-      languageButton.onclick = function (e) {
-        ScratchAudio.sndFX("tap.wav");
-        let newLocale = window.Settings.supportedLocales[e.target.textContent];
-        Cookie.set("localization", newLocale);
-        OS.analyticsEvent("lobby", "language_changed", newLocale);
-        window.location = "?place=gear";
-      };
+        languageButton.onclick = function (e) {
+            ScratchAudio.sndFX('tap.wav');
+            let newLocale = window.Settings.supportedLocales[e.target.textContent];
+            Cookie.set('localization', newLocale);
+            OS.analyticsEvent('lobby', 'language_changed', newLocale);
+            window.location = '?place=gear';
+        };
     }
   }
-
-  static setSubMenu(page) {
+  
+  static setSubMenu (page) {
     if (busy) {
-      return;
+        return;
     }
     document.ontouchmove = undefined;
     document.onmousemove = undefined;
     busy = true;
-    ScratchAudio.sndFX("tap.wav");
+    ScratchAudio.sndFX('tap.wav');
     Lobby.selectSubButton(page);
     document.documentElement.scrollTop = 0;
-    gn("wrapc").scrollTop = 0;
-    var div = gn("wrapc");
+    gn('wrapc').scrollTop = 0;
+    var div = gn('wrapc');
     while (div.childElementCount > 0) {
-      div.removeChild(div.childNodes[0]);
+        div.removeChild(div.childNodes[0]);
     }
     var url;
     switch (page) {
-      case "about":
-        url = host + "about.html";
-        Lobby.loadLink(div, url, "contentwrap scroll", "htmlcontents scrolled");
+    case 'about':
+        url = host + 'about.html';
+        Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
         break;
-      case "interface":
+    case 'interface':
         document.ontouchmove = function (e) {
-          e.preventDefault();
+            e.preventDefault();
         };
         document.onmousemove = function (e) {
-          e.preventDefault();
+            e.preventDefault();
         };
-        url = host + "interface.html";
-        Lobby.loadLink(div, url, "contentwrap noscroll", "htmlcontents fixed");
+        url = host + 'interface.html';
+        Lobby.loadLink(div, url, 'contentwrap noscroll', 'htmlcontents fixed');
         break;
-      case "paint":
+    case 'paint':
         document.ontouchmove = function (e) {
-          e.preventDefault();
+            e.preventDefault();
         };
         document.onmousemove = function (e) {
-          e.preventDefault();
+            e.preventDefault();
         };
-        url = host + "paint.html";
-        Lobby.loadLink(div, url, "contentwrap noscroll", "htmlcontents fixed");
+        url = host + 'paint.html';
+        Lobby.loadLink(div, url, 'contentwrap noscroll', 'htmlcontents fixed');
         break;
-      case "blocks":
-        url = host + "blocks.html";
-        Lobby.loadLink(div, url, "contentwrap scroll", "htmlcontents scrolled");
+    case 'blocks':
+        url = host + 'blocks.html';
+        Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
         break;
-      default:
+    case 'privacy':
+        url = host + 'privacy.html';
+        Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
+        break;
+    default:
         Lobby.missing(page, div);
         break;
-      //url =  Lobby.loadProjects(div); break;
+    //url =  Lobby.loadProjects(div); break;
     }
   }
 
-  static selectSubButton(str) {
-    var list = ["about", "interface", "paint", "blocks"];
+  static selectSubButton (str) {
+    var list = ['about', 'interface', 'paint', 'blocks', 'privacy'];
     for (var i = 0; i < list.length; i++) {
-      var kid = gn(list[i] + "tab");
-      var cls = kid.className.split(" ")[0];
-      kid.className = cls + (list[i] == str ? " on" : " off");
+        var kid = gn(list[i] + 'tab');
+        var cls = kid.className.split(' ')[0];
+        kid.className = cls + ((list[i] == str) ? ' on' : ' off');
     }
   }
 

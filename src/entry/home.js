@@ -19,11 +19,10 @@ function homeGoBack() {
   goToLink("index.html?back=yes");
 }
 
-function homeStrings() {
-  gn("abouttab-text").textContent = Localization.localize("ABOUT_SCRATCHJR");
-  gn("interfacetab-text").textContent = Localization.localize(
-    "INTERFACE_GUIDE"
-  );
-  gn("painttab-text").textContent = Localization.localize("PAINT_EDITOR_GUIDE");
-  gn("blockstab-text").textContent = Localization.localize("BLOCKS_GUIDE");
+function homeStrings () {
+    gn('abouttab-text').textContent = Localization.localize('ABOUT_SCRATCHJR');
+    gn('interfacetab-text').textContent = Localization.localize('INTERFACE_GUIDE');
+    gn('painttab-text').textContent = Localization.localize('PAINT_EDITOR_GUIDE');
+    gn('blockstab-text').textContent = Localization.localize('BLOCKS_GUIDE');
+    gn('privacytab-text').textContent = Localization.localize('PRIVACY_POLICY');
 }

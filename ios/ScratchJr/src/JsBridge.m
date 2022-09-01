@@ -179,6 +179,7 @@
     NSDictionary* metadata = request.params[1];
     NSString* name = request.params[2];
     NSString * fullName = [IO createZipForProject:projectData :metadata :name];
+    fullName = [fullName stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
     [request callback:fullName];
 }
 
