@@ -51,11 +51,11 @@ export default class Lobby {
                 Lobby.setPage('home');
             }
         };
-        gn('helptab').onclick = function () {
-            if (gn('helptab').className != 'help on') {
-                Lobby.setPage('help');
-            }
-        };
+        // gn('helptab').onclick = function () {
+        //     if (gn('helptab').className != 'help on') {
+        //         Lobby.setPage('help');
+        //     }
+        // };
         gn('booktab').onclick = function () {
             if (gn('booktab').className != 'book on') {
                 Lobby.setPage('book');

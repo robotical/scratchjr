@@ -202,8 +202,10 @@ export default class Page {
                 // if the bckground img doesnt load within 
                 // 5 seconds it means that it doesnt exist
                 // so we move on with empty image
-                this.clearBackground();
-                fcn();
+                if (!img.complete) {
+                    this.clearBackground();
+                    fcn();
+                }
                 clearTimeout(loadImgTimeLimit);
             }, 5000);
             img.onload = function () {
