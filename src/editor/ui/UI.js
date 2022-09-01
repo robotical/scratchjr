@@ -404,7 +404,7 @@ export default class UI {
         }
 
         var canShare = ScratchJr.editmode != 'storyStarter' || ScratchJr.changed;
-        gn('infoboxParentsSectionButton').style.display = canShare ? 'block' : 'none';
+        // gn('infoboxParentsSectionButton').style.display = canShare ? 'block' : 'none';
 
         // Prevent button from thrashing
         setTimeout(function () {
@@ -484,7 +484,7 @@ export default class UI {
             gn('infobox').className = 'infobox fade';
         }
         gn('sharebuttons').style.visibility = 'hidden';
-        gn('parentsection').style.visibility = 'visible';
+        // gn('parentsection').style.visibility = 'visible';
         infoBoxOpen = false;
     }
 
