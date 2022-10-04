@@ -536,6 +536,16 @@ export function getStringSize(ctx, f, label) {
   return ctx.measureText(label);
 }
 
+export function addCol(ctx, c, cnvWidth, cnvHeight) {
+
+  const centerX = cnvWidth / 2;
+  const centerY = cnvHeight / 2;
+  ctx.arc(centerX, centerY, 10, 0, Math.PI * 2, false);
+  ctx.fillStyle = c;
+  ctx.fill();
+
+}
+
 export function writeText(ctx, f, c, label, dy, dx) {
   dx = dx == undefined ? 0 : dx;
   ctx.font = f;

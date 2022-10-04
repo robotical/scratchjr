@@ -44,6 +44,7 @@ export default class UI {
         UI.BottomSection();
         UI.fullscreenControls();
         UI.createFormForText(frame);
+        ScratchJr.setupColKeypad();
         ScratchJr.setupKeypad();
         ScratchJr.setupEditableField();
         UI.aspectRatioAdjustment();

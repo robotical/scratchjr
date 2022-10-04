@@ -80,6 +80,22 @@ export default class OS {
         tabletInterface.martyCmd(json, fcn);
     }
 
+    // Marty addons
+    static getMartyAddons() {
+        if (window.mv2?.addons) {
+            return JSON.parse(window.mv2.addons).addons;
+        }
+        return [];
+    }
+
+    // Marty fw version
+    static getMartyFwVersion() {
+        if (window.mv2?.systemInfo?.SystemVersion) {
+            return window.mv2.systemInfo.SystemVersion;
+        }
+        return "";
+    }
+
     // Database functions
     static stmt (json, fcn) {
         tabletInterface.stmt(json, fcn);

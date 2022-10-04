@@ -26,7 +26,6 @@ export default class Webapp {
   // marty functions
   static async martyCmd(json, fcn) {
     const result = await WebappInterface.marty_cmd(json);
-    console.log(result, "webapp.js", "line: ", "29");
     if (typeof fcn !== "undefined") {
       fcn(result);
     }

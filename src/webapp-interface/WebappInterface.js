@@ -1,6 +1,8 @@
 import { dataStoreInstance } from "./ScratchJRDataStore";
 import { soundManagerInstance } from "./SoundManager";
+import cameraInstance from "./Camera";
 import path from "path-browserify";
+import Camera from "../painteditor/Camera";
 
 export default class WebappInterface {
   constructor() {}
@@ -166,15 +168,13 @@ export default class WebappInterface {
   }
 
   static async marty_cmd(json) {
-    console.log(json, "WebappInterface.js", "line: ", "152");
     return window.mv2.send_REST(json.cmd);
   }
 
   static scratchjr_stopfeed() {
     console.log("scratchjr_stopfeed NYI");
-    if (this.cameraPickerDialog) {
-      this.cameraPickerDialog.hide();
-      this.cameraPickerDialog = null;
+    if (cameraInstance) {
+      cameraInstance.hide();
     }
   }
 
@@ -185,29 +185,25 @@ export default class WebappInterface {
   static scratchjr_captureimage(whenDone) {
     console.log("scratchjr_captureimage NYI", whenDone);
 
-    if (this.cameraPickerDialog) {
-      let imgData = this.cameraPickerDialog.snapshot();
+    if (cameraInstance.videoCaptureElement) {
+      let imgData = cameraInstance.videoCaptureElement.snapshot();
       if (imgData) {
         let base64resultNoDataPrefix = imgData.split(",")[1];
+        Camera.processimage(base64resultNoDataPrefix); // eslint-disable-line no-undef
+    }
 
-        // Camera.processimage(base64resultNoDataPrefix); // eslint-disable-line no-undef
-      }
     }
   }
 
   static scratchjr_cameracheck() {
     console.log("scratchjr_cameracheck");
-    return false;
+    return cameraInstance.hasCamera();
   }
 
   static scratchjr_startfeed(str) {
     console.log("scratchjr_startfeed", str);
     let data = JSON.parse(str);
-
-    // if (!this.cameraPickerDialog) {
-    //   this.cameraPickerDialog = new CameraPickerDialog(data);
-    //   this.cameraPickerDialog.show();
-    // }
+    cameraInstance.show(data);
   }
 
   static registerLibraryAssets(version, assets) {

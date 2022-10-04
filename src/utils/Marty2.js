@@ -73,11 +73,13 @@ class Marty2 extends EventDispatcher {
     this.rssi = -100;
     this.servos = 0;
     this.accel = 0;
+    this.addons = "";
     //        this.commandPromise = null;
     //        this.onCommandReply = this.onCommandReply.bind(this);
     //        this.sendCommand = this.sendCommand.bind(this);
     this.setRSSI = this.setRSSI.bind(this);
     this.setIsConnected = this.setIsConnected.bind(this);
+    this.fwVersion = "";
   }
 
   async send_REST(cmd) {

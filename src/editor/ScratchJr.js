@@ -43,6 +43,7 @@ let runtime = undefined;
 let stage = undefined;
 let inFullscreen = false;
 let keypad = undefined;
+let colpad = undefined;
 let textForm = undefined;
 let editfirst = false;
 let stagecolor;
@@ -660,7 +661,10 @@ export default class ScratchJr {
     static editArg (e, ti) {
         e.preventDefault();
         e.stopPropagation();
-        if (ti && ti.owner.isText()) {
+        if (ti && ti.owner.isColour()) {
+            ScratchJr.colourClicked(e, ti);
+        }
+        else if (ti && ti.owner.isText()) {
             ScratchJr.textClicked(e, ti);
         } else {
             ScratchJr.numberClicked(e, ti);
@@ -729,6 +733,54 @@ export default class ScratchJr {
     }
 
     /////////////////////////////////////////
+    //Colour keyboard
+    /////////////////////////////////////////
+    static setupColKeypad () {
+        colpad = newHTML('div', 'colkeyboard', frame);
+        colpad.ontouchstart = ScratchJr.eatEvent;
+        colpad.onmousedown = ScratchJr.eatEvent;
+        // var pad = newHTML('div', 'insidekeyboard', colpad);
+        const colours = ["#e30613", "#009640", "#009fe3", "#662483", "#e94e1b", "#ffed00"];
+        for (const colour of colours) {
+            ScratchJr.keyboardAddCol(colpad, colour, 'onecol');
+        }
+    }
+
+    static keyboardAddCol (p, col, c) {
+        var keym = newHTML('div', c, p);
+        keym.style.background = col;
+        // var mk = newHTML('span', undefined, keym);
+        // mk.textContent = col ? col : '';
+        keym.ontouchstart = ScratchJr.colEditKey;
+        keym.onmousedown = ScratchJr.colEditKey;
+    }
+
+    /////////////////////////////////////////////////
+    //Colour Clicked
+    static colourClicked (e, ti) {
+        var delta = (activeFocus) ? activeFocus.delta : 0;
+        if (activeFocus && (activeFocus.type == 'blockarg')) {
+            activeFocus.div.className = 'colfield off';
+            ScratchJr.colEditDone();
+        }
+        var b = ti.owner; // b is a BlockArg
+        activeFocus = b;
+        activeFocus.delta = delta;
+        b.oldvalue = ti.style.background;
+        activeFocus.div.className = 'colfield on';
+        colpad.className = 'colkeyboard on';
+        editfirst = true;
+        var p = ti.parentNode.parentNode.owner;
+        // if (Number(p.min) < 0) {
+        //     ScratchJr.setMinusKey();
+        // } else {
+        //     ScratchJr.setSpaceKey();
+        // }
+        if (delta == 0) {
+            ScratchJr.needsToScroll(b);
+        }
+    }
+    /////////////////////////////////////////
     //Numeric keyboard
     /////////////////////////////////////////
 
@@ -792,6 +844,7 @@ export default class ScratchJr {
         // so we listen to `keydown`
         window.onkeydown = ScratchJr.handleKeyDown;
     }
+    
 
     static needsToScroll (b) {
         // needs scroll
@@ -830,6 +883,10 @@ export default class ScratchJr {
         }
     }
 
+    // static handleColDown (evt) {
+    //     ScratchJr.fillValueWithKey(evt.key);
+    // }
+
     static numEditKey (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -853,6 +910,27 @@ export default class ScratchJr {
         ScratchJr.fillValueWithKey(c);
     }
 
+    static colEditKey (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var t = e.target;
+        if (!t) {
+            return;
+        }
+        if (t.className == '') {
+            t = t.parentNode;
+        }
+        ScratchAudio.sndFX('keydown.wav');
+        var c = t.style.background;
+        if (!c) {
+            if ((t.parentNode.className == 'onecol delete') || (t.className == 'onecol delete')) {
+                ScratchJr.numEditDelete();
+            }
+            return;
+        }
+        ScratchJr.fillValueWithCol(c);
+    }
+
     /**
      * Fill active focus with value `c`
      * @param c The input char, should be 0...9 or `-`
@@ -873,11 +951,23 @@ export default class ScratchJr {
         } else {
             val += c;
         }
-        if ((Number(val).toString() != 'NaN') && ((Number(val) > 99) || (Number(val) < -99))) {
+        const min = activeFocus.daddy.min || -99;
+        const max = activeFocus.daddy.max || 99;
+        if ((Number(val).toString() != 'NaN') && ((Number(val) > max) || (Number(val) < min))) {
             ScratchAudio.sndFX('boing.wav');
         } else {
             activeFocus.setValue(val);
         }
+    }
+
+    /**
+     * Fill active focus with value `c`
+     * @param c The input char, should be string colour
+     */
+     static fillValueWithCol (c) {
+        var input = activeFocus.input;
+        input.style.background = c;
+        activeFocus.setCol(c);
     }
 
     static setSpaceKey () {
@@ -904,7 +994,9 @@ export default class ScratchJr {
             val = val.substring(0, val.length - 1);
         }
         if (val.length == 0) {
-            val = '0';
+            let min = activeFocus.daddy.min || 0;
+            min = Math.min(min, 0);
+            val = String(min);
         }
         activeFocus.setValue(val);
     }
@@ -919,7 +1011,11 @@ export default class ScratchJr {
         if (activeFocus.type != 'blockarg') {
             return;
         }
-        if (activeFocus.isText()) {
+        if (activeFocus.isColour()) {
+            ScratchJr.closeColEdit();
+            onBackButtonCallback.pop();
+        }
+        else if (activeFocus.isText()) {
             document.forms.editable.field.blur();
         } else {
             ScratchJr.closeNumberEdit();
@@ -935,6 +1031,37 @@ export default class ScratchJr {
         activeFocus = undefined;
         // stop accepting keyboard events
         window.onkeydown = undefined;
+    }
+
+    static closeColEdit () {
+        ScratchJr.colEditDone();
+        ScratchJr.resetScroll();
+        colpad.className = 'colkeyboard off';
+        activeFocus.div.className = 'colfield off';
+        activeFocus = undefined;
+        // stop accepting keyboard events
+        window.onkeydown = undefined;
+    }
+
+    static colEditDone () {
+        var col = activeFocus.argValue;
+        var ba = activeFocus;
+        activeFocus.setCol(col);
+        ba.argValue = col;
+        if (ba.daddy && ba.daddy.div.parentNode.owner) {
+            var spr = ba.daddy.div.parentNode.owner.spr;
+            if (spr && spr.div.parentNode) {
+                var action = {
+                    action: 'scripts',
+                    where: spr.div.parentNode.owner.id,
+                    who: spr.id
+                };
+                if (ba.argValue != ba.oldvalue) {
+                    ScratchJr.storyStart('ScratchJr.numEditDone');
+                    Undo.record(action);
+                }
+            }
+        }
     }
 
     static numEditDone () {
