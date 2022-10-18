@@ -1,0 +1,13 @@
+.github
+.idea
+android/*
+bin/*
+doc/*
+ios/*
+node_modules
+src/*
+.editorconfig
+.eslintignore
+.eslintrc
+.gitignore
+.npmignore

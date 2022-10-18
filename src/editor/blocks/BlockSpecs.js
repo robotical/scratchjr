@@ -122,6 +122,7 @@ export default class BlockSpecs {
             loadassets[img.src] = img;
             loadCount++;
             img.onload = function () {
+                console.log(img.src)
                 delete loadassets[img.src];
                 loadCount--;
             };
@@ -227,8 +228,8 @@ static setupCategories () {
     static setupPalettesDef () {
 
         return [['onflag'],
-            ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance'],
-            ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle', 'waveLeft', 'waveRight'],
+            ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance', 'kickLeft', 'kickRight'],
+            ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle', 'waveLeft', 'waveRight', 'ledEyesP1','ledEyesP2','ledEyesP3', 'ledEyesColour', 'celebrate'],
             ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
             ['wait', 'stopmine', 'repeat'],
             ['endstack', 'forever']];
@@ -279,25 +280,31 @@ static setupCategories () {
             'repeat': ['repeat', BlockSpecs.getImageFrom('assets/blockicons/Repeat', 'svg'),
                 BlockSpecs.cShape, 'n', 4, BlockSpecs.cShapeH, 0, 24, BlockSpecs.repeatS],
             'getReady': ['getReady', BlockSpecs.getImageFrom('assets/blockicons/MartyGetReady', 'svg'),
-                BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
             'martyDance': ['martyDance', BlockSpecs.getImageFrom('assets/blockicons/MartyDance', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
             'forward': ['forward', BlockSpecs.getImageFrom('assets/blockicons/Foward', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
             'back': ['back', BlockSpecs.getImageFrom('assets/blockicons/Back', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
             'up': ['up', BlockSpecs.getImageFrom('assets/blockicons/Up', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -15, 15, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
             'down': ['down', BlockSpecs.getImageFrom('assets/blockicons/Down', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -15, 15, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
             'right': ['right', BlockSpecs.getImageFrom('assets/blockicons/Right', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -12, 12, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
             'left': ['left', BlockSpecs.getImageFrom('assets/blockicons/Left', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -12, 12, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+            
+            'kickRight': ['kickRight', BlockSpecs.getImageFrom('assets/blockicons/MartyKickRight', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 10, BlockSpecs.cmdS],
+            'kickLeft': ['kickLeft', BlockSpecs.getImageFrom('assets/blockicons/MartyKickLeft', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 10, BlockSpecs.cmdS],
+
             'home': ['home', BlockSpecs.getImageFrom('assets/blockicons/Home', 'svg'),
                 BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, null, null, BlockSpecs.cmdS],
             'hop': ['hop', BlockSpecs.getImageFrom('assets/blockicons/Hop', 'svg'),
-                BlockSpecs.blueCmd, 'n', 2, BlockSpecs.blueCmdH, -15, 15, BlockSpecs.cmdS],
+                BlockSpecs.blueCmd, 'n', 2, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
 
 
             'wait': ['wait', BlockSpecs.getImageFrom('assets/blockicons/Wait', 'svg'),
@@ -322,7 +329,16 @@ static setupCategories () {
                 BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
             'waveRight': ['waveRight', BlockSpecs.getImageFrom('assets/blockicons/MartyWaveRight', 'svg'),
                 BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
-
+            'ledEyesP1': ['ledEyesP1', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP1', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'ledEyesP2': ['ledEyesP2', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP2', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'ledEyesP3': ['ledEyesP3', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP3', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'ledEyesColour': ['ledEyesColour', BlockSpecs.getImageFrom('assets/blockicons/MartyEyesColour', 'svg'),
+                BlockSpecs.pinkCmd, 'c', 'black', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'celebrate': ['celebrate', BlockSpecs.getImageFrom('assets/blockicons/MartyCelebrate', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'say': ['say', BlockSpecs.getImageFrom('assets/blockicons/Say', 'svg'),
                 BlockSpecs.pinkCmd, 't',
                 Localization.localize('SAY_BLOCK_DEFAULT_ARGUMENT'), BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
@@ -399,6 +415,8 @@ static setupCategories () {
             'home': Localization.localize('BLOCK_DESC_GO_HOME'),
             'left': Localization.localize('BLOCK_DESC_TURN_LEFT'),
             'right': Localization.localize('BLOCK_DESC_TURN_RIGHT'),
+            'kickLeft': Localization.localize('BLOCK_KICK_LEFT'),
+            'kickRight': Localization.localize('BLOCK_KICK_RIGHT'),
             'hop': Localization.localize('BLOCK_DESC_HOP'),
             'wait': Localization.localize('BLOCK_DESC_WAIT'),
             'setspeed': Localization.localize('BLOCK_DESC_SET_SPEED'),
@@ -413,6 +431,11 @@ static setupCategories () {
             'eyesWiggle': Localization.localize('BLOCK_EYES_WIGGLE'),
             'waveLeft': Localization.localize('BLOCK_WAVE_LEFT'),
             'waveRight': Localization.localize('BLOCK_WAVE_RIGHT'),
+            'ledEyesP1': Localization.localize('BLOCK_LED_EYES_P1'),
+            'ledEyesP2': Localization.localize('BLOCK_LED_EYES_P2'),
+            'ledEyesP3': Localization.localize('BLOCK_LED_EYES_P3'),
+            'ledEyesColour': Localization.localize('BLOCK_LED_EYES_COLOUR'),
+            'celebrate': Localization.localize('BLOCK_CELEBRATE'),
             'say': Localization.localize('BLOCK_DESC_SAY'),
             'show': Localization.localize('BLOCK_DESC_SHOW'),
             'hide': Localization.localize('BLOCK_DESC_HIDE'),

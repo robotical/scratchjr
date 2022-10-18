@@ -4,8 +4,10 @@ import Grid from '../ui/Grid';
 import Vector from '../../geom/Vector';
 import {gn} from '../../utils/lib';
 import OS from '../../tablet/OS';
+import celebrateHelper from './celebrate-helper';
+import isVersionGreater from '../../utils/versionChecker';
 
-
+const LED_EYES_FW_VERSION = "2.0.1"; // greater versions than this support the LED_EYE functionality
 let martyInterval = 33;
 const intervalToSeconds = 31.25; // runtime tick is set at 32ms by Runtime.js. 32*31.25 = 1s
 let tinterval = 1;
@@ -41,6 +43,8 @@ export default class Prims {
         Prims.table.forward = Prims.StepRight;
         Prims.table.left = Prims.TurnLeft;
         Prims.table.right = Prims.TurnRight;
+        Prims.table.kickLeft = Prims.kickLeft;
+        Prims.table.kickRight = Prims.kickRight;
         Prims.table.home = Prims.Home;
         Prims.table.setspeed = Prims.SetSpeed;
         Prims.table.message = Prims.Message;
@@ -74,6 +78,11 @@ export default class Prims {
         Prims.table.eyesWiggle = Prims.eyesWiggle;
         Prims.table.waveLeft = Prims.waveLeft;
         Prims.table.waveRight = Prims.waveRight;
+        Prims.table.ledEyesP1 = Prims.ledEyesP1;
+        Prims.table.ledEyesP2 = Prims.ledEyesP2;
+        Prims.table.ledEyesP3 = Prims.ledEyesP3;
+        Prims.table.ledEyesColour = Prims.ledEyesColour;
+        Prims.table.celebrate = Prims.celebrate;
 
         Prims.table.confusion = Prims.playConfusion;
         Prims.table.disbelief = Prims.playDisbelief;
@@ -733,6 +742,72 @@ export default class Prims {
         const reps = Number(strip.thisblock.getArgValue());
         const moveTime = 2500;
         const marty_cmd = `traj/wave/${reps}?side=1`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
+    }
+
+    static ledEyesP1 (strip) {
+        const duration = 1500;
+        let marty_cmd = `ledeyes/pattern/cyan-magenta?side=1&speed=2500`;
+        if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
+            marty_cmd = "notification/fw-needs-update";
+        } 
+        Prims.clearLedEyesIn(strip, duration);
+       return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
+    }
+    static ledEyesP2 (strip) {
+        const duration = 1500;
+        let marty_cmd = `ledeyes/pattern/green-yellow?side=1&speed=2500`;
+        if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
+            marty_cmd = "notification/fw-needs-update";
+        } 
+        Prims.clearLedEyesIn(strip, duration);
+       return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
+    }
+    static ledEyesP3 (strip) {
+        const duration = 1500;
+        let marty_cmd = `ledeyes/pattern/celebrate?side=1&speed=2500`;
+        if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
+            marty_cmd = "notification/fw-needs-update";
+        } 
+        Prims.clearLedEyesIn(strip, duration);
+       return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
+    }
+    static ledEyesColour (strip) {
+        const duration = 1500;
+        const colour = strip.thisblock.getArgValue();
+        let marty_cmd = `ledeyes/colour/${colour}?side=1&speed=2500`;
+        if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
+            marty_cmd = "notification/fw-needs-update";
+        } 
+        Prims.clearLedEyesIn(strip, duration);
+       return Prims.doMartyCmd(strip, marty_cmd, duration);
+    }
+
+    static clearLedEyesIn(strip, duration) {
+        const turnOffLedEyesTimer = setTimeout(() => {
+            console.log("clearing eyes");
+            const clearLedEyesCmd = "ledeyes/clear";
+            OS.martyCmd({ cmd: clearLedEyesCmd });
+            clearTimeout(turnOffLedEyesTimer);
+        }, duration);
+    }
+
+    static celebrate (strip){
+        // const reps = Number(strip.thisblock.getArgValue());
+        celebrateHelper(OS, Prims, strip, tinterval, intervalToSeconds);
+    }
+
+    static kickLeft (strip){
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2500;
+        const marty_cmd = `traj/kick/${reps}`;
+        return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
+    }
+
+    static kickRight (strip){
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2500;
+        const marty_cmd = `traj/kick/${reps}?side=1`;
         return Prims.doMartyCmd(strip, marty_cmd, moveTime*reps, Prims.playMartyServo);
     }
 

@@ -4,6 +4,7 @@ import OS from '../tablet/OS';
 import UI from '../editor/ui/UI';
 import Localization from '../utils/Localization';
 import InitialOptions from '../utils/InitialOptions';
+import goToLink from '../utils/goToLink';
 
 /*
 When this code starts up, there are several scenarios:
@@ -57,9 +58,10 @@ function startQuestionsIfNotAlreadyStarted () {
 function indexNewSession () {
     showSplash();
     OS.askpermission(); // ask for sound recording
+    indexGohome();
     setTimeout(function () {
         OS.hidesplash(addTouchListener);
-    }, 500);
+    }, 200);
     // may be necessary to wait for a touch in some environments
     function addTouchListener () {
         window.addEventListener('touchend', startQuestionsIfNotAlreadyStarted, false);
@@ -147,6 +149,14 @@ function showLogo () {
     gn('jrlogo').className = 'jrlogo show';
 }
 
+function hideGear () {
+    gn('gear').className = 'gear hide';
+}
+
+function showGear () {
+    gn('gear').className = 'gear show';
+}
+
 function indexAskPlace () {
     gn('authors').className = 'credits show';
     gn('authorsText').className = 'creditsText hide';
@@ -231,6 +241,7 @@ function optionSelected (elem) {
 function indexShowQuestion (key) {
     indexHideSplash();
     hideLogo();
+    hideGear();
     var optionType = InitialOptions.optionTypeForKey(key);
     if (optionType === 'place_preference') {
         indexAskPlace();
@@ -313,7 +324,7 @@ function indexGohome () {
         doNext();
     });
     function doNext () {
-        window.location.href = 'home.html';
+        goToLink('home.html');
     }
 }
 
@@ -321,18 +332,18 @@ function indexGoSettings () {
     // Switch to the settings selection page
     // Triggered by tapping the gear icon in the top right
     ScratchAudio.sndFX('tap.wav');
-    window.location.href = 'home.html?place=gear';
+    goToLink('home.html?place=gear');
 }
 
 function indexGettingstarted () {
     ScratchAudio.sndFX('tap.wav');
-    window.location.href = 'gettingstarted.html?place=home';
+    goToLink('gettingstarted.html?place=home');
 }
 
 // For PBS KIDS edition only
 function indexInfo () {
     ScratchAudio.sndFX('tap.wav');
-    window.location.href = 'home.html?place=book';
+    goToLink('home.html?place=book');
 }
 
 function indexMoreApps () {
@@ -340,9 +351,9 @@ function indexMoreApps () {
 
     UI.parentalGate(null, function () {
         if (isiOS) {
-            window.location.href = 'https://itunes.apple.com/us/developer/pbs-kids/id324323339?mt=8';
+            goToLink('https://itunes.apple.com/us/developer/pbs-kids/id324323339?mt=8');
         } else {
-            window.location.href = 'http://to.pbs.org/ScJr_GPlay';
+            goToLink('http://to.pbs.org/ScJr_GPlay');
         }
     });
 }

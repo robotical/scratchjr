@@ -1,0 +1,20 @@
+export WebappHome=/Users/nikolastheodoropoulos/Documents/Robotical/marty-web-app
+export MBJRHome=/Users/nikolastheodoropoulos/Documents/Robotical/phone-app/scratch/scratchjr
+
+
+export gui_original=$MBJRHome/scratch-gui
+
+alias cdhome='cd $MBJRHome'
+alias sourceMBJRProf='cdhome && source martyBlocksCliProfile'
+
+buildAllAndCpToWebApp () {
+    local type="${1:-debug}"
+    if [ $type = debug ]; then npm run build:copy; fi
+    if [ $type = prod ]; then npm run build-prod:copy; fi
+    cpToWebapp
+}
+
+cpToWebapp () {
+    rm -rf $WebappHome/public/MartyBlocksJR/*
+    cp -r $MBJRHome/editions/free/src/* $WebappHome/public/MartyBlocksJR
+}

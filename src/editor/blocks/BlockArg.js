@@ -4,7 +4,7 @@ import Menu from './Menu';
 import Undo from '../ui/Undo';
 import {setCanvasSize, setProps, writeText, scaleMultiplier,
     newHTML, newDiv, newCanvas, getStringSize, isTablet,
-    newP, globalx, globaly} from '../../utils/lib';
+    newP, globalx, globaly, addCol} from '../../utils/lib';
 import Localization from '../../utils/Localization';
 
 /*
@@ -16,6 +16,7 @@ m: regular menu with icons
 s: text for soundblock
 r: number for recorded sound block
 p: page icons
+c: colour
 
 */
 export default class BlockArg {
@@ -24,6 +25,10 @@ export default class BlockArg {
         this.type = 'blockarg';
         this.argType = block.spec[3];
         switch (this.argType) {
+        case 'c':
+            this.argValue = block.spec[4];
+            this.div = this.addColArg();
+            break;
         case 'n':
             this.argValue = block.spec[4];
             this.div = this.addNumArg();
@@ -104,6 +109,15 @@ export default class BlockArg {
         } else {
             return this.addNumArgument(str);
         }
+    
+    }
+    addColArg () {
+        var str = this.argValue.toString();
+        if (this.daddy.inpalette) {
+            return this.addColLabel(str);
+        } else {
+            return this.addColArgument(str);
+        }
     }
 
     addTextArg () {
@@ -113,6 +127,53 @@ export default class BlockArg {
         } else {
             return this.addTextArgument(str, true);
         }
+    }
+
+    addColLabel (col) {
+        var scale = this.daddy.scale;
+        var dx = 16;
+        var dy = 57;
+        if (this.daddy.blocktype == 'repeat') {
+            dx = Math.round(this.daddy.blockshape.width / window.devicePixelRatio / scale) - 60;
+            dy = Math.round(this.daddy.blockshape.height / window.devicePixelRatio / scale) - 10;
+        }
+        var img = BlockSpecs.numfieldimg;
+        var w =  36;
+        var h = 17;
+        var field = newCanvas(this.daddy.div, 0, 0, w * window.devicePixelRatio, h * window.devicePixelRatio, {
+            position: 'absolute',
+            webkitTransform: 'translate(' + (-w * window.devicePixelRatio / 2) + 'px, ' +
+                (-h * window.devicePixelRatio / 2) + 'px) ' +
+                'scale(' + (scale / window.devicePixelRatio) + ') ' +
+                'translate(' + (dx * window.devicePixelRatio + (w * window.devicePixelRatio / 2)) + 'px, ' +
+                (dy * window.devicePixelRatio + (h * window.devicePixelRatio / 2)) + 'px)',
+            pointerEvents: 'all'
+
+        });
+        var ctx = field.getContext('2d');
+        if (!img.complete) {
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0, w, h, 0, 0, w * window.devicePixelRatio, h * window.devicePixelRatio);
+            };
+        } else {
+            ctx.drawImage(img, 0, 0, w, h, 0, 0, w * window.devicePixelRatio, h * window.devicePixelRatio);
+        }
+        var div = newDiv(this.daddy.div, dx, dy, w, h, {
+            position: 'absolute',
+            zoom: (scale * 100) + '%',
+            margin: '0px',
+            padding: '0px'
+        });
+        var cnv = newCanvas(div, 0, 0, w * window.devicePixelRatio, h * window.devicePixelRatio, {
+            position: 'absolute',
+            webkitTransform: 'translate(' + (-w * window.devicePixelRatio / 2) + 'px, ' +
+                (-h * window.devicePixelRatio / 2) + 'px) ' +
+                'scale(' + (1 / window.devicePixelRatio) + ') ' +
+                'translate(' + (w * window.devicePixelRatio / 2) + 'px, ' + (h * window.devicePixelRatio / 2) + 'px)'
+        });
+        ctx = cnv.getContext('2d');
+        addCol(ctx, col, cnv.width, cnv.height);
+        return div;
     }
 
     addLabel (str, isText) {
@@ -186,6 +247,29 @@ export default class BlockArg {
         return div;
     }
 
+    addColArgument (col) {
+        var div = newHTML('div', 'colfield', this.daddy.div);
+        if (this.daddy.blocktype == 'repeat') {
+            setProps(div.style, {
+                left: (this.daddy.blockshape.width / window.devicePixelRatio - 62 * this.daddy.scale) + 'px',
+                top: (this.daddy.blockshape.height / window.devicePixelRatio - 11 * this.daddy.scale) + 'px'
+            });
+        }
+        var ti = newHTML('h3', 'colfield-div', div);
+        this.input = ti;
+        ti.owner = this;
+        ti.style.background = col;
+        this.arg = div;
+        // Expand the parent div to incorporate the size of the button,
+        // else on Android 4.2 the bottom part of the button
+        // will not be clickable.
+        div.parentNode.height += 10 * window.devicePixelRatio;
+        setCanvasSize(div.parentNode, div.parentNode.width, div.parentNode.height);
+        return div;
+    }
+
+    
+
     addTextArgument (str) {
         var div = newHTML('div', 'textfield', this.daddy.div);
         var ti = newHTML('h3', undefined, div);
@@ -201,16 +285,34 @@ export default class BlockArg {
         return div;
     }
 
+    setCol (col) {
+        if (!this.input) {
+            return;
+        }
+        this.argValue = col;
+        // if (this.argType == 'c') {
+        //     this.argValue = 0;
+        // }
+        this.input.style.background = col;
+    }
+
     setValue (val) {
         if (!this.input) {
             return;
         }
         this.argValue = val;
+        if (this.argType == 'n' && isNaN(Number(val))) {
+            this.argValue = 0;
+        }
         this.input.textContent = val;
     }
 
     isText () {
         return (this.argType != 'n');
+    }
+
+    isColour () {
+        return (this.argType === 'c');
     }
 
     /////////////////////////////////

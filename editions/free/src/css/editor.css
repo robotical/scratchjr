@@ -51,12 +51,12 @@ div.frame {
 *.rightpanel {
     position: absolute;
     top: ${css_vh(0)};
-    right: ${css_vh(5.73)};
+    right: ${css_vh_ratio_adj(5.73)};
     margin: ${css_vh(0)};
     padding: ${css_vh(0)};
     display: inline-block;
-    height: ${css_vh(61.20)};
-    width: ${css_vh(21.09)};
+    height: ${css_vh_ratio_adj(61.20)};
+    width: ${css_vh_ratio_adj(21.09)};
 }
 
 /* Pages Thumbnails */
@@ -255,7 +255,7 @@ div.frame {
     position: relative;
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0)};
     height: ${64 * scaleMultiplier}px;
-    width: ${659 * scaleMultiplier}px;
+    width: ${900 * scaleMultiplier}px;
     z-index:4;
     overflow: hidden;
 }
@@ -452,6 +452,11 @@ z-index: 5;
     width: ${css_vh(14.44)};
     height: ${css_vh(14.44)};
     filter: opacity(0.25);
+}
+
+.watermark img{
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .watermark > canvas{
@@ -902,7 +907,7 @@ p.soundname{
     overflow: hidden;
     font-size:  13px;
     font-weight:bold;
-    font-family: Verdana;
+    font-family: Roboto;
     line-height: 16px;
     padding: 0px;
     cursor: default;
@@ -914,7 +919,7 @@ p.balloon{
     text-align: center;
     margin: ${css_vh(0.65)};
     color: #ffffff;
-    font-family: Verdana;
+    font-family: Roboto;
     font-size:  14px;
     font-weight: bold;
     overflow: hidden;
@@ -948,7 +953,7 @@ Blocks text fields and input fields
     float: left;
     text-align: center;
     color: #77787b;
-    font-family: Verdana;
+    font-family: Roboto;
     font-size:  ${css_vh(1.82)};
     font-weight: normal;
     font-size:  ${css_vh(1.82)};
@@ -983,7 +988,7 @@ Blocks text fields and input fields
     outline: 0px solid;
     text-align: center;
     color: #77787b;
-    font-family: Verdana;
+    font-family: Roboto;
     cursor: default;
     border: 2px solid  #28A5DA;
     width: ${css_vh(62.51)};
@@ -1000,6 +1005,76 @@ Blocks text fields and input fields
     height: ${css_vh(6.25)};
     font-size: ${css_vh(3.13)};
 }
+/* colour keyboard */
+*.colkeyboard {
+    position: absolute;
+    display: none;
+    padding: ${css_vh(0)};
+    margin: ${css_vh(0)};
+    width: ${css_vh(23.44)};
+    top: ${css_vh(71.61)};
+    right: ${css_vh(1)};
+    border: ${scaleMultiplier}px solid #B9C0C6;
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(0%,#ffffff), color-stop(1%,#ffffff),  color-stop(100%,#F9F9F9));
+    -webkit-border-radius: ${6 * scaleMultiplier}px;
+    -webkit-box-shadow: ${2 * scaleMultiplier}px ${2 * scaleMultiplier}px ${css_vh(0)} #aaa;
+    z-index: 1000;
+}
+*.colkeyboard.on {display: block;}
+
+.colfield {
+    position: absolute;
+    margin: ${css_vh(0.00)};
+    padding: ${css_vh(0.00)};
+    border: 0px solid;
+    height: ${css_vh(3.13)};
+    width: ${css_vh(5.47)};
+    top: ${css_vh(7.16)};
+    left: ${css_vh(1.30)};
+    color: #77787b;
+    -moz-border-radius: ${12 * scaleMultiplier}px;
+    -webkit-border-radius: ${12 * scaleMultiplier}px;
+    border: ${2 * scaleMultiplier}px solid #c0c2c3;
+    background: #ffffff;
+    pointer-events: all;
+    -webkit-transform: translateZ(0);
+}
+.colfield.on {
+    -webkit-box-shadow: 0px ${scaleMultiplier}px ${scaleMultiplier}px rgba(40, 165, 218, 0.5);
+    border: ${2 * scaleMultiplier}px solid  #9dc7d5;
+    background: #28A5DA;
+    color: #ffffff;
+}
+.colfield-div {
+    border-radius: 50%;
+    height: 80%;
+    width: 50%;
+    margin: 6% 25%;
+}
+
+*.colkeyboard.off {    display: none;}
+
+*.onecol {
+    display: inline-block;
+    position: relative;
+    border-radius: 50%;
+    cursor: pointer;
+    width: ${css_vh(7)};
+    height: ${css_vh(7)};
+    margin: ${css_vh(0.26)};
+    color: #999;
+    line-height: ${css_vh(4.95)};
+    font-size: ${css_vh(2.08)};
+    font-family: Roboto;
+    font-weight: bold;
+    margin: ${css_vh(0.39)};
+    text-shadow: 0 ${css_vh(0.13)} #fff;
+    background-size: 100%;
+    box-sizing: border-box;
+}
+
+*.onecol:active { border: #28A5DA solid 2px; background-size: 100%; }
+
 
 /* numric keyboard */
 
@@ -1054,7 +1129,7 @@ Blocks text fields and input fields
 
 *.onekey.minus {
     font-size: ${css_vh(3.13)};
-    font-family: 'Verdana';
+    font-family: 'Roboto';
     line-height: ${css_vh(4.17)};
 }
 
@@ -1105,7 +1180,7 @@ Blocks text fields and input fields
     float: left;
     text-align: center;
     color: #77787b;
-    font-family: Verdana;
+    font-family: Roboto;
     font-size:  ${css_vh(1.82)};
     font-weight: normal;
     height: ${css_vh(3.13)};

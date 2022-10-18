@@ -13,7 +13,7 @@ import Matrix from '../../geom/Matrix';
 import Vector from '../../geom/Vector';
 import {newHTML, newDiv, gn,
     setCanvasSizeScaledToWindowDocumentHeight,
-    DEGTOR, getIdFor, setProps, isTablet} from '../../utils/lib';
+    DEGTOR, getIdFor, setProps} from '../../utils/lib';
 
 export default class Page {
     constructor (id, data, fcn) {
@@ -28,6 +28,7 @@ export default class Page {
         this.sprites = JSON.stringify([]);
         this.bkg = newDiv(this.div, 0, 0, 480, 360, {
             position: 'absolute',
+            zIndex: '-10',
             background: ScratchJr.stagecolor
         });
         this.bkg.type = 'background';
@@ -126,11 +127,24 @@ export default class Page {
         }
         var me = this;
         var url = (MediaLib.keys[name]) ?
-            MediaLib.path + name :
-            (name.indexOf('/') < 0) ? OS.path + name : name;
+        MediaLib.path + name :
+        (name.indexOf('/') < 0) ? OS.path + name : name;
         var md5 = (MediaLib.keys[name]) ? MediaLib.path + name : name;
+       
 
-        if (md5.substr(md5.length - 3) == 'png') {
+        var duplicateBkg = function () {
+            var fileName = IO.getFilenameWithExt(md5);
+            if (MediaLib.keys[name]) {
+                OS.duplicateAsset(md5, fileName);
+            } else if (name.indexOf('/') > -1) {
+                OS.duplicateAsset(md5, fileName);
+                me.md5 = name;
+            }
+        };
+
+        var isPng = md5.substr(md5.length - 3) == 'png';
+        if (isPng && (MediaLib.keys[name] || name.indexOf('/') > -1)) {
+            duplicateBkg();
             this.setBackgroundImage(url, fcn);
             this.svg = null;
             return;
@@ -142,9 +156,16 @@ export default class Page {
             OS.getmedia(md5, nextStep);
         }
         function nextStep (base64) {
-            doNext(atob(base64));
+            if (isPng) {
+                var data = IO.getImageDataURL(name, base64);
+                me.setBackgroundImage(data, fcn);
+                me.svg = null;
+            } else {
+                doNext(atob(base64));
+            }
         }
         function doNext (str) {
+            duplicateBkg();
             str = str.replace(/>\s*</g, '><');
             me.setSVG(str);
             IO.getImagesInSVG(str, function () {
@@ -177,6 +198,16 @@ export default class Page {
         });
         this.bkg.img = img;
         if (!img.complete) {
+            const loadImgTimeLimit = setTimeout(() => {
+                // if the bckground img doesnt load within 
+                // 5 seconds it means that it doesnt exist
+                // so we move on with empty image
+                if (!img.complete) {
+                    this.clearBackground();
+                    fcn();
+                }
+                clearTimeout(loadImgTimeLimit);
+            }, 5000);
             img.onload = function () {
                 if (gn('backdrop').className == 'modal-backdrop fade in') {
                     Project.setProgress(Project.getMediaLoadRatio(70));

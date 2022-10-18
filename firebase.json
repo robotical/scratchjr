@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "public": "editions/free/src",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

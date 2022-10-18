@@ -1,28 +1,38 @@
-import Project from './ui/Project';
-import ScratchAudio from '../utils/ScratchAudio';
-import Paint from '../painteditor/Paint';
-import Prims from './engine/Prims';
-import Undo from './ui/Undo';
-import Alert from './ui/Alert';
-import Palette from './ui/Palette';
-import Record from './ui/Record';
-import IO from '../tablet/IO';
-import OS from '../tablet/OS';
-import UI from './ui/UI';
-import Menu from './blocks/Menu';
-import Library from './ui/Library';
-import Grid from './ui/Grid';
-import ScriptsPane from './ui/ScriptsPane';
-import Events from '../utils/Events';
-import BlockSpecs from './blocks/BlockSpecs';
-import Runtime from './engine/Runtime';
-import Localization from '../utils/Localization';
-import {libInit, gn, scaleMultiplier, newHTML,
-    isAndroid, isTablet, getUrlVars, CSSTransition3D, frame} from '../utils/lib';
-import Marty2 from '../utils/Marty2';
+import Project from "./ui/Project";
+import ScratchAudio from "../utils/ScratchAudio";
+import Paint from "../painteditor/Paint";
+import Prims from "./engine/Prims";
+import Undo from "./ui/Undo";
+import Alert from "./ui/Alert";
+import Palette from "./ui/Palette";
+import Record from "./ui/Record";
+import IO from "../tablet/IO";
+import OS from "../tablet/OS";
+import UI from "./ui/UI";
+import Menu from "./blocks/Menu";
+import Library from "./ui/Library";
+import Grid from "./ui/Grid";
+import ScriptsPane from "./ui/ScriptsPane";
+import Events from "../utils/Events";
+import BlockSpecs from "./blocks/BlockSpecs";
+import Runtime from "./engine/Runtime";
+import Localization from "../utils/Localization";
+import {
+  libInit,
+  gn,
+  scaleMultiplier,
+  newHTML,
+  isAndroid,
+  isTablet,
+  getUrlVars,
+  CSSTransition3D,
+  frame,
+} from "../utils/lib";
+import Marty2 from "../utils/Marty2";
+import goToLink from "../utils/goToLink";
 
-let workingCanvas = document.createElement('canvas');
-let workingCanvas2 = document.createElement('canvas');
+let workingCanvas = document.createElement("canvas");
+let workingCanvas2 = document.createElement("canvas");
 let activeFocus = undefined;
 let changed = false;
 // Our behavior for story-starters are slightly different from changed
@@ -33,6 +43,7 @@ let runtime = undefined;
 let stage = undefined;
 let inFullscreen = false;
 let keypad = undefined;
+let colpad = undefined;
 let textForm = undefined;
 let editfirst = false;
 let stagecolor;
@@ -52,7 +63,7 @@ let editmode;
 let martymode;
 let martyConnected;
 
-let isDebugging = false;
+let isDebugging = true;
 let time;
 let userStart = false;
 let onHold = false;
@@ -84,6 +95,10 @@ export default class ScratchJr {
 
     static set changed (newChanged) {
         changed = newChanged;
+    }
+
+    static get changed () {
+        return changed;
     }
 
     static set storyStarted (newStoryStarted) {
@@ -131,14 +146,13 @@ export default class ScratchJr {
         return currentProject;
     }
 
+    static set currentProject (md5) {
+        currentProject = md5;
+    }
+
     static get editmode () {
         return editmode;
     }
-
-    // //returns bool martymode
-    // static get martymode () {
-    //     return martymode;
-    // }
 
     static set editmode (newEditmode) {
         editmode = newEditmode;
@@ -201,8 +215,10 @@ export default class ScratchJr {
         editmode = urlvars.mode;
         martymode = false;
         martyConnected = mv2.isConnected;
-        mv2.addEventListener('onIsConnectedChange', ScratchJr.onMartyConnectedChange);
-
+        mv2.addEventListener(
+          "onIsConnectedChange",
+          ScratchJr.onMartyConnectedChange
+        );
         libInit();
         Project.init();
         ScratchJr.log('Start ui init', ScratchJr.getTime(), 'sec');
@@ -226,7 +242,7 @@ export default class ScratchJr {
                 }
             }, window.Settings.autoSaveInterval);
         }
-    }
+  }
 
     // Event handler for when a story is started
     // When called and enabled, this will trigger sample projects to save copies
@@ -236,20 +252,20 @@ export default class ScratchJr {
         storyStarted = true;
     }
 
-    static getMartyMode(){
-        return martymode;
+    static getMartyMode() {
+      return martymode;
     }
-
-    static getMartyConnected(){
-        return martyConnected;
+  
+    static getMartyConnected() {
+      return martyConnected;
     }
-
-    static onMartyConnectedChange(event){
-        ScratchJr.setMartyConnected(event.isConnected);
+  
+    static onMartyConnectedChange(event) {
+      ScratchJr.setMartyConnected(event.isConnected);
     }
-
-    static setMartyConnected(connected){
-        martyConnected = connected;
+  
+    static setMartyConnected(connected) {
+      martyConnected = connected;
     }
 
     static editorEvents () {
@@ -338,21 +354,18 @@ export default class ScratchJr {
     static isSampleOrStarter () {
         return editmode == 'look' || editmode == 'storyStarter';
     }
-
     static isEditable () {
         return editmode != 'look';
     }
 
-    //to manage the toggle between regular mode and sprite mode
-    static isMartyMode () {
-        return martymode;
+      //to manage the toggle between regular mode and sprite mode
+    static isMartyMode() {
+      return martymode;
     }
 
-    static toggleMartyMode () {
-        martymode = !martymode;
+    static toggleMartyMode() {
+      martymode = !martymode;
     }
-
-
 
     // Called when ScratchJr is brought back to focus
     // Here, we fix up some UI elements that may not have been properly shut down when the app was paused.
@@ -382,36 +395,49 @@ export default class ScratchJr {
     }
 
     static saveProject (e, onDone) {
-        if (ScratchJr.isEditable() && editmode == 'storyStarter' && storyStarted && !Project.error) {
-            OS.analyticsEvent('samples', 'story_starter_edited', Project.metadata.name);
-            // Localize sample project names
-            var sampleName = Localization.localize('SAMPLE_' + Project.metadata.name);
-            // Get the new project name
-            IO.uniqueProjectName({
-                name: sampleName
-            }, function (jsonData) {
-                var newName = jsonData.name;
-                Project.metadata.name = newName;
-                // Create the new project
-                IO.createProject({
-                    name: newName,
-                    version: version,
-                    mtime: (new Date()).getTime().toString()
-                }, function (md5) {
-                    // Save project data
-                    currentProject = md5;
-                    // Switch out of story-starter mode to avoid creating new projects
-                    editmode = 'edit';
+        if (ScratchJr.isEditable() && !Project.error && changed) {
+            if (editmode != 'storyStarter') {
+                if (currentProject) {
                     Project.prepareToSave(currentProject, onDone);
-                });
-            }, true);
-        } else if (ScratchJr.isEditable() && currentProject && !Project.error && changed) {
-            Project.prepareToSave(currentProject, onDone);
-        } else {
-            if (onDone) {
-                onDone();
+                    return;
+                }
+            } else if (storyStarted) {
+                ScratchJr.saveStory(onDone);
+                return;
             }
         }
+        if (onDone) {
+            onDone();
+        }
+    }
+
+    /**
+     * Save the story as a new project so that the user can
+     * continue to edit or share it in the future.
+     */
+    static saveStory (onDone) {
+        OS.analyticsEvent('samples', 'story_starter_edited', Project.metadata.name);
+        // Localize sample project names
+        var sampleName = Localization.localizeSampleName(Project.metadata.name);
+        // Get the new project name
+        IO.uniqueProjectName({
+            name: sampleName
+        }, function (jsonData) {
+            var newName = jsonData.name;
+            Project.metadata.name = newName;
+            // Create the new project
+            IO.createProject({
+                name: newName,
+                version: version,
+                mtime: (new Date()).getTime().toString()
+            }, function (md5) {
+                // Save project data
+                currentProject = md5;
+                // Switch out of story-starter mode to avoid creating new projects
+                editmode = 'edit';
+                Project.prepareToSave(currentProject, onDone);
+            });
+        }, true);
     }
 
     static saveAndFlip (e) {
@@ -430,8 +456,8 @@ export default class ScratchJr {
         }
     }
 
-    static switchPage () {
-        window.location.href = ScratchJr.getGotoLink();
+    static switchPage() {
+      goToLink(ScratchJr.getGotoLink());
     }
 
     static getGotoLink () {
@@ -635,7 +661,10 @@ export default class ScratchJr {
     static editArg (e, ti) {
         e.preventDefault();
         e.stopPropagation();
-        if (ti && ti.owner.isText()) {
+        if (ti && ti.owner.isColour()) {
+            ScratchJr.colourClicked(e, ti);
+        }
+        else if (ti && ti.owner.isText()) {
             ScratchJr.textClicked(e, ti);
         } else {
             ScratchJr.numberClicked(e, ti);
@@ -646,68 +675,111 @@ export default class ScratchJr {
         });
     }
 
-    static textClicked (e, div) {
-        var b = div.owner; // b is a BlockArg
-        activeFocus = b;
-        var pt = b.getScreenPt();
-        var sc = ScratchJr.getActiveScript();
-        div = sc.parentNode;
-        var w = div.offsetWidth;
-        var h = div.offsetHeight;
-        var dx = ((pt.x + 480 * scaleMultiplier) > w) ? (w - 486 * scaleMultiplier) : pt.x - 6 * scaleMultiplier;
-        var ti = document.forms.editable.field;
-        ti.style.textAlign = 'center';
-        document.forms.editable.style.left = dx + 'px';
-        var top = pt.y + 55 * scaleMultiplier;
-        document.forms.editable.style.top = top + 'px';
-        if (isAndroid) {
-            AndroidInterface.scratchjr_setsoftkeyboardscrolllocation(
-                top * window.devicePixelRatio, (top + h) * window.devicePixelRatio
-            );
-        }
-        document.forms.editable.className = 'textform on';
-        ti.value = b.argValue;
-        if (isAndroid) {
-            AndroidInterface.scratchjr_forceShowKeyboard();
-        }
-        ti.focus();
-    }
 
-    static handleTextFieldFocus (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        activeFocus.oldvalue = activeFocus.input.textContent;
-    }
+  static onPause() {
+    autoSaveEnabled = false;
+    window.clearInterval(autoSaveSetInterval);
+  }
 
-    static handleTextFieldBlur (e) {
-        onBackButtonCallback.pop();
-        e.preventDefault();
-        e.stopPropagation();
-        var ti = document.forms.editable.field;
-        var str = ti.value.substring(0, ti.maxLength);
-        activeFocus.argValue = str;
-        activeFocus.setValue(str);
-        document.forms.editable.className = 'textform off';
-        if (activeFocus.daddy.div.parentNode) {
-            var spr = activeFocus.daddy.div.parentNode.owner.spr;
-            var action = {
-                action: 'scripts',
-                where: spr.div.parentNode.owner.id,
-                who: spr.id
-            };
-            if (activeFocus.input.textContent != activeFocus.oldvalue) {
-                Undo.record(action);
-                ScratchJr.storyStart('ScratchJr.handleTextFieldBlur');
+  static saveProject(e, onDone) {
+    if (
+      ScratchJr.isEditable() &&
+      editmode == "storyStarter" &&
+      storyStarted &&
+      !Project.error
+    ) {
+      OS.analyticsEvent(
+        "samples",
+        "story_starter_edited",
+        Project.metadata.name
+      );
+      // Localize sample project names
+      var sampleName = Localization.localize("SAMPLE_" + Project.metadata.name);
+      // Get the new project name
+      IO.uniqueProjectName(
+        {
+          name: sampleName,
+        },
+        function (jsonData) {
+          var newName = jsonData.name;
+          Project.metadata.name = newName;
+          // Create the new project
+          IO.createProject(
+            {
+              name: newName,
+              version: version,
+              mtime: new Date().getTime().toString(),
+            },
+            function (md5) {
+              // Save project data
+              currentProject = md5;
+              // Switch out of story-starter mode to avoid creating new projects
+              editmode = "edit";
+              Project.prepareToSave(currentProject, onDone);
+            });
+          }, true);
+        } else if (ScratchJr.isEditable()
+            && editmode != 'storyStarter'
+            && currentProject
+            && !Project.error
+            && changed
+        ) {
+            Project.prepareToSave(currentProject, onDone);
+        } else {
+            if (onDone) {
+                onDone();
             }
         }
-        activeFocus = undefined;
-        document.body.scrollTop = 0;
-        document.body.scrollLeft = 0;
-        if (isAndroid) {
-            AndroidInterface.scratchjr_forceHideKeyboard();
+    }
+
+    /////////////////////////////////////////
+    //Colour keyboard
+    /////////////////////////////////////////
+    static setupColKeypad () {
+        colpad = newHTML('div', 'colkeyboard', frame);
+        colpad.ontouchstart = ScratchJr.eatEvent;
+        colpad.onmousedown = ScratchJr.eatEvent;
+        // var pad = newHTML('div', 'insidekeyboard', colpad);
+        const colours = ["#e30613", "#009640", "#009fe3", "#662483", "#e94e1b", "#ffed00"];
+        for (const colour of colours) {
+            ScratchJr.keyboardAddCol(colpad, colour, 'onecol');
         }
     }
 
+    static keyboardAddCol (p, col, c) {
+        var keym = newHTML('div', c, p);
+        keym.style.background = col;
+        // var mk = newHTML('span', undefined, keym);
+        // mk.textContent = col ? col : '';
+        keym.ontouchstart = ScratchJr.colEditKey;
+        keym.onmousedown = ScratchJr.colEditKey;
+    }
+
+    /////////////////////////////////////////////////
+    //Colour Clicked
+    static colourClicked (e, ti) {
+        var delta = (activeFocus) ? activeFocus.delta : 0;
+        if (activeFocus && (activeFocus.type == 'blockarg')) {
+            activeFocus.div.className = 'colfield off';
+            ScratchJr.colEditDone();
+        }
+        var b = ti.owner; // b is a BlockArg
+        activeFocus = b;
+        activeFocus.delta = delta;
+        b.oldvalue = ti.style.background;
+        activeFocus.div.className = 'colfield on';
+        colpad.className = 'colkeyboard on';
+        editfirst = true;
+        var p = ti.parentNode.parentNode.owner;
+        // if (Number(p.min) < 0) {
+        //     ScratchJr.setMinusKey();
+        // } else {
+        //     ScratchJr.setSpaceKey();
+        // }
+        if (delta == 0) {
+            ScratchJr.needsToScroll(b);
+        }
+    }
     /////////////////////////////////////////
     //Numeric keyboard
     /////////////////////////////////////////
@@ -767,7 +839,12 @@ export default class ScratchJr {
         if (delta == 0) {
             ScratchJr.needsToScroll(b);
         }
+        // accept keyboard input
+        // `keypress` will not catch `Backspace`,
+        // so we listen to `keydown`
+        window.onkeydown = ScratchJr.handleKeyDown;
     }
+    
 
     static needsToScroll (b) {
         // needs scroll
@@ -791,6 +868,25 @@ export default class ScratchJr {
         activeFocus.delta = delta;
     }
 
+    static handleKeyDown (evt) {
+        // 48 is the keyCode for 0
+        // 57 is the keyCode for 9
+        // For the detail of keyCode of keyboard event
+        // please refer to https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#value_of_keycode
+        if ((evt.keyCode >= 48 && evt.keyCode <= 57) || evt.key == '-') {
+            // if the user input numbers or negative sign
+            ScratchJr.fillValueWithKey(evt.key);
+            return;
+        }
+        if (evt.key == 'Backspace') {
+            ScratchJr.numEditDelete();
+        }
+    }
+
+    // static handleColDown (evt) {
+    //     ScratchJr.fillValueWithKey(evt.key);
+    // }
+
     static numEditKey (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -805,13 +901,42 @@ export default class ScratchJr {
             ScratchAudio.sndFX('keydown.wav');
         }
         var c = t.textContent;
-        var input = activeFocus.input;
         if (!c) {
             if ((t.parentNode.className == 'onekey delete') || (t.className == 'onekey delete')) {
                 ScratchJr.numEditDelete();
             }
             return;
         }
+        ScratchJr.fillValueWithKey(c);
+    }
+
+    static colEditKey (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var t = e.target;
+        if (!t) {
+            return;
+        }
+        if (t.className == '') {
+            t = t.parentNode;
+        }
+        ScratchAudio.sndFX('keydown.wav');
+        var c = t.style.background;
+        if (!c) {
+            if ((t.parentNode.className == 'onecol delete') || (t.className == 'onecol delete')) {
+                ScratchJr.numEditDelete();
+            }
+            return;
+        }
+        ScratchJr.fillValueWithCol(c);
+    }
+
+    /**
+     * Fill active focus with value `c`
+     * @param c The input char, should be 0...9 or `-`
+     */
+    static fillValueWithKey (c) {
+        var input = activeFocus.input;
         var val = input.textContent;
         if (editfirst) {
             editfirst = false;
@@ -826,11 +951,23 @@ export default class ScratchJr {
         } else {
             val += c;
         }
-        if ((Number(val).toString() != 'NaN') && ((Number(val) > 99) || (Number(val) < -99))) {
+        const min = activeFocus.daddy.min || -99;
+        const max = activeFocus.daddy.max || 99;
+        if ((Number(val).toString() != 'NaN') && ((Number(val) > max) || (Number(val) < min))) {
             ScratchAudio.sndFX('boing.wav');
         } else {
             activeFocus.setValue(val);
         }
+    }
+
+    /**
+     * Fill active focus with value `c`
+     * @param c The input char, should be string colour
+     */
+     static fillValueWithCol (c) {
+        var input = activeFocus.input;
+        input.style.background = c;
+        activeFocus.setCol(c);
     }
 
     static setSpaceKey () {
@@ -857,7 +994,9 @@ export default class ScratchJr {
             val = val.substring(0, val.length - 1);
         }
         if (val.length == 0) {
-            val = '0';
+            let min = activeFocus.daddy.min || 0;
+            min = Math.min(min, 0);
+            val = String(min);
         }
         activeFocus.setValue(val);
     }
@@ -872,7 +1011,11 @@ export default class ScratchJr {
         if (activeFocus.type != 'blockarg') {
             return;
         }
-        if (activeFocus.isText()) {
+        if (activeFocus.isColour()) {
+            ScratchJr.closeColEdit();
+            onBackButtonCallback.pop();
+        }
+        else if (activeFocus.isText()) {
             document.forms.editable.field.blur();
         } else {
             ScratchJr.closeNumberEdit();
@@ -886,6 +1029,39 @@ export default class ScratchJr {
         keypad.className = 'picokeyboard off';
         activeFocus.div.className = 'numfield off';
         activeFocus = undefined;
+        // stop accepting keyboard events
+        window.onkeydown = undefined;
+    }
+
+    static closeColEdit () {
+        ScratchJr.colEditDone();
+        ScratchJr.resetScroll();
+        colpad.className = 'colkeyboard off';
+        activeFocus.div.className = 'colfield off';
+        activeFocus = undefined;
+        // stop accepting keyboard events
+        window.onkeydown = undefined;
+    }
+
+    static colEditDone () {
+        var col = activeFocus.argValue;
+        var ba = activeFocus;
+        activeFocus.setCol(col);
+        ba.argValue = col;
+        if (ba.daddy && ba.daddy.div.parentNode.owner) {
+            var spr = ba.daddy.div.parentNode.owner.spr;
+            if (spr && spr.div.parentNode) {
+                var action = {
+                    action: 'scripts',
+                    where: spr.div.parentNode.owner.id,
+                    who: spr.id
+                };
+                if (ba.argValue != ba.oldvalue) {
+                    ScratchJr.storyStart('ScratchJr.numEditDone');
+                    Undo.record(action);
+                }
+            }
+        }
     }
 
     static numEditDone () {
@@ -942,6 +1118,16 @@ export default class ScratchJr {
         return str;
     }
 
+    static makeThumb (svgName, width, height) {
+        IO.getAsset(svgName, function (svgDataUrl) {
+            var svgBase64 = svgDataUrl.split(',')[1];
+            var dataurl = IO.getThumbnail(atob(svgBase64), width, height, 120, 90);
+            var pngBase64 = dataurl.split(',')[1];
+            var name = svgName.split('.')[0];
+            OS.setmedianame(pngBase64, name, 'png');
+        });
+    }
+
     /////////////////
     //Application on the background
 
@@ -970,8 +1156,10 @@ export default class ScratchJr {
             var callbackReference = onBackButtonCallback[onBackButtonCallback.length - 1];
             callbackReference();
         }
+      }
     }
-}
+
+
 
 // Expose ScratchJr to global
 window.ScratchJr = ScratchJr;

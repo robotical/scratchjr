@@ -1,10 +1,11 @@
-import {isiOS, isAndroid, gn} from '../utils/lib';
+import {isiOS, isAndroid, isWebapp, gn} from '../utils/lib';
 import IO from './IO';
 import iOS from './iOS';
 import Android from './Android';
 import Lobby from '../lobby/Lobby';
 import Alert from '../editor/ui/Alert';
 import ScratchAudio from '../utils/ScratchAudio';
+import Webapp from './Webapp';
 
 //////////////////////////////////////////////////
 //  Tablet interface functions
@@ -39,6 +40,11 @@ export default class OS {
 
     // Wait for the tablet interface to be injected into the webview
     static waitForInterface (fcn) {
+        if (isAndroid === true && isiOS === true
+            || isWebapp === true && isiOS === true 
+            || isWebapp === true && isAndroid === true) {
+                throw new Error("Platform flags are wrong");
+            }
         // Already loaded the interface
         if (tabletInterface != null) {
             fcn();
@@ -51,7 +57,11 @@ export default class OS {
             }, 100);
         }
 
-        tabletInterface = isiOS ? iOS : Android;
+        if (isWebapp) {
+            tabletInterface = Webapp;
+        } else {
+            tabletInterface = isiOS ? iOS : Android;
+        }
         if (fcn) {
             fcn();
         }
@@ -68,6 +78,22 @@ export default class OS {
     // Marty test
     static martyCmd (json, fcn) {
         tabletInterface.martyCmd(json, fcn);
+    }
+
+    // Marty addons
+    static getMartyAddons() {
+        if (window.mv2?.addons) {
+            return JSON.parse(window.mv2.addons).addons;
+        }
+        return [];
+    }
+
+    // Marty fw version
+    static getMartyFwVersion() {
+        if (window.mv2?.systemInfo?.SystemVersion) {
+            return window.mv2.systemInfo.SystemVersion;
+        }
+        return "";
     }
 
     // Database functions
@@ -229,6 +255,10 @@ export default class OS {
     // Sharing
     ///////////////
 
+    static createZipForProject (projectData, metadata, name, fcn) {
+        tabletInterface.createZipForProject(projectData, metadata, name, fcn);
+    }
+
 
     // Called on the JS side to trigger native UI for project sharing.
     // fileName: name for the file to share
@@ -253,6 +283,14 @@ export default class OS {
             return 0;
         }
         return 1;
+    }
+
+    static registerLibraryAssets (version, assets, fcn) {
+        tabletInterface.registerLibraryAssets(version, assets, fcn);
+    }
+
+    static duplicateAsset (path, name, fcn) {
+        tabletInterface.duplicateAsset(path, name, fcn);
     }
 
     // Name of the device/iPad to display on the sharing dialog page

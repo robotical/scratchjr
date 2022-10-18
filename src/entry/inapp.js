@@ -148,6 +148,10 @@ export function inappBlocksGuide () {
         'BLOCKS_TURN_RIGHT_DESCRIPTION',
         'BLOCKS_TURN_LEFT',
         'BLOCKS_TURN_LEFT_DESCRIPTION',
+        'BLOCKS_KICK_RIGHT',
+        'BLOCKS_KICK_RIGHT_DESCRIPTION',
+        'BLOCKS_KICK_LEFT',
+        'BLOCKS_KICK_LEFT_DESCRIPTION',
         'BLOCK_MOVE_GETREADY',
         'BLOCK_MOVE_GETREADY_DESCRIPTION',
         'BLOCK_MOVE_DANCE',
@@ -166,6 +170,16 @@ export function inappBlocksGuide () {
         'BLOCK_WAVE_LEFT_DESCRIPTION',
         'BLOCK_WAVE_RIGHT',
         'BLOCK_WAVE_RIGHT_DESCRIPTION',
+        'BLOCK_LED_EYES_P1',
+        'BLOCK_LED_EYES_P1_DESCRIPTION',
+        'BLOCK_LED_EYES_P2',
+        'BLOCK_LED_EYES_P2_DESCRIPTION',
+        'BLOCK_LED_EYES_P3',
+        'BLOCK_LED_EYES_P3_DESCRIPTION',
+        'BLOCK_LED_EYES_COLOUR',
+        'BLOCK_LED_EYES_COLOUR_DESCRIPTION',
+        'BLOCK_CELEBRATE',
+        'BLOCK_CELEBRATE_DESCRIPTION',
         'BLOCK_PLAY_CONFUSION_SOUND',
         'BLOCK_PLAY_CONFUSION_SOUND_DESCRIPTION',
         'BLOCK_PLAY_DISBELIEF_SOUND',
@@ -194,6 +208,16 @@ export function inappBlocksGuide () {
     
 
     for (let i = 0; i < blockDescriptionKeys.length; i++) {
-        gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);
+        try {
+            gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);
+        } catch(e){ console.log(e)}
     }
+}
+
+export function inappPrivacyPolicy () {
+    const elements = document.querySelectorAll('[data-i18n]');
+    elements.forEach(function (item) {
+        const key = item.getAttribute('data-i18n');
+        item.innerHTML = Localization.localize(key);
+    });
 }
