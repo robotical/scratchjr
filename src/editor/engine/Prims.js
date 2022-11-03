@@ -2,12 +2,12 @@ import ScratchJr from '../ScratchJr';
 import ScratchAudio from '../../utils/ScratchAudio';
 import Grid from '../ui/Grid';
 import Vector from '../../geom/Vector';
-import {gn} from '../../utils/lib';
+import {gn, rgbToHex} from '../../utils/lib';
 import OS from '../../tablet/OS';
 import celebrateHelper from './celebrate-helper';
 import isVersionGreater from '../../utils/versionChecker';
 
-const LED_EYES_FW_VERSION = "2.0.1"; // greater versions than this support the LED_EYE functionality
+const LED_EYES_FW_VERSION = "1.2.0"; // greater versions than this support the LED_EYE functionality
 let martyInterval = 33;
 const intervalToSeconds = 31.25; // runtime tick is set at 32ms by Runtime.js. 32*31.25 = 1s
 let tinterval = 1;
@@ -747,7 +747,7 @@ export default class Prims {
 
     static ledEyesP1 (strip) {
         const duration = 1500;
-        let marty_cmd = `ledeyes/pattern/cyan-magenta?side=1&speed=2500`;
+        let marty_cmd = `led/LEDeye/pattern/show-off`;
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
         } 
@@ -756,7 +756,7 @@ export default class Prims {
     }
     static ledEyesP2 (strip) {
         const duration = 1500;
-        let marty_cmd = `ledeyes/pattern/green-yellow?side=1&speed=2500`;
+        let marty_cmd = `led/LEDeye/pattern/pinwheel`;
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
         } 
@@ -774,8 +774,8 @@ export default class Prims {
     }
     static ledEyesColour (strip) {
         const duration = 1500;
-        const colour = strip.thisblock.getArgValue();
-        let marty_cmd = `ledeyes/colour/${colour}?side=1&speed=2500`;
+        const colour = rgbToHex(strip.thisblock.getArgValue()).replace("#", "");
+        let marty_cmd = `led/LEDeye/color/${colour}`;
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
         } 
@@ -786,7 +786,7 @@ export default class Prims {
     static clearLedEyesIn(strip, duration) {
         const turnOffLedEyesTimer = setTimeout(() => {
             console.log("clearing eyes");
-            const clearLedEyesCmd = "ledeyes/clear";
+            const clearLedEyesCmd = "led/LEDeye/color/000000";
             OS.martyCmd({ cmd: clearLedEyesCmd });
             clearTimeout(turnOffLedEyesTimer);
         }, duration);

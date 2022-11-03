@@ -229,7 +229,7 @@ static setupCategories () {
 
         return [['onflag'],
             ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance', 'kickLeft', 'kickRight'],
-            ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle', 'waveLeft', 'waveRight', 'ledEyesP1','ledEyesP2','ledEyesP3', 'ledEyesColour', 'celebrate'],
+            ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle', 'waveLeft', 'waveRight', 'ledEyesP1','ledEyesP2', 'ledEyesColour', 'celebrate'],
             ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
             ['wait', 'stopmine', 'repeat'],
             ['endstack', 'forever']];
@@ -333,8 +333,8 @@ static setupCategories () {
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'ledEyesP2': ['ledEyesP2', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP2', 'svg'),
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-            'ledEyesP3': ['ledEyesP3', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP3', 'svg'),
-                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            // 'ledEyesP3': ['ledEyesP3', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP3', 'svg'),
+            //     BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'ledEyesColour': ['ledEyesColour', BlockSpecs.getImageFrom('assets/blockicons/MartyEyesColour', 'svg'),
                 BlockSpecs.pinkCmd, 'c', 'black', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'celebrate': ['celebrate', BlockSpecs.getImageFrom('assets/blockicons/MartyCelebrate', 'svg'),
@@ -433,7 +433,7 @@ static setupCategories () {
             'waveRight': Localization.localize('BLOCK_WAVE_RIGHT'),
             'ledEyesP1': Localization.localize('BLOCK_LED_EYES_P1'),
             'ledEyesP2': Localization.localize('BLOCK_LED_EYES_P2'),
-            'ledEyesP3': Localization.localize('BLOCK_LED_EYES_P3'),
+            // 'ledEyesP3': Localization.localize('BLOCK_LED_EYES_P3'),
             'ledEyesColour': Localization.localize('BLOCK_LED_EYES_COLOUR'),
             'celebrate': Localization.localize('BLOCK_CELEBRATE'),
             'say': Localization.localize('BLOCK_DESC_SAY'),
