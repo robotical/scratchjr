@@ -746,30 +746,30 @@ export default class Prims {
     }
 
     static ledEyesP1 (strip) {
-        const duration = 1500;
+        const duration = 2500;
         let marty_cmd = `led/LEDeye/pattern/show-off`;
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
         } 
-        Prims.clearLedEyesIn(strip, duration);
+        Prims.clearLedEyesIn(strip, duration-100);
        return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
     }
     static ledEyesP2 (strip) {
-        const duration = 1500;
+        const duration = 2500;
         let marty_cmd = `led/LEDeye/pattern/pinwheel`;
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
         } 
-        Prims.clearLedEyesIn(strip, duration);
+        Prims.clearLedEyesIn(strip, duration-100);
        return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
     }
     static ledEyesP3 (strip) {
-        const duration = 1500;
+        const duration = 2500;
         let marty_cmd = `ledeyes/pattern/celebrate?side=1&speed=2500`;
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
         } 
-        Prims.clearLedEyesIn(strip, duration);
+        Prims.clearLedEyesIn(strip, duration-100);
        return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
     }
     static ledEyesColour (strip) {
@@ -779,7 +779,7 @@ export default class Prims {
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
         } 
-        Prims.clearLedEyesIn(strip, duration);
+        Prims.clearLedEyesIn(strip, duration-100);
        return Prims.doMartyCmd(strip, marty_cmd, duration);
     }
 
