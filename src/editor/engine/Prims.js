@@ -776,6 +776,7 @@ export default class Prims {
         const duration = 1500;
         const colour = rgbToHex(strip.thisblock.getArgValue()).replace("#", "");
         let marty_cmd = `led/LEDeye/color/${colour}`;
+        console.log(marty_cmd, 'Prims.js', 'line: ', '779');
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
         } 

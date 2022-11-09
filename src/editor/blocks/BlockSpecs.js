@@ -336,7 +336,7 @@ static setupCategories () {
             // 'ledEyesP3': ['ledEyesP3', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP3', 'svg'),
             //     BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'ledEyesColour': ['ledEyesColour', BlockSpecs.getImageFrom('assets/blockicons/MartyEyesColour', 'svg'),
-                BlockSpecs.pinkCmd, 'c', 'black', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+                BlockSpecs.pinkCmd, 'c', '#000000', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'celebrate': ['celebrate', BlockSpecs.getImageFrom('assets/blockicons/MartyCelebrate', 'svg'),
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'say': ['say', BlockSpecs.getImageFrom('assets/blockicons/Say', 'svg'),

@@ -93,7 +93,7 @@ spriteform.off {visibility: hidden; };
 
 .phototopbar {
     position: fixed;
-    top: 0;
+    top: ${css_vh(15.29)};
     left: 0;
     height: ${css_vh(10.29)};
     width: ${css_vw(100)};
