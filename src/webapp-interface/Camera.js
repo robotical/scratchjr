@@ -1,6 +1,7 @@
 class Camera {
   constructor() {
     this.isMirrored = true;
+    this.cameraFacing = "user";
     this.initialiseMedia();
   }
 
@@ -103,7 +104,13 @@ class Camera {
       this.videoCaptureElement = new VideoCapture(this.videoElement);
       this.videoCaptureElement.isRecordingPermitted = true;
       this.videoCaptureElement.startRecord({
-        video: { width: this.shapeData.width, height: this.shapeData.height },
+        video: {
+          width: this.shapeData.width,
+          height: this.shapeData.height,
+          facingMode: {
+            exact: this.cameraFacing,
+          },
+        },
       });
     }
   }
@@ -210,8 +217,8 @@ class VideoCapture {
     let canvas = document.createElement("canvas");
 
     // make the canvas the same size as the videoElement.
-    let w = this.videoElement.clientWidth; // cameraRect.width; 
-    let h = this.videoElement.clientHeight; // cameraRect.height; 
+    let w = this.videoElement.clientWidth; // cameraRect.width;
+    let h = this.videoElement.clientHeight; // cameraRect.height;
 
     canvas.width = w;
     canvas.height = h;
@@ -227,7 +234,13 @@ class VideoCapture {
       ctx.scale(-1, 1);
     }
 
-    ctx.drawImage(this.videoElement, 0, 0, this.videoElement.clientWidth, this.videoElement.clientHeight);
+    ctx.drawImage(
+      this.videoElement,
+      0,
+      0,
+      this.videoElement.clientWidth,
+      this.videoElement.clientHeight
+    );
 
     let data = canvas.toDataURL("image/png");
     return data;

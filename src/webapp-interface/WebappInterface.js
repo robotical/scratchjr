@@ -178,7 +178,10 @@ export default class WebappInterface {
     }
   }
 
-  static scratchjr_choosecamera(mode) {
+  static scratchjr_choosecamera(mode) { 
+    const cameraSide = mode === "front" ? "user" : "enviroment";
+    cameraInstance.cameraFacing = cameraSide;
+    WebappInterface.scratchjr_stopfeed();
     console.log("scratchjr_choosecamera NYI", mode);
   }
 

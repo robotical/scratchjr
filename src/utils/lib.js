@@ -37,6 +37,7 @@ export const getPlatforms = () => {
       isWebapp = true;
     }
   }
+  return {isiOS: false, isAndroid: false, isWebapp: true};
   return { isiOS, isAndroid, isWebapp };
 };
 
