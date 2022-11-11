@@ -103,13 +103,15 @@ class Camera {
 
       this.videoCaptureElement = new VideoCapture(this.videoElement);
       this.videoCaptureElement.isRecordingPermitted = true;
+      const supports = navigator.mediaDevices.getSupportedConstraints();
+      if (!supports['facingMode']) {
+        alert('This browser does not support facingMode!');
+      }
       this.videoCaptureElement.startRecord({
         video: {
           width: this.shapeData.width,
           height: this.shapeData.height,
-          facingMode: {
-            exact: this.cameraFacing,
-          },
+          facingMode: this.cameraFacing,
         },
       });
     }

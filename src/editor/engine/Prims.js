@@ -786,7 +786,6 @@ export default class Prims {
 
     static clearLedEyesIn(strip, duration) {
         const turnOffLedEyesTimer = setTimeout(() => {
-            console.log("clearing eyes");
             const clearLedEyesCmd = "led/LEDeye/color/000000";
             OS.martyCmd({ cmd: clearLedEyesCmd });
             clearTimeout(turnOffLedEyesTimer);
@@ -982,7 +981,6 @@ export default class Prims {
 
 
     static playConfusion (strip) {
-        console.log('Play Confusion!!')
         const martyConnected = ScratchJr.getMartyConnected();
         const moveTime = 1000;
         Prims.setTime(strip);
@@ -1004,7 +1002,6 @@ export default class Prims {
     }
 
     static playDisbelief (strip) {
-        console.log('Play Disbelief!!')
         const martyConnected = ScratchJr.getMartyConnected();
         const moveTime = 500;
         Prims.setTime(strip);
@@ -1028,7 +1025,6 @@ export default class Prims {
     
 
     static playExcitement (strip) {
-        console.log('Play No Way!!')
         const martyConnected = ScratchJr.getMartyConnected();
         const moveTime = 1000;
         Prims.setTime(strip);
@@ -1050,7 +1046,6 @@ export default class Prims {
     }
 
     static playNoway (strip) {
-        console.log('Play No Way!!')
         const martyConnected = ScratchJr.getMartyConnected();
         const moveTime = 1000;
         Prims.setTime(strip);
@@ -1072,7 +1067,6 @@ export default class Prims {
     }
 
     static playNo (strip) {
-        console.log('Play No!!')
         const martyConnected = ScratchJr.getMartyConnected();
         const moveTime = 500;
         Prims.setTime(strip);
@@ -1094,7 +1088,6 @@ export default class Prims {
     }
 
     static playWhistle (strip) {
-        console.log('Play Whistle!!')
         const martyConnected = ScratchJr.getMartyConnected();
         const moveTime = 500;
         Prims.setTime(strip);

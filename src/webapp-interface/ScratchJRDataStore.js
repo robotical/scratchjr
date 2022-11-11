@@ -74,6 +74,7 @@ export default class ScratchJRDataStore {
      */
 
   static async ensureDir(filePath) {
+    await new Promise(rsv => setTimeout(rsv, 1000)); // ios sometimes isn't ready so it needs some time
     const files = await readdir(filePath);
     if (files.length) {
       await mkdir(filePath);

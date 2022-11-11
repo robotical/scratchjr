@@ -5,6 +5,7 @@ import Lobby from "../lobby/Lobby";
 import goToLink from "../utils/goToLink";
 
 export function homeMain() {
+  OS.martyCmd({cmd: "show-back-arrow"});
   gn("logotab").onclick = homeGoBack;
   homeStrings();
   OS.getsettings(doNext);

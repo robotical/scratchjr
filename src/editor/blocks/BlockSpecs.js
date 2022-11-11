@@ -122,7 +122,6 @@ export default class BlockSpecs {
             loadassets[img.src] = img;
             loadCount++;
             img.onload = function () {
-                console.log(img.src)
                 delete loadassets[img.src];
                 loadCount--;
             };

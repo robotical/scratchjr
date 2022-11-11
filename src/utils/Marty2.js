@@ -83,9 +83,11 @@ class Marty2 extends EventDispatcher {
   }
 
   async send_REST(cmd) {
-    console.log("IN USELESS send_REST");
-    // just a sort of a placeholder (abstract) method.
-    // This method will get replaced by the webapp equivalent method.
+    try {
+      window.ReactNativeWebView.postMessage(cmd); // this call triggers onMessage in the app
+    } catch(e) {
+      console.log("IN USELESS send_REST", e);
+    }
   }
 
   setName(martyName) {

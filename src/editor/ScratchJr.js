@@ -248,7 +248,6 @@ export default class ScratchJr {
     // When called and enabled, this will trigger sample projects to save copies
     // Here for debugging, run-time filtering, etc.
     static storyStart (/*eventName*/) {
-        // console.log("Story started: " + eventName);
         storyStarted = true;
     }
 

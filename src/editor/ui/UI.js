@@ -108,8 +108,6 @@ export default class UI {
         function connCB(str){
             mv2.updateConnectionInfo();
             ScratchJr.setMartyConnected(mv2.isConnected);
-            console.log('ScratchJr.getMartyConnected()');
-            console.log(ScratchJr.getMartyConnected());
         }
 
         UI.layoutLibrary(sl);
@@ -790,7 +788,6 @@ export default class UI {
         UI.setShowGrid(Grid.hidden);
 
         OS.analyticsEvent('editor', Grid.hidden ? 'hide_grid' : 'show_grid');
-        console.log('build updated')
     }
 
     static setShowGrid (b) {
