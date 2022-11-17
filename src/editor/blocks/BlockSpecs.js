@@ -228,7 +228,7 @@ static setupCategories () {
 
         return [['onflag'],
             ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance', 'kickLeft', 'kickRight'],
-            ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle', 'waveLeft', 'waveRight', 'ledEyesP1','ledEyesP2', 'ledEyesColour', 'celebrate'],
+            ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle', 'waveLeft', 'waveRight', 'celebrate', 'ledEyesP1','ledEyesP2', 'ledEyesColour'],
             ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
             ['wait', 'stopmine', 'repeat'],
             ['endstack', 'forever']];
@@ -328,6 +328,8 @@ static setupCategories () {
                 BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
             'waveRight': ['waveRight', BlockSpecs.getImageFrom('assets/blockicons/MartyWaveRight', 'svg'),
                 BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
+            'celebrate': ['celebrate', BlockSpecs.getImageFrom('assets/blockicons/MartyCelebrate', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'ledEyesP1': ['ledEyesP1', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP1', 'svg'),
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'ledEyesP2': ['ledEyesP2', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP2', 'svg'),
@@ -336,8 +338,6 @@ static setupCategories () {
             //     BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'ledEyesColour': ['ledEyesColour', BlockSpecs.getImageFrom('assets/blockicons/MartyEyesColour', 'svg'),
                 BlockSpecs.pinkCmd, 'c', '#000000', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-            'celebrate': ['celebrate', BlockSpecs.getImageFrom('assets/blockicons/MartyCelebrate', 'svg'),
-                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'say': ['say', BlockSpecs.getImageFrom('assets/blockicons/Say', 'svg'),
                 BlockSpecs.pinkCmd, 't',
                 Localization.localize('SAY_BLOCK_DEFAULT_ARGUMENT'), BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],

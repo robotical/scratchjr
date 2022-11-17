@@ -78,11 +78,11 @@ export default class Prims {
         Prims.table.eyesWiggle = Prims.eyesWiggle;
         Prims.table.waveLeft = Prims.waveLeft;
         Prims.table.waveRight = Prims.waveRight;
+        Prims.table.celebrate = Prims.celebrate;
         Prims.table.ledEyesP1 = Prims.ledEyesP1;
         Prims.table.ledEyesP2 = Prims.ledEyesP2;
         Prims.table.ledEyesP3 = Prims.ledEyesP3;
         Prims.table.ledEyesColour = Prims.ledEyesColour;
-        Prims.table.celebrate = Prims.celebrate;
 
         Prims.table.confusion = Prims.playConfusion;
         Prims.table.disbelief = Prims.playDisbelief;
