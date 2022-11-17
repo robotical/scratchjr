@@ -113,7 +113,6 @@ class Marty2 extends EventDispatcher {
   }
 
   setIsConnected(isConnected) {
-    console.log("setIsConnected", isConnected);
     if (isConnected !== this.isConnected) {
       this.isConnected = isConnected;
       if (isConnected) {

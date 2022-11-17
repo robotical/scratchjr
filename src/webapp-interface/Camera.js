@@ -26,6 +26,7 @@ class Camera {
   }
 
   hasCamera() {
+    return true;
     return !!navigator.mediaDevices.getUserMedia({ video: true, audio: false });
   }
 
