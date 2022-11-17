@@ -26,7 +26,7 @@ class Camera {
   }
 
   hasCamera() {
-    return !!navigator.mediaDevices.getUserMedia({ audio: false });
+    return !!navigator.mediaDevices.getUserMedia({ video: true, audio: false });
   }
 
   layoutDiv(el, x, y, w, h) {
