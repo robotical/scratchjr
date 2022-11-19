@@ -86,7 +86,7 @@ class Marty2 extends EventDispatcher {
   async send_REST(cmd) {
     try {
       window.ReactNativeWebView.postMessage(cmd); // this call triggers onMessage in the app
-    } catch(e) {
+    } catch (e) {
       console.log("IN USELESS send_REST", e);
     }
   }
@@ -113,14 +113,14 @@ class Marty2 extends EventDispatcher {
   }
 
   setIsConnected(isConnected) {
+    if (isConnected) {
+      hideLedBlocks(this.addons);
+    } else {
+      showLedBlocks();
+    }
     if (isConnected !== this.isConnected) {
+      if (!isConnected) this.updateConnectionInfo();
       this.isConnected = isConnected;
-      if (isConnected) {
-        hideLedBlocks(this.addons);
-      } else {
-        this.updateConnectionInfo();
-        showLedBlocks();
-      }
       this.dispatchEvent({
         type: "onIsConnectedChange",
         isConnected: this.isConnected,
