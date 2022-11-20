@@ -3,8 +3,8 @@ const RIC_WHOAMI_TYPE_CODE_ADDON_LEDEYE = "LEDeye";
 export default function hideLedBlocks(addons) {
   if (areLedConnected(addons)) {
     showLedBlocks();
-  } else {
-    // hiding led blocks if no led blocks are connected
+  } else if (!areLedConnected(addons) && isLooksSelected()) {
+    // hiding led blocks if no led blocks are connected and the looks area is selected
     try {
       document.querySelector("#palette :nth-child(9)").style.display = "none";
       document.querySelector("#palette :nth-child(10)").style.display = "none";
@@ -33,4 +33,12 @@ function areLedConnected(addonsStringified) {
     if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_LEDEYE) return true;
   }
   return false;
+}
+
+function isLooksSelected() {
+  try {
+    return document.querySelector("#looks :nth-child(2)").style.visibility === "visible"; // second child is the looksOn img. If that's visible the category is selected
+  } catch (e) {
+    return false;
+  }
 }
