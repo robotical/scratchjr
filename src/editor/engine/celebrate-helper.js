@@ -44,10 +44,7 @@ export const discoChangeBlockPattern = (onOff, OS) => {
 
   //so if it's set in a forever loop give 0.2s break between each update
   const resolveTime = 200;
-  let patternProgram = "11"; // 11, 01;
-  if (onOff === "off") {
-    patternProgram = "01";
-  }
+
   // select all LED addons found
   const addressList = getAllDiscoBoards(addons);
 
@@ -55,8 +52,12 @@ export const discoChangeBlockPattern = (onOff, OS) => {
 
   for (var i = 0; i < numberOfLEDAddons; i++) {
     let ledDeviceName = addressList.pop();
-    const commandMsg = `elem/${ledDeviceName}/json?cmd=raw&hexWr=${patternProgram}`;
-    OS.martyCmd({ cmd: commandMsg });
+    let ledCmd = `led/${ledDeviceName}/pattern/show-off`;
+    if (onOff === "off") {
+      ledCmd = `led/${ledDeviceName}/off`;
+    }
+
+    OS.martyCmd({ cmd: ledCmd });
   }
   return new Promise((resolve) => setTimeout(resolve, resolveTime));
 };
