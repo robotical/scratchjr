@@ -80,6 +80,16 @@ All changes should be made in a fork. Before making a pull request, ensure all c
 
 For more information, see [CONTRIBUTING.md](https://github.com/LLK/scratchjr/blob/develop/.github/CONTRIBUTING.md).
 
+## GitHub Actions
+
+### Versioning
+
+We use GitHub Actions to automate versioning of the project. The workflow is triggered every time a new tag is pushed to the repository. The action updates the version number in the `package.json` file, creates a new release on GitHub, and pushes the updated files to the repository.
+
+### Deployment to NPM
+
+We also use GitHub Actions for deployment to NPM. The workflow is triggered every time a new release is created on GitHub. The action builds and publishes the updated package to NPM, making it available for others to install and use.
+
 ## Code credits
 ScratchJr would not be possible without free and open source libraries, including:
 * [Snap.svg](https://github.com/adobe-webplatform/Snap.svg/)
