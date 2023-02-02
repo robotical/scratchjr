@@ -116,6 +116,25 @@ export default class UI {
     static middleSection () {
         var bp = newHTML('div', 'blockspalette', frame);
         bp.setAttribute('id', 'blockspalette');
+        var leftScroll = newHTML('div', 'left-scroll', bp);
+        var rightScroll = newHTML('div', 'right-scroll', bp);
+        leftScroll.addEventListener('click', function(event) {
+            // scroll smooth on x axis
+            gn('palette').scrollBy({
+                top: 0,
+                left: 200,
+                behavior: 'smooth'
+                });
+          });
+        rightScroll.addEventListener('click', function(event) {
+            // scroll smooth on x axis
+            gn('palette').scrollBy({
+                top: 0,
+                left: -200,
+                behavior: 'smooth'
+                });
+        });
+
         Palette.setup(bp);
         Undo.setup(bp);
     }

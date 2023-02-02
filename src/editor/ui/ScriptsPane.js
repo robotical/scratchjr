@@ -310,8 +310,8 @@ export default class ScriptsPane {
         Events.dragged = false;
         e.preventDefault();
         Events.clearEvents();
-        scroll.bounceBack();
-    }
+        scroll.bounceBack(); // commented out because we want to be able to drag the script pane to the bottom of the screen without it bouncing back
+}
 
     //////////////////////
     //

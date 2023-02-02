@@ -189,6 +189,8 @@ div.frame {
 
 #blockspalette {
     position: relative;
+    display: grid;
+    grid-template-columns: min-content 1fr;
     left: 0;
     right: 0;
     height: ${64 * scaleMultiplier}px;
@@ -255,9 +257,49 @@ div.frame {
     position: relative;
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0)};
     height: ${64 * scaleMultiplier}px;
-    width: ${900 * scaleMultiplier}px;
+    /* width: ${600 * scaleMultiplier}px; */
+    width: 89%;
     z-index:4;
     overflow: hidden;
+    overflow-x: scroll;
+    margin-left: ${css_vh(5)};
+}
+/* hide scroll bar */
+#blockspalette .palette {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+#blockspalette .palette::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera*/
+}
+
+#blockspalette .left-scroll,
+#blockspalette .right-scroll {
+    position: absolute;
+    margin: ${css_vh(0)};
+    top: 50%;
+    transform: translateY(-50%);
+    width: ${css_vh(5)};
+    height: ${css_vh(5)};
+    z-index: 5;
+    background-color: rgb(214, 243, 246);
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+#blockspalette .left-scroll:hover,
+#blockspalette .right-scroll:hover {
+    opacity: 1;
+}
+#blockspalette .left-scroll {
+    content: "";
+    left: ${354 * scaleMultiplier}px;
+    background-image: url('../assets/ui/left-scroll.svg');
+}
+#blockspalette .right-scroll {
+    content: "";
+    right: ${css_vh(0)};
+    background-image: url('../assets/ui/right-scroll.svg');
 }
 
 #blockspalette .yellow { background: #FFE75A;}    /* #ffe100;}{ background: #FFFA5A;} */
@@ -382,7 +424,7 @@ z-index: 5;
 .controlundo {
     position: absolute;
     display: inline-block;
-    top: ${css_vh(0.91)};
+    top: -${css_vh(7)};
     right: ${css_vh(1)};
     margin: ${css_vh(0.00)};
     padding: ${css_vh(0.00)};
