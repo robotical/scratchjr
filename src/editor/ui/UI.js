@@ -23,6 +23,7 @@ import ScratchAudio from '../../utils/ScratchAudio';
 import {frame, gn, CSSTransition, localx, newHTML, getIDByClass, hideHTML, showHTML, scaleMultiplier, fullscreenScaleMultiplier,
     getIdFor, isTablet, newDiv, newTextInput, isAndroid, getDocumentWidth, getDocumentHeight,
     setProps, globalx} from '../../utils/lib';
+import Trace from './Trace';
 
 let projectNameTextInput = null;
 let info = null;
@@ -122,7 +123,7 @@ export default class UI {
             // scroll smooth on x axis
             gn('palette').scrollBy({
                 top: 0,
-                left: 200,
+                left: -200,
                 behavior: 'smooth'
                 });
           });
@@ -130,7 +131,7 @@ export default class UI {
             // scroll smooth on x axis
             gn('palette').scrollBy({
                 top: 0,
-                left: -200,
+                left: 200,
                 behavior: 'smooth'
                 });
         });
@@ -767,15 +768,19 @@ export default class UI {
         div.setAttribute('id', 'stageframe');
         ScratchJr.stage = new Stage(div);
         Grid.init(div);
+        Trace.init(ScratchJr.stage.div);
         if (ScratchJr.isEditable()) {
             UI.createTopBarClicky(div, 'addtext', 'addText', UI.addText);
             UI.createTopBarClicky(div, 'setbkg', 'changeBkg', UI.addBackground);
         }
         UI.createTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
+        UI.createTopBarClicky(div, 'traceBtn', 'traceToggle off', UI.switchTrace);
+        UI.createTopBarClicky(div, 'traceClear', 'traceClear', Trace.clear);
         UI.createTopBarClicky(div, 'go', 'go on', UI.toggleRun);
         UI.createTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
         UI.createTopBarClicky(div, 'full', 'fullscreen', ScratchJr.fullScreen);
         UI.setShowGrid(false);
+        UI.setShowTrace(false);
     }
 
     static resetAllSprites (e) {
@@ -809,9 +814,21 @@ export default class UI {
         OS.analyticsEvent('editor', Grid.hidden ? 'hide_grid' : 'show_grid');
     }
 
+    static switchTrace () {
+        ScratchAudio.sndFX('tap.wav');
+        UI.setShowTrace(Trace.hidden);
+    
+        OS.analyticsEvent('editor', Trace.hidden ? 'hide_trace' : 'show_trace');
+    }
+
     static setShowGrid (b) {
         Grid.hide(!b);
         gn('grid').className = Grid.hidden ? 'gridToggle off' : 'gridToggle on';
+    }
+
+    static setShowTrace (b) {
+        Trace.hide(!b);
+        gn('traceBtn').className = Trace.hidden ? 'traceToggle off' : 'traceToggle on';
     }
 
     // UI.createTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
@@ -836,6 +853,7 @@ export default class UI {
             //toolbar elements
             hideHTML('full');
             hideHTML('grid');
+            hideHTML('traceBtn')
             hideHTML('addtext');
             hideHTML('setbkg');
             hideHTML('resetall');
@@ -862,6 +880,7 @@ export default class UI {
             //toolbar elements
             showHTML('full');
             showHTML('grid');
+            showHTML('traceBtn')
             showHTML('addtext');
             showHTML('setbkg');
             showHTML('resetall');

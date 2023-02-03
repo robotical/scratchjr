@@ -44,7 +44,7 @@ export default class Sprite {
         this.div = document.createElement('div');
         setProps(this.div.style, {
             position: 'absolute',
-            zIndex: -1,
+            zIndex: 11,
             left: '0px',
             top: '0px'
         });

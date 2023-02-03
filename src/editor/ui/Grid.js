@@ -28,7 +28,7 @@ export default class Grid {
             position: 'absolute',
             zIndex: ScratchJr.layerTop
         });
-        Grid.setScaleAndPosition(grid, scaleMultiplier, 47, 75, width, height);
+        // Grid.setScaleAndPosition(grid, scaleMultiplier, 47, 75, width, height);
         grid.setAttribute('id', 'livegrid');
         Grid.drawLines(grid, width, height);
         Grid.createNumbering(w, h);
@@ -184,7 +184,7 @@ export default class Grid {
         ScratchJr.stage.setEvents();
     }
 
-    static updateCursor () {
+    static updateCursor () {        
         if (hidden) {
             return;
         }
@@ -255,6 +255,10 @@ export default class Grid {
     static hide (b) {
         hidden = b;
         var mystate = hidden ? 'hidden' : 'visible';
+        let div = gn('page 1');
+        if (div) {
+            div.appendChild(gn('livegrid'));
+        }
         gn('livegrid').style.visibility = mystate;
         gn('rownum').style.visibility = mystate;
         gn('colnum').style.visibility = mystate;

@@ -30,6 +30,7 @@ import {
 } from "../utils/lib";
 import Marty2 from "../utils/Marty2";
 import goToLink from "../utils/goToLink";
+import Trace from "./ui/Trace";
 
 let workingCanvas = document.createElement("canvas");
 let workingCanvas2 = document.createElement("canvas");
@@ -487,6 +488,7 @@ export default class ScratchJr {
         } else {
             gn('go').className = isOff ? 'go on' : 'go off';
             Grid.updateCursor();
+            Trace.updateTrace();
         }
         if (ScratchJr.getSprite()) {
             if (isOff && !inFullscreen) {
