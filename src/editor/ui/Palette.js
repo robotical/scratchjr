@@ -82,7 +82,7 @@ export default class Palette {
         var pal = gn('palette');
         var spt = Events.getTargetPoint(e);
         var pt = {
-            x: localx(pal, spt.x),
+            x: localx(pal, spt.x) + pal.scrollLeft,
             y: localy(pal, spt.y)
         };
         for (var i = 0; i < pal.childElementCount; i++) {
@@ -276,7 +276,8 @@ export default class Palette {
                 return;
             }
         }
-        var mx = Events.dragmousex - frame.offsetLeft - localx(Events.dragthumbnail, Events.dragmousex);
+        var pal = gn('palette');
+        var mx = Events.dragmousex - frame.offsetLeft - localx(Events.dragthumbnail, Events.dragmousex) - pal.scrollLeft;
         var my = Events.dragmousey - frame.offsetTop - localy(Events.dragthumbnail, Events.dragmousey);
         Events.dragcanvas = Events.dragthumbnail.owner.duplicateBlock(mx, my, sc.spr).div;
         Events.dragcanvas.style.zIndex = ScratchJr.dragginLayer;
