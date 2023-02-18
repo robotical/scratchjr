@@ -1,7 +1,10 @@
 name: 'Versioning'
 
-on: workflow_dispatch
-
+on: 
+  push:
+    branches:
+      - mv2app
+      
 jobs:
   bump-version:
     name: 'Bump Version'
