@@ -5,7 +5,7 @@
     "shareEnabled": true,
     "defaultSprite": "Marty.svg",
     "spriteOutlineColor": "white",
-    "stageColor": "#d6f3f6",
+    "stageColor": "rgb(250, 253, 223)",
     "textSpriteFont": "Helvetica",
     "blockArgFont": "Roboto",
     "paletteBalloonFont": "Roboto",
