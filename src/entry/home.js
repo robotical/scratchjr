@@ -4,6 +4,20 @@ import OS from "../tablet/OS";
 import Lobby from "../lobby/Lobby";
 import goToLink from "../utils/goToLink";
 
+window.addEventListener("error", function (event) {
+  console.error("An error occurred:", event.error);
+  try {
+    mv2.sendFeedbackToServer(event.error);
+  } catch {}
+});
+
+window.addEventListener("unhandledrejection", function (event) {
+  console.error("An unhandled promise rejection occurred:", event.reason);
+  try {
+    mv2.sendFeedbackToServer(event.reason);
+  } catch {}
+});
+
 export function homeMain() {
   OS.martyCmd({cmd: "show-back-arrow"});
   gn("logotab").onclick = homeGoBack;

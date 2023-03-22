@@ -75,9 +75,6 @@ class Marty2 extends EventDispatcher {
     this.servos = 0;
     this.accel = 0;
     this.addons = "";
-    //        this.commandPromise = null;
-    //        this.onCommandReply = this.onCommandReply.bind(this);
-    //        this.sendCommand = this.sendCommand.bind(this);
     this.setRSSI = this.setRSSI.bind(this);
     this.setIsConnected = this.setIsConnected.bind(this);
     this.fwVersion = "";
@@ -156,6 +153,23 @@ class Marty2 extends EventDispatcher {
       // busy wait to not overload the app
       await new Promise((resolve) => setTimeout(resolve, 500));
       mv2.updateConnectionInfo();
+    }
+  }
+
+  /**
+   * Sends feedback to the server after a command has been executed from martyblocks
+   * Usefull for debugging and testing through MST
+   * @param {string} feedback Stringified JSON object with feedback
+   * @returns {void}
+   */
+  sendFeedbackToServer(feedback) {
+    if (window.ReactNativeWebView) {
+      return this.send_REST(
+        JSON.stringify({
+          command: "feedback",
+          feedback,
+        })
+      );
     }
   }
 }
