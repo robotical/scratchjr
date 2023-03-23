@@ -14,20 +14,6 @@ When this code starts up, there are several scenarios:
 
 */
 
-window.addEventListener("error", function (event) {
-  console.error("An error occurred:", event.error);
-  try {
-    mv2.sendFeedbackToServer(event.error);
-  } catch {}
-});
-
-window.addEventListener("unhandledrejection", function (event) {
-  console.error("An unhandled promise rejection occurred:", event.reason);
-  try {
-    mv2.sendFeedbackToServer(event.reason);
-  } catch {}
-});
-
 let alreadyStartedQuestions = false;
 
 export function indexMain() {

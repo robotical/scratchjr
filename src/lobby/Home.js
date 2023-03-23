@@ -11,27 +11,12 @@ import ScratchAudio from "../utils/ScratchAudio";
 import Vector from "../geom/Vector";
 import { gn, newHTML, isTablet } from "../utils/lib";
 import goToLink from "../utils/goToLink";
-import Marty2 from "../utils/Marty2";
 
 let frame;
 let scrollvalue;
 let version;
 let timeoutEvent;
-let performingAction = false;
 
-window.addEventListener('error', function (event) {
-  console.error('An error occurred:', event.error);
-  try {
-    mv2.sendFeedbackToServer(event.error);
-  } catch{}
-});
-
-window.addEventListener('unhandledrejection', function (event) {
-  console.error('An unhandled promise rejection occurred:', event.reason);
-  try {
-    mv2.sendFeedbackToServer(event.reason);
-  } catch{}
-});
 
 export default class Home {
   static init() {

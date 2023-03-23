@@ -3,20 +3,6 @@ import OS from "../tablet/OS";
 import Camera from "../painteditor/Camera";
 import Record from "../editor/ui/Record";
 
-window.addEventListener("error", function (event) {
-  console.error("An error occurred:", event.error);
-  try {
-    mv2.sendFeedbackToServer(event.error);
-  } catch {}
-});
-
-window.addEventListener("unhandledrejection", function (event) {
-  console.error("An unhandled promise rejection occurred:", event.reason);
-  try {
-    mv2.sendFeedbackToServer(event.reason);
-  } catch {}
-});
-
 export function editorMain() {
   OS.martyCmd({ cmd: "hide-back-arrow" });
   OS.getsettings(doNext);
