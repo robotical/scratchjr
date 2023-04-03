@@ -160,14 +160,16 @@ class Marty2 extends EventDispatcher {
    * Sends feedback to the server after a command has been executed from martyblocks
    * Usefull for debugging and testing through MST
    * @param {string} feedback Stringified JSON object with feedback
+   * @param {boolean} isError Whether the feedback is an error or not (if it's an error it'll be stored to db)
    * @returns {void}
    */
-  sendFeedbackToServer(feedback) {
+  sendFeedbackToServer(feedback, isError = false) {
     if (window.ReactNativeWebView) {
       return this.send_REST(
         JSON.stringify({
           command: "feedback",
           feedback,
+          isError,
         })
       );
     }
@@ -185,7 +187,7 @@ window.addEventListener("error", function (event) {
   const errorString = JSON.stringify(errorObj);
   console.log("Stringified error:", errorString);
   try {
-    mv2.sendFeedbackToServer(errorString);
+    mv2.sendFeedbackToServer(errorString, true);
   } catch (e) {
     console.log("error sending feedback", e);
   }
@@ -211,7 +213,7 @@ window.addEventListener("unhandledrejection", function (event) {
     console.log(msg);
   }
   try {
-    mv2.sendFeedbackToServer(msg);
+    mv2.sendFeedbackToServer(msg, true);
   } catch (e) {
     console.log("error sending feedback", e);
   }

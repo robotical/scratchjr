@@ -8,6 +8,10 @@ export function editorMain() {
   OS.getsettings(doNext);
   OS.analyticsEvent("editor", "project_editor_open");
   function doNext(str) {
+    new Promise((resolve) => {
+      d
+      resolve();
+    })
     var list = str.split(",");
     OS.path = list[1] == "0" ? list[0] + "/" : undefined;
     if (list.length > 2) {
