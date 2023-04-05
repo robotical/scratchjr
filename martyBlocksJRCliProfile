@@ -1,5 +1,6 @@
 export WebappHome=/Users/nikolastheodoropoulos/Documents/Robotical/marty-web-app
 export MBJRHome=/Users/nikolastheodoropoulos/Documents/Robotical/phone-app/scratch/scratchjr
+export PhoneAppHome=/Users/nikolastheodoropoulos/Documents/Robotical/phone-app/marty-react-native # <- replace this if you want to use the buildAllAndCpToWebApp function, which builds everything and copies the build files in the phoneapp
 
 
 export gui_original=$MBJRHome/scratch-gui
@@ -17,4 +18,18 @@ buildAllAndCpToWebApp () {
 cpToWebapp () {
     rm -rf $WebappHome/public/MartyBlocksJR/*
     cp -r $MBJRHome/editions/free/src/* $WebappHome/public/MartyBlocksJR
+}
+
+cpToPhoneApp() {
+    rm -rf $PhoneAppHome/assets/www/scratchjr-build/*
+    rm -rf $PhoneAppHome/node_modules/@robotical/martyblocksjr/editions/free/src
+    cp -r $MBJRHome/editions/free/src/* $PhoneAppHome/assets/www/scratchjr-build
+    cp -r $MBJRHome/editions/free/src $PhoneAppHome/node_modules/@robotical/martyblocksjr/editions/free
+}
+
+buildAllAndCpToPhoneApp () {
+    local type="${1:-debug}"
+    if [ $type = debug ]; then npm run build:copy; fi
+    if [ $type = prod ]; then npm run build-prod:copy; fi
+    cpToPhoneApp
 }

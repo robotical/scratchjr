@@ -845,10 +845,10 @@ export default class UI {
     UI.createTopBarClicky(div, "full", "fullscreen", ScratchJr.fullScreen);
     UI.setShowGrid(false);
     UI.setShowTrace(false);
-    // activate grid after 3 seconds to give time for the stage to load
+    // activate grid after 5 seconds to give time for the stage to load
     setTimeout(() => {
       UI.setShowGrid(true);
-    }, 3000);
+    }, 5000);
   }
 
   static resetAllSprites(e) {

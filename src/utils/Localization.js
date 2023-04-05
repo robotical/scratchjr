@@ -99,8 +99,14 @@ export default class Localization {
 
         // Get messages
         IO.requestFromServer(localizationRoot + 'localizations/' + topLevel + '.json', (result) => {
-            localizationMessages = JSON.parse(result);
-            whenDone();
+            try {
+                localizationMessages = JSON.parse(result);
+                whenDone();
+            } catch (e) {
+                mv2.sendFeedbackToServer(JSON.stringify({
+                    'message': 'Soft error parsing localization file -- ignore, it\'ll work in next iteration',
+                }));
+            }
         });
     }
 
