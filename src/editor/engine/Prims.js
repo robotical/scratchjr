@@ -617,7 +617,7 @@ export default class Prims {
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
-        if (martyConnected == true && !Prims.MartyCommanded(strip)){
+        if (martyConnected && !Prims.MartyCommanded(strip)){
 
             steps = Math.min(Math.max(steps, 1), 20);
             let turn = -1 * turnSize; //Negative Direction
