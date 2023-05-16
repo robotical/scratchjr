@@ -609,7 +609,7 @@ export default class Prims {
     }
 
     static TurnRight (strip) {
-        var num = Number(strip.thisblock.getArgValue()) * turnSize; //Turnsize is set globally to keep left and right consistent
+        var num = Number(strip.thisblock.getArgValue()) * turnSize * 1.4; //Turnsize is set globally to keep left and right consistent
         var s = strip.spr;
         const moveTime = turnMoveTime;
         let steps = Number(strip.thisblock.getArgValue());
@@ -646,7 +646,7 @@ export default class Prims {
     }
 
     static TurnLeft (strip) {
-        var num = Number(strip.thisblock.getArgValue()) * turnSize; //Turnsize is set globally to keep left and right consistent
+        var num = Number(strip.thisblock.getArgValue()) * turnSize * 1.4; //Turnsize is set globally to keep left and right consistent
         var s = strip.spr;
         const moveTime = turnMoveTime;
         let steps = Number(strip.thisblock.getArgValue());
@@ -654,7 +654,7 @@ export default class Prims {
         const martyConnected = ScratchJr.getMartyConnected();
         Prims.setTime(strip);
 
-        if (martyConnected == true && !Prims.MartyCommanded(strip)){
+        if (martyConnected && !Prims.MartyCommanded(strip)){
 
             steps = Math.min(Math.max(steps, 1), 20);
             let turn = 1 * turnSize; //Positive Direction
