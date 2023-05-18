@@ -105,8 +105,9 @@ export default class Project {
                   } catch (e) {
                     console.log("error sending feedback", e);
                   }
-                  const randomMdNumber = Math.floor(Math.random() * 10000) + 20;
-                  goToLink(`editor.html?pmd5=${randomMdNumber}&mode=edit`);
+                //   const randomMdNumber = Math.floor(Math.random() * 10000) + 20;
+                //   goToLink(`editor.html?pmd5=${randomMdNumber}&mode=edit`);
+                  goToLink(`home.html`);
             }
         }, 10000);
         
