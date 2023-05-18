@@ -199,6 +199,7 @@ export default class ScratchJr {
   }
 
   static appinit(v) {
+    Project.reloadPageIfFreezes(); // if project is not loaded in 10 seconds, reload page
     stagecolor = window.Settings.stageColor;
     defaultSprite = window.Settings.defaultSprite;
     version = v;

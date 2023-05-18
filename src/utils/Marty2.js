@@ -10,6 +10,7 @@ const {
 const {
   default: signal_render,
 } = require("./connection-ui/disconnect-btn/signal_svg_render");
+const { default: goToLink } = require("./goToLink");
 const { default: hideLedBlocks, showLedBlocks } = require("./hide-led-blocks");
 
 /**
@@ -78,6 +79,7 @@ class Marty2 extends EventDispatcher {
     this.setRSSI = this.setRSSI.bind(this);
     this.setIsConnected = this.setIsConnected.bind(this);
     this.fwVersion = "";
+    this.startNewProjectButton = goToLink("editor.html?pmd5=999&mode=edit"); // only for debugging purposes so we can start new project from MST
   }
 
   async send_REST(cmd) {

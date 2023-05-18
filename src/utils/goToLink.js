@@ -4,7 +4,6 @@ export default function goToLink(hrefFile) {
     // it uses the file
     const href = hrefFile.replace(".html", "");
     try {
-
         fetch(hrefFile).then(response => {
             if (response.redirected) window.location.href = href;
             else window.location.href = hrefFile;
