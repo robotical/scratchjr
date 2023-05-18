@@ -11,6 +11,7 @@ import Paint from '../../painteditor/Paint';
 import SVG2Canvas from '../../utils/SVG2Canvas';
 import {frame, gn, newHTML, scaleMultiplier, getIdFor,
     isAndroid, setProps, setCanvasSize} from '../../utils/lib';
+import goToLink from '../../utils/goToLink';
 
 let metadata = undefined;
 let mediaCount = -1;
@@ -104,7 +105,8 @@ export default class Project {
                   } catch (e) {
                     console.log("error sending feedback", e);
                   }
-                window.location.reload();
+                  const randomMdNumber = Math.floor(Math.random() * 10000) + 20;
+                  goToLink(`editor.html?pmd5=${randomMdNumber}&mode=edit`);
             }
         }, 10000);
         

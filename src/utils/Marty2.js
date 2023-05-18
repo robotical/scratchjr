@@ -79,7 +79,10 @@ class Marty2 extends EventDispatcher {
     this.setRSSI = this.setRSSI.bind(this);
     this.setIsConnected = this.setIsConnected.bind(this);
     this.fwVersion = "";
-    this.startNewProject = () => goToLink("editor.html?pmd5=999&mode=edit"); // only for debugging purposes so we can start new project from MST
+    // random number from 20 to 10000
+    const randomMdNumber = Math.floor(Math.random() * 10000) + 20;
+    this.startNewProject = () => goToLink(`editor.html?pmd5=${randomMdNumber}&mode=edit`); // only for debugging purposes so we can start new project from MST
+    this.startNewProjectFail = () => goToLink("editor.html"); // only for debugging purposes so we can start new project from MST
   }
 
   async send_REST(cmd) {
