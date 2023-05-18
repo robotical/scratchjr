@@ -17,7 +17,6 @@ let scrollvalue;
 let version;
 let timeoutEvent;
 
-
 export default class Home {
   static init() {
     console.log("INITIALISING HOME");
@@ -284,6 +283,11 @@ export default class Home {
   }
 
   static displayProjects(str) {
+    // wait for a few seconds before displaying projects to avoid race conditions
+    var start = new Date().getTime();
+    while (new Date().getTime() - start < 3000) {
+      // do nothing
+    }
     let data = JSON.parse(str);
     var div = gn("scrollarea");
     while (div.childElementCount > 0) {
