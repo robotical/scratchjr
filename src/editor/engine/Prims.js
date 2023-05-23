@@ -8,6 +8,7 @@ import celebrateHelper from './celebrate-helper';
 import isVersionGreater from '../../utils/versionChecker';
 
 const LED_EYES_FW_VERSION = "1.2.0"; // greater versions than this support the LED_EYE functionality
+const LED_MS_PARAMETER_SUPPORT = "1.2.46"; // greater versions than this support the ms parameter for LEDs
 let martyInterval = 33;
 const intervalToSeconds = 31.25; // runtime tick is set at 32ms by Runtime.js. 32*31.25 = 1s
 let tinterval = 1;
@@ -772,17 +773,23 @@ export default class Prims {
         Prims.clearLedEyesIn(strip, duration-100);
        return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
     }
-    static ledEyesColour (strip) {
+    static ledEyesColour(strip) {
         const duration = 1500;
         const colour = rgbToHex(strip.thisblock.getArgValue()).replace("#", "");
         let marty_cmd = `led/LEDeye/color/${colour}`;
-        console.log(marty_cmd, 'Prims.js', 'line: ', '779');
+    
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
-        } 
-        Prims.clearLedEyesIn(strip, duration-100);
-       return Prims.doMartyCmd(strip, marty_cmd, duration);
+        } else if (isVersionGreater(OS.getMartyFwVersion(), LED_MS_PARAMETER_SUPPORT)) {
+            marty_cmd = `led/LEDeye/color/${colour}?ms=${duration + 100}`; // +100 so the leds are turning off after the blocks duration (cf if the are in a for loop this will keep the leds on)
+        } else {
+            Prims.clearLedEyesIn(strip, duration-100); // -100 so the switch off command is sent before the next block (cf if the next block is a colour block)
+        }
+    
+        console.log(marty_cmd);
+        return Prims.doMartyCmd(strip, marty_cmd, duration);
     }
+    
 
     static clearLedEyesIn(strip, duration) {
         const turnOffLedEyesTimer = setTimeout(() => {
