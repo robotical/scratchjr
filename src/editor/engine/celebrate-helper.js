@@ -1,22 +1,31 @@
+import isVersionGreater from "../../utils/versionChecker";
 import ScratchJr from "../ScratchJr";
 
 const RIC_WHOAMI_TYPE_CODE_ADDON_LEDFOOT = "LEDfoot";
 const RIC_WHOAMI_TYPE_CODE_ADDON_LEDARM = "LEDarm";
 const RIC_WHOAMI_TYPE_CODE_ADDON_LEDEYE = "LEDeye";
+const FILE_RUN_CHANGES_VERSION = '1.3.0';
+
 
 export default function celebrateHelper(OS, Prims, strip, tinterval, intervalToSeconds) {
   const timesOfDancing = 2;
   const moveSpeed = 3800;
   const danceTrajectoryMessage = `traj/dance?moveTime=${moveSpeed}`;
-  const soundMessage = "filerun/spiffs/sax-in-the-city.raw";
+  const soundMessageOld = "filerun/spiffs/sax-in-the-city.raw";
+  const soundMessageNew = "filerun/celebrate.mp3";
 
   const martyConnected = ScratchJr.getMartyConnected();
 
   Prims.setTime(strip);
 
   if (martyConnected) {
+    console.log("celebrateHelper")
     discoChangeBlockPattern("on", OS);
-    OS.martyCmd({ cmd: soundMessage });
+    if (isVersionGreater(FILE_RUN_CHANGES_VERSION, OS.getMartyFwVersion())) {
+      OS.martyCmd({ cmd: soundMessageOld });
+    } else {
+      OS.martyCmd({ cmd: soundMessageNew });
+    }
     OS.martyCmd({ cmd: danceTrajectoryMessage });
     OS.martyCmd({ cmd: danceTrajectoryMessage });
     strip.waitTimer = parseInt(

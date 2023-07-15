@@ -1,6 +1,6 @@
-export WebappHome=/Users/nikolastheodoropoulos/Documents/Robotical/marty-web-app
-export MBJRHome=/Users/nikolastheodoropoulos/Documents/Robotical/phone-app/scratch/scratchjr
-export PhoneAppHome=/Users/nikolastheodoropoulos/Documents/Robotical/phone-app/marty-react-native # <- replace this if you want to use the buildAllAndCpToWebApp function, which builds everything and copies the build files in the phoneapp
+export WebappHome=/Users/ntheodoropoulos/Robotical/marty-web-app
+export MBJRHome=/Users/ntheodoropoulos/Robotical/scratchjr
+export PhoneAppHome=/Users/ntheodoropoulos/Robotical/marty-react-native # <- replace this if you want to use the buildAllAndCpToWebApp function, which builds everything and copies the build files in the phoneapp
 
 
 export gui_original=$MBJRHome/scratch-gui
