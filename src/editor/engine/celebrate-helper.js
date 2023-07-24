@@ -4,7 +4,6 @@ import ScratchJr from "../ScratchJr";
 const RIC_WHOAMI_TYPE_CODE_ADDON_LEDFOOT = "LEDfoot";
 const RIC_WHOAMI_TYPE_CODE_ADDON_LEDARM = "LEDarm";
 const RIC_WHOAMI_TYPE_CODE_ADDON_LEDEYE = "LEDeye";
-const FILE_RUN_CHANGES_VERSION = '1.3.0';
 
 
 export default function celebrateHelper(OS, Prims, strip, tinterval, intervalToSeconds) {
@@ -21,7 +20,7 @@ export default function celebrateHelper(OS, Prims, strip, tinterval, intervalToS
   if (martyConnected) {
     console.log("celebrateHelper")
     discoChangeBlockPattern("on", OS);
-    if (isVersionGreater(FILE_RUN_CHANGES_VERSION, OS.getMartyFwVersion())) {
+    if (isVersionGreater(window.mv2.FILE_RUN_CHANGES_VERSION, OS.getMartyFwVersion())) {
       OS.martyCmd({ cmd: soundMessageOld });
     } else {
       OS.martyCmd({ cmd: soundMessageNew });

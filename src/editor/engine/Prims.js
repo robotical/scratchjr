@@ -5,7 +5,7 @@ import Vector from '../../geom/Vector';
 import {gn, rgbToHex} from '../../utils/lib';
 import OS from '../../tablet/OS';
 import celebrateHelper from './celebrate-helper';
-import isVersionGreater from '../../utils/versionChecker';
+import isVersionGreater, { isVersionEqual } from '../../utils/versionChecker';
 
 const LED_EYES_FW_VERSION = "1.2.0"; // greater versions than this support the LED_EYE functionality
 const LED_MS_PARAMETER_SUPPORT = "1.2.46"; // greater versions than this support the ms parameter for LEDs
@@ -993,7 +993,14 @@ export default class Prims {
         Prims.setTime(strip);
 
         if (martyConnected){
-            let marty_cmd = `filerun/spiffs/confused.raw`;
+            let marty_cmd;
+            if (isVersionEqual(OS.getMartyFwVersion(), window.mv2.MARTY_SOUNDS_NOT_IN_FW)) {
+                marty_cmd = "notification/fw-needs-update";
+            } else if (isVersionGreater(window.mv2.FILE_RUN_CHANGES_VERSION, OS.getMartyFwVersion())) {
+                marty_cmd = `filerun/spiffs/confused.raw`;
+            } else {
+                marty_cmd = `filerun/confused.mp3`;
+            }
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
             
@@ -1014,7 +1021,14 @@ export default class Prims {
         Prims.setTime(strip);
 
         if (martyConnected){
-            let marty_cmd = `filerun/spiffs/disbelief.raw`;
+            let marty_cmd;
+            if (isVersionEqual(OS.getMartyFwVersion(), window.mv2.MARTY_SOUNDS_NOT_IN_FW)) {
+                marty_cmd = "notification/fw-needs-update";
+            } else if (isVersionGreater(window.mv2.FILE_RUN_CHANGES_VERSION, OS.getMartyFwVersion())) {
+                marty_cmd = `filerun/spiffs/disbelief.raw`;
+            } else {
+                marty_cmd = `filerun/disbelief.mp3`;
+            }
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
@@ -1037,7 +1051,14 @@ export default class Prims {
         Prims.setTime(strip);
 
         if (martyConnected){
-            let marty_cmd = `filerun/spiffs/excited.raw`;
+            let marty_cmd;
+            if (isVersionEqual(OS.getMartyFwVersion(), window.mv2.MARTY_SOUNDS_NOT_IN_FW)) {
+                marty_cmd = "notification/fw-needs-update";
+            } else if (isVersionGreater(window.mv2.FILE_RUN_CHANGES_VERSION, OS.getMartyFwVersion())) {
+                marty_cmd = `filerun/spiffs/excited.raw`;
+            } else {
+                marty_cmd = `filerun/excited.mp3`;
+            }
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
@@ -1058,7 +1079,14 @@ export default class Prims {
         Prims.setTime(strip);
 
         if (martyConnected){
-            let marty_cmd = `filerun/spiffs/no_way.raw`;
+            let marty_cmd;
+            if (isVersionEqual(OS.getMartyFwVersion(), window.mv2.MARTY_SOUNDS_NOT_IN_FW)) {
+                marty_cmd = "notification/fw-needs-update";
+            } else if (isVersionGreater(window.mv2.FILE_RUN_CHANGES_VERSION, OS.getMartyFwVersion())) {
+                marty_cmd = `filerun/spiffs/no_way.raw`;
+            } else {
+                marty_cmd = `filerun/no_way.mp3`;
+            }
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
@@ -1079,7 +1107,14 @@ export default class Prims {
         Prims.setTime(strip);
 
         if (martyConnected){
-            let marty_cmd = `filerun/spiffs/no.raw`;
+            let marty_cmd;
+            if (isVersionEqual(OS.getMartyFwVersion(), window.mv2.MARTY_SOUNDS_NOT_IN_FW)) {
+                marty_cmd = "notification/fw-needs-update";
+            } else if (isVersionGreater(window.mv2.FILE_RUN_CHANGES_VERSION, OS.getMartyFwVersion())) {
+                marty_cmd = `filerun/spiffs/no.raw`;
+            } else {
+                marty_cmd = `filerun/no.mp3`;
+            }
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
@@ -1100,7 +1135,14 @@ export default class Prims {
         Prims.setTime(strip);
 
         if (martyConnected){
-            let marty_cmd = `filerun/spiffs/whistle.raw`;
+            let marty_cmd;
+            if (isVersionEqual(OS.getMartyFwVersion(), window.mv2.MARTY_SOUNDS_NOT_IN_FW)) {
+                marty_cmd = "notification/fw-needs-update";
+            } else if (isVersionGreater(window.mv2.FILE_RUN_CHANGES_VERSION, OS.getMartyFwVersion())) {
+                marty_cmd = `filerun/spiffs/whistle.raw`;
+            } else {
+                marty_cmd = `filerun/whistle.mp3`;
+            }
             console.log(marty_cmd);
             OS.martyCmd({ cmd: marty_cmd });
             strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));

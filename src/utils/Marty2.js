@@ -67,6 +67,8 @@ class EventDispatcher {
 class Marty2 extends EventDispatcher {
   constructor() {
     super();
+    this.FILE_RUN_CHANGES_VERSION = "1.3.1";
+    this.MARTY_SOUNDS_NOT_IN_FW = "1.3.0";
     this.isConnected = false;
     this.ip = null;
     this.martyName = null;
