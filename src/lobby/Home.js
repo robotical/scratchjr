@@ -19,16 +19,18 @@ let timeoutEvent;
 
 export default class Home {
   static init() {
-    console.log("INITIALISING HOME");
     version = Lobby.version;
     frame = gn("htmlcontents");
     var inner = newHTML("div", "inner", frame);
     var div = newHTML("div", "scrollarea", inner);
     div.setAttribute("id", "scrollarea");
-    frame.ontouchstart = Home.handleTouchStart;
-    frame.ontouchend = Home.handleTouchEnd;
-    frame.onmousedown = Home.handleTouchStart;
-    frame.onmouseup = Home.handleTouchEnd;
+    if ('ontouchstart' in window) {
+      frame.ontouchstart = Home.handleTouchStart;
+      frame.ontouchend = Home.handleTouchEnd;
+    } else {
+      frame.onmousedown = Home.handleTouchStart;
+      frame.onmouseup = Home.handleTouchEnd;
+    }
     Home.displayYourProjects();
   }
 
@@ -84,7 +86,7 @@ export default class Home {
           Home.actionTarget.childNodes[
             Home.actionTarget.childElementCount - 1
           ].style.visibility = "visible";
-
+          
           Home.holding = true;
         }
       };
