@@ -1,5 +1,5 @@
 var WebpackNotifierPlugin = require("webpack-notifier");
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const mode = process.argv.find(arg => arg.startsWith('--mode=')).split('=')[1];
 const isProduction = mode === 'production';
