@@ -57,7 +57,7 @@ module.exports = {
     ],
   },
   plugins: [
-    new BundleAnalyzerPlugin(),
+    // new BundleAnalyzerPlugin(),
     new WebpackNotifierPlugin({
       title: "ScratchJr",
       alwaysNotify: true,
