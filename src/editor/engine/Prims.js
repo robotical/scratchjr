@@ -989,7 +989,7 @@ export default class Prims {
 
     static playConfusion (strip) {
         const martyConnected = ScratchJr.getMartyConnected();
-        const moveTime = 1000;
+        const moveTime = 2500;
         Prims.setTime(strip);
 
         if (martyConnected){
@@ -1005,6 +1005,7 @@ export default class Prims {
             OS.martyCmd({ cmd: marty_cmd });
             
             Prims.showTime(strip);
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(moveTime/1000));
             strip.thisblock = strip.thisblock.next;
             return;
         } else {
@@ -1017,7 +1018,7 @@ export default class Prims {
 
     static playDisbelief (strip) {
         const martyConnected = ScratchJr.getMartyConnected();
-        const moveTime = 500;
+        const moveTime = 2500;
         Prims.setTime(strip);
 
         if (martyConnected){
@@ -1047,7 +1048,7 @@ export default class Prims {
 
     static playExcitement (strip) {
         const martyConnected = ScratchJr.getMartyConnected();
-        const moveTime = 1000;
+        const moveTime = 2500;
         Prims.setTime(strip);
 
         if (martyConnected){
@@ -1075,7 +1076,7 @@ export default class Prims {
 
     static playNoway (strip) {
         const martyConnected = ScratchJr.getMartyConnected();
-        const moveTime = 1000;
+        const moveTime = 2500;
         Prims.setTime(strip);
 
         if (martyConnected){
@@ -1103,7 +1104,7 @@ export default class Prims {
 
     static playNo (strip) {
         const martyConnected = ScratchJr.getMartyConnected();
-        const moveTime = 500;
+        const moveTime = 2500;
         Prims.setTime(strip);
 
         if (martyConnected){
@@ -1131,7 +1132,7 @@ export default class Prims {
 
     static playWhistle (strip) {
         const martyConnected = ScratchJr.getMartyConnected();
-        const moveTime = 500;
+        const moveTime = 2500;
         Prims.setTime(strip);
 
         if (martyConnected){
