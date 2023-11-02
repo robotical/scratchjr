@@ -751,8 +751,11 @@ export default class Prims {
         let marty_cmd = `led/LEDeye/pattern/show-off`;
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
+            return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
         } 
-        Prims.clearLedEyesIn(strip, duration-100);
+        Prims.clearLedsIn(strip, duration-100);
+        OS.martyCmd({ cmd: `led/LEDarm/pattern/show-off` });
+        OS.martyCmd({ cmd: `led/LEDfoot/pattern/show-off` });
        return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
     }
     static ledEyesP2 (strip) {
@@ -760,17 +763,17 @@ export default class Prims {
         let marty_cmd = `led/LEDeye/pattern/pinwheel`;
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
+            return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
         } 
-        Prims.clearLedEyesIn(strip, duration-100);
+        Prims.clearLedsIn(strip, duration-100);
+        OS.martyCmd({ cmd: `led/LEDarm/pattern/pinwheel` });
+        OS.martyCmd({ cmd: `led/LEDfoot/pattern/pinwheel` });
        return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
     }
     static ledEyesP3 (strip) {
+        // placeholder --isn't used --pattern doesn't exist 
         const duration = 2500;
-        let marty_cmd = `ledeyes/pattern/celebrate?side=1&speed=2500`;
-        if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
-            marty_cmd = "notification/fw-needs-update";
-        } 
-        Prims.clearLedEyesIn(strip, duration-100);
+        let marty_cmd = ``;
        return Prims.doMartyCmd(strip, marty_cmd, duration, Prims.playMartyServo);
     }
     static ledEyesColour(strip) {
@@ -780,21 +783,30 @@ export default class Prims {
     
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {
             marty_cmd = "notification/fw-needs-update";
+            return Prims.doMartyCmd(strip, marty_cmd, duration);
         } else if (isVersionGreater(OS.getMartyFwVersion(), LED_MS_PARAMETER_SUPPORT)) {
             marty_cmd = `led/LEDeye/color/${colour}?ms=${duration + 100}`; // +100 so the leds are turning off after the blocks duration (cf if the are in a for loop this will keep the leds on)
+            OS.martyCmd({ cmd: `led/LEDarm/color/${colour}?ms=${duration + 100}` });
+            OS.martyCmd({ cmd: `led/LEDfoot/color/${colour}?ms=${duration + 100}` });
+            return Prims.doMartyCmd(strip, marty_cmd, duration);
         } else {
-            Prims.clearLedEyesIn(strip, duration-100); // -100 so the switch off command is sent before the next block (cf if the next block is a colour block)
+            Prims.clearLedsIn(strip, duration-100); // -100 so the switch off command is sent before the next block (cf if the next block is a colour block)
         }
     
         console.log(marty_cmd);
+        OS.martyCmd({ cmd: `led/LEDarm/color/${colour}` });
+        OS.martyCmd({ cmd: `led/LEDfoot/color/${colour}` });
         return Prims.doMartyCmd(strip, marty_cmd, duration);
     }
-    
 
-    static clearLedEyesIn(strip, duration) {
+    static clearLedsIn(strip, duration) {
         const turnOffLedEyesTimer = setTimeout(() => {
             const clearLedEyesCmd = "led/LEDeye/color/000000";
+            const clearLedArmCmd = "led/LEDarm/color/000000";
+            const clearLedFootCmd = "led/LEDfoot/color/000000";
             OS.martyCmd({ cmd: clearLedEyesCmd });
+            OS.martyCmd({ cmd: clearLedArmCmd });
+            OS.martyCmd({ cmd: clearLedFootCmd });
             clearTimeout(turnOffLedEyesTimer);
         }, duration);
     }
