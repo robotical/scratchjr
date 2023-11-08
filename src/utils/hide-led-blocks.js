@@ -2,7 +2,7 @@ const RIC_WHOAMI_TYPE_CODE_ADDON_LEDEYE = "LEDeye";
 const RIC_WHOAMI_TYPE_CODE_ADDON_LEDARM = "LEDarm";
 const RIC_WHOAMI_TYPE_CODE_ADDON_LEDFOOT = "LEDfoot";
 
-export default function hideLedBlocks(addons) {
+export default function hideLedBlocksIFNotConnected(addons) {
   if (areLedConnected(addons)) {
     showLedBlocks();
   } else if (!areLedConnected(addons) && isLooksSelected()) {

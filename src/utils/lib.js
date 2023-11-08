@@ -1,3 +1,5 @@
+import { LINEAR_GRADIENT_COLOUR } from "../editor/engine/Prims";
+
 export var frame;
 // XXX: isTablet is legacy code that can be used to detect if we're running on a desktop browser
 // There are references to it throughout the codebase, should possibly be removed at some point
@@ -537,12 +539,31 @@ export function getStringSize(ctx, f, label) {
   return ctx.measureText(label);
 }
 
-export function addCol(ctx, c, cnvWidth, cnvHeight) {
+function createGradient (ctx, cnvWidth) {
+  // Define the start and end points of the gradient
+  const gradient = ctx.createLinearGradient(0, 0, cnvWidth, 0);
 
+  // Add color stops for the rainbow
+  gradient.addColorStop(0, "red");
+  gradient.addColorStop(1 / 6, "red");
+  gradient.addColorStop(2 / 6, "yellow");
+  gradient.addColorStop(3 / 6, "green");
+  gradient.addColorStop(4 / 6, "blue");
+  gradient.addColorStop(5 / 6, "indigo");
+  gradient.addColorStop(1, "violet");
+
+  return gradient;
+};
+
+export function addCol(ctx, c, cnvWidth, cnvHeight) {
   const centerX = cnvWidth / 2;
   const centerY = cnvHeight / 2;
   ctx.arc(centerX, centerY, 10, 0, Math.PI * 2, false);
   ctx.fillStyle = c;
+  if (c == LINEAR_GRADIENT_COLOUR) {
+    const gradient = createGradient(ctx, cnvWidth);
+    ctx.fillStyle = gradient;
+  }
   ctx.fill();
 
 }

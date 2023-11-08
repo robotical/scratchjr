@@ -7,6 +7,7 @@ import OS from '../../tablet/OS';
 import celebrateHelper from './celebrate-helper';
 import isVersionGreater, { isVersionEqual } from '../../utils/versionChecker';
 
+export const LINEAR_GRADIENT_COLOUR = "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)";
 const LED_EYES_FW_VERSION = "1.2.0"; // greater versions than this support the LED_EYE functionality
 const LED_MS_PARAMETER_SUPPORT = "1.2.46"; // greater versions than this support the ms parameter for LEDs
 let martyInterval = 33;
@@ -778,7 +779,11 @@ export default class Prims {
     }
     static ledEyesColour(strip) {
         const duration = 1500;
-        const colour = rgbToHex(strip.thisblock.getArgValue()).replace("#", "");
+        let colour = rgbToHex(strip.thisblock.getArgValue()).replace("#", "");
+        if (colour === LINEAR_GRADIENT_COLOUR) {
+            colour = "000000";
+        }
+        console.log("setting colour", colour)
         let marty_cmd = `led/LEDeye/color/${colour}`;
     
         if (!isVersionGreater(OS.getMartyFwVersion(), LED_EYES_FW_VERSION)) {

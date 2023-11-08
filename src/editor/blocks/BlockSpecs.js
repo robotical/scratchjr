@@ -1,5 +1,6 @@
 import Localization from '../../utils/Localization';
 import IO from '../../tablet/IO';
+import { LINEAR_GRADIENT_COLOUR } from '../engine/Prims';
 
 let loadCount = 0;
 
@@ -337,7 +338,7 @@ static setupCategories () {
             // 'ledEyesP3': ['ledEyesP3', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP3', 'svg'),
             //     BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'ledEyesColour': ['ledEyesColour', BlockSpecs.getImageFrom('assets/blockicons/MartyEyesColour', 'svg'),
-                BlockSpecs.pinkCmd, 'c', '#000000', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+                BlockSpecs.pinkCmd, 'c', LINEAR_GRADIENT_COLOUR, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'say': ['say', BlockSpecs.getImageFrom('assets/blockicons/Say', 'svg'),
                 BlockSpecs.pinkCmd, 't',
                 Localization.localize('SAY_BLOCK_DEFAULT_ARGUMENT'), BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
