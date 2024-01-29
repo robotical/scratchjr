@@ -315,6 +315,8 @@ export default class Paint {
         window.ontouchend = Paint.gestureEnd;
         window.onmousemove = Paint.gestureChange;
         window.onmouseup = Paint.gestureEnd;
+        window.onpointermove = Paint.gestureChange;
+        window.onpointerup = Paint.gestureEnd;
     }
 
     static gestureChange (e) {

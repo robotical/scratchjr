@@ -48,12 +48,15 @@ export default class Palette {
         Palette.createCategorySelectors(parent);
         var div = newHTML('div', 'palette', parent);
         div.setAttribute('id', 'palette');
-        div.ontouchstart = function (evt) {
+        div.onpointerdown = function (evt) {
             Palette.paletteMouseDown(evt);
-        };
-        div.onmousedown = function (evt) {
-            Palette.paletteMouseDown(evt);
-        };
+        }
+        // div.ontouchstart = function (evt) {
+        //     Palette.paletteMouseDown(evt);
+        // };
+        // div.onmousedown = function (evt) {
+        //     Palette.paletteMouseDown(evt);
+        // };
         var pc = newHTML('div', 'papercut', parent);
         newHTML('div', 'withstyle', pc);
     }
@@ -72,9 +75,11 @@ export default class Palette {
 
     static paletteMouseDown (e) {
         if (isTablet && e.touches && (e.touches.length > 1)) {
+            console.debug('Palette:paletteMouseDown: ignoring multi-touch event');
             return;
         }
         if (ScratchJr.onHold) {
+            console.debug('Palette:paletteMouseDown: ignoring event due to onHold');
             return;
         }
         e.preventDefault();
@@ -93,6 +98,7 @@ export default class Palette {
             if (ScratchJr.shaking && (ScratchJr.shaking == ths)) {
                 Palette.removeSound(ths);
             } else {
+                console.debug('Palette:paletteMouseDown: dragging block');
                 Events.startDrag(e, ths, Palette.prepareForDrag,
                     Palette.dropBlockFromPalette, ScriptsPane.draggingBlock, Palette.showHelp, Palette.startShaking);
             }
