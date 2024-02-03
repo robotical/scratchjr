@@ -98,7 +98,6 @@ export default class Palette {
             if (ScratchJr.shaking && (ScratchJr.shaking == ths)) {
                 Palette.removeSound(ths);
             } else {
-                console.debug('Palette:paletteMouseDown: dragging block');
                 Events.startDrag(e, ths, Palette.prepareForDrag,
                     Palette.dropBlockFromPalette, ScriptsPane.draggingBlock, Palette.showHelp, Palette.startShaking);
             }

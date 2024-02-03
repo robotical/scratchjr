@@ -131,16 +131,11 @@ export default class Events {
             delta = 7;
             
         }
-        window.ontouchmove = function (evt) {
+
+        window.onpointermove = function (evt) {
             Events.mouseMove(evt);
         };
-        window.ontouchend = function (evt) {
-            Events.mouseUp(evt);
-        };
-        window.onmousemove = function (evt) {
-            Events.mouseMove(evt);
-        };
-        window.onmouseup = function (evt) {
+        window.onpointerup = function (evt) {
             Events.mouseUp(evt);
         };
     }

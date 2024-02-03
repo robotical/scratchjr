@@ -31,3 +31,6 @@
 ios/Pods
 google-services.json
 GoogleService-Info.plist
+
+# publish docs to the repo when you want to test something remotely. MBJR will get published to the gh pages from within the docs folder
+/docs
