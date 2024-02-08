@@ -2,6 +2,8 @@ import initSqlJs from "sql.js";
 import sqlWasm from "!!file-loader?name=sql-wasm-[contenthash].wasm!sql.js/dist/sql-wasm.wasm";
 import { readdir, writeFile, readFile } from "fs-web";
 
+const SCRATCH_JR_DB_NAME_LOCAL_STORAGE = "scratchjrDb";
+
 export default class DatabaseManager {
   constructor(databaseFilename, databaseDir) {
     this.databaseFilename = databaseFilename;
@@ -17,16 +19,47 @@ export default class DatabaseManager {
         break;
       }
     }
+
+    if (window.ReactNativeWebView) {
+      // we are on the phone app, so we need to load the database from local storage
+      dbExists = false;
+    }
+
     if (!dbExists) {
-      await this.initTables();
+      console.log("db doesn't exist, looking at local storage...");
+      // if it doesn't exist, and we are on the phone app, look at local storage
+      const localStorageBuffer = await this.getFromDeviceLocalStorage();
+      if (localStorageBuffer) {
+        console.log("opening from local storage...");
+        await this.openFromLocalStorage(localStorageBuffer);
+      } else {
+        console.log("local storage didn't have a db, creating new db...");
+        await this.initTables();
+      }
       this.runMigrations();
       this.save();
     } else {
+      console.log("db exists, opening...")
       await this.open();
       this.runMigrations();
       this.save();
     }
   }
+
+  /** Opens the databse from local storage buffer */
+  async openFromLocalStorage(bufferRaw) {
+    if (bufferRaw) {
+      try {
+        const SQL = await initSqlJs({ locateFile: () => sqlWasm });
+        const buffer = new Uint8Array(bufferRaw);
+        this.db = new SQL.Database(buffer);
+        this.db.handleError = this.handleError;
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
 
   /** opens the database */
   async open() {
@@ -61,11 +94,87 @@ export default class DatabaseManager {
     return this.db != null;
   }
 
+  arrayBufferToBase64(buffer) {
+    let binary = '';
+    let bytes = new Uint8Array(buffer);
+    let len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+  }
+
+  base64ToArrayBuffer(base64) {
+    const binary_string = window.atob(base64);
+    const len = binary_string.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
+
+  storeArrayBuffer(key, buffer) {
+    const base64String = this.arrayBufferToBase64(buffer);
+    localStorage.setItem(key, base64String);
+  }
+
+  blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      try {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = function () {
+          resolve(reader.result);
+        };
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
   /** saves the database to the file specified in this.databaseFilename */
-  save() {
+  async save() {
     const data = this.db.export();
     const buffer = data.buffer;
+    this.saveToDeviceLocalStorage(buffer);
     writeFile(this.databaseFilename, buffer);
+  }
+
+  saveToDeviceLocalStorage(buffer) {
+    if (window.ReactNativeWebView) {
+      const base64String = this.arrayBufferToBase64(buffer);
+      return mv2.sendCommand({
+        command: "saveFile",
+        fileName: SCRATCH_JR_DB_NAME_LOCAL_STORAGE,
+        contents: base64String
+      });
+    }
+    return null;
+  }
+
+  async getFromDeviceLocalStorage() {
+    // if we are on a the phone app, load the database from local storage
+    if (window.ReactNativeWebView) {
+      try {
+
+        const response = await mv2.sendCommand({
+          command: "loadFile",
+          fileName: SCRATCH_JR_DB_NAME_LOCAL_STORAGE
+        });
+        const base64String = response.contents;
+        if (base64String) {
+          return this.base64ToArrayBuffer(base64String);
+        } else {
+          return null;
+        }
+      } catch (e) {
+        console.log("failed to load from local storage:", e);
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   /** removes all unused files of a specific filetype, e.g. unused svg files
@@ -163,9 +272,8 @@ export default class DatabaseManager {
     json.values = [fileMD5];
     const table = "PROJECTFILES";
 
-    json.stmt = `select ${json.items} from ${table} where ${json.cond}${
-      json.order ? ` order by ${json.order}` : ""
-    }`;
+    json.stmt = `select ${json.items} from ${table} where ${json.cond}${json.order ? ` order by ${json.order}` : ""
+      }`;
     const rows = this.query(json);
 
     if (rows.length > 0) {
@@ -270,7 +378,7 @@ export default class DatabaseManager {
   /**
       runs a sql query on the database, returns the results of the SQL statment
       @param {json} json object with stmt and values filled out - can be a string or object
-  
+   
       @returns lastRowId
       */
   query(jsonStrOrJsonObj) {

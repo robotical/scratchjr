@@ -174,7 +174,7 @@ export default class Events {
         }
         timeoutEvent = undefined;
         if (!dragged) {
-            fcnstart(e);
+            fcnstart && fcnstart(e);
         }
         dragged = true;
         if (updatefcn) {

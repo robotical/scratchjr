@@ -81,6 +81,7 @@ class Marty2 extends EventDispatcher {
     this.setRSSI = this.setRSSI.bind(this);
     this.setIsConnected = this.setIsConnected.bind(this);
     this.fwVersion = "";
+    this.commandPromise = null;
     // random number from 20 to 10000
     const randomMdNumber = Math.floor(Math.random() * 10000) + 20;
     this.goToLink = goToLink; // only for debugging purposes so we can start new project from MST
@@ -95,6 +96,43 @@ class Marty2 extends EventDispatcher {
       console.log("IN USELESS send_REST", e);
     }
   }
+
+  /**
+ * Sends a command to the react-native code and returns a promise that will be
+ * fulfilled when the react-native code replies
+ * @param {{command: string}} payload Payload to send to the react-native code
+ * @returns {Promise} Promise
+ */
+  sendCommand(payload) {
+    if (this.commandPromise) {
+      // eslint-disable-next-line no-console
+      console.warn("Command already in flight");
+    }
+    const promise = new Promise((resolve, reject) => {
+      this.commandPromise = { resolve, reject };
+    });
+    window.ReactNativeWebView.postMessage(JSON.stringify(payload));
+    return promise;
+  }
+
+  /**
+ * Called by the react-native code to respond to sendCommand
+ * @param {{success: boolean, error: string}} args Response from the react native side
+ */
+  onCommandReply(args) {
+    if (this.commandPromise) {
+      if (args.success) {
+        this.commandPromise.resolve(args);
+      } else {
+        this.commandPromise.reject(new Error(args.error));
+      }
+      this.commandPromise = null;
+    } else {
+      console.warn("Unhandled command reply");
+    }
+  }
+
+
 
   setName(martyName) {
     this.martyName = martyName;
@@ -157,10 +195,10 @@ class Marty2 extends EventDispatcher {
         signal_render(this.rssi);
       }
     } catch (e) {
-      console.log("Connection button is not here yet");
+      console.log("Connect button is not here yet");
       // busy wait to not overload the app
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      mv2.updateConnectionInfo();
+      // await new Promise((resolve) => setTimeout(resolve, 500));
+      // await mv2.updateConnectionInfo();
     }
   }
 
