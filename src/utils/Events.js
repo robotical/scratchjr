@@ -217,6 +217,10 @@ export default class Events {
             e.preventDefault();
         };
         window.onmouseup = undefined;
+        window.onpointermove = undefined;
+        window.onpointerup = undefined;
+        window.ontouchleave = undefined;
+        window.ontouchcancel = undefined;
     }
 
     static performMouseUpAction (e) {
