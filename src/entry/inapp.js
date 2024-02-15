@@ -24,10 +24,14 @@ export function inappInterfaceGuide () {
     var interfaceKeyHeaderNode = gn('interface-key-header');
     var interfaceKeyDescriptionNode = gn('interface-key-description');
 
-    interfaceKeyHeaderNode.textContent = Localization.localize('INTERFACE_GUIDE_SAVE', {N: 1});
-    interfaceKeyDescriptionNode.textContent = Localization.localize('INTERFACE_GUIDE_SAVE_DESCRIPTION');
+    interfaceKeyHeaderNode.textContent = Localization.localize('INTERFACE_GUIDE_NEW_PROJECT', {N: 1});
+    interfaceKeyDescriptionNode.textContent = Localization.localize('INTERFACE_GUIDE_NEW_PROJECT_DESCRIPTION');
 
     var interfaceKeys = [
+        'NEW_PROJECT',
+        'SAVED_PROJECT',
+        'SETTINGS',
+        'USER_GUIDES',
         'SAVE',
         'MARTY_CONNECT',
         'STAGE',
@@ -57,7 +61,7 @@ export function inappInterfaceGuide () {
     }
 
 
-    var currentButton = document.getElementById('interface-button-save');
+    var currentButton = document.getElementById('interface-button-lobby-new-project');
 
     var switchHelp = function (e) {
         var target = e.target;
