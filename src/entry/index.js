@@ -130,7 +130,7 @@ function indexLoadStart() {
   document.ontouchmove = function (e) {
     e.preventDefault();
   };
-  document.onmousemove = function (e) {
+  document.onpointermove = function (e) {
     e.preventDefault();
   };
   if (isAndroid) {

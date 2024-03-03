@@ -48,13 +48,14 @@ export default class Palette {
         Palette.createCategorySelectors(parent);
         var div = newHTML('div', 'palette', parent);
         div.setAttribute('id', 'palette');
+        div.style["touch-action"] = "none";
         div.onpointerdown = function (evt) {
             Palette.paletteMouseDown(evt);
         }
         // div.ontouchstart = function (evt) {
         //     Palette.paletteMouseDown(evt);
         // };
-        // div.onmousedown = function (evt) {
+        // div.onpointerdown = function (evt) {
         //     Palette.paletteMouseDown(evt);
         // };
         var pc = newHTML('div', 'papercut', parent);
@@ -334,7 +335,7 @@ export default class Palette {
         div.ontouchstart = function (evt) {
             Palette.clickOnCategory(evt);
         };
-        div.onmousedown = function (evt) {
+        div.onpointerdown = function (evt) {
             Palette.clickOnCategory(evt);
         };
     }
@@ -483,7 +484,7 @@ export default class Palette {
             };
         }
         div.ontouchstart = Palette.recordSound;
-        div.onmousedown = Palette.recordSound;
+        div.onpointerdown = Palette.recordSound;
     }
 
     static recordSound (e) {

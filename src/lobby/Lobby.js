@@ -145,7 +145,7 @@ export default class Lobby {
 
   static loadProjects(p) {
     document.ontouchmove = undefined;
-    document.onmousemove = undefined;
+    document.onpointermove = undefined;
     gn("topsection").className = "topsection home";
     gn("tabheader").textContent = Localization.localize("MY_PROJECTS");
     gn("subtitle").textContent = "";
@@ -169,7 +169,7 @@ export default class Lobby {
     document.ontouchmove = function (e) {
       e.preventDefault();
     };
-    document.onmousemove = function (e) {
+    document.onpointermove = function (e) {
       e.preventDefault();
     };
     Samples.init();
@@ -224,7 +224,7 @@ export default class Lobby {
         return;
     }
     document.ontouchmove = undefined;
-    document.onmousemove = undefined;
+    document.onpointermove = undefined;
     busy = true;
     ScratchAudio.sndFX('tap.wav');
     Lobby.selectSubButton(page);
@@ -244,7 +244,7 @@ export default class Lobby {
         document.ontouchmove = function (e) {
             e.preventDefault();
         };
-        document.onmousemove = function (e) {
+        document.onpointermove = function (e) {
             e.preventDefault();
         };
         url = host + 'interface.html';
@@ -254,7 +254,7 @@ export default class Lobby {
         document.ontouchmove = function (e) {
             e.preventDefault();
         };
-        document.onmousemove = function (e) {
+        document.onpointermove = function (e) {
             e.preventDefault();
         };
         url = host + 'paint.html';

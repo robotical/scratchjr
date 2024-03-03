@@ -276,9 +276,9 @@ export default class ScratchJr {
   static editorEvents() {
     document.ongesturestart = undefined;
     window.ontouchstart = ScratchJr.unfocus;
-    window.onmousedown = ScratchJr.unfocus;
+    window.onpointerdown = ScratchJr.unfocus;
     window.ontouchend = undefined;
-    window.onmouseup = undefined;
+    window.onpointerup = undefined;
   }
 
   static unfocus(evt) {
@@ -759,7 +759,7 @@ export default class ScratchJr {
   static setupColKeypad() {
     colpad = newHTML("div", "colkeyboard", frame);
     colpad.ontouchstart = ScratchJr.eatEvent;
-    colpad.onmousedown = ScratchJr.eatEvent;
+    colpad.onpointerdown = ScratchJr.eatEvent;
     // var pad = newHTML('div', 'insidekeyboard', colpad);
     const colours = [
       "#e30613",
@@ -780,7 +780,7 @@ export default class ScratchJr {
     // var mk = newHTML('span', undefined, keym);
     // mk.textContent = col ? col : '';
     keym.ontouchstart = ScratchJr.colEditKey;
-    keym.onmousedown = ScratchJr.colEditKey;
+    keym.onpointerdown = ScratchJr.colEditKey;
   }
 
   /////////////////////////////////////////////////
@@ -815,7 +815,7 @@ export default class ScratchJr {
   static setupKeypad() {
     keypad = newHTML("div", "picokeyboard", frame);
     keypad.ontouchstart = ScratchJr.eatEvent;
-    keypad.onmousedown = ScratchJr.eatEvent;
+    keypad.onpointerdown = ScratchJr.eatEvent;
     var pad = newHTML("div", "insidekeyboard", keypad);
     for (var i = 1; i < 10; i++) {
       ScratchJr.keyboardAddKey(pad, i, "onekey");
@@ -837,7 +837,7 @@ export default class ScratchJr {
     var mk = newHTML("span", undefined, keym);
     mk.textContent = str ? str : "";
     keym.ontouchstart = ScratchJr.numEditKey;
-    keym.onmousedown = ScratchJr.numEditKey;
+    keym.onpointerdown = ScratchJr.numEditKey;
   }
 
   /////////////////////////////////////////////////

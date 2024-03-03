@@ -129,7 +129,6 @@ export default class Events {
             };
         } else {
             delta = 7;
-            
         }
 
         window.onpointermove = function (evt) {
@@ -213,10 +212,10 @@ export default class Events {
     static clearEvents () {
         window.ontouchmove = undefined;
         window.ontouchend = undefined;
-        window.onmousemove = function (e) {
+        window.onpointermove = function (e) {
             e.preventDefault();
         };
-        window.onmouseup = undefined;
+        window.onpointerup = undefined;
         window.onpointermove = undefined;
         window.onpointerup = undefined;
         window.ontouchleave = undefined;

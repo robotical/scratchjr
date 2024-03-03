@@ -31,7 +31,7 @@ export default class Stage {
         this.div.ontouchstart = function (evt) {
             me.mouseDown(evt);
         };
-        this.div.onmousedown = function (evt) {
+        this.div.onpointerdown = function (evt) {
             me.mouseDown(evt);
         };
         this.div.owner = this;
@@ -428,10 +428,10 @@ export default class Stage {
         window.ontouchend = function (evt) {
             me.mouseUp(evt);
         };
-        window.onmousemove = function (evt) {
+        window.onpointermove = function (evt) {
             me.mouseMove(evt);
         };
-        window.onmouseup = function (evt) {
+        window.onpointerup = function (evt) {
             me.mouseUp(evt);
         };
     }

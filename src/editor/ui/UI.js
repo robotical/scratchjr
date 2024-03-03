@@ -555,7 +555,7 @@ export default class UI {
     var div = newHTML("div", "spritecc", p);
     div.setAttribute("id", "spritecc");
     div.ontouchstart = UI.spriteThumbsActions;
-    div.onmousedown = UI.spriteThumbsActions;
+    div.onpointerdown = UI.spriteThumbsActions;
 
     // scrollbar
     var sb = newHTML("div", "scrollbar", sprites);
@@ -1136,7 +1136,7 @@ export default class UI {
       e.preventDefault();
     };
     tf.ontouchstart = eatEvent;
-    tf.onmousedown = eatEvent;
+    tf.onpointerdown = eatEvent;
     var activetb = newHTML("form", "pageform", tf);
     activetb.name = "activetextbox";
     activetb.id = "myform";
@@ -1154,12 +1154,12 @@ export default class UI {
     var clicky = newHTML("div", "fontsizeText off", ta);
     clicky.setAttribute("id", "fontsizebutton");
     clicky.ontouchstart = UI.openFontSizeMenu;
-    clicky.onmousedown = UI.openFontSizeMenu;
+    clicky.onpointerdown = UI.openFontSizeMenu;
     var col = newHTML("div", "changecolorText off", ta);
     col.setAttribute("id", "fontcolorbutton");
 
     col.ontouchstart = UI.topLevelColor;
-    col.onmousedown = UI.topLevelColor;
+    col.onpointerdown = UI.topLevelColor;
     UI.createColorMenu(tf);
     UI.createTextSizeMenu(tf);
   }
@@ -1179,7 +1179,7 @@ export default class UI {
       Paint.setSplashColor(sf, Paint.splash, swatchlist[i]);
       Paint.addImageUrl(sf, Paint.splashshade);
       colour.ontouchstart = UI.setTextColor;
-      colour.onmousedown = UI.setTextColor;
+      colour.onpointerdown = UI.setTextColor;
     }
     UI.setMenuTextColor(gn("textcolormenu").childNodes[9]);
   }
@@ -1194,7 +1194,7 @@ export default class UI {
       var sf = newHTML("span", undefined, textuisize);
       sf.textContent = "A";
       textuisize.ontouchstart = UI.setTextSize;
-      textuisize.onmousedown = UI.setTextSize;
+      textuisize.onpointerdown = UI.setTextSize;
     }
     UI.setMenuTextSize(gn("textfontsizes").childNodes[5]);
   }

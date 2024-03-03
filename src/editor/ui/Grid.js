@@ -72,7 +72,7 @@ export default class Grid {
         cnv.ontouchstart = function (evt) {
             ScratchJr.stage.mouseDown(evt);
         };
-        cnv.onmousedown = function (evt) {
+        cnv.onpointerdown = function (evt) {
             ScratchJr.stage.mouseDown(evt);
         };
     }
@@ -153,7 +153,7 @@ export default class Grid {
         cnv.ontouchstart = function (evt) {
             Grid.mouseDownOnCursor(evt);
         };
-        cnv.onmousedown = function (evt) {
+        cnv.onpointerdown = function (evt) {
             Grid.mouseDownOnCursor(evt);
         };
         var ctx = cnv.getContext('2d');
@@ -164,7 +164,7 @@ export default class Grid {
         ctx.strokeRect(3, 3, size - 6, size - 6);
         ctx.fillRect(3, 3, size - 6, size - 6);
         gc.ontouchstart = Grid.mouseDownOnCursor;
-        gc.onmousedown = Grid.mouseDownOnCursor;
+        gc.onpointerdown = Grid.mouseDownOnCursor;
     }
 
     static mouseDownOnCursor (e) {

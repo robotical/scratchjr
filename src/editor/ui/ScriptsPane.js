@@ -46,7 +46,7 @@ export default class ScriptsPane {
         currentsc.parentNode.ontouchstart = function (evt) {
             currentsc.owner.scriptsMouseDown(evt);
         };
-        currentsc.parentNode.onmousedown = function (evt) {
+        currentsc.parentNode.onpointerdown = function (evt) {
             currentsc.owner.scriptsMouseDown(evt);
         };
         scroll.update();
@@ -282,10 +282,10 @@ export default class ScriptsPane {
                 fcnup(evt);
             };
         } else {
-            window.onmousemove = function (evt) {
+            window.onpointermove = function (evt) {
                 fcnmove(evt);
             };
-            window.onmouseup = function (evt) {
+            window.onpointerup = function (evt) {
                 fcnup(evt);
             };
         }

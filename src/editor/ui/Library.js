@@ -55,10 +55,10 @@ export default class Library {
         Library.addThumbnails(type);
         window.ontouchstart = undefined;
         window.ontouchend = undefined;
-        window.onmousedown = undefined;
-        window.onmouseup = undefined;
+        window.onpointerdown = undefined;
+        window.onpointerup = undefined;
         document.ontouchmove = undefined;
-        document.onmousemove = undefined;
+        document.onpointermove = undefined;
         window.onresize = undefined;
 
         gn('library_paintme').style.opacity = 1;
@@ -213,7 +213,7 @@ export default class Library {
         tb.ontouchstart = function (evt) {
             fcn(evt, tb);
         };
-        tb.onmousedown = function (evt) {
+        tb.onpointerdown = function (evt) {
             fcn(evt, tb);
         };
         return tb;
@@ -245,7 +245,7 @@ export default class Library {
         tb.ontouchstart = function (evt) {
             fcn(evt, tb);
         };
-        tb.onmousedown = function (evt) {
+        tb.onpointerdown = function (evt) {
             fcn(evt, tb);
         };
         return tb;
@@ -278,7 +278,7 @@ export default class Library {
         tb.ontouchstart = function (evt) {
             Library.selectAsset(evt, tb);
         };
-        tb.onmousedown = function (evt) {
+        tb.onpointerdown = function (evt) {
             Library.selectAsset(evt, tb);
         };
     }
@@ -307,17 +307,17 @@ export default class Library {
         tb.ontouchend = function (evt) {
             clickMe(evt, tb);
         };
-        window.onmouseup = function (evt) {
+        window.onpointerup = function (evt) {
             clickMe(evt, tb);
         };
-        window.onmousemove = function (evt) {
+        window.onpointermove = function (evt) {
             clearEvents(evt, tb);
         };
         function holdit () {
             var repeat = function () {
                 tb.ontouchend = undefined;
-                window.onmouseup = undefined;
-                window.onmousemove = undefined;
+                window.onpointerup = undefined;
+                window.onpointermove = undefined;
                 timeoutEvent = undefined;
                 Library.stopShaking();
                 shaking = tb;
@@ -341,8 +341,8 @@ export default class Library {
             }
             timeoutEvent = undefined;
             tb.ontouchend = undefined;
-            window.onmousemove = undefined;
-            window.onmouseup = undefined;
+            window.onpointermove = undefined;
+            window.onpointerup = undefined;
         }
         function clickMe (e, tb) {
             if (timeoutEvent) {
@@ -351,9 +351,9 @@ export default class Library {
             Library.selectThisAsset(e, tb);
             timeoutEvent = undefined;
             tb.ontouchend = undefined;
-            tb.onmouseup = undefined;
-            window.onmousemove = undefined;
-            window.onmouseup = undefined;
+            tb.onpointerup = undefined;
+            window.onpointermove = undefined;
+            window.onpointerup = undefined;
         }
     }
 

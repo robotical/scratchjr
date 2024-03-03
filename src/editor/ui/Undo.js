@@ -38,7 +38,7 @@ export default class Undo {
             div.ontouchstart = function (evt) {
                 fcn(evt);
             };
-            div.onmousedown = function (evt) {
+            div.onpointerdown = function (evt) {
                 fcn(evt);
             };
         }

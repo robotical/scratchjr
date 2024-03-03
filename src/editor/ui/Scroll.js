@@ -55,7 +55,7 @@ export default class Scroll {
                 me.scrolldown(e);
             };
         } else {
-            this.aup.onmousedown = function (e) {
+            this.aup.onpointerdown = function (e) {
                 me.scrolldown(e);
             };
         }
@@ -65,7 +65,7 @@ export default class Scroll {
                 me.scrollup(e);
             };
         } else {
-            this.adown.onmousedown = function (e) {
+            this.adown.onpointerdown = function (e) {
                 me.scrollup(e);
             };
         }
@@ -75,7 +75,7 @@ export default class Scroll {
                 me.scrollright(e);
             };
         } else {
-            this.aleft.onmousedown = function (e) {
+            this.aleft.onpointerdown = function (e) {
                 me.scrollright(e);
             };
         }
@@ -85,7 +85,7 @@ export default class Scroll {
                 me.scrollleft(e);
             };
         } else {
-            this.aright.onmousedown = function (e) {
+            this.aright.onpointerdown = function (e) {
                 me.scrollleft(e);
             };
         }

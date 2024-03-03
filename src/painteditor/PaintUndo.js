@@ -51,7 +51,7 @@ export default class PaintUndo {
             button.ontouchstart = function (evt) {
                 fcn(evt);
             };
-            button.onmousedown = function (evt) {
+            button.onpointerdown = function (evt) {
                 fcn(evt);
             };
         }

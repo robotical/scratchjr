@@ -78,7 +78,7 @@ export default class Menu {
         cs.onmouseout = function (evt) {
             Menu.unhighlightdot(evt);
         };
-        cs.onmousedown = function (evt) {
+        cs.onpointerdown = function (evt) {
             fcn(evt, mu, block, c);
         };
         function handleTouchStart (e) {

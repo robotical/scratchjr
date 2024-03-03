@@ -336,7 +336,7 @@ export default class BlockArg {
             ba.button.ontouchstart = function (evt) {
                 ba.pressDropDown(evt, fcn);
             };
-            ba.button.onmousedown = function (evt) {
+            ba.button.onpointerdown = function (evt) {
                 ba.pressDropDown(evt, fcn);
             };
             // Expand the parent div to incorporate the size of the button,

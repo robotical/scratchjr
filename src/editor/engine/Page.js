@@ -267,7 +267,7 @@ export default class Page {
         tb.ontouchstart = function (evt) {
             Thumbs.pageMouseDown(evt);
         };
-        tb.onmousedown = function (evt) {
+        tb.onpointerdown = function (evt) {
             Thumbs.pageMouseDown(evt);
         };
         this.thumbnail = tb;

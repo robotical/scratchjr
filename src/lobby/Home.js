@@ -28,8 +28,8 @@ export default class Home {
       frame.ontouchstart = Home.handleTouchStart;
       frame.ontouchend = Home.handleTouchEnd;
     } else {
-      frame.onmousedown = Home.handleTouchStart;
-      frame.onmouseup = Home.handleTouchEnd;
+      frame.onpointerdown = Home.handleTouchStart;
+      frame.onpointerup = Home.handleTouchEnd;
     }
     Home.displayYourProjects();
   }
@@ -80,7 +80,7 @@ export default class Home {
     }
     function holdit() {
       frame.ontouchmove = Home.handleMove;
-      frame.onmousemove = Home.handleMove;
+      frame.onpointermove = Home.handleMove;
       var repeat = function () {
         if (Home.actionTarget && Home.actionTarget.childElementCount > 2) {
           Home.actionTarget.childNodes[
@@ -135,7 +135,7 @@ export default class Home {
       return;
     }
     frame.ontouchmove = undefined;
-    frame.onmousemove = undefined;
+    frame.onpointermove = undefined;
     if (timeoutEvent) {
       clearTimeout(timeoutEvent);
     }
