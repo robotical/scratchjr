@@ -985,22 +985,17 @@ export default class ScratchJr {
     // this get called twice on ipads probably because there are 2 listeners somewhere listening for both keydown and touchdown or something. look into it
     var input = activeFocus.input;
     var val = input.textContent;
-    console.log("val", val);
     if (editfirst) {
-      console.log("editfirst", editfirst);
       editfirst = false;
       val = "0";
     }
-    console.log("val", val);
     if (c == "-" && val != "0") {
       ScratchAudio.sndFX("boing.wav");
       return;
     }
     if (val == "0") {
-      console.log("val 0 true", val);
       val = c;
     } else {
-      console.log("val 0 false", val);
       val += c;
     }
     const min = activeFocus.daddy.min || -99;
@@ -1012,11 +1007,9 @@ export default class ScratchJr {
     ) {
       ScratchAudio.sndFX("boing.wav");
       if (Number(c) < max && Number(c) > min) {
-        console.log("c", c);
         activeFocus.setValue(c);
       }
     } else {
-      console.log("setValue", val);
       activeFocus.setValue(val);
     }
   }
