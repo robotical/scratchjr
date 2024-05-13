@@ -982,7 +982,6 @@ export default class ScratchJr {
    * @param c The input char, should be 0...9 or `-`
    */
   static fillValueWithKey(c) {
-    // this get called twice on ipads probably because there are 2 listeners somewhere listening for both keydown and touchdown or something. look into it
     var input = activeFocus.input;
     var val = input.textContent;
     if (editfirst) {
