@@ -989,6 +989,9 @@ export default class ScratchJr {
       (Number(val) > max || Number(val) < min)
     ) {
       ScratchAudio.sndFX("boing.wav");
+      if (Number(c) < max && Number(c) > min) {
+        activeFocus.setValue(c);
+      }
     } else {
       activeFocus.setValue(val);
     }
