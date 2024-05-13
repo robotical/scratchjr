@@ -1199,12 +1199,15 @@ Blocks text fields and input fields
 }
 
 .numfield {
+    display: grid;
+    justify-content: center;
+    align-items: center;
     position: absolute;
     margin: ${css_vh(0.00)};
     padding: ${css_vh(0.00)};
     border: 0px solid;
-    height: ${css_vh(3.13)};
-    width: ${css_vh(5.47)};
+    height: ${css_vh(4.13)};
+    width: ${css_vh(6.47)};
     top: ${css_vh(7.16)};
     left: ${css_vh(1.30)};
     color: #77787b;
@@ -1219,16 +1222,16 @@ Blocks text fields and input fields
 .numfield h3 {
     margin: ${css_vh(0.00)};
     padding: ${css_vh(0.00)};
-    float: left;
+    /* float: left; */
     text-align: center;
     color: #77787b;
     font-family: Roboto;
     font-size:  ${css_vh(1.82)};
     font-weight: normal;
-    height: ${css_vh(3.13)};
-    width: ${css_vh(5.47)};
+    /* height: ${css_vh(4.13)}; */
+    /* width: ${css_vh(6.47)}; */
     cursor: default;
-    line-height: ${css_vh(3.13)};
+    /* line-height: ${css_vh(4.13)}; */
 }
 
 .numfield.on {
