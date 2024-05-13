@@ -275,10 +275,13 @@ export default class ScratchJr {
 
   static editorEvents() {
     document.ongesturestart = undefined;
-    window.ontouchstart = ScratchJr.unfocus;
-    window.onpointerdown = ScratchJr.unfocus;
-    window.ontouchend = undefined;
-    window.onpointerup = undefined;
+    if (isTablet) {
+      window.ontouchstart = ScratchJr.unfocus;
+      window.ontouchend = undefined;
+    } else {
+      window.onpointerdown = ScratchJr.unfocus;
+      window.onpointerup = undefined;
+    }
   }
 
   static unfocus(evt) {
@@ -758,8 +761,11 @@ export default class ScratchJr {
   /////////////////////////////////////////
   static setupColKeypad() {
     colpad = newHTML("div", "colkeyboard", frame);
-    colpad.ontouchstart = ScratchJr.eatEvent;
-    colpad.onpointerdown = ScratchJr.eatEvent;
+    if (isTablet) {
+      colpad.ontouchstart = ScratchJr.eatEvent;
+    } else {
+      colpad.onpointerdown = ScratchJr.eatEvent;
+    }
     // var pad = newHTML('div', 'insidekeyboard', colpad);
     const colours = [
       "#e30613",
@@ -779,8 +785,11 @@ export default class ScratchJr {
     keym.style.background = col;
     // var mk = newHTML('span', undefined, keym);
     // mk.textContent = col ? col : '';
-    keym.ontouchstart = ScratchJr.colEditKey;
-    keym.onpointerdown = ScratchJr.colEditKey;
+    if (isTablet) {
+      keym.ontouchstart = ScratchJr.colEditKey;
+    } else {
+      keym.onpointerdown = ScratchJr.colEditKey;
+    }
   }
 
   /////////////////////////////////////////////////
@@ -814,8 +823,11 @@ export default class ScratchJr {
 
   static setupKeypad() {
     keypad = newHTML("div", "picokeyboard", frame);
-    keypad.ontouchstart = ScratchJr.eatEvent;
-    keypad.onpointerdown = ScratchJr.eatEvent;
+    if (isTablet) {
+      keypad.ontouchstart = ScratchJr.eatEvent;
+    } else {
+      keypad.onpointerdown = ScratchJr.eatEvent;
+    }
     var pad = newHTML("div", "insidekeyboard", keypad);
     for (var i = 1; i < 10; i++) {
       ScratchJr.keyboardAddKey(pad, i, "onekey");
@@ -836,8 +848,11 @@ export default class ScratchJr {
     var keym = newHTML("div", c, p);
     var mk = newHTML("span", undefined, keym);
     mk.textContent = str ? str : "";
-    keym.ontouchstart = ScratchJr.numEditKey;
-    keym.onpointerdown = ScratchJr.numEditKey;
+    if (isTablet) {
+      keym.ontouchstart = ScratchJr.numEditKey;
+    } else {
+      keym.onpointerdown = ScratchJr.numEditKey;
+    }
   }
 
   /////////////////////////////////////////////////
@@ -967,32 +982,41 @@ export default class ScratchJr {
    * @param c The input char, should be 0...9 or `-`
    */
   static fillValueWithKey(c) {
+    // this get called twice on ipads probably because there are 2 listeners somewhere listening for both keydown and touchdown or something. look into it
     var input = activeFocus.input;
     var val = input.textContent;
+    console.log("val", val);
     if (editfirst) {
+      console.log("editfirst", editfirst);
       editfirst = false;
       val = "0";
     }
+    console.log("val", val);
     if (c == "-" && val != "0") {
       ScratchAudio.sndFX("boing.wav");
       return;
     }
     if (val == "0") {
+      console.log("val 0 true", val);
       val = c;
     } else {
+      console.log("val 0 false", val);
       val += c;
     }
     const min = activeFocus.daddy.min || -99;
     const max = activeFocus.daddy.max || 99;
+
     if (
       Number(val).toString() != "NaN" &&
       (Number(val) > max || Number(val) < min)
     ) {
       ScratchAudio.sndFX("boing.wav");
       if (Number(c) < max && Number(c) > min) {
+        console.log("c", c);
         activeFocus.setValue(c);
       }
     } else {
+      console.log("setValue", val);
       activeFocus.setValue(val);
     }
   }

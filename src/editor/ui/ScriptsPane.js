@@ -8,34 +8,36 @@ import Events from '../../utils/Events';
 import Scroll from './Scroll';
 import Menu from '../blocks/Menu';
 import ScratchAudio from '../../utils/ScratchAudio';
-import {gn, localx, localy, newHTML, isTablet,
-    globalx, globaly, setCanvasSize, getDocumentHeight, frame} from '../../utils/lib';
+import {
+    gn, localx, localy, newHTML, isTablet,
+    globalx, globaly, setCanvasSize, getDocumentHeight, frame
+} from '../../utils/lib';
 
 let scroll = undefined;
 let watermark;
 
 export default class ScriptsPane {
-    static get scroll () {
+    static get scroll() {
         return scroll;
     }
 
-    static get watermark () {
+    static get watermark() {
         return watermark;
     }
 
-    static createScripts (parent) {
+    static createScripts(parent) {
         var div = newHTML('div', 'scripts', parent);
         div.setAttribute('id', 'scripts');
         watermark = newHTML('div', 'watermark', div);
         watermark.setAttribute('id', 'watermark');
-        
+
         var h = Math.max(getDocumentHeight(), frame.offsetHeight);
         setCanvasSize(div, div.offsetWidth, h - div.offsetTop);
         scroll = new Scroll(div, 'scriptscontainer', div.offsetWidth,
             h - div.offsetTop, ScratchJr.getActiveScript, ScratchJr.getBlocks);
     }
 
-    static setActiveScript (sprname) {
+    static setActiveScript(sprname) {
         var currentsc = gn(sprname + '_scripts');
         if (!currentsc) {
             // Sprite not found
@@ -43,16 +45,19 @@ export default class ScriptsPane {
         }
         ScratchJr.stage.currentPage.setCurrentSprite(gn(sprname).owner);
         currentsc.owner.activate();
-        currentsc.parentNode.ontouchstart = function (evt) {
-            currentsc.owner.scriptsMouseDown(evt);
-        };
-        currentsc.parentNode.onpointerdown = function (evt) {
-            currentsc.owner.scriptsMouseDown(evt);
+        if (isTablet) {
+            currentsc.parentNode.ontouchstart = function (evt) {
+                currentsc.owner.scriptsMouseDown(evt);
+            };
+        } else {
+            currentsc.parentNode.onpointerdown = function (evt) {
+                currentsc.owner.scriptsMouseDown(evt);
+            }
         };
         scroll.update();
     }
 
-    static runBlock (e, div) {
+    static runBlock(e, div) {
         e.preventDefault();
         e.stopPropagation();
         var b = div.owner.findFirst();
@@ -65,13 +70,13 @@ export default class ScriptsPane {
         ScratchJr.userStart = true;
     }
 
-    static prepareToDrag (e) {
+    static prepareToDrag(e) {
         e.preventDefault();
         var pt = Events.getTargetPoint(e);
         ScriptsPane.pickBlock(pt.x, pt.y, e);
     }
 
-    static pickBlock (x, y, e) {
+    static pickBlock(x, y, e) {
         if (!ScratchJr.runtime.inactive()) {
             ScratchJr.stopStrips();
         }
@@ -125,7 +130,7 @@ export default class ScriptsPane {
     //  Events MouseMove
     ////////////////////////////////////////////////
 
-    static draggingBlock (e) {
+    static draggingBlock(e) {
         e.preventDefault();
         var pt = Events.getTargetPoint(e);
         var dx = pt.x - Events.dragmousex;
@@ -134,7 +139,7 @@ export default class ScriptsPane {
         ScriptsPane.blockFeedback(Events.dragcanvas.left, Events.dragcanvas.top, e);
     }
 
-    static blockFeedback (dx, dy, e) {
+    static blockFeedback(dx, dy, e) {
         var script = ScratchJr.getActiveScript().owner;
         var limit = gn('palette').parentNode.offsetTop + gn('palette').parentNode.offsetHeight;
         var ycor = dy + Events.dragcanvas.offsetHeight;
@@ -146,26 +151,26 @@ export default class ScriptsPane {
         }
         var thumb;
         switch (Palette.getLandingPlace(script.dragList[0].div, e)) {
-        case 'library':
-            thumb = Palette.getHittedThumb(script.dragList[0].div, gn('spritecc'));
-            if (thumb && (gn(thumb.owner).owner.type == ScratchJr.getSprite().type)) {
-                Thumbs.quickHighlight(thumb);
-            } else {
-                thumb = undefined;
-            }
-            for (var i = 0; i < gn('spritecc').childElementCount; i++) {
-                var spr = gn('spritecc').childNodes[i];
-                if (spr.nodeName == 'FORM') {
-                    continue;
+            case 'library':
+                thumb = Palette.getHittedThumb(script.dragList[0].div, gn('spritecc'));
+                if (thumb && (gn(thumb.owner).owner.type == ScratchJr.getSprite().type)) {
+                    Thumbs.quickHighlight(thumb);
+                } else {
+                    thumb = undefined;
                 }
-                if (thumb && (thumb.id != spr.id)) {
-                    Thumbs.quickRestore(spr);
+                for (var i = 0; i < gn('spritecc').childElementCount; i++) {
+                    var spr = gn('spritecc').childNodes[i];
+                    if (spr.nodeName == 'FORM') {
+                        continue;
+                    }
+                    if (thumb && (thumb.id != spr.id)) {
+                        Thumbs.quickRestore(spr);
+                    }
                 }
-            }
-            break;
-        default:
-            ScriptsPane.removeLibCaret();
-            break;
+                break;
+            default:
+                ScriptsPane.removeLibCaret();
+                break;
         }
     }
 
@@ -174,45 +179,45 @@ export default class ScriptsPane {
     //  Events MouseUP
     ////////////////////////////////////////////////
 
-    static dropBlock (e, el) {
+    static dropBlock(e, el) {
         e.preventDefault();
         var sc = ScratchJr.getActiveScript();
         var spr = sc.owner.spr.id;
         var page = ScratchJr.stage.currentPage;
         switch (Palette.getLandingPlace(el, e)) {
-        case 'scripts':
-            var dx = localx(sc, el.left);
-            var dy = localy(sc, el.top);
-            ScriptsPane.blockDropped(sc, dx, dy);
-            // Start the story if scripts is changed.
-            ScratchJr.storyStart('ScriptsPane.changed');
-            break;
-        case 'library':
-            var thumb = Palette.getHittedThumb(el, gn('spritecc'));
-            ScriptsPane.blockDropped(ScratchJr.getActiveScript(), el.startx, el.starty);
-            if (thumb && (gn(thumb.owner).owner.type == gn(page.currentSpriteName).owner.type)) {
-                ScratchJr.storyStart('ScriptsPane.dropBlock:library');
-                ScratchAudio.sndFX('copy.wav');
-                Thumbs.quickHighlight(thumb);
-                setTimeout(function () {
-                    Thumbs.quickRestore(thumb);
-                }, 300);
-                sc = gn(thumb.owner + '_scripts').owner;
-                var strip = Project.encodeStrip(el.owner);
-                var firstblock = strip[0];
-                var delta = sc.gettopblocks().length * 3;
-                firstblock[2] = firstblock[2] + delta;
-                firstblock[3] = firstblock[3] + delta;
-                sc.recreateStrip(strip);
-                spr = thumb.owner;
-            }
-            break;
-        default:
-            ScratchJr.getActiveScript().owner.deleteBlocks();
-            scroll.adjustCanvas();
-            scroll.refresh();
-            scroll.fitToScreen();
-            break;
+            case 'scripts':
+                var dx = localx(sc, el.left);
+                var dy = localy(sc, el.top);
+                ScriptsPane.blockDropped(sc, dx, dy);
+                // Start the story if scripts is changed.
+                ScratchJr.storyStart('ScriptsPane.changed');
+                break;
+            case 'library':
+                var thumb = Palette.getHittedThumb(el, gn('spritecc'));
+                ScriptsPane.blockDropped(ScratchJr.getActiveScript(), el.startx, el.starty);
+                if (thumb && (gn(thumb.owner).owner.type == gn(page.currentSpriteName).owner.type)) {
+                    ScratchJr.storyStart('ScriptsPane.dropBlock:library');
+                    ScratchAudio.sndFX('copy.wav');
+                    Thumbs.quickHighlight(thumb);
+                    setTimeout(function () {
+                        Thumbs.quickRestore(thumb);
+                    }, 300);
+                    sc = gn(thumb.owner + '_scripts').owner;
+                    var strip = Project.encodeStrip(el.owner);
+                    var firstblock = strip[0];
+                    var delta = sc.gettopblocks().length * 3;
+                    firstblock[2] = firstblock[2] + delta;
+                    firstblock[3] = firstblock[3] + delta;
+                    sc.recreateStrip(strip);
+                    spr = thumb.owner;
+                }
+                break;
+            default:
+                ScratchJr.getActiveScript().owner.deleteBlocks();
+                scroll.adjustCanvas();
+                scroll.refresh();
+                scroll.fitToScreen();
+                break;
         }
         Undo.record({
             action: 'scripts',
@@ -222,7 +227,7 @@ export default class ScriptsPane {
         ScratchJr.getActiveScript().owner.dragList = [];
     }
 
-    static blockDropped (sc, dx, dy) {
+    static blockDropped(sc, dx, dy) {
         Events.dragcanvas.style.zIndex = '';
         var script = ScratchJr.getActiveScript().owner;
         ScriptsPane.cleanCarets();
@@ -235,12 +240,12 @@ export default class ScriptsPane {
         }
     }
 
-    static cleanCarets () {
+    static cleanCarets() {
         ScratchJr.getActiveScript().owner.removeCaret();
         ScriptsPane.removeLibCaret();
     }
 
-    static removeLibCaret () {
+    static removeLibCaret() {
         for (var i = 0; i < gn('spritecc').childElementCount; i++) {
             var spr = gn('spritecc').childNodes[i];
             if (spr.nodeName == 'FORM') {
@@ -254,7 +259,7 @@ export default class ScriptsPane {
     //  Drag Script Background
     //----------------------------------
 
-    static dragBackground (e) {
+    static dragBackground(e) {
         if (Menu.openMenu) {
             return;
         }
@@ -273,7 +278,7 @@ export default class ScriptsPane {
         ScriptsPane.setDragBackgroundEvents(ScriptsPane.dragMove, ScriptsPane.dragEnd);
     }
 
-    static setDragBackgroundEvents (fcnmove, fcnup) {
+    static setDragBackgroundEvents(fcnmove, fcnup) {
         if (isTablet) { // setDragBackgroundEvents
             window.ontouchmove = function (evt) {
                 fcnmove(evt);
@@ -291,7 +296,7 @@ export default class ScriptsPane {
         }
     }
 
-    static dragMove (e) {
+    static dragMove(e) {
         var pt = Events.getTargetPoint(e);
         if (!Events.dragged && (Events.distance(Events.dragmousex - pt.x, Events.dragmousey - pt.y) < 5)) {
             return;
@@ -306,18 +311,18 @@ export default class ScriptsPane {
         e.preventDefault();
     }
 
-    static dragEnd (e) {
+    static dragEnd(e) {
         Events.dragged = false;
         e.preventDefault();
         Events.clearEvents();
         scroll.bounceBack(); // commented out because we want to be able to drag the script pane to the bottom of the screen without it bouncing back
-}
+    }
 
     //////////////////////
     //
     //////////////////////
 
-    static updateScriptsPageBlocks (list) {
+    static updateScriptsPageBlocks(list) {
         for (var j = 0; j < list.length; j++) {
             if (!gn(list[j] + '_scripts')) {
                 continue;

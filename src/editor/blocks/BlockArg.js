@@ -2,9 +2,11 @@ import ScratchJr from '../ScratchJr';
 import BlockSpecs from './BlockSpecs';
 import Menu from './Menu';
 import Undo from '../ui/Undo';
-import {setCanvasSize, setProps, writeText, scaleMultiplier,
+import {
+    setCanvasSize, setProps, writeText, scaleMultiplier,
     newHTML, newDiv, newCanvas, getStringSize, isTablet,
-    newP, globalx, globaly, addCol} from '../../utils/lib';
+    newP, globalx, globaly, addCol
+} from '../../utils/lib';
 import Localization from '../../utils/Localization';
 
 /*
@@ -20,73 +22,73 @@ c: colour
 
 */
 export default class BlockArg {
-    constructor (block) {
+    constructor(block) {
         this.daddy = block;
         this.type = 'blockarg';
         this.argType = block.spec[3];
         switch (this.argType) {
-        case 'c':
-            this.argValue = block.spec[4];
-            this.div = this.addColArg();
-            break;
-        case 'n':
-            this.argValue = block.spec[4];
-            this.div = this.addNumArg();
-            break;
-        case 't':
-            this.argValue = block.spec[4];
-            if (Localization.isSampleLocalizedKey(this.argValue) && ScratchJr.isSampleOrStarter()) {
-                this.argValue = Localization.localize('SAMPLE_TEXT_' + this.argValue);
-            }
-            this.div = this.addTextArg();
-            break;
-        case 'm':
-            this.argValue = block.spec[4];
-            this.list = JSON.stringify(block.spec[1]);
-            this.numperrow = 3;
-            this.icon = this.getIconFrom(block.spec[4], block.spec[1]);
-            this.div = this.addImageMenu(this.closePictureMenu);
-            break;
-        case 'd':
-            this.argValue = block.spec[4];
-            this.list = JSON.stringify(block.spec[1]);
-            this.numperrow = 3;
-            this.icon = BlockSpecs.speeds[this.argValue];
-            this.div = this.addImageMenu(this.menuCloseSpeeds);
-            break;
-        case 'p':
-            this.argValue = block.spec[4];
-            this.div = this.pageIcon(this.argValue);
-            var ctx = block.blockshape.getContext('2d');
-            ctx.drawImage(this.div, 0, 0, this.div.width, this.div.height, 0, 0,
-                this.div.width * block.scale, this.div.height * block.scale);
-            break;
-        case 's':
-            this.argValue = block.spec[4];
-            this.div = newDiv(block.div, 2, 46, 60, 20, {
-                position: 'absolute',
-                zoom: (block.scale * 100) + '%'
-            });
-            var p = newP(this.div, this.argValue.split('.')[0], {
-                width: '60px'
-            });
-            p.setAttribute('class', 'soundname');
-            break;
-        case 'r':
-            this.argValue = block.spec[4];
-            this.div = newHTML('div', 'recordedCircle', block.div);
-            setProps(this.div.style, {
-                zoom: (block.scale * 100) + '%'
-            });
-            var num = newHTML('p', 'recordedNumber', this.div);
-            num.textContent = this.daddy.inpalette ? this.argValue : '?';
-            break;
-        default:
-            break;
+            case 'c':
+                this.argValue = block.spec[4];
+                this.div = this.addColArg();
+                break;
+            case 'n':
+                this.argValue = block.spec[4];
+                this.div = this.addNumArg();
+                break;
+            case 't':
+                this.argValue = block.spec[4];
+                if (Localization.isSampleLocalizedKey(this.argValue) && ScratchJr.isSampleOrStarter()) {
+                    this.argValue = Localization.localize('SAMPLE_TEXT_' + this.argValue);
+                }
+                this.div = this.addTextArg();
+                break;
+            case 'm':
+                this.argValue = block.spec[4];
+                this.list = JSON.stringify(block.spec[1]);
+                this.numperrow = 3;
+                this.icon = this.getIconFrom(block.spec[4], block.spec[1]);
+                this.div = this.addImageMenu(this.closePictureMenu);
+                break;
+            case 'd':
+                this.argValue = block.spec[4];
+                this.list = JSON.stringify(block.spec[1]);
+                this.numperrow = 3;
+                this.icon = BlockSpecs.speeds[this.argValue];
+                this.div = this.addImageMenu(this.menuCloseSpeeds);
+                break;
+            case 'p':
+                this.argValue = block.spec[4];
+                this.div = this.pageIcon(this.argValue);
+                var ctx = block.blockshape.getContext('2d');
+                ctx.drawImage(this.div, 0, 0, this.div.width, this.div.height, 0, 0,
+                    this.div.width * block.scale, this.div.height * block.scale);
+                break;
+            case 's':
+                this.argValue = block.spec[4];
+                this.div = newDiv(block.div, 2, 46, 60, 20, {
+                    position: 'absolute',
+                    zoom: (block.scale * 100) + '%'
+                });
+                var p = newP(this.div, this.argValue.split('.')[0], {
+                    width: '60px'
+                });
+                p.setAttribute('class', 'soundname');
+                break;
+            case 'r':
+                this.argValue = block.spec[4];
+                this.div = newHTML('div', 'recordedCircle', block.div);
+                setProps(this.div.style, {
+                    zoom: (block.scale * 100) + '%'
+                });
+                var num = newHTML('p', 'recordedNumber', this.div);
+                num.textContent = this.daddy.inpalette ? this.argValue : '?';
+                break;
+            default:
+                break;
         }
     }
 
-    update () {
+    update() {
         if (this.argType == 'r') {
             this.div.childNodes[0].textContent = this.argValue;
         }
@@ -95,23 +97,23 @@ export default class BlockArg {
         }
     }
 
-    getScreenPt () {
+    getScreenPt() {
         return {
             x: globalx(this.daddy.div),
             y: globaly(this.daddy.div)
         };
     }
 
-    addNumArg () {
+    addNumArg() {
         var str = this.argValue.toString();
         if (this.daddy.inpalette) {
             return this.addLabel(str, false);
         } else {
             return this.addNumArgument(str);
         }
-    
+
     }
-    addColArg () {
+    addColArg() {
         var str = this.argValue.toString();
         if (this.daddy.inpalette) {
             return this.addColLabel(str);
@@ -120,7 +122,7 @@ export default class BlockArg {
         }
     }
 
-    addTextArg () {
+    addTextArg() {
         var str = this.argValue.toString();
         if (this.daddy.inpalette) {
             return this.addLabel(str, true);
@@ -129,7 +131,7 @@ export default class BlockArg {
         }
     }
 
-    addColLabel (col) {
+    addColLabel(col) {
         var scale = this.daddy.scale;
         var dx = 16;
         var dy = 57;
@@ -138,7 +140,7 @@ export default class BlockArg {
             dy = Math.round(this.daddy.blockshape.height / window.devicePixelRatio / scale) - 10;
         }
         var img = BlockSpecs.numfieldimg;
-        var w =  36;
+        var w = 36;
         var h = 17;
         var field = newCanvas(this.daddy.div, 0, 0, w * window.devicePixelRatio, h * window.devicePixelRatio, {
             position: 'absolute',
@@ -176,7 +178,7 @@ export default class BlockArg {
         return div;
     }
 
-    addLabel (str, isText) {
+    addLabel(str, isText) {
         var scale = this.daddy.scale;
         var dx = isText ? 8 : 16;
         var dy = 57;
@@ -226,7 +228,7 @@ export default class BlockArg {
         return div;
     }
 
-    addNumArgument (str) {
+    addNumArgument(str) {
         var div = newHTML('div', 'numfield', this.daddy.div);
         if (this.daddy.blocktype == 'repeat') {
             setProps(div.style, {
@@ -247,7 +249,7 @@ export default class BlockArg {
         return div;
     }
 
-    addColArgument (col) {
+    addColArgument(col) {
         var div = newHTML('div', 'colfield', this.daddy.div);
         if (this.daddy.blocktype == 'repeat') {
             setProps(div.style, {
@@ -268,9 +270,9 @@ export default class BlockArg {
         return div;
     }
 
-    
 
-    addTextArgument (str) {
+
+    addTextArgument(str) {
         var div = newHTML('div', 'textfield', this.daddy.div);
         var ti = newHTML('h3', undefined, div);
         this.input = ti;
@@ -285,7 +287,7 @@ export default class BlockArg {
         return div;
     }
 
-    setCol (col) {
+    setCol(col) {
         if (!this.input) {
             return;
         }
@@ -296,7 +298,7 @@ export default class BlockArg {
         this.input.style.background = col;
     }
 
-    setValue (val) {
+    setValue(val) {
         if (!this.input) {
             return;
         }
@@ -307,11 +309,11 @@ export default class BlockArg {
         this.input.textContent = val;
     }
 
-    isText () {
+    isText() {
         return (this.argType != 'n');
     }
 
-    isColour () {
+    isColour() {
         return (this.argType === 'c');
     }
 
@@ -319,7 +321,7 @@ export default class BlockArg {
     // Menu drop downs
     //////////////////////////////
 
-    getIconFrom (key, list) {
+    getIconFrom(key, list) {
         for (var i = 0; i < list.length; i++) {
             if (list[i].indexOf(key) > -1) {
                 return list[i];
@@ -328,17 +330,20 @@ export default class BlockArg {
         return list[0];
     }
 
-    addImageMenu (fcn) {
+    addImageMenu(fcn) {
         this.drawChoice(this.daddy.blockicon);
         this.button = this.addPressButton();
         if (!this.daddy.inpalette) {
             var ba = this;
-            ba.button.ontouchstart = function (evt) {
-                ba.pressDropDown(evt, fcn);
-            };
-            ba.button.onpointerdown = function (evt) {
-                ba.pressDropDown(evt, fcn);
-            };
+            if (isTablet) {
+                ba.button.ontouchstart = function (evt) {
+                    ba.pressDropDown(evt, fcn);
+                };
+            } else {
+                ba.button.onpointerdown = function (evt) {
+                    ba.pressDropDown(evt, fcn);
+                };
+            }
             // Expand the parent div to incorporate the size of the button,
             // else on Android 4.2 the bottom part of the button
             // will not be clickable.
@@ -348,7 +353,7 @@ export default class BlockArg {
         return this.daddy.blockicon;
     }
 
-    drawChoice (cnv) {
+    drawChoice(cnv) {
         var ctx = cnv.getContext('2d');
         ctx.clearRect(0, 0, cnv.width, cnv.height);
         var icon = BlockSpecs.getImageFrom('assets/blockicons/' + this.icon, 'svg');
@@ -367,7 +372,7 @@ export default class BlockArg {
         return cnv;
     }
 
-    addPressButton () {
+    addPressButton() {
         var scale = this.daddy.scale;
         var dx;
         if (this.daddy.inpalette) {
@@ -396,7 +401,7 @@ export default class BlockArg {
         return field;
     }
 
-    pressDropDown (e, fcn) {
+    pressDropDown(e, fcn) {
         if (isTablet && e.touches && (e.touches.length > 1)) {
             return;
         }
@@ -412,7 +417,7 @@ export default class BlockArg {
         Menu.openDropDown(this.daddy.div, fcn);
     }
 
-    closePictureMenu (e, mu, b, c) {
+    closePictureMenu(e, mu, b, c) {
         e.preventDefault();
         var value = b.owner.arg.argValue;
         b.owner.arg.argValue = c.substring(c.indexOf('_') + 1, c.length);
@@ -451,7 +456,7 @@ export default class BlockArg {
         Menu.openMenu = undefined;
     }
 
-    menuCloseSpeeds (e, mu, b, c) {
+    menuCloseSpeeds(e, mu, b, c) {
         e.preventDefault();
         var value = b.owner.arg.argValue;
         b.owner.arg.argValue = BlockSpecs.speeds.indexOf(c);
@@ -496,7 +501,7 @@ export default class BlockArg {
     // Page Icon
     //////////////////////////
 
-    pageIcon (num) {
+    pageIcon(num) {
         var dpr = window.devicePixelRatio;
         var page = ScratchJr.stage.pages[num - 1];
         var icon = document.createElement('canvas');
@@ -552,7 +557,7 @@ export default class BlockArg {
         return icon;
     }
 
-    updateIcon () {
+    updateIcon() {
         var num = this.argValue;
         var page = ScratchJr.stage.pages[num - 1];
         page.num = num;
