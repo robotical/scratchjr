@@ -14,12 +14,12 @@ from subprocess import call
 
 def main(argv):
     print("sys.path", sys.path)
-    rsvgConvert = "/usr/bin/rsvg-convert"
+    rsvgConvert = "/opt/homebrew/Cellar/librsvg/2.58.1/bin/rsvg-convert"
     localRsvgConvert = "/usr/local/bin/rsvg-convert"
-    imConvert = "/usr/bin/convert"
+    imConvert = "/opt/homebrew/bin/magick"
     localImConvert = "/usr/local/bin/convert"
-    svgDirectory = ''
-    pngDirectory = ''
+    svgDirectory = '/Users/ntheodoropoulos/Robotical/scratchjr-p3/editions/free/src/svglibrary/'
+    pngDirectory = '/Users/ntheodoropoulos/Robotical/scratchjr-p3/editions/free/src/pnglibrary/'
 
     if not os.path.isfile(rsvgConvert):
         if os.path.isfile(localRsvgConvert):

@@ -1,6 +1,7 @@
 import BlockSpecs from './BlockSpecs';
 import {scaleMultiplier, setProps, setCanvasSize, newHTML, isTablet,
     newDiv, getDocumentHeight, drawThumbnail, frame, globalx, globaly} from '../../utils/lib';
+import Path from '../../painteditor/Path';
 
 let openMenu = undefined;
 
@@ -73,12 +74,12 @@ export default class Menu {
             handleTouchStart(evt);
         };
         cs.onmouseover = function (evt) {
-            Menu.highlightdot(evt);
+            Path.highlightDot(evt);
         };
         cs.onmouseout = function (evt) {
-            Menu.unhighlightdot(evt);
+            Path.unhighlightDot(evt);
         };
-        cs.onpointerdown = function (evt) {
+        cs.onmousedown = function (evt) {
             fcn(evt, mu, block, c);
         };
         function handleTouchStart (e) {

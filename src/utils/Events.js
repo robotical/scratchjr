@@ -120,7 +120,6 @@ export default class Events {
         updatefcn = atdrag;
         if (isTablet) { // startDrag event setting
             delta = 10 * scaleMultiplier;
-            
             window.ontouchleave = function (evt) {
                 Events.mouseUp(evt);
             };
@@ -130,11 +129,16 @@ export default class Events {
         } else {
             delta = 7;
         }
-
-        window.onpointermove = function (evt) {
+        window.ontouchmove = function (evt) {
             Events.mouseMove(evt);
         };
-        window.onpointerup = function (evt) {
+        window.ontouchend = function (evt) {
+            Events.mouseUp(evt);
+        };
+        window.onmousemove = function (evt) {
+            Events.mouseMove(evt);
+        };
+        window.onmouseup = function (evt) {
             Events.mouseUp(evt);
         };
     }
@@ -173,7 +177,7 @@ export default class Events {
         }
         timeoutEvent = undefined;
         if (!dragged) {
-            fcnstart && fcnstart(e);
+            fcnstart(e);
         }
         dragged = true;
         if (updatefcn) {
@@ -212,14 +216,10 @@ export default class Events {
     static clearEvents () {
         window.ontouchmove = undefined;
         window.ontouchend = undefined;
-        window.onpointermove = function (e) {
+        window.onmousemove = function (e) {
             e.preventDefault();
         };
-        window.onpointerup = undefined;
-        window.onpointermove = undefined;
-        window.onpointerup = undefined;
-        window.ontouchleave = undefined;
-        window.ontouchcancel = undefined;
+        window.onmouseup = undefined;
     }
 
     static performMouseUpAction (e) {

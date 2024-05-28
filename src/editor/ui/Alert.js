@@ -36,7 +36,7 @@ export default class Alert {
         });
         balloon.icon = obj;
         var ctx = balloon.getContext('2d');
-        w = 16 + getStringSize(ctx, 'bold 14px Roboto', label).width;
+        w = 16 + getStringSize(ctx, 'bold 14px Verdana', label).width;
         if (w < 36) {
             w = 36;
         }
@@ -55,7 +55,7 @@ export default class Alert {
                 'translate(' + (w / 2) + 'px, ' + (h / 2) + 'px) '
         });
         Alert.draw(balloon.getContext('2d'), 6, w, h, color);
-        writeText(ctx, 'bold 14px Robot', 'white', label, 20, 8);
+        writeText(ctx, 'bold 14px Verdana', 'white', label, 20, 8);
     }
 
     static draw (ctx, curve, w, h, color) {

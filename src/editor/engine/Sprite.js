@@ -44,7 +44,7 @@ export default class Sprite {
         this.div = document.createElement('div');
         setProps(this.div.style, {
             position: 'absolute',
-            zIndex: 11,
+            zIndex: -1,
             left: '0px',
             top: '0px'
         });
@@ -209,7 +209,11 @@ export default class Sprite {
         var c = newHTML('canvas', 'thumbcanvas', tb);
 
         // TODO: Merge these to get better thumbnail rendering on iOS
-        setCanvasSizeScaledToWindowDocumentHeight(c, 64, 64);
+        if (isAndroid) {
+            setCanvasSizeScaledToWindowDocumentHeight(c, 64, 64);
+        } else {
+            setCanvasSize(c, 64, 64);
+        }
 
         this.drawMyImage(c, c.width, c.height);
         p = newHTML('p', 'sname', tb);

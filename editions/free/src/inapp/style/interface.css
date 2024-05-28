@@ -64,110 +64,22 @@ body {
 	color: #2898CD;
 }
 
-/* Guide 1 - Interface Guide Lobby */
-/* 1. New Project */
-#interface-button-lobby-new-project {
-    left: ${css_vh(22.31)};
-    top: ${css_vh(8.25)};
-}
-
-#interface-vertical-line-lobby-new-project {
-    height: ${css_vh(2.47)};
-    top: ${css_vh(13.9)};
-    left: ${css_vh(25.27)};
-}
-
-#interface-dot-lobby-new-project {
-    top: ${css_vh(15.68)};
-    left: ${css_vh(25.03)};
-}
-
-/* 2. saved project */
-#interface-button-lobby-saved-project {
-    left: ${css_vh(50.59)};
-    top: ${css_vh(5.25)};
-}
-
-#interface-vertical-line-lobby-saved-project {
-    height: ${css_vh(2.47)};
-    top: ${css_vh(10.68)};
-    left: ${css_vh(53.55)};
-}
-
-#interface-dot-lobby-saved-project {
-    top: ${css_vh(12.68)};
-    left: ${css_vh(53.29)};
-}
-/* 3. settings */
-#interface-button-lobby-settings {
-    left: ${css_vh(106.09)};
-    left: ${css_vh(96.22)};
-    top: ${css_vh(-6.25)};
-}
-
-#interface-vertical-line-lobby-settings {
-    height: ${css_vh(2.47)};
-    top: ${css_vh(-0.82)};
-    left: ${css_vh(99.01)};
-}
-
-#interface-dot-lobby-settings {
-    top: ${css_vh(1.64)};
-    left: ${css_vh(98.68)};
-}
-
-/* 4. user-guides */
-#interface-button-lobby-user-guides {
-    left: ${css_vh(106.09)};
-    top: ${css_vh(-6.25)};
-}
-
-#interface-vertical-line-lobby-user-guides {
-    height: ${css_vh(2.14)};
-    top: ${css_vh(-0.82)};
-    left: ${css_vh(108.88)};
-}
-
-#interface-dot-lobby-user-guides {
-    top: ${css_vh(1.32)};
-    left: ${css_vh(108.55)};
-}
-
-
-/* Guide 1 - Interface Guide Editor*/
+/* Guide 1 - Interface Guide */
 
 /* 1. Save */
 
 #interface-button-save {
-	left: ${css_vh(14.59)};
+	left: ${css_vh(30.59)};
 	top: ${css_vh(-6.25)};
 }
 
 #interface-vertical-line-save {
 	height: ${css_vh(2.47)};
 	top: ${css_vh(-0.82)};
-	left: ${css_vh(17.55)};
-}
-
-#interface-dot-save {
-	top: ${css_vh(1.15)};
-	left: ${css_vh(17.22)};
-}
-
-/* 2. Marty Connect */
-
-#interface-button-marty-connect {
-	left: ${css_vh(30.59)};
-	top: ${css_vh(-6.25)};
-}
-
-#interface-vertical-line-marty-connect {
-	height: ${css_vh(2.47)};
-	top: ${css_vh(-0.82)};
 	left: ${css_vh(33.55)};
 }
 
-#interface-dot-marty-connect {
+#interface-dot-save {
 	top: ${css_vh(1.15)};
 	left: ${css_vh(33.22)};
 }
@@ -474,7 +386,7 @@ body {
 #interface-vertical-line-programming-script-1 {
     height: ${css_vh(1.64)};
     top: ${css_vh(63.32)};
-    left: ${css_vh(69.79)};
+    left: ${css_vh(65.79)};
 }
 
 #interface-vertical-line-programming-script-3 {
@@ -484,9 +396,9 @@ body {
 }
 
 #interface-horizontal-line-programming-script {
-    width: ${css_vh(23.47)};
+    width: ${css_vh(27.47)};
     top: ${css_vh(64.97)};
-    left: ${css_vh(69.79)};
+    left: ${css_vh(65.79)};
 }
 
 #interface-vertical-line-programming-script-2 {
@@ -585,40 +497,3 @@ body {
 
 
 /* End Guide 3 - Block Descriptions */
-
-
-#interface-title-container {
-    position: absolute;
-    top: -10px;
-    left: 40%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-}
-
-#interface-title {
-    font-size: ${css_vh(3.62)};
-    color: #2898CD;
-    font-weight: bold;
-    margin-left: ${css_vh(1.64)};
-    margin-right: ${css_vh(1.64)};
-}
-
-#interface-title-right-arrow {
-    margin-left: ${css_vh(1.64)};
-    margin-right: ${css_vh(1.64)};
-    font-size: ${css_vh(3.62)};
-    color: #2898CD;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#interface-title-left-arrow {
-    margin-left: ${css_vh(1.64)};
-    margin-right: ${css_vh(1.64)};
-    font-size: ${css_vh(3.62)};
-    color: #2898CD;
-    font-weight: bold;
-    cursor: pointer;
-}

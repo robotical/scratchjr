@@ -168,7 +168,11 @@ export default class WebappInterface {
   }
 
   static async marty_cmd(json) {
-    return window.mv2.send_REST(json.cmd);
+    try {
+      return window.mv2.send_REST(json.cmd);
+    } catch (e) {
+      return null;
+    }
   }
 
   static scratchjr_stopfeed() {

@@ -48,26 +48,6 @@ export default class iOS {
         delete callbacks[id];
     }
 
-    static martyCmd (json, fcn) {
-        (async () => {
-            var result = await iOS.call('marty_cmd', JSON.stringify(json));
-            if (typeof (fcn) !== 'undefined') {
-                fcn(result);
-            }
-        })();
-    }
-
-    static martyRESTCmd (json, fcn) {
-        (async () => {
-            console.log("iOS: martyREST");
-            console.log(json);
-            var result = await iOS.call('marty_cmd', JSON.stringify(json));
-            if (typeof (fcn) !== 'undefined') {
-                fcn(result);
-            }
-        })();
-    }
-
     // Database functions
     static stmt (json, fcn) {
         (async () => {

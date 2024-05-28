@@ -1927,7 +1927,7 @@ export default class Path {
 
     static getAllPoints (d) {
         var list = SVG2Canvas.getCommandList(d);
-        if (!list || list.length == 0) {
+        if (list.length == 0) {
             return [];
         }
         var res = [];

@@ -11,7 +11,6 @@ import Paint from '../../painteditor/Paint';
 import SVG2Canvas from '../../utils/SVG2Canvas';
 import {frame, gn, newHTML, scaleMultiplier, getIdFor,
     isAndroid, setProps, setCanvasSize} from '../../utils/lib';
-import goToLink from '../../utils/goToLink';
 
 let metadata = undefined;
 let mediaCount = -1;
@@ -22,7 +21,6 @@ let loadIcon = undefined;
 let error = false;
 let projectbarsize = 66;
 let mediaCountBase = 1;
-let isProjectLoaded = false;
 
 export default class Project {
     static get metadata () {
@@ -88,36 +86,6 @@ export default class Project {
         IO.getObject(ScratchJr.currentProject, Project.dataRecieved);
     }
 
-    static reloadPageIfFreezes() {
-        // if project is not loaded in 10 seconds, reload page
-        setTimeout(function () {
-            if (!isProjectLoaded) {
-                // send error message to server
-                const errorObj = {
-                    message: "Project didn't load in 10 seconds",
-                    name: "Project didn't load in 10 seconds",
-                    stack: "Project didn't load in 10 seconds",
-                  };
-                  const errorString = JSON.stringify(errorObj);
-                  console.log("Stringified error:", errorString);
-                  try {
-                    mv2.sendFeedbackToServer(errorString, true);
-                  } catch (e) {
-                    console.log("error sending feedback", e);
-                  }
-                //   const randomMdNumber = Math.floor(Math.random() * 10000) + 20;
-                //   goToLink(`editor.html?pmd5=${randomMdNumber}&mode=edit`);
-                  goToLink(`home.html`);
-            }
-        }, 10000);
-        
-        // busy wait loop for 5 seconds to allow project to load
-        var start = new Date().getTime();
-        while (new Date().getTime() - start < 1000) {
-            // do nothing
-        }
-    }
-
     static dataRecieved (str) {
         ScratchJr.log('got project metadata', ScratchJr.getTime(), 'sec');
         var data = JSON.parse(str)[0];
@@ -149,7 +117,6 @@ export default class Project {
             Paint.layout();
             Project.setProgress(100);
             Project.liftCurtain();
-            isProjectLoaded = true;
             ScratchJr.stage.currentPage.update();
             ScratchJr.changed = false;
             ScratchJr.storyStarted = false;
@@ -477,8 +444,7 @@ export default class Project {
             if (thumb.md5.indexOf('samples/') < 0) { // In case we've exited story-starter mode
                 Project.thumbnailUnique(thumb.md5, id, function (isUnique) {
                     if (isUnique) {
-                        // this removes the thubnail when renaming a project so i too it out
-                        // OS.remove(thumb.md5, OS.trace); // remove thumb;
+                        OS.remove(thumb.md5, OS.trace); // remove thumb;
                     }
                 });
             }
@@ -510,8 +476,7 @@ export default class Project {
         function saveDone () {
             saving = false;
             if (whenDone) {
-                setTimeout(whenDone, 3000)
-                // whenDone();
+                whenDone();
             }
         }
     }

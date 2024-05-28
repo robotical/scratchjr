@@ -5,7 +5,7 @@
 import ScratchJr from '../ScratchJr';
 import Events from '../../utils/Events';
 import Localization from '../../utils/Localization';
-import { gn, scaleMultiplier, newDiv, setProps, newP, newCanvas, isTablet } from '../../utils/lib';
+import {gn, scaleMultiplier, newDiv, setProps, newP, newCanvas} from '../../utils/lib';
 
 let width = 482;
 let height = 362;
@@ -13,22 +13,22 @@ let size = 24;
 let hidden = true;
 
 export default class Grid {
-    static get size() {
+    static get size () {
         return size;
     }
 
-    static get hidden() {
+    static get hidden () {
         return hidden;
     }
 
-    static init(div) {
+    static init (div) {
         var w = div.offsetWidth;
         var h = div.offsetHeight;
         var grid = newDiv(div, 0, 0, width, height, {
             position: 'absolute',
             zIndex: ScratchJr.layerTop
         });
-        // Grid.setScaleAndPosition(grid, scaleMultiplier, 47, 75, width, height);
+        Grid.setScaleAndPosition(grid, scaleMultiplier, 47, 75, width, height);
         grid.setAttribute('id', 'livegrid');
         Grid.drawLines(grid, width, height);
         Grid.createNumbering(w, h);
@@ -37,7 +37,7 @@ export default class Grid {
         Grid.createXcursor();
     }
 
-    static setScaleAndPosition(grid, scale, x, y, w, h) {
+    static setScaleAndPosition (grid, scale, x, y, w, h) {
         setProps(grid.style, {
             webkitTransform: 'translate(' + (-w / 2) + 'px, ' + (-h / 2) + 'px) ' +
                 'scale(' + scale + ') ' +
@@ -45,7 +45,7 @@ export default class Grid {
         });
     }
 
-    static drawLines(grid, w, h) {
+    static drawLines (grid, w, h) {
         var cnv = newCanvas(grid, 0, 0, w, h, {
             position: 'absolute'
         });
@@ -69,18 +69,15 @@ export default class Grid {
             ctx.stroke();
             dy += size;
         }
-        if (isTablet) {
-            cnv.ontouchstart = function (evt) {
-                ScratchJr.stage.mouseDown(evt);
-            };
-        } else {
-            cnv.onpointerdown = function (evt) {
-                ScratchJr.stage.mouseDown(evt);
-            };
-        }
+        cnv.ontouchstart = function (evt) {
+            ScratchJr.stage.mouseDown(evt);
+        };
+        cnv.onmousedown = function (evt) {
+            ScratchJr.stage.mouseDown(evt);
+        };
     }
 
-    static createNumbering(w, h) {
+    static createNumbering (w, h) {
         var row = newDiv(gn('stageframe'), 0, 0, w - 46 - 30, 24, {
             position: 'absolute',
             zIndex: ScratchJr.layerTop
@@ -120,7 +117,7 @@ export default class Grid {
         }
     }
 
-    static createYcursor() {
+    static createYcursor () {
         var num = newDiv(gn('colnum'), 0, 0, size, size, {
             position: 'absolute',
             zIndex: 20
@@ -132,7 +129,7 @@ export default class Grid {
         p.setAttribute('class', 'circlenum');
     }
 
-    static createXcursor() {
+    static createXcursor () {
         var num = newDiv(gn('rownum'), size, 0, size, size, {
             position: 'absolute',
             zIndex: 20
@@ -144,7 +141,7 @@ export default class Grid {
         p.setAttribute('class', 'circlenum');
     }
 
-    static createCursor() {
+    static createCursor () {
         var gc = newDiv(gn('livegrid'), 0, 0, size + 2, size + 2, {
             position: 'absolute',
             zIndex: ScratchJr.layerAboveBottom
@@ -153,15 +150,12 @@ export default class Grid {
         var cnv = newCanvas(gc, 0, 0, size + 2, size + 2, {
             position: 'absolute'
         });
-        if (isTablet) {
-            cnv.ontouchstart = function (evt) {
-                Grid.mouseDownOnCursor(evt);
-            };
-        } else {
-            cnv.onpointerdown = function (evt) {
-                Grid.mouseDownOnCursor(evt);
-            };
-        }
+        cnv.ontouchstart = function (evt) {
+            Grid.mouseDownOnCursor(evt);
+        };
+        cnv.onmousedown = function (evt) {
+            Grid.mouseDownOnCursor(evt);
+        };
         var ctx = cnv.getContext('2d');
         ctx.globalAlpha = 0.5;
         ctx.fillStyle = '#28A5DA';
@@ -169,14 +163,11 @@ export default class Grid {
         ctx.lineWidth = 3;
         ctx.strokeRect(3, 3, size - 6, size - 6);
         ctx.fillRect(3, 3, size - 6, size - 6);
-        if (isTablet) {
-            gc.ontouchstart = Grid.mouseDownOnCursor;
-        } else {
-            gc.onpointerdown = Grid.mouseDownOnCursor;
-        }
+        gc.ontouchstart = Grid.mouseDownOnCursor;
+        gc.onmousedown = Grid.mouseDownOnCursor;
     }
 
-    static mouseDownOnCursor(e) {
+    static mouseDownOnCursor (e) {
         e.preventDefault();
         e.stopPropagation();
         var pt = ScratchJr.stage.getStagePt(e);
@@ -193,7 +184,7 @@ export default class Grid {
         ScratchJr.stage.setEvents();
     }
 
-    static updateCursor() {
+    static updateCursor () {
         if (hidden) {
             return;
         }
@@ -226,7 +217,7 @@ export default class Grid {
         Grid.setCursorsValues(dx, dy);
     }
 
-    static setCursorsValues(dx, dy) {
+    static setCursorsValues (dx, dy) {
         var c = gn('circlenum');
         var numX = Math.round(dx / size);
         var numY = Math.round(dy / size);
@@ -261,13 +252,9 @@ export default class Grid {
         });
     }
 
-    static hide(b) {
+    static hide (b) {
         hidden = b;
         var mystate = hidden ? 'hidden' : 'visible';
-        let div = gn('page 1');
-        if (div) {
-            div.appendChild(gn('livegrid'));
-        }
         gn('livegrid').style.visibility = mystate;
         gn('rownum').style.visibility = mystate;
         gn('colnum').style.visibility = mystate;

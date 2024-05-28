@@ -67,9 +67,9 @@ div.frame {
 
 #topbar ul.topbar-nav .logo .logo-icon {
     display: block;
-    width: ${css_vh(10)};
-    height: ${css_vh(10)};
-    background: url('../assets/lobby/backButton.svg');
+    width: ${css_vh(28.65)};
+    height: ${css_vh(10.03)};
+    background: url('../assets/lobby/scratchJrlogo.svg');
     background-size: 101%;
     padding: 0;
     margin: auto auto;

@@ -11,7 +11,7 @@
     "watch": "webpack --mode=development --progress --watch",
     "dev": "webpack --mode=development --progress",
     "build": "webpack --mode=production --progress",
-    "build-dev": "webpack --mode=development --progress",
+    "build-dev": "webpack --mode=development --progress --stats-error-details",
     "start": "serve --listen tcp://0.0.0.0:3011 ./editions/free/src",
     "build:copy": "npm run build-dev && cp -f src/build/bundles/* editions/free/src",
     "build-prod:copy": "npm run build && cp -f src/build/bundles/* editions/free/src",
@@ -58,6 +58,7 @@
     "snapsvg": "^0.3.0",
     "sql.js": "^1.6.2",
     "stream-browserify": "^3.0.0",
-    "util": "^0.12.4"
+    "util": "^0.12.4",
+    "vm-browserify": "^1.1.2"
   }
 }

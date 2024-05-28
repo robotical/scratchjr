@@ -11,15 +11,12 @@ import MediaLib from '../../tablet/MediaLib';
 import Undo from '../ui/Undo';
 import Matrix from '../../geom/Matrix';
 import Vector from '../../geom/Vector';
-import {
-    newHTML, newDiv, gn,
+import {newHTML, newDiv, gn,
     setCanvasSizeScaledToWindowDocumentHeight,
-    DEGTOR, getIdFor, setProps,
-    isTablet
-} from '../../utils/lib';
+    DEGTOR, getIdFor, setProps} from '../../utils/lib';
 
 export default class Page {
-    constructor(id, data, fcn) {
+    constructor (id, data, fcn) {
         var container = ScratchJr.stage.pagesdiv;
         this.div = newHTML('div', 'stagepage', container); // newDiv(container,0,0, 480, 360, {position: 'absolute'});
         this.div.owner = this;
@@ -43,7 +40,7 @@ export default class Page {
         }
     }
 
-    loadPageData(data, fcn) {
+    loadPageData (data, fcn) {
         this.currentSpriteName = data.lastSprite;
         if (data.textstartat) {
             this.textstartat = Number(data.textstartat);
@@ -64,7 +61,7 @@ export default class Page {
                 this.div.appendChild(obj);
             }
         }
-        function checkCount() {
+        function checkCount () {
             if (!fcn) {
                 return;
             }
@@ -73,7 +70,7 @@ export default class Page {
             }
         }
 
-        function checkBkgDone() {
+        function checkBkgDone () {
             Project.substractCount();
             if (!fcn) {
                 return;
@@ -84,12 +81,12 @@ export default class Page {
         }
     }
 
-    emptyPage() {
+    emptyPage () {
         this.clearBackground();
         this.createCat();
     }
 
-    setCurrentSprite(spr) { // set the sprite and toggles UI if no sprite is available
+    setCurrentSprite (spr) { // set the sprite and toggles UI if no sprite is available
         if (ScratchJr.getSprite()) {
             ScratchJr.getSprite().unselect();
         }
@@ -106,13 +103,13 @@ export default class Page {
         }
     }
 
-    clearBackground() {
+    clearBackground () {
         while (this.bkg.childElementCount > 0) {
             this.bkg.removeChild(this.bkg.childNodes[0]);
         }
     }
 
-    setBackground(name, fcn) {
+    setBackground (name, fcn) {
         if (name == 'undefined') {
             return;
         }
@@ -133,7 +130,6 @@ export default class Page {
             MediaLib.path + name :
             (name.indexOf('/') < 0) ? OS.path + name : name;
         var md5 = (MediaLib.keys[name]) ? MediaLib.path + name : name;
-
 
         var duplicateBkg = function () {
             var fileName = IO.getFilenameWithExt(md5);
@@ -158,7 +154,7 @@ export default class Page {
         } else {
             OS.getmedia(md5, nextStep);
         }
-        function nextStep(base64) {
+        function nextStep (base64) {
             if (isPng) {
                 var data = IO.getImageDataURL(name, base64);
                 me.setBackgroundImage(data, fcn);
@@ -167,7 +163,7 @@ export default class Page {
                 doNext(atob(base64));
             }
         }
-        function doNext(str) {
+        function doNext (str) {
             duplicateBkg();
             str = str.replace(/>\s*</g, '><');
             me.setSVG(str);
@@ -178,7 +174,7 @@ export default class Page {
         }
     }
 
-    setSVG(str) {
+    setSVG (str) {
         var xmlDoc = new DOMParser().parseFromString(str, 'text/xml');
         var extxml = document.importNode(xmlDoc.documentElement, true);
         if (extxml.childNodes[0].nodeName == '#comment') {
@@ -187,7 +183,7 @@ export default class Page {
         this.svg = extxml;
     }
 
-    setBackgroundImage(url, fcn) {
+    setBackgroundImage (url, fcn) {
         var img = document.createElement('img');
         img.src = url;
         this.bkg.originalImg = img.cloneNode(false);
@@ -201,16 +197,6 @@ export default class Page {
         });
         this.bkg.img = img;
         if (!img.complete) {
-            const loadImgTimeLimit = setTimeout(() => {
-                // if the bckground img doesnt load within 
-                // 5 seconds it means that it doesnt exist
-                // so we move on with empty image
-                if (!img.complete) {
-                    this.clearBackground();
-                    fcn();
-                }
-                clearTimeout(loadImgTimeLimit);
-            }, 5000);
             img.onload = function () {
                 if (gn('backdrop').className == 'modal-backdrop fade in') {
                     Project.setProgress(Project.getMediaLoadRatio(70));
@@ -229,14 +215,14 @@ export default class Page {
         }
     }
 
-    setPageSprites(showstate) {
+    setPageSprites (showstate) {
         var list = JSON.parse(this.sprites);
         for (var i = 0; i < list.length; i++) {
             gn(list[i]).style.visibility = showstate;
         }
     }
 
-    redoChangeBkg(data) {
+    redoChangeBkg (data) {
         var me = this;
         var md5 = data[this.id].md5 ? data[this.id].md5 : 'none';
         this.setBackground(md5, me.updateThumb);
@@ -246,7 +232,7 @@ export default class Page {
     // page thumbnail
     /////////////////////////////////////
 
-    updateThumb(page) {
+    updateThumb (page) {
         var me = page ? page : ScratchJr.stage.currentPage;
         if (!me.thumbnail) {
             return;
@@ -255,7 +241,7 @@ export default class Page {
         me.setPageThumb(c);
     }
 
-    pageThumbnail(p) {
+    pageThumbnail (p) {
         var tb = newHTML('div', 'pagethumb', p);
         tb.setAttribute('id', getIdFor('pagethumb'));
         tb.owner = this.id;
@@ -267,20 +253,17 @@ export default class Page {
         var pq = newHTML('p', undefined, num);
         pq.textContent = this.num;
         newHTML('div', 'deletethumb', tb);
-        if (isTablet) {
-            tb.ontouchstart = function (evt) {
-                Thumbs.pageMouseDown(evt);
-            };
-        } else {
-            tb.onpointerdown = function (evt) {
-                Thumbs.pageMouseDown(evt);
-            };
-        }
+        tb.ontouchstart = function (evt) {
+            Thumbs.pageMouseDown(evt);
+        };
+        tb.onmousedown = function (evt) {
+            Thumbs.pageMouseDown(evt);
+        };
         this.thumbnail = tb;
         return tb;
     }
 
-    setPageThumb(c) {
+    setPageThumb (c) {
         var w0, h0;
         if (window.Settings.edition == 'PBS') {
             w0 = 136;
@@ -324,7 +307,7 @@ export default class Page {
         }
     }
 
-    stampSpriteAt(ctx, spr, scale) {
+    stampSpriteAt (ctx, spr, scale) {
         if (!spr.shown) {
             return;
         }
@@ -332,7 +315,7 @@ export default class Page {
         this.drawSpriteImage(ctx, img, spr, scale);
     }
 
-    drawSpriteImage(ctx, img, spr, scale) {
+    drawSpriteImage (ctx, img, spr, scale) {
         if (!spr.shown) {
             return;
         }
@@ -364,7 +347,7 @@ export default class Page {
         ctx.restore();
     }
 
-    getMatrixFor(spr) {
+    getMatrixFor (spr) {
         var sx = new Matrix();
         var angle = spr.angle ? -spr.angle : 0;
         if (spr.flip) {
@@ -380,7 +363,7 @@ export default class Page {
     // Saving
     /////////////////////
 
-    encodePage() {
+    encodePage () {
         var p = this.div;
         var spritelist = JSON.parse(this.sprites);
         var data = {};
@@ -393,7 +376,7 @@ export default class Page {
         data.num = this.num;
         this.currentSpriteName = !this.currentSpriteName ?
             undefined : (gn(this.currentSpriteName).owner.type == 'sprite') ?
-                this.currentSpriteName : this.getSprites()[0];
+            this.currentSpriteName : this.getSprites()[0];
         data.lastSprite = this.currentSpriteName;
         for (var j = 0; j < spritelist.length; j++) {
             data[spritelist[j]] = Project.encodeSprite(spritelist[j]);
@@ -409,7 +392,7 @@ export default class Page {
         return data;
     }
 
-    getSprites() {
+    getSprites () {
         var spritelist = JSON.parse(this.sprites);
         var res = [];
         for (var i = 0; i < spritelist.length; i++) {
@@ -425,7 +408,7 @@ export default class Page {
     // Object creation
     /////////////////////////////
 
-    createText() {
+    createText () {
         var textAttr = {
             shown: true,
             type: 'text',
@@ -452,14 +435,14 @@ export default class Page {
         new Sprite(textAttr);
     }
 
-    createCat() {
+    createCat () {
         var sprAttr = UI.mascotData(ScratchJr.stage.currentPage);
         Project.mediaCount++;
         var me = this;
         new Sprite(sprAttr, me.pageAdded);
     }
 
-    update(spr) {
+    update (spr) {
         if (spr) {
             Undo.record({
                 action: 'modify',
@@ -481,7 +464,7 @@ export default class Page {
         Thumbs.updatePages();
     }
 
-    updateBkg() {
+    updateBkg () {
         var me = ScratchJr.stage.currentPage;
         ScratchJr.storyStart('Page.prototype.updateBkg');
         Undo.record({
@@ -492,7 +475,7 @@ export default class Page {
         Thumbs.updatePages();
     }
 
-    spriteAdded(spr) {
+    spriteAdded (spr) {
         var me = spr.div.parentNode.owner;
         me.setCurrentSprite(spr);
         me.update(spr);
@@ -500,7 +483,7 @@ export default class Page {
         ScratchJr.onHold = false;
     }
 
-    pageAdded(spr) {
+    pageAdded (spr) {
         var me = spr.div.parentNode.owner;
         Project.mediaCount--;
         me.setCurrentSprite(spr);
@@ -516,7 +499,7 @@ export default class Page {
         Thumbs.updatePages();
     }
 
-    addSprite(scale, md5, cname) {
+    addSprite (scale, md5, cname) {
         ScratchJr.onHold = true;
         var sprAttr = {
             flip: false,
@@ -543,11 +526,11 @@ export default class Page {
         new Sprite(sprAttr, this.spriteAdded);
     }
 
-    createSprite(data) {
+    createSprite (data) {
         new Sprite(data, this.spriteAdded);
     }
 
-    modifySprite(md5, cid, sid) {
+    modifySprite (md5, cid, sid) {
         var sprite = gn(unescape(sid)).owner;
         if (!sprite) {
             sprite = ScratchJr.getSprite();
@@ -556,12 +539,12 @@ export default class Page {
         sprite.name = cid;
         var me = this;
         sprite.getAsset(gotImage);
-        function gotImage(dataurl) {
+        function gotImage (dataurl) {
             sprite.setCostume(dataurl, me.spriteAdded);
         }
     }
 
-    modifySpriteName(cid, sid) {
+    modifySpriteName (cid, sid) {
         var sprite = gn(unescape(sid)).owner;
         if (!sprite) {
             sprite = ScratchJr.getSprite();

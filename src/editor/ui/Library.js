@@ -7,11 +7,8 @@ import Paint from '../../painteditor/Paint';
 import Events from '../../utils/Events';
 import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
-import {
-    gn, newHTML, scaleMultiplier,
-    getDocumentWidth, getDocumentHeight, setProps, newCanvas, frame,
-    isTablet
-} from '../../utils/lib';
+import {gn, newHTML, scaleMultiplier,
+    getDocumentWidth, getDocumentHeight, setProps, newCanvas, frame} from '../../utils/lib';
 
 let selectedOne;
 let nativeJr = true;
@@ -22,7 +19,7 @@ let timeoutEvent;
 let libFrame;
 
 export default class Library {
-    static init() {
+    static init () {
         libFrame = document.getElementById('libframe');
         libFrame.style.minHeight = Math.max(getDocumentHeight(), frame.offsetHeight) + 'px';
         var topbar = newHTML('div', 'topbar', libFrame);
@@ -37,14 +34,14 @@ export default class Library {
         Library.layoutHeader();
     }
 
-    static createScrollPanel() {
+    static createScrollPanel () {
         var inner = newHTML('div', 'innerlibrary', libFrame);
         inner.setAttribute('id', 'asssetsview');
         var div = newHTML('div', 'scrollarea', inner);
         div.setAttribute('id', 'scrollarea');
     }
 
-    static open(libType) {
+    static open (libType) {
         type = libType;
         gn('assetname').textContent = '';
         nativeJr = true;
@@ -58,10 +55,10 @@ export default class Library {
         Library.addThumbnails(type);
         window.ontouchstart = undefined;
         window.ontouchend = undefined;
-        window.onpointerdown = undefined;
-        window.onpointerup = undefined;
+        window.onmousedown = undefined;
+        window.onmouseup = undefined;
         document.ontouchmove = undefined;
-        document.onpointermove = undefined;
+        document.onmousemove = undefined;
         window.onresize = undefined;
 
         gn('library_paintme').style.opacity = 1;
@@ -75,14 +72,14 @@ export default class Library {
         });
     }
 
-    static clean() {
+    static clean () {
         if (gn('scrollarea')) {
             var div = gn('scrollarea').parentNode;
             libFrame.removeChild(div);
         }
     }
 
-    static close(e) {
+    static close (e) {
         e.preventDefault();
         e.stopPropagation();
         ScratchAudio.sndFX('tap.wav');
@@ -94,7 +91,7 @@ export default class Library {
         ScratchJr.onBackButtonCallback.pop();
     }
 
-    static layoutHeader() {
+    static layoutHeader () {
         var buttons = newHTML('div', 'bkgbuttons', gn('libactions'));
         var paintme = newHTML('div', 'painticon', buttons);
         paintme.id = 'library_paintme';
@@ -105,7 +102,7 @@ export default class Library {
         cancelbut.onclick = Library.cancelPick;
     }
 
-    static cancelPick(e) {
+    static cancelPick (e) {
         ScratchJr.onHold = true;
         Library.close(e);
         setTimeout(function () {
@@ -113,7 +110,7 @@ export default class Library {
         }, 1000);
     }
 
-    static addThumbnails(type) {
+    static addThumbnails () {
         var div = gn('scrollarea');
         Library.addEmptyThumb(div, (type == 'costumes') ? (118 * scaleMultiplier) : (120 * scaleMultiplier),
             (type == 'costumes') ? (90 * scaleMultiplier) : (90 * scaleMultiplier));
@@ -128,7 +125,7 @@ export default class Library {
         IO.query(key, json, Library.displayAssets);
     }
 
-    static skipUserAssets(type) {
+    static skipUserAssets () {
         var div = gn('scrollarea');
         Library.addEmptyThumb(div, (type == 'costumes') ? (118 * scaleMultiplier) : (120 * scaleMultiplier),
             (type == 'costumes') ? (90 * scaleMultiplier) : (90 * scaleMultiplier));
@@ -136,7 +133,7 @@ export default class Library {
         Library.displayLibAssets((type == 'costumes') ? MediaLib.sprites : MediaLib.backgrounds);
     }
 
-    static getpadding(div) {
+    static getpadding (div) {
         var w = Math.min(getDocumentWidth(), libFrame.offsetWidth);
         var dw = div.childNodes[1].offsetLeft - div.childNodes[0].offsetLeft;
         var qty = Math.floor(w / dw);
@@ -147,7 +144,7 @@ export default class Library {
         return pad;
     }
 
-    static displayAssets(str) {
+    static displayAssets (str) {
         nativeJr = true;
         var div = gn('scrollarea');
         var data = JSON.parse(str);
@@ -163,7 +160,7 @@ export default class Library {
         Library.displayLibAssets(data);
     }
 
-    static displayLibAssets(data) {
+    static displayLibAssets (data) {
         var div = gn('scrollarea');
         if (data.length < 1) {
             return;
@@ -186,7 +183,7 @@ export default class Library {
         }
     }
 
-    static addAssetThumbChoose(parent, aa, w, h, fcn) {
+    static addAssetThumbChoose (parent, aa, w, h, fcn) {
         var data = Library.parseAssetData(aa);
         var tb = document.createElement('div');
         parent.appendChild(tb);
@@ -210,22 +207,19 @@ export default class Library {
         if (data.altmd5) {
             IO.getAsset(data.altmd5, drawMe);
         }
-        function drawMe(dataurl) {
+        function drawMe (dataurl) {
             img.src = dataurl;
         }
-        if (isTablet) {
-            tb.ontouchstart = function (evt) {
-                fcn(evt, tb);
-            };
-        } else {
-            tb.onpointerdown = function (evt) {
-                fcn(evt, tb);
-            };
-        }
+        tb.ontouchstart = function (evt) {
+            fcn(evt, tb);
+        };
+        tb.onmousedown = function (evt) {
+            fcn(evt, tb);
+        };
         return tb;
     }
 
-    static addLocalThumbChoose(parent, data, w, h, fcn) {
+    static addLocalThumbChoose (parent, data, w, h, fcn) {
         var tb = newHTML('div', 'assetbox off', parent);
         var md5 = data.md5;
         tb.byme = nativeJr ? 1 : 0;
@@ -247,19 +241,17 @@ export default class Library {
         // Cached downsized-thumbnails are in pnglibrary
         var pngPath = MediaLib.path.replace('svg', 'png');
         img.src = pngPath + IO.getFilename(md5) + '.png';
-        if (isTablet) {
-            tb.ontouchstart = function (evt) {
-                fcn(evt, tb);
-            };
-        } else {
-            tb.onpointerdown = function (evt) {
-                fcn(evt, tb);
-            };
-        }
+
+        tb.ontouchstart = function (evt) {
+            fcn(evt, tb);
+        };
+        tb.onmousedown = function (evt) {
+            fcn(evt, tb);
+        };
         return tb;
     }
 
-    static userAssetThumbnail(img, cnv, sizew, sizeh) {
+    static userAssetThumbnail (img, cnv, sizew, sizeh) {
         var scale = Math.min(sizew / img.width, sizeh / img.height);
         var currentCtx = cnv.getContext('2d');
         var iw = Math.floor(scale * img.width);
@@ -269,7 +261,7 @@ export default class Library {
         currentCtx.drawImage(img, 0, 0, img.width, img.height, ix, iy, iw, ih);
     }
 
-    static addEmptyThumb(parent, w, h) {
+    static addEmptyThumb (parent, w, h) {
         var tb = document.createElement('div');
         tb.setAttribute('class', 'assetbox off');
         tb.setAttribute('id', 'none');
@@ -283,18 +275,15 @@ export default class Library {
         ctx.fillStyle = ScratchJr.stagecolor;
         ctx.fillRect(0, 0, w, h);
         parent.appendChild(tb);
-        if (isTablet) {
-            tb.ontouchstart = function (evt) {
-                Library.selectAsset(evt, tb);
-            };
-        } else {
-            tb.onpointerdown = function (evt) {
-                Library.selectAsset(evt, tb);
-            };
-        }
+        tb.ontouchstart = function (evt) {
+            Library.selectAsset(evt, tb);
+        };
+        tb.onmousedown = function (evt) {
+            Library.selectAsset(evt, tb);
+        };
     }
 
-    static addHR(div) {
+    static addHR (div) {
         var hr = document.createElement('hr');
         div.appendChild(hr);
         hr.setAttribute('class', 'bigdivide');
@@ -304,7 +293,7 @@ export default class Library {
     //selection
 
 
-    static selectAsset(e, tb) {
+    static selectAsset (e, tb) {
         tb.pt = JSON.stringify(Events.getTargetPoint(e));
         if (shaking && (e.target.className == 'deleteasset')) {
             Library.removeFromAssetList();
@@ -318,17 +307,17 @@ export default class Library {
         tb.ontouchend = function (evt) {
             clickMe(evt, tb);
         };
-        window.onpointerup = function (evt) {
+        window.onmouseup = function (evt) {
             clickMe(evt, tb);
         };
-        window.onpointermove = function (evt) {
+        window.onmousemove = function (evt) {
             clearEvents(evt, tb);
         };
-        function holdit() {
+        function holdit () {
             var repeat = function () {
                 tb.ontouchend = undefined;
-                window.onpointerup = undefined;
-                window.onpointermove = undefined;
+                window.onmouseup = undefined;
+                window.onmousemove = undefined;
                 timeoutEvent = undefined;
                 Library.stopShaking();
                 shaking = tb;
@@ -337,7 +326,7 @@ export default class Library {
             };
             timeoutEvent = setTimeout(repeat, 500);
         }
-        function clearEvents(e, tb) {
+        function clearEvents (e, tb) {
             var pt = Events.getTargetPoint(e);
             var pt2 = JSON.parse(tb.pt);
             if (Library.distance(pt, pt2) < 30) {
@@ -352,29 +341,29 @@ export default class Library {
             }
             timeoutEvent = undefined;
             tb.ontouchend = undefined;
-            window.onpointermove = undefined;
-            window.onpointerup = undefined;
+            window.onmousemove = undefined;
+            window.onmouseup = undefined;
         }
-        function clickMe(e, tb) {
+        function clickMe (e, tb) {
             if (timeoutEvent) {
                 clearTimeout(timeoutEvent);
             }
             Library.selectThisAsset(e, tb);
             timeoutEvent = undefined;
             tb.ontouchend = undefined;
-            tb.onpointerup = undefined;
-            window.onpointermove = undefined;
-            window.onpointerup = undefined;
+            tb.onmouseup = undefined;
+            window.onmousemove = undefined;
+            window.onmouseup = undefined;
         }
     }
 
-    static startShaking(b) {
+    static startShaking (b) {
         b.className = b.className + ' shakeme';
         newHTML('div', 'deleteasset', b);
         shaking = b;
     }
 
-    static stopShaking() {
+    static stopShaking () {
         if (!shaking) {
             return;
         }
@@ -387,7 +376,7 @@ export default class Library {
         shaking = undefined;
     }
 
-    static removeFromAssetList() {
+    static removeFromAssetList () {
         ScratchAudio.sndFX('cut.wav');
         var b = shaking;
         b.parentNode.removeChild(b);
@@ -406,7 +395,7 @@ export default class Library {
     // md5: thumbnail md5 to determine uniqueness
     // type: "costumes" or "backgrounds"
     // callback: called with true if unique, false if duplicate exists
-    static assetThumbnailUnique(md5, type, callback) {
+    static assetThumbnailUnique (md5, type, callback) {
         var key = (type == 'costumes') ? 'usershapes' : 'userbkgs';
         var json = {};
         json.cond = 'ext = ? AND altmd5 = ?';
@@ -419,7 +408,7 @@ export default class Library {
         });
     }
 
-    static removeAssetFromLib(str) {
+    static removeAssetFromLib (str) {
         var key = (type == 'costumes') ? 'usershapes' : 'userbkgs';
         var aa = JSON.parse(str)[0];
         var data = Library.parseAssetData(aa);
@@ -438,7 +427,7 @@ export default class Library {
         IO.deleteobject(key, data.id, OS.trace);
     }
 
-    static parseAssetData(data) {
+    static parseAssetData (data) {
         var res = new Object();
         for (var key in data) {
             res[key.toLowerCase()] = data[key];
@@ -446,7 +435,7 @@ export default class Library {
         return res;
     }
 
-    static selectThisAsset(e, tb) {
+    static selectThisAsset (e, tb) {
         if (tb.id == selectedOne) {
             if (type == 'costumes') {
                 Library.closeSpriteSelection(e);
@@ -472,7 +461,6 @@ export default class Library {
             setTimeout(function () {
                 selectedOne = tb.id;
             }, 200);
-            selectedOne = tb.id;
             clickThumb = tb;
             if (tb.fieldname) {
                 gn('assetname').textContent = tb.fieldname;
@@ -480,7 +468,7 @@ export default class Library {
         }
     }
 
-    static clearAllSelections() {
+    static clearAllSelections () {
         var div = gn('scrollarea');
         for (var i = 0; i < div.childElementCount; i++) {
             if (div.childNodes[i].nodeName == 'DIV') {
@@ -489,7 +477,7 @@ export default class Library {
         }
     }
 
-    static unSelect(tb) {
+    static unSelect (tb) {
         gn('assetname').textContent = '';
         tb.className = 'assetbox off';
         selectedOne = undefined;
@@ -501,7 +489,7 @@ export default class Library {
         }
     }
 
-    static resizeScroll() {
+    static resizeScroll () {
         var w = Math.min(getDocumentWidth(), frame.offsetWidth);
         var h = Math.max(getDocumentHeight(), frame.offsetHeight);
         var dx = w - 20 * scaleMultiplier;
@@ -515,7 +503,7 @@ export default class Library {
     // Object actions
     //////////////////////////////////////////
 
-    static editResource(e) {
+    static editResource (e) {
         Library.close(e);
         if (type != 'costumes') {
             Library.editBackground(e);
@@ -524,12 +512,12 @@ export default class Library {
         }
     }
 
-    static editBackground() {
+    static editBackground () {
         var md5 = selectedOne && (selectedOne != 'none') ? selectedOne : undefined;
         Paint.open(true, md5);
     }
 
-    static editCostume() {
+    static editCostume () {
         var sname = undefined;
         var cname = selectedOne ? clickThumb.fieldname : Localization.localize('LIBRARY_CHARACTER');
         var scale = selectedOne && (selectedOne != 'none') ? clickThumb.scale : 0.5;
@@ -539,7 +527,7 @@ export default class Library {
         Paint.open(false, md5, sname, cname, scale, w, h);
     }
 
-    static closeSpriteSelection(e) {
+    static closeSpriteSelection (e) {
         e.preventDefault();
         e.stopPropagation();
         var id = selectedOne ? clickThumb.fieldname : Localization.localize('LIBRARY_CHARACTER');
@@ -558,7 +546,7 @@ export default class Library {
         Library.close(e);
     }
 
-    static closeBkgSelection(e) {
+    static closeBkgSelection (e) {
         e.preventDefault();
         e.stopPropagation();
         if (selectedOne) {
@@ -579,7 +567,7 @@ export default class Library {
     //Key Handeling Top Level prevention
     /////////////////////////////////////////
 
-    static distance(pt1, pt2) {
+    static distance (pt1, pt2) {
         var dx = pt1.x - pt2.x;
         var dy = pt1.y - pt2.y;
         return Math.round(Math.sqrt((dx * dx) + (dy * dy)));
