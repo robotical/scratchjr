@@ -665,7 +665,7 @@ export default class Prims {
         var receivers = [];
 
         var findReceivers = function (block, s) {
-            if (block.blocktype == 'ontouchp3') {
+            if (block.blocktype == 'ontouchp3' && event == 'ontouch') {
                 receivers.push([s, block]);
             }
             if (block.blocktype == 'tiltany') {

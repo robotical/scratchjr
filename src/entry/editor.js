@@ -18,6 +18,6 @@ export function editorMain() {
     }
     ScratchJr.appinit(window.Settings.scratchJrVersion);
 
-    setTimeout(mv2.updateConnectionInfo, 2000);
+    // setTimeout(mv2.updateConnectionInfo, 2000);
   }
 }
