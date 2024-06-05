@@ -18,8 +18,8 @@ def main(argv):
     localRsvgConvert = "/usr/local/bin/rsvg-convert"
     imConvert = "/opt/homebrew/bin/magick"
     localImConvert = "/usr/local/bin/convert"
-    svgDirectory = '/Users/ntheodoropoulos/Robotical/scratchjr-p3/editions/free/src/svglibrary/'
-    pngDirectory = '/Users/ntheodoropoulos/Robotical/scratchjr-p3/editions/free/src/pnglibrary/'
+    svgDirectory = '/Users/ntheodoropoulos/Robotical/scratchjr/editions/free/src/svglibrary/'
+    pngDirectory = '/Users/ntheodoropoulos/Robotical/scratchjr/editions/free/src/pnglibrary/'
 
     if not os.path.isfile(rsvgConvert):
         if os.path.isfile(localRsvgConvert):
@@ -58,7 +58,7 @@ def main(argv):
     
     nullout = open(os.devnull,'wb')
     count = 0
-
+    print("os.listdir(svgDirectory)", os.listdir(svgDirectory))
     for i in os.listdir(svgDirectory):
         tokens = i.split(".")
         fname = tokens[0]

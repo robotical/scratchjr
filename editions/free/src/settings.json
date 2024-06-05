@@ -3,7 +3,7 @@
     "scratchJrVersion": "iOSv01",
     "useStoryStarters": false,
     "shareEnabled": true,
-    "defaultSprite": "martoon1.svg",
+    "defaultSprite": "Sprites_Marty.svg",
     "spriteOutlineColor": "white",
     "stageColor": "#F5F2F7",
     "textSpriteFont": "Helvetica",

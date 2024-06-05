@@ -860,8 +860,10 @@ export default class SVGTools {
     ///////////////////////////////
 
     static getWatermark (shape, color) {
+        console.log("sprites")
         var svg = SVGTools.getCopy(shape);
         SVGTools.removeExtras(svg);
+        SVGTools.removeStylesInDefs(svg);
         SVGTools.changeShape(svg, color);
         return svg;
     }
@@ -892,6 +894,20 @@ export default class SVGTools {
             }
             valid = n < svg.childElementCount;
         }
+    }
+
+    static removeStylesInDefs(svg) {
+        var defs = svg.getElementsByTagName('defs');
+        if (defs.length == 0) {
+            return;
+        }
+        var def = defs[0];
+        var styles = def.getElementsByTagName('style');
+        if (styles.length == 0) {
+            return;
+        }
+        var style = styles[0];
+        def.removeChild(style);
     }
 
     static setObjectWaterMark (elem, color) {
