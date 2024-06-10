@@ -1,4 +1,4 @@
-import { RaftLog, RaftOKFail, RaftPublishEvent, RaftPublishEventNames, RaftSubscribeForUpdatesCBType } from "@robdobsn/raftjs";
+import { RaftLog, RaftOKFail, RaftPublishEvent, RaftPublishEventNames, RaftSubscribeForUpdatesCBType } from "../../raftjs/dist/main";
 import RICLEDPatternChecker from "./CogLEDPatternChecker";
 import { CogStateInfo } from "./CogStateInfo";
 

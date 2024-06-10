@@ -1,4 +1,4 @@
-import { RaftConnEvent, RaftConnEventNames, RaftPublishEvent } from "@robdobsn/raftjs";
+import { RaftConnEvent, RaftConnEventNames, RaftPublishEvent } from "../../raftjs/dist/main.js";
 import UIConnectP3 from "../editor/ui/ConnectP3";
 import { Observable } from "../utils/Observable";
 import ConnManager from "./ConnManager";

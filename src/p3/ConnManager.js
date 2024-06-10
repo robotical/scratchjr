@@ -1,4 +1,4 @@
-import { RaftChannelWebBLE, RaftConnector, RaftLog } from "@robdobsn/raftjs";
+import { RaftChannelWebBLE, RaftConnector, RaftLog } from "../../raftjs/dist/main.js";
 import SystemTypeCog from "./SystemTypeCog.js";
 // import SystemTypeMarty from "./SystemTypeMarty/SystemTypeMarty";
 

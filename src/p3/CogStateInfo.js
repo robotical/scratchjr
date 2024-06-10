@@ -1,5 +1,5 @@
 // import { time } from "console";
-import RaftLog from "@robdobsn/raftjs";
+import RaftLog from "../../raftjs/dist/main";
 
 // export interface IMUStateInfo {
 //     gx: number;

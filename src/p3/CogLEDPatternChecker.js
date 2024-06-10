@@ -1,6 +1,6 @@
-import { RaftConnEvent, RaftConnEventFn } from '@robdobsn/raftjs';
-import { RaftLog } from '@robdobsn/raftjs';
-import { RaftMsgHandler } from '@robdobsn/raftjs';
+import { RaftConnEvent, RaftConnEventFn } from '../../raftjs/dist/main';
+import { RaftLog } from '../../raftjs/dist/main';
+import { RaftMsgHandler } from '../../raftjs/dist/main';
 
 export default class CogLEDPatternChecker {
 
