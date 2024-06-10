@@ -13,6 +13,7 @@ export default class PublishedDataAnalyser {
 
 
     analyse(data, publisher) {
+        console.log("data", data);
         // analyse data (this should first collect some data and then analyse)
         // if the appropriate number of data has been collected, analyse
         // if the data is not enough, return

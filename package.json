@@ -12,10 +12,11 @@
     "dev": "webpack --mode=development --progress",
     "build": "webpack --mode=production --progress",
     "build-dev": "webpack --mode=development --progress --stats-error-details",
-    "start": "serve --listen tcp://0.0.0.0:3011 ./editions/free/src",
+    "start": "npx serve --listen tcp://0.0.0.0:3011 ./editions/free/src",
     "build:copy": "npm run build-dev && cp -f src/build/bundles/* editions/free/src",
     "build-prod:copy": "npm run build && cp -f src/build/bundles/* editions/free/src",
-    "build:start": "npm run build:copy && npm start"
+    "build:start": "npm run build:copy && npm start",
+    "postinstall": "cd node_modules/@robotical/roboticaljs && npm install && npm run build"
   },
   "author": "Massachusetts Institute of Technology",
   "license": "BSD-3-Clause",
@@ -60,6 +61,6 @@
     "stream-browserify": "^3.0.0",
     "util": "^0.12.4",
     "vm-browserify": "^1.1.2",
-    "@robdobsn/raftjs": "file:./raftjs"
+    "@robotical/roboticaljs": "github:@robotical/roboticaljs"
   }
 }

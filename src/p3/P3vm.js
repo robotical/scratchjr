@@ -1,7 +1,7 @@
-import { RaftConnEvent, RaftConnEventNames, RaftPublishEvent } from "../../raftjs/dist/main.js";
+import { RaftConnEvent, RaftPublishEvent, RaftLog } from "@robdobsn/raftjs";
 import UIConnectP3 from "../editor/ui/ConnectP3";
 import { Observable } from "../utils/Observable";
-import ConnManager from "./ConnManager";
+import { ConnManager } from "@robotical/roboticaljs";
 import PublishedDataAnalyser from "./PublishedDataAnalyser";
 import P3vmEvents from "./P3EventEnum.js";
 
@@ -23,6 +23,12 @@ export default class P3vm extends Observable {
     }
     constructor() {
         super();
+        RaftLog.setLogLevel(1);
+        RaftLog.error("this is an error");
+        RaftLog.warn("this is a warning");
+        RaftLog.info("this is an info");
+        RaftLog.debug("this is a debug");
+        RaftLog.verbose("this is a trace");
     }
 
     setConnected(connected) {
@@ -46,7 +52,8 @@ export default class P3vm extends Observable {
         const msgHandler = connManager.getConnector().getRaftSystemUtils().getMsgHandler();
         const onConnEvent = connManager.getConnector().onConnEvent.bind(connManager.getConnector());
         const isConnectedFn = connManager.isConnected.bind(connManager);
-        const didVerificationStart = await connManager.getConnector().getSystemType().getLEDPatternChecker().checkCorrectRICStart(
+
+        const didVerificationStart = await connManager.getConnector()._systemType.getLEDPatternChecker().checkCorrectRICStart(
             ledLcdColours,
             msgHandler,
             onConnEvent,
@@ -74,7 +81,7 @@ export default class P3vm extends Observable {
 
     async onVerifyingCallback(lights) {
         const connManager = ConnManager.getInstance();
-        const cogLEDs = connManager.getConnector().getSystemType().getLEDPatternChecker();
+        const cogLEDs = connManager.getConnector()._systemType.getLEDPatternChecker();
         // set the lights in the modal and wait for confirmation or cancel
         const modalResults = await UIConnectP3.setLights(lights);
 
@@ -122,6 +129,7 @@ export default class P3vm extends Observable {
 
     async connect() {
         const connManager = ConnManager.getInstance();
+       
 
         const listener = async (
             eventType,
@@ -129,7 +137,6 @@ export default class P3vm extends Observable {
             eventName,
             data
         ) => {
-            // console.log(`Connection event type ${eventType}; event name ${eventName} event enum ${eventEnum}`);
             if (eventType === "conn") {
                 console.log("in connection event", eventType, eventEnum, eventName, data);
                 if (eventEnum === RaftConnEvent.CONN_CONNECTED) {
@@ -148,13 +155,21 @@ export default class P3vm extends Observable {
                 if (eventEnum === RaftConnEvent.CONN_REJECTED) {
                     this.onRejectedCallback();
                 }
+            } else if (eventType === "pub") {
+                if (eventEnum === RaftPublishEvent.PUBLISH_EVENT_DATA) {
+                    const systemType = connManager.getConnector().getSystemType();
+                    if (systemType) {
+                      const newState = systemType.getStateInfo();
+                      console.log(`stateInfo: ${JSON.stringify(newState)}`);
+                    }
+                }
             }
         };
 
         // Set the listener function 
         connManager.setConnectionEventListener(listener);
 
-        const wasConnected = await connManager.connect("WebBLE", "");
+        const wasConnected = await connManager.connect("WebSocket", "192.168.86.187");
         if (!wasConnected) {
             console.error("P3vm.connect", "not connected");
             return;
