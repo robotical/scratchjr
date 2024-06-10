@@ -59,6 +59,7 @@
     "sql.js": "^1.6.2",
     "stream-browserify": "^3.0.0",
     "util": "^0.12.4",
-    "vm-browserify": "^1.1.2"
+    "vm-browserify": "^1.1.2",
+    "@robdobsn/raftjs": "file:./raftjs"
   }
 }

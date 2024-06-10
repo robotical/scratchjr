@@ -261,7 +261,7 @@ export default class BlockSpecs {
             'clearcolours': ['clearcolours', BlockSpecs.getImageFrom('assets/blockicons/clearcolours', 'svg'),
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'selectcolour': ['selectcolour', colourshapes,
-                BlockSpecs.pinkCmd, 'm', 'colourred', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+                BlockSpecs.pinkCmd, 'm', 'selectcolourred', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'say': ['say', BlockSpecs.getImageFrom('assets/blockicons/Say', 'svg'),
                 BlockSpecs.pinkCmd, 't',
                 Localization.localize('SAY_BLOCK_DEFAULT_ARGUMENT'), BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],

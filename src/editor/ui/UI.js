@@ -25,9 +25,8 @@ import {
     getIdFor, isTablet, newDiv, newTextInput, isAndroid, getDocumentWidth, getDocumentHeight,
     setProps, globalx
 } from '../../utils/lib';
-import connectToP3 from '../../p3/connect';
-import ConnectP3 from './ConnectP3';
-import P3vm, { P3vmEvents } from '../../p3/P3vm';
+import P3vm from '../../p3/P3vm';
+import P3vmEvents from '../../p3/P3EventEnum';
 
 let projectNameTextInput = null;
 let info = null;
@@ -103,20 +102,21 @@ export default class UI {
         });
         p3vm.subscribe(DISCONNECT_SUBSCRIPTION_ID, P3vmEvents.P3_DISCONNECTED, () => {
             connectText.textContent = "Connect to P3";
-            connectButton.onclick = connectToP3;
+            connectButton.onclick = p3vm.connect.bind(p3vm);
             connectDotDiv.style.backgroundColor = 'black';
         });
     }
 
     static createConnectButton(leftPanel) {
-        
+
         var connectButton = newHTML('div', 'connectButton', leftPanel);
         const connectDotDiv = newHTML('div', 'connectDot', connectButton);
         var connectText = newHTML('div', 'connectText', connectButton);
 
         connectText.textContent = "Connect to P3";
         connectButton.onclick = function () {
-            connectToP3();
+            const p3vm = P3vm.getInstance();
+            p3vm.connect();
         };
 
         UI.manageConnectButtonSubscriptions(connectText, connectButton, connectDotDiv);

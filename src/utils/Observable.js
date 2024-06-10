@@ -1,4 +1,4 @@
-import { P3vmEvents } from "../p3/P3vm";
+import P3vmEvents from "../p3/P3EventEnum";
 
 /**
  * Abstract class representing an observable in code assessment context.

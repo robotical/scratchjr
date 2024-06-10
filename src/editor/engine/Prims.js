@@ -3,11 +3,24 @@ import ScratchAudio from '../../utils/ScratchAudio';
 import Grid from '../ui/Grid';
 import Vector from '../../geom/Vector';
 import { gn } from '../../utils/lib';
+import P3Blocks from '../../p3/P3Blocks';
+import P3vmEvents from '../../p3/P3EventEnum';
 
 let tinterval = 1;
 let hopList = [-48, -30, -22, -14, -6, 0, 6, 14, 22, 30, 48];
 export const LINEAR_GRADIENT_COLOUR = "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)";
 
+const P3_EVENT_SUBSCRIPTIONS = {
+    ON_TOUCH: 'ontouch_sub',
+    TILT_BACKWARD: 'tiltbackward_sub',
+    TILT_FORWARD: 'tiltforward_sub',
+    TILT_RIGHT: 'tiltright_sub',
+    TILT_LEFT: 'tiltleft_sub',
+    ON_MOVE: 'onmove_sub',
+    ON_SHAKE: 'onshake_sub',
+    ON_ROTATE_CLOCKWISE: 'onrotateclockwise_sub',
+    ON_ROTATE_COUNTER_CLOCKWISE: 'onrotatecounterclockwise_sub',
+}
 
 export default class Prims {
     static get hopList() {
@@ -19,12 +32,12 @@ export default class Prims {
         Prims.table.done = Prims.Done;
         Prims.table.missing = Prims.Ignore;
         Prims.table.onflag = Prims.Ignore;
-        Prims.table.tiltany = Prims.Ignore;
-        Prims.table.ontouchp3 = Prims.Ignore;
-        Prims.table.onmove = Prims.Ignore;
-        Prims.table.onrotate = Prims.Ignore;
+        Prims.table.tiltany = Prims.Ignore; //
+        Prims.table.ontouchp3 = Prims.Ignore; //
+        Prims.table.onmove = Prims.Ignore; // 
+        Prims.table.onrotate = Prims.Ignore; //
         Prims.table.onmessage = Prims.Ignore;
-        Prims.table.onclick = Prims.Ignore;
+        Prims.table.onclick = Prims.Ignore;  
         Prims.table.ontouch = Prims.OnTouch;
         Prims.table.onchat = Prims.Ignore;
         Prims.table.repeat = Prims.Repeat;
@@ -53,20 +66,48 @@ export default class Prims {
         Prims.table.hop = Prims.Hop;
         Prims.table.show = Prims.Show;
         Prims.table.hide = Prims.Hide;
-        Prims.table.confusion = Prims.playConfusion;
-        Prims.table.disbelief = Prims.playDisbelief;
-        Prims.table.excitement = Prims.playExcitement;
-        Prims.table.noway = Prims.playNoway;
-        Prims.table.no = Prims.playNo;
-        Prims.table.whistle = Prims.playWhistle;
-        Prims.table.playNote = Prims.playNote;
+        Prims.table.confusion = Prims.playConfusion; //
+        Prims.table.disbelief = Prims.playDisbelief; //
+        Prims.table.excitement = Prims.playExcitement; //
+        Prims.table.noway = Prims.playNoway; //
+        Prims.table.no = Prims.playNo; //
+        Prims.table.whistle = Prims.playWhistle; //
+        Prims.table.playnote = Prims.playNote; // 
         Prims.table.grow = Prims.Grow;
         Prims.table.shrink = Prims.Shrink;
         Prims.table.same = Prims.Same;
-        Prims.table.setpattern = Prims.SetPattern;
-        Prims.table.selectcolour = Prims.SelectColour;
-        Prims.table.clearcolours = Prims.ClearColours;
+        Prims.table.setpattern = Prims.setPattern; //
+        Prims.table.selectcolour = Prims.selectColour; //
+        Prims.table.clearcolours = Prims.clearColours; //
         Prims.table.say = Prims.Say;
+
+        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_TOUCH, P3vmEvents.ON_TOUCH, () => {
+            Prims.OnP3Event("ontouch");
+        });
+        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_RIGHT, P3vmEvents.TILT_RIGHT, () => {
+            Prims.OnP3Event("tiltright");
+        });
+        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_LEFT, P3vmEvents.TILE_LEFT, () => {
+            Prims.OnP3Event("tiltleft");
+        });
+        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_BACKWARD, P3vmEvents.TILT_BACKWARD, () => {
+            Prims.OnP3Event("tiltbackward");
+        });
+        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_FORWARD, P3vmEvents.TILT_FORWARD, () => {
+            Prims.OnP3Event("tiltforward");
+        });
+        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_MOVE, P3vmEvents.ON_MOVE, () => {
+            Prims.OnP3Event("onmove");
+        });
+        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_SHAKE, P3vmEvents.ON_SHAKE, () => {
+            Prims.OnP3Event("onshake");
+        });
+        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_ROTATE_CLOCKWISE, P3vmEvents.ON_ROTATE_CLOCKWISE, () => {
+            Prims.OnP3Event("onrotateclockwise");
+        });
+        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_ROTATE_COUNTER_CLOCKWISE, P3vmEvents.ON_ROTATE_COUNTER_CLOCKWISE, () => {
+            Prims.OnP3Event("onrotatecounterclockwise");
+        });
     }
 
     static Done(strip) {
@@ -109,7 +150,8 @@ export default class Prims {
 
 
     static playConfusion(strip) {
-        console.log("playing confusion")
+        console.log("playing confusion");
+        P3Blocks.getInstance().playSound("confusion");
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
@@ -117,6 +159,7 @@ export default class Prims {
 
     static playDisbelief(strip) {
         console.log("playing disbelief")
+        P3Blocks.getInstance().playSound("disbelief");
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
@@ -126,6 +169,7 @@ export default class Prims {
 
     static playExcitement(strip) {
         console.log("playing excitement")
+        P3Blocks.getInstance().playSound("excitement");
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
@@ -133,6 +177,7 @@ export default class Prims {
 
     static playNoway(strip) {
         console.log("playing noway")
+        P3Blocks.getInstance().playSound("noway");
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
@@ -140,6 +185,7 @@ export default class Prims {
 
     static playNo(strip) {
         console.log("playing no")
+        P3Blocks.getInstance().playSound("no");
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
@@ -147,13 +193,16 @@ export default class Prims {
 
     static playWhistle(strip) {
         console.log("playing whistle")
+        P3Blocks.getInstance().playSound("whistle");
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
     }
 
     static playNote(strip) {
-        console.log("playing note")
+        const note = strip.thisblock.getArgValue();
+        console.log("playing note: ", note)
+        P3Blocks.getInstance().playNote(note);
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
@@ -181,22 +230,27 @@ export default class Prims {
         strip.waitTimer = tinterval * 4;
     }
 
-    static SetPattern(strip) {
-        console.log("setting colours")
+    static setPattern(strip) {
+        const pattern = strip.thisblock.getArgValue();
+        console.log("setting pattern: ", pattern)
+        P3Blocks.getInstance().setPattern(pattern);
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
     }
 
-    static SelectColour(strip) {
-        console.log("selecting colours")
+    static selectColour(strip) {
+        const colour = strip.thisblock.getArgValue();
+        console.log("selecting colour: ", colour)
+        P3Blocks.getInstance().selectColour(colour);
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
     }
 
-    static ClearColours(strip) {
+    static clearColours(strip) {
         console.log("clearing colours")
+        P3Blocks.getInstance().clearColours();
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
