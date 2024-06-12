@@ -225,7 +225,7 @@ class ShakeDetector {
         this.moveCallback = moveCallback;
 
         const magAcc = Math.sqrt(xAcc * xAcc + yAcc * yAcc + zAcc * zAcc);
-        if (magAcc > 0.9 && magAcc < 1.1 && !this.shakeInProgress){
+        if (magAcc > 0.9 && magAcc < 1.1){
             // device is stationary-ish, log direction of acc values to get a rough reading on where down is
             this.gravityVector = [xAcc, yAcc, zAcc];
             if (this.moveInProgress){
@@ -265,7 +265,7 @@ class ShakeDetector {
                         }
                     }
                 } else {
-                    if (this.sensorBundles.length && (timestamp - this.sensorBundles[this.sensorBundles.length-1].timestamp) > this.interval){
+                    if (!this.sensorBundles.length || (timestamp - this.sensorBundles[this.sensorBundles.length-1].timestamp) > this.interval){
                         this.shakeInProgress = false;
                         this.sensorBundles = [];
                         console.log("resetting shake detector. Move detected");
@@ -287,7 +287,7 @@ class ShakeDetector {
             this.performCheck();
         }
         */
-        
+        }
     }
 
     static performCheck() {
