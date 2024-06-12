@@ -5,6 +5,8 @@ import Vector from '../../geom/Vector';
 import { gn } from '../../utils/lib';
 import P3Blocks from '../../p3/P3Blocks';
 import P3vmEvents from '../../p3/P3EventEnum';
+import PublishedDataAnalyser from '../../p3/PublishedDataAnalyser';
+import { clock_1, counterClock_1 } from '../../p3/dummy-rotation-data';
 
 let tinterval = 1;
 let hopList = [-48, -30, -22, -14, -6, 0, 6, 14, 22, 30, 48];
@@ -37,7 +39,7 @@ export default class Prims {
         Prims.table.onmove = Prims.Ignore; // 
         Prims.table.onrotate = Prims.Ignore; //
         Prims.table.onmessage = Prims.Ignore;
-        Prims.table.onclick = Prims.Ignore;  
+        Prims.table.onclick = Prims.Ignore;
         Prims.table.ontouch = Prims.OnTouch;
         Prims.table.onchat = Prims.Ignore;
         Prims.table.repeat = Prims.Repeat;
@@ -81,31 +83,31 @@ export default class Prims {
         Prims.table.clearcolours = Prims.clearColours; //
         Prims.table.say = Prims.Say;
 
-        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_TOUCH, P3vmEvents.ON_TOUCH, () => {
+        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_TOUCH, P3vmEvents.ON_TOUCH, () => {
             Prims.OnP3Event("ontouch");
         });
-        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_RIGHT, P3vmEvents.TILT_RIGHT, () => {
+        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_RIGHT, P3vmEvents.TILT_RIGHT, () => {
             Prims.OnP3Event("tiltright");
         });
-        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_LEFT, P3vmEvents.TILE_LEFT, () => {
+        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_LEFT, P3vmEvents.TILE_LEFT, () => {
             Prims.OnP3Event("tiltleft");
         });
-        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_BACKWARD, P3vmEvents.TILT_BACKWARD, () => {
+        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_BACKWARD, P3vmEvents.TILT_BACKWARD, () => {
             Prims.OnP3Event("tiltbackward");
         });
-        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_FORWARD, P3vmEvents.TILT_FORWARD, () => {
+        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_FORWARD, P3vmEvents.TILT_FORWARD, () => {
             Prims.OnP3Event("tiltforward");
         });
-        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_MOVE, P3vmEvents.ON_MOVE, () => {
+        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_MOVE, P3vmEvents.ON_MOVE, () => {
             Prims.OnP3Event("onmove");
         });
-        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_SHAKE, P3vmEvents.ON_SHAKE, () => {
+        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_SHAKE, P3vmEvents.ON_SHAKE, () => {
             Prims.OnP3Event("onshake");
         });
-        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_ROTATE_CLOCKWISE, P3vmEvents.ON_ROTATE_CLOCKWISE, () => {
+        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_ROTATE_CLOCKWISE, P3vmEvents.ON_ROTATE_CLOCKWISE, () => {
             Prims.OnP3Event("onrotateclockwise");
         });
-        P3Blocks.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_ROTATE_COUNTER_CLOCKWISE, P3vmEvents.ON_ROTATE_COUNTER_CLOCKWISE, () => {
+        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_ROTATE_COUNTER_CLOCKWISE, P3vmEvents.ON_ROTATE_COUNTER_CLOCKWISE, () => {
             Prims.OnP3Event("onrotatecounterclockwise");
         });
     }
@@ -522,6 +524,7 @@ export default class Prims {
     }
 
     static Right(strip) {
+        // processRotationData(clock_1);
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 30;
         if (strip.count < 0) {
@@ -541,6 +544,7 @@ export default class Prims {
     }
 
     static Left(strip) {
+        // processRotationData(counterClock_1);
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 30;
         if (strip.count < 0) {
@@ -839,4 +843,20 @@ export default class Prims {
 
 window.p3Event = function (event) {
     Prims.OnP3Event(event);
+}
+
+
+let processDataLastTime = 0;
+async function processRotationData(data) {
+    const currentTime = new Date().getTime();
+    if (currentTime - processDataLastTime < 500) {
+        return;
+    }
+    processDataLastTime = currentTime;
+    for (const c of data) {
+        PublishedDataAnalyser.getInstance().analyse({ LSM6DS: { gx: c, gy: c, gz: c, ax: 0, ay: 0, az: 1 } }, window.P3vm.getInstance());
+
+        // Wait for 100ms before processing the next item
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
 }

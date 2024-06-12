@@ -22,7 +22,9 @@ let fontcolors = [fontred, fontorange, fontyellow,
 let fontsizes = [16, 24, 36, 48, 56, 72];
 
 const tiltshapes = ['tiltright', 'tiltleft', 'tiltbackward', 'tiltforward', 'tiltbackwardforward', 'tiltleftright']
-const moveshapes = ['onmove', 'onshake'];
+const moveshapes = [
+    //'onmove',
+     'onshake'];
 const rotateshapes = ['onrotateclockwise', 'onrotatecounterclockwise'];
 const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];
 const colourshapes = ['selectcolourred', 'selectcolourgreen', 'selectcolourblue', 'selectcolourpurple', 'selectcolourorange', 'selectcolouryellow'];
@@ -216,7 +218,7 @@ export default class BlockSpecs {
             'ontouchp3': ['ontouchp3', BlockSpecs.getImageFrom('assets/blockicons/ontouchp3', 'svg'),
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'onmove': ['onmove', moveshapes,
-                BlockSpecs.yellowStart, 'm', 'onmove', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
+                BlockSpecs.yellowStart, 'm', 'onshake', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'onrotate': ['onrotate', rotateshapes,
                 BlockSpecs.yellowStart, 'm', 'onrotateclockwise', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'onmessage': ['onmessage', getshapes, BlockSpecs.yellowStart, 'm', 'Orange',

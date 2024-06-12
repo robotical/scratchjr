@@ -12,4 +12,5 @@ export default class P3vmEvents {
     static ON_SHAKE = 'on-shake';
     static ON_ROTATE_CLOCKWISE = 'on-rotate-clockwise';
     static ON_ROTATE_COUNTER_CLOCKWISE = 'on-rotate-counter-clockwise';
+    static ON_BUTTON_CLICK = 'on-button-click';
 }

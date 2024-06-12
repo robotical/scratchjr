@@ -101,7 +101,7 @@ export default class UI {
             connectDotDiv.style.backgroundColor = 'green';
         });
         p3vm.subscribe(DISCONNECT_SUBSCRIPTION_ID, P3vmEvents.P3_DISCONNECTED, () => {
-            connectText.textContent = "Connect to P3";
+            connectText.textContent = "Connect to Cog";
             connectButton.onclick = p3vm.connect.bind(p3vm);
             connectDotDiv.style.backgroundColor = 'black';
         });
@@ -113,7 +113,7 @@ export default class UI {
         const connectDotDiv = newHTML('div', 'connectDot', connectButton);
         var connectText = newHTML('div', 'connectText', connectButton);
 
-        connectText.textContent = "Connect to P3";
+        connectText.textContent = "Connect to Cog";
         connectButton.onclick = function () {
             const p3vm = P3vm.getInstance();
             p3vm.connect();

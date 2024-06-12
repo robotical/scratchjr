@@ -15,6 +15,11 @@ export default class P3Blocks extends P3vm {
         super();
     }
 
+    async onButtonClickCallback() {
+        this.playSound("disbelief");
+        this.selectColour("selectcolourred");
+    }
+
     async playSound(sound) {
         switch (sound) {
             case "disbelief":
@@ -89,8 +94,10 @@ export default class P3Blocks extends P3vm {
                 await this.sendRICRESTMsg('led//pattern/RainbowSnake');
                 break;
             case "patternpinwheel":
+                await this.sendRICRESTMsg('led//pattern/Spin?numPix=12&mod=1');
                 break;
             case "patternshowoff":
+                await this.sendRICRESTMsg('led//pattern/Flash?c=112233');
                 break;
 
             default:

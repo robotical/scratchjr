@@ -23,7 +23,8 @@ export default class P3vm extends Observable {
     }
     constructor() {
         super();
-        RaftLog.setLogLevel(1);
+        console.log("setting the log level")
+        RaftLog.setLogLevel(0);
         RaftLog.error("this is an error");
         RaftLog.warn("this is a warning");
         RaftLog.info("this is an info");
@@ -96,15 +97,6 @@ export default class P3vm extends Observable {
 
     async onVerifiedCorrectCallback() {
         this.setConnected(true);
-        const connManager = ConnManager.getInstance();
-        const connector = connManager.getConnector();
-        connector.setEventListener((eventType, eventEnum, eventName, eventData) => {
-            if (eventType === "pub") {
-                if (eventEnum === RaftPublishEvent.PUBLISH_EVENT_DATA) {
-                    this.onPublishDataCallback(data);
-                }
-            }
-        });
     }
 
     async onDisconnectedCallback() {
@@ -124,12 +116,12 @@ export default class P3vm extends Observable {
 
         // decide data analyser
         const pubDataAnalyser = PublishedDataAnalyser.getInstance();
-        pubDataAnalyser.analyse(data, this.publish.bind(this));
+        pubDataAnalyser.analyse(data, this);
     }
 
     async connect() {
         const connManager = ConnManager.getInstance();
-       
+
 
         const listener = async (
             eventType,
@@ -159,8 +151,25 @@ export default class P3vm extends Observable {
                 if (eventEnum === RaftPublishEvent.PUBLISH_EVENT_DATA) {
                     const systemType = connManager.getConnector().getSystemType();
                     if (systemType) {
-                      const newState = systemType.getStateInfo();
-                      console.log(`stateInfo: ${JSON.stringify(newState)}`);
+                        if (this.isP3Connected) {
+                              const newState = systemType.getStateInfo();
+                            // const accelData = systemType.getRICStateInfo().imuData.accel;
+                            // const newState = {
+                            //     "Light": {
+                            //         "irVals": [1103, 341, randomNumber(0, 1400)],
+                            //     },
+                            //     "LSM6DS": {
+                            //         "gx": randomNumber(-1, 1),
+                            //         "gy": randomNumber(-1, 1),
+                            //         "gz": randomNumber(-1, 1),
+                            //         "ax": accelData.x,
+                            //         "ay": accelData.y,
+                            //         "az": accelData.z,
+                            //         "tsMs": 19848
+                            //     }, "_deviceLastTs": { "LSM6DS": { "lastMs": 19848, "offsetMs": 0 } }
+                            // }
+                            this.onPublishDataCallback(newState);
+                        }
                     }
                 }
             }
@@ -169,7 +178,7 @@ export default class P3vm extends Observable {
         // Set the listener function 
         connManager.setConnectionEventListener(listener);
 
-        const wasConnected = await connManager.connect("WebSocket", "192.168.86.187");
+        const wasConnected = await connManager.connect("WebBLE");
         if (!wasConnected) {
             console.error("P3vm.connect", "not connected");
             return;
@@ -190,3 +199,11 @@ export default class P3vm extends Observable {
 }
 
 window.P3vm = P3vm;
+
+
+
+
+// utils
+const randomNumber = (min, max) => {
+    return Math.random() * (max - min) + min;
+}
