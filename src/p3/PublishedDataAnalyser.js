@@ -38,28 +38,28 @@ export default class PublishedDataAnalyser {
     // Analyze the data in the buffer
     analyse(data, p3vm) {
         this.publisher = p3vm.publish.bind(p3vm);
-        this.detectTilt(data);
-        this.detectMovement(data);
-        this.detectRotation(data);
+        const isMoving = this.detectMovement(data);
+        this.detectTilt(data, isMoving);
+        this.detectRotation(data, isMoving);
         this.detectButtonClick(data);
     }
 
-    detectTilt(data) {
+    detectTilt(data, isMoving) {
         TiltDetection.detectTilt(data, {
             onTiltLeft: () => this.publisher(P3vmEvents.TILE_LEFT),
             onTiltRight: () => this.publisher(P3vmEvents.TILT_RIGHT),
             onTiltForward: () => this.publisher(P3vmEvents.TILT_FORWARD),
             onTiltBackward: () => this.publisher(P3vmEvents.TILT_BACKWARD),
-        })
+        }, isMoving)
     }
 
     detectMovement(data) {
-        ShakeDetector.detectShake(data.LSM6DS.ax, data.LSM6DS.ay, data.LSM6DS.az, Date.now(), () => this.publisher(P3vmEvents.ON_SHAKE));
+        return ShakeDetector.detectShake(data.LSM6DS.ax, data.LSM6DS.ay, data.LSM6DS.az, Date.now(), () => this.publisher(P3vmEvents.ON_SHAKE), () => this.publisher(P3vmEvents.ON_MOVE));
         // MovementDetection.detectMovement(data, () => this.publisher(P3vmEvents.ON_MOVE), () => this.publisher(P3vmEvents.ON_SHAKE));
     }
 
-    detectRotation(data) {
-        RotationDetection.detectRotation(data, () => this.publisher(P3vmEvents.ON_ROTATE_CLOCKWISE), () => this.publisher(P3vmEvents.ON_ROTATE_COUNTER_CLOCKWISE));
+    detectRotation(data, isMoving) {
+        RotationDetection.detectRotation(data, () => this.publisher(P3vmEvents.ON_ROTATE_CLOCKWISE), () => this.publisher(P3vmEvents.ON_ROTATE_COUNTER_CLOCKWISE), isMoving);
     }
 
     detectButtonClick(data) {
@@ -76,20 +76,27 @@ class TiltDetection {
         // Convert degrees to radians
         const radians = degrees * (Math.PI / 180);
 
+        // First rotate by 180 degrees about y axis
+        let rotatedX = 0-x;
+        let rotatedY = y;
+        let rotatedZ = 0-z;
+
         // Calculate cosine and sine of the rotation angle
         const cosTheta = Math.cos(radians);
         const sinTheta = Math.sin(radians);
 
         // Rotate around the z-axis
-        const rotatedX = x * cosTheta - y * sinTheta;
-        const rotatedY = x * sinTheta + y * cosTheta;
-        const rotatedZ = z;  // z remains unchanged as the rotation is around the z-axis
+        rotatedX = rotatedX * cosTheta - rotatedY * sinTheta;
+        rotatedY = rotatedX * sinTheta + rotatedY * cosTheta;
+        rotatedZ = rotatedZ;  // z remains unchanged as the rotation is around the z-axis
 
         return { x: rotatedX, y: rotatedY, z: rotatedZ };
     }
 
-    static detectTilt(data, { onTiltLeft, onTiltRight, onTiltForward, onTiltBackward }) {
-        const { x, y, z } = this.rotateAccelData(data.LSM6DS.ax, data.LSM6DS.ay, data.LSM6DS.az, window.tilt_rotate_z_deg || 120);
+    static detectTilt(data, { onTiltLeft, onTiltRight, onTiltForward, onTiltBackward }, isMoving = false) {
+        if (isMoving) return;
+
+        const { x, y, z } = this.rotateAccelData(data.LSM6DS.ax, data.LSM6DS.ay, data.LSM6DS.az, window.tilt_rotate_z_deg || -30);
         const pitch = Math.atan2(x, this.distance(y, z));
         const roll = Math.atan2(y, this.distance(x, z));
         const yaw = Math.atan2(z, this.distance(x, y));
@@ -99,21 +106,24 @@ class TiltDetection {
         // tilt forward example values: pitch: -1.00, roll: 0.00, yaw: 0.50
         // tilt backward example values: pitch: 1.00, roll: 0.00, yaw: 0.50
 
-        const forwardBackwardThreshold = window.tilt_fw_bw || 0.4; // threshold for forward and backward tilt
-        const leftRightThreshold = window.tilt_left_right || 0.2; // threshold for left and right tilt
+        const forwardBackwardThreshold = window.tilt_fw_bw || 20 * (Math.PI / 180); // threshold for forward and backward tilt
+        const leftRightThreshold = window.tilt_left_right || 20 * (Math.PI / 180); // threshold for left and right tilt
         const upDownThreshold = window.tilt_up_down || 0.5; // threshold for up and down tilt
 
         let tiltDirection = "";
-        if (pitch < -forwardBackwardThreshold && Math.abs(yaw) < upDownThreshold) {
+        if (pitch < -forwardBackwardThreshold){// && Math.abs(yaw) < upDownThreshold) {
             tiltDirection = "forward";
             onTiltForward();
-        } else if (pitch > forwardBackwardThreshold && Math.abs(yaw) < upDownThreshold) {
+        }
+        if (pitch > forwardBackwardThreshold){// && Math.abs(yaw) < upDownThreshold) {
             tiltDirection = "backward";
             onTiltBackward();
-        } else if (roll < -leftRightThreshold && Math.abs(yaw) < upDownThreshold) {
+        }
+        if (roll < -leftRightThreshold){// && Math.abs(yaw) < upDownThreshold) {
             tiltDirection = "left";
             onTiltLeft();
-        } else if (roll > leftRightThreshold && Math.abs(yaw) < upDownThreshold) {
+        }
+        if (roll > leftRightThreshold){// && Math.abs(yaw) < upDownThreshold) {
             tiltDirection = "right";
             onTiltRight();
         }
@@ -140,23 +150,23 @@ class RotationDetection {
         }
     }
 
-    static detectRotation(data, onClockRotationDetected, onCounterClockRotationDetected) {
+    static detectRotation(data, onClockRotationDetected, onCounterClockRotationDetected, isMoving = false) {
         this.bufferSize = window.rotation_buffer_size || this.bufferSize;
         this.DELAY_FOR_ROTATION = window.rotation_delay || this.DELAY_FOR_ROTATION;
         this.ROTATION_THRESHOLD = window.rotation_thr || this.ROTATION_THRESHOLD;
         const currentTime = Date.now();
-        if (currentTime - this.lastRotationDetectionTime < this.DELAY_FOR_ROTATION) {
-            // Ensure there is a minimum time between detections
-            return;
-        }
 
-        this.addToBuffer(data);
+        this.addToBuffer(data.LSM6DS.gz);
         if (this.dataBuffer.length < this.bufferSize) {
             return;  // Wait until buffer is full
         }
 
-        const metric = this.calculateMetric();
+        if (currentTime - this.lastRotationDetectionTime < this.DELAY_FOR_ROTATION || isMoving) {
+            // Ensure there is a minimum time between detections
+            return;
+        }
 
+        const metric = this.calculateMetric();
         // Check if the magnitude of the rate of change is above the threshold
         if (metric > this.ROTATION_THRESHOLD || metric < -this.ROTATION_THRESHOLD) {
             this.lastRotationDetectionTime = currentTime;
@@ -172,10 +182,15 @@ class RotationDetection {
     }
 
     static calculateMetric() {
+        //let gzArray = [];
         let sum = 0;
-        for (let i = 1; i < this.dataBuffer.length; i++) {
-            sum += this.dataBuffer[i].LSM6DS.gz;
+        for (let i = 0; i < this.dataBuffer.length; i++) {
+            //sum += this.dataBuffer[i].LSM6DS.gz;
+            sum += this.dataBuffer[i];
+            //gzArray.push(this.dataBuffer[i]);
         }
+        //console.log("gz buffer (" + gzArray.length + " elements avg. " + (sum / this.dataBuffer.length) + "): " + gzArray);
+        //console.log(this.dataBuffer);
         return sum / this.dataBuffer.length;
     }
 }
@@ -183,23 +198,85 @@ class RotationDetection {
 
 class ShakeDetector {
     static shakeCallback;
-    static thresholdAcceleration = .2; // how much acceleration is needed to consider shaking
+    static moveCallback;
+    static thresholdAccelerationMove = 0.3;
+    static thresholdAcceleration = 1; // how much acceleration is needed to consider shaking
     static thresholdShakeNumber = 1; // how many shakes are needed
-    static interval = 100; // how much time between shakes
+    static interval = 400; // how much time between shakes
     static maxShakeDuration = 1500; // Maximum duration between first and last shakes in a sequence
     static coolOffPeriod = 1500; // how much time to wait before detecting another shake
     static lastTime = 0;
     static lastTimeShakeDetected = 0;
     static sensorBundles = [];
+    static gravityVector = [0,0,0];
+    static lastVector = [0,0,0];
+    static shakeInProgress = false;
+    static moveInProgress = false;
 
-    static detectShake(xAcc, yAcc, zAcc, timestamp, shakeCallback) {
+    static detectShake(xAcc, yAcc, zAcc, timestamp, shakeCallback, moveCallback) {
         this.thresholdAcceleration = window.shake_thr_acc || this.thresholdAcceleration;
+        this.thresholdAccelerationMove = window.move_thr_acc || this.thresholdAccelerationMove;
         this.thresholdShakeNumber = window.shake_thr_num || this.thresholdShakeNumber;
         this.interval = window.shake_interval || this.interval;
         this.maxShakeDuration = window.shake_max_duration || this.maxShakeDuration;
         this.coolOffPeriod = window.shake_cool_off || this.coolOffPeriod;
 
         this.shakeCallback = shakeCallback;
+        this.moveCallback = moveCallback;
+
+        const magAcc = Math.sqrt(xAcc * xAcc + yAcc * yAcc + zAcc * zAcc);
+        if (magAcc > 0.9 && magAcc < 1.1){
+            // device is stationary-ish, log direction of acc values to get a rough reading on where down is
+            this.gravityVector = [xAcc, yAcc, zAcc];
+            if (this.moveInProgress){
+                console.log("move detected");
+                this.moveCallback();   
+            }
+            this.moveInProgress = false;
+            this.shakeInProgress = false;
+            this.sensorBundles = [];
+        } else {
+            //console.log("move in progrss. prev state: ", this.moveInProgress);
+            // potentially threshold this with thresholeAccelerationMove if we want it to be less trigger happy
+            this.moveInProgress = true;
+
+            // this assumes that the orientation of the device doesn't change during the movement, so it's not ideal
+            const x = xAcc - this.gravityVector[0];
+            const y = yAcc - this.gravityVector[1];
+            const z = zAcc - this.gravityVector[2];
+            const mag = Math.sqrt(x * x + y * y + z * z);
+
+            if (mag > this.thresholdAcceleration || this.shakeInProgress){
+                this.shakeInProgress = true;
+                const diffThresh = this.thresholdAcceleration;
+                if (mag > this.thresholdAcceleration){
+                    console.log('large magnitude movement ', x, y, z, this.gravityVector);
+                    // check if the acc vector is significantly changed from the previous large value
+                    if (!this.sensorBundles.length || Math.sqrt(Math.pow(this.lastVector[0] - x,2) + Math.pow(this.lastVector[1] - y,2) + Math.pow(this.lastVector[2] - z,2)) > this.thresholdAcceleration){
+                        this.sensorBundles.push({x, y, z, timestamp });
+                        //console.log(this.sensorBundles);
+                        this.lastVector = [x, y, z];
+                        // todo - call performCheck() to do a more detailed analysis of the readings? Might need some tweaks
+                        if (this.sensorBundles.length > this.thresholdShakeNumber){
+                            console.log("Shake detected!");
+                            this.sensorBundles = [];
+                            this.shakeInProgress = false;
+                            this.shakeCallback();
+                        }
+                    }
+                } else {
+                    if (!this.sensorBundles.length || (timestamp - this.sensorBundles[this.sensorBundles.length-1].timestamp) > this.interval){
+                        this.shakeInProgress = false;
+                        this.sensorBundles = [];
+                        console.log("resetting shake detector. Move detected");
+                        // fire move detector
+                        this.moveCallback();
+                    }
+                }
+            }
+        
+        return this.moveInProgress;
+        /*
         if (this.sensorBundles.length === 0 || timestamp - this.lastTime > this.interval) {
             // Check if we should reset based on time since last recorded shake
             if (this.sensorBundles.length > 0 && (timestamp - this.sensorBundles[0].timestamp) > this.maxShakeDuration) {
@@ -208,6 +285,8 @@ class ShakeDetector {
             this.sensorBundles.push({ xAcc, yAcc, zAcc, timestamp });
             this.lastTime = timestamp;
             this.performCheck();
+        }
+        */
         }
     }
 
