@@ -1,28 +1,5 @@
 import P3vmEvents from "./P3EventEnum";
-import { Butterworth, Filter, FilterType, RealtimeFilter } from "./butterworthiir";
 
-
-let butterworthFilter;
-
-let realtimeFilterX;
-let realtimeFilterY;
-let realtimeFilterZ;
-
-const initialiseFilters = () => {
-    /* These filters are used to filter the accelerometer data */
-    const channels = 1;
-    const samplingRate = 10;  // 10Hz -- 10 samples per second
-    const filterType = FilterType.Highpass;
-    const filterOrder = 4;
-    const cutoffFrequencies = [0.5];
-
-    butterworthFilter = new Butterworth(samplingRate, filterType, filterOrder, cutoffFrequencies);
-
-    realtimeFilterX = new RealtimeFilter(butterworthFilter, channels);
-    realtimeFilterY = new RealtimeFilter(butterworthFilter, channels);
-    realtimeFilterZ = new RealtimeFilter(butterworthFilter, channels);
-}
-initialiseFilters();
 export default class PublishedDataAnalyser {
     static _instance;
     publisher = null;
@@ -35,7 +12,6 @@ export default class PublishedDataAnalyser {
         return PublishedDataAnalyser._instance;
     }
 
-    // Analyze the data in the buffer
     analyse(data, p3vm) {
         this.publisher = p3vm.publish.bind(p3vm);
         const isMoving = this.detectMovement(data);
@@ -55,7 +31,6 @@ export default class PublishedDataAnalyser {
 
     detectMovement(data) {
         return ShakeDetector.detectShake(data.LSM6DS.ax, data.LSM6DS.ay, data.LSM6DS.az, Date.now(), () => this.publisher(P3vmEvents.ON_SHAKE), () => this.publisher(P3vmEvents.ON_MOVE));
-        // MovementDetection.detectMovement(data, () => this.publisher(P3vmEvents.ON_MOVE), () => this.publisher(P3vmEvents.ON_SHAKE));
     }
 
     detectRotation(data, isMoving) {
@@ -66,7 +41,6 @@ export default class PublishedDataAnalyser {
         ButtonClickDetection.detectButtonClick(data.Light.irVals[2], () => this.publisher(P3vmEvents.ON_BUTTON_CLICK));
     }
 }
-
 
 class TiltDetection {
     static distance(a, b) { return Math.sqrt((Math.pow(a, 2) + Math.pow(b, 2))) }
@@ -194,7 +168,6 @@ class RotationDetection {
         return sum / this.dataBuffer.length;
     }
 }
-
 
 class ShakeDetector {
     static shakeCallback;
@@ -332,72 +305,6 @@ class ShakeDetector {
         }
     }
 }
-
-
-class MovementDetection {
-    static DELAY_FOR_MOVEMENT_CONFIRMATION = 200; // after movement detected, wait for this time before confirming (in case of shake detection)
-    static DELAY_AFTER_SHAKE_OBSEVATION = 1000; // after shake detected, wait for this time before detecting movement
-    static DELAY_AFTER_MOVEMENT_IN_GENERAL = 1000; // after either movement or shake detected, wait for this time before detecting again
-    static MOVEMENT_THRESHOLD = 0.75; // movement threshold 
-    static SHAKE_THRESHOLD = 0.08; // setting shake threshold very low as a way to disable it for now
-    // static MOVEMENT_THRESHOLD = 0.3;
-    // static SHAKE_THRESHOLD = 0.4
-    static lastShakeTime = 0;
-    static lastMovementTime = 0;
-    static movementTimer = null;
-
-    static calculateMagnitude(x, y) {
-        // return Math.sqrt(x * x + y * y + z * z);
-        return Math.sqrt(x * x + y * y);
-    }
-
-    static detectMovement(data, onMovementDetected, onShakeDetected) {
-        this.DELAY_FOR_MOVEMENT_CONFIRMATION = window.movement_movement_delay_confirmation || this.DELAY_FOR_MOVEMENT_CONFIRMATION
-        this.DELAY_AFTER_SHAKE_OBSEVATION = window.movement_shake_delay || this.DELAY_AFTER_SHAKE_OBSEVATION
-        this.DELAY_AFTER_MOVEMENT_IN_GENERAL = window.movement_delay_g || this.DELAY_AFTER_MOVEMENT_IN_GENERAL
-        this.MOVEMENT_THRESHOLD = window.movement_movement_thr || this.MOVEMENT_THRESHOLD
-        this.SHAKE_THRESHOLD = window.movement_shake_thr || this.SHAKE_THRESHOLD
-        // function processAccelerometerData(dataToProcess) {
-        //     const filteredX = realtimeFilterX.step([[dataToProcess.LSM6DS.ax]]);
-        //     const filteredY = realtimeFilterY.step([[dataToProcess.LSM6DS.ay]]);
-        //     const filteredZ = realtimeFilterZ.step([[dataToProcess.LSM6DS.az]]);
-
-        //     return {
-        //         x: filteredX[0][0],
-        //         y: filteredY[0][0],
-        //         z: filteredZ[0][0]
-        //     };
-        // }
-
-        // const filteredData = processAccelerometerData(data);
-        // const magnitude = MovementDetection.calculateMagnitude(filteredData.x, filteredData.y, filteredData.z);
-        const magnitude = MovementDetection.calculateMagnitude(data.LSM6DS.ax, data.LSM6DS.ay, data.LSM6DS.az);
-        // Check if the shake threshold is exceeded
-        if (Date.now() - this.lastMovementTime > this.DELAY_AFTER_MOVEMENT_IN_GENERAL) {
-            if (magnitude < this.SHAKE_THRESHOLD) {
-                // if (magnitude > this.SHAKE_THRESHOLD) {
-                console.log("Shake detected:", magnitude);
-                onShakeDetected();
-                clearTimeout(this.movementTimer);  // Cancel the movement confirmation if shake detected
-                this.movementTimer = null;
-                this.lastShakeTime = Date.now();
-                this.lastMovementTime = Date.now();
-                // initialiseFilters();
-            } else if (magnitude < this.MOVEMENT_THRESHOLD && !this.movementTimer && Date.now() - this.lastShakeTime > this.DELAY_AFTER_SHAKE_OBSEVATION) {
-                // } else if (magnitude > this.MOVEMENT_THRESHOLD && !this.movementTimer && Date.now() - this.lastShakeTime > this.DELAY_AFTER_SHAKE_OBSEVATION) {
-                // when movement is detected, wait for a confirmation before sending the event
-                this.movementTimer = setTimeout(() => {
-                    console.log("Movement detected:", magnitude);
-                    // initialiseFilters();
-                    onMovementDetected();
-                    this.movementTimer = null;
-                    this.lastMovementTime = Date.now();
-                }, this.DELAY_FOR_MOVEMENT_CONFIRMATION);
-            }
-        }
-    }
-}
-
 
 class ButtonClickDetection {
     /* 

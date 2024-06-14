@@ -23,7 +23,7 @@ let fontsizes = [16, 24, 36, 48, 56, 72];
 
 const tiltshapes = ['tiltright', 'tiltleft', 'tiltbackward', 'tiltforward', 'tiltbackwardforward', 'tiltleftright']
 const moveshapes = [
-    //'onmove',
+    'onmove',
      'onshake'];
 const rotateshapes = ['onrotateclockwise', 'onrotatecounterclockwise'];
 const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];
@@ -218,7 +218,7 @@ export default class BlockSpecs {
             'ontouchp3': ['ontouchp3', BlockSpecs.getImageFrom('assets/blockicons/ontouchp3', 'svg'),
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'onmove': ['onmove', moveshapes,
-                BlockSpecs.yellowStart, 'm', 'onshake', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
+                BlockSpecs.yellowStart, 'm', 'onmove', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'onrotate': ['onrotate', rotateshapes,
                 BlockSpecs.yellowStart, 'm', 'onrotateclockwise', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'onmessage': ['onmessage', getshapes, BlockSpecs.yellowStart, 'm', 'Orange',
