@@ -22,6 +22,7 @@ const P3_EVENT_SUBSCRIPTIONS = {
     ON_SHAKE: 'onshake_sub',
     ON_ROTATE_CLOCKWISE: 'onrotateclockwise_sub',
     ON_ROTATE_COUNTER_CLOCKWISE: 'onrotatecounterclockwise_sub',
+    ON_BUTTON_CLICK: 'onbuttonclick_sub'
 }
 
 export default class Prims {
@@ -109,6 +110,9 @@ export default class Prims {
         });
         window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_ROTATE_COUNTER_CLOCKWISE, P3vmEvents.ON_ROTATE_COUNTER_CLOCKWISE, () => {
             Prims.OnP3Event("onrotatecounterclockwise");
+        });
+        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_BUTTON_CLICK, P3vmEvents.ON_BUTTON_CLICK, () => {
+            Prims.OnP3Event("ontouch");
         });
     }
 
@@ -333,7 +337,8 @@ export default class Prims {
 
     static Wait(strip) {
         var n = strip.thisblock.getArgValue();
-        strip.waitTimer = Math.round(n * 3.125); // thenth of a second
+        // strip.waitTimer = Math.round(n * 3.125); // thenth of a second
+        strip.waitTimer = Math.round(n * 3.125 * 10); // A second
         Prims.setTime(strip);
         strip.thisblock = strip.thisblock.next;
     }

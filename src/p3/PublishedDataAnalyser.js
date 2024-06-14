@@ -63,7 +63,7 @@ export default class PublishedDataAnalyser {
     }
 
     detectButtonClick(data) {
-        ButtonClickDetection.detectButtonClick(data.Light.irVals[2], () => window.P3Blocks.getInstance().onButtonClickCallback());
+        ButtonClickDetection.detectButtonClick(data.Light.irVals[2], () => this.publisher(P3vmEvents.ON_BUTTON_CLICK));
     }
 }
 
@@ -325,7 +325,7 @@ class ButtonClickDetection {
     When the threshold is exceeded, the button is clicked, but we want to send the event when the button is released 
     so that the event is triggered only once. 
     */
-    static clickThreshold = 1500;
+    static clickThreshold = 1300;
     static releaseThreshold = 1100;
     static lastTime = 0;
     static buttonClicked = false;

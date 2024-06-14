@@ -14,12 +14,6 @@ export default class P3Blocks extends P3vm {
     constructor() {
         super();
     }
-
-    async onButtonClickCallback() {
-        this.playSound("disbelief");
-        this.selectColour("selectcolourred");
-    }
-
     async playSound(sound) {
         switch (sound) {
             case "disbelief":
