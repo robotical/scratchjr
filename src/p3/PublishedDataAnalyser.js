@@ -311,8 +311,8 @@ class ButtonClickDetection {
     When the threshold is exceeded, the button is clicked, but we want to send the event when the button is released 
     so that the event is triggered only once. 
     */
-    static clickThreshold = 1800;
-    static releaseThreshold = 1600;
+    static clickThreshold = 1600;
+    static releaseThreshold = 1500;
     static lastTime = 0;
     static buttonClicked = false;
     static buttonClickCallback;
