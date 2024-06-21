@@ -2,6 +2,7 @@ import P3vm from "./P3vm";
 
 export default class P3Blocks extends P3vm {
     static instance = null;
+    static selectedColour = null;
 
     isP3Connected = false;
 
@@ -88,10 +89,18 @@ export default class P3Blocks extends P3vm {
                 await this.sendRICRESTMsg('led//pattern/RainbowSnake');
                 break;
             case "patternpinwheel":
-                await this.sendRICRESTMsg('led//pattern/Spin?numPix=12&mod=1');
+                if (this.selectedColour) {
+                    await this.sendRICRESTMsg(`led//pattern/Spin?numPix=12&mod=1&c=${this.selectedColour}`);
+                } else {
+                    await this.sendRICRESTMsg('led//pattern/Spin?numPix=12&mod=1');
+                }
                 break;
             case "patternshowoff":
-                await this.sendRICRESTMsg('led//pattern/Flash?c=112233');
+                if (this.selectedColour) {
+                    await this.sendRICRESTMsg(`led//pattern/Flash?c=${this.selectedColour}`);
+                } else {
+                    await this.sendRICRESTMsg('led//pattern/Flash?c=112233');
+                }
                 break;
 
             default:
@@ -102,21 +111,27 @@ export default class P3Blocks extends P3vm {
     async selectColour(colour) {
         switch (colour) {
             case "selectcolourred":
+                this.selectedColour = "ff0000";
                 await this.sendRICRESTMsg('led//color/ff0000');
                 break;
             case "selectcolourgreen":
+                this.selectedColour = "00ff00";
                 await this.sendRICRESTMsg('led//color/00ff00');
                 break;
             case "selectcolourblue":
+                this.selectedColour = "0000ff";
                 await this.sendRICRESTMsg('led//color/0000ff');
                 break;
             case "selectcolourpurple":
+                this.selectedColour = "800080";
                 await this.sendRICRESTMsg('led//color/800080');
                 break;
             case "selectcolourorange":
+                this.selectedColour = "ffa500";
                 await this.sendRICRESTMsg('led//color/ffa500');
                 break;
             case "selectcolouryellow":
+                this.selectedColour = "ffff00";
                 await this.sendRICRESTMsg('led//color/ffff00');
                 break;
 
@@ -126,6 +141,7 @@ export default class P3Blocks extends P3vm {
     }
 
     async clearColours() {
+        this.selectedColour = null;
         await this.sendRICRESTMsg('led//off');
     }
 }

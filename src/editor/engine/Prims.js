@@ -156,61 +156,68 @@ export default class Prims {
 
 
     static playConfusion(strip) {
+        const durationInSeconds = 10;
         console.log("playing confusion");
         P3Blocks.getInstance().playSound("confusion");
         Prims.setTime(strip);
-        strip.waitTimer = tinterval * 1;
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
     static playDisbelief(strip) {
+        const durationInSeconds = 6;
         console.log("playing disbelief")
         P3Blocks.getInstance().playSound("disbelief");
         Prims.setTime(strip);
-        strip.waitTimer = tinterval * 1;
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
 
 
     static playExcitement(strip) {
+        const durationInSeconds = 5;
         console.log("playing excitement")
         P3Blocks.getInstance().playSound("excitement");
         Prims.setTime(strip);
-        strip.waitTimer = tinterval * 1;
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
     static playNoway(strip) {
+        const durationInSeconds = 6;
         console.log("playing noway")
         P3Blocks.getInstance().playSound("noway");
         Prims.setTime(strip);
-        strip.waitTimer = tinterval * 1;
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
     static playNo(strip) {
+        const durationInSeconds = 3;
         console.log("playing no")
         P3Blocks.getInstance().playSound("no");
         Prims.setTime(strip);
-        strip.waitTimer = tinterval * 1;
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
     static playWhistle(strip) {
+        const durationInSeconds = 3;
         console.log("playing whistle")
         P3Blocks.getInstance().playSound("whistle");
         Prims.setTime(strip);
-        strip.waitTimer = tinterval * 1;
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
     static playNote(strip) {
+        const durationInSeconds = .5;
         const note = strip.thisblock.getArgValue();
         console.log("playing note: ", note)
         P3Blocks.getInstance().playNote(note);
         Prims.setTime(strip);
-        strip.waitTimer = tinterval * 1;
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
@@ -864,4 +871,9 @@ async function processRotationData(data) {
         // Wait for 100ms before processing the next item
         await new Promise(resolve => setTimeout(resolve, 100));
     }
+}
+
+
+const convertNumberToSeconds = (time) => {
+    return time * 3.125 * 10;
 }
