@@ -17,6 +17,9 @@ export default class Menu {
     static openDropDown (b, fcn) {
         var size = 50;
         var color = b.owner.blocktype == 'setspeed' ? 'orange' : 'yellow';
+        if (b.owner.spec[9]) {
+            color = b.owner.spec[9]; // menu colour
+        }
         var list = JSON.parse(b.owner.arg.list);
         var num = b.owner.arg.numperrow;
         var p = b.parentNode;

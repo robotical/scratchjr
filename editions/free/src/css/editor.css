@@ -816,6 +816,17 @@ form.projectname {
   border-color: #FFEA00 #FFEA00 hsl(59, 79%, 60%);
 }
 
+*.menustyle.purple {
+    background-color: #CD7CD1;
+    border: 2px solid #A75CA9;
+  border-color: #CD7CD1 #CD7CD1 hsl(300, 79%, 60%);
+}
+*.menustyle.green {
+    background-color: #48CC7E;
+    border: 2px solid #2E9E5B;
+  border-color: #48CC7E #48CC7E hsl(140, 79%, 60%);
+
+}
 *.ddchoice{
   width: 42px;
   height: 42px;
@@ -834,6 +845,22 @@ form.projectname {
   border-color: #FCDD03 #FCDD03 hsl(52, 79%, 40%);
 }
 
+*.menustyle.purple > *.ddchoice{
+    -webkit-box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
+        background-color: #CD7CD1;
+        border: 2px solid #A75CA9;
+    border-color: #CD7CD1 #CD7CD1 hsl(300, 79%, 40%);
+ }
+
+ *.menustyle.green > *.ddchoice{
+    -webkit-box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
+        background-color: #48CC7E;
+        border: 2px solid #2E9E5B;
+    border-color: #48CC7E #48CC7E hsl(140, 79%, 40%);
+ }
+
 *.menustyle.orange > *.ddchoice{
   -webkit-box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
   box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
@@ -849,6 +876,22 @@ form.projectname {
 	border: 2px solid #B59B00;
   border-color: #B59B00 #B59B00 hsl(52, 79%, 55%);
 }
+
+*.menustyle.purple > *.ddchoice:active{
+    -webkit-box-shadow: inset 0 2px 0 #8A4F8A;
+    box-shadow: inset 0 2px 0 #8A4F8A;
+        background-color: #A75CA9;
+        border: 2px solid #8A4F8A;
+    border-color: #8A4F8A #8A4F8A hsl(300, 79%, 55%);
+ }
+
+ *.menustyle.green > *.ddchoice:active{
+    -webkit-box-shadow: inset 0 2px 0 #2E9E5B;
+    box-shadow: inset 0 2px 0 #2E9E5B;
+        background-color: #2E9E5B;
+        border: 2px solid #2E9E5B;
+    border-color: #2E9E5B #2E9E5B hsl(140, 79%, 55%);
+    }
 
 *.menustyle.orange > *.ddchoice{
   -webkit-box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
