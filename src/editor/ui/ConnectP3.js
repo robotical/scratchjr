@@ -3,83 +3,87 @@ import { frame, newHTML } from '../../utils/lib';
 
 export default class ConnectP3 {
 
-    static modalDiv;
+  static modalDiv;
 
-    static promise;
-    static resolve;
-    static reject;
-
-
-    // create the connection modal
-    static async init(p3Name) {
+  static promise;
+  static resolve;
+  static reject;
 
 
-        ConnectP3.modalDiv = newHTML('div', 'connection-modal', frame);
-        ConnectP3.modalDiv.addEventListener('click', ConnectP3.onConnectionModalClick);
-        // modal-content-icon
-        // modal-content-verification
-        // modal-content-bottom-buttons
-        const modalContent = newHTML('div', 'modal-content', ConnectP3.modalDiv);
-        modalContent.addEventListener('click', ConnectP3.onContentClick);
+  // create the connection modal
+  static async init(p3Name) {
 
-        const modalContentIcon = newHTML('div', 'modal-content-icon', modalContent);
-        const icon = newHTML('img', 'icon', modalContentIcon);
-        icon.src = 'assets/logoBlue.png';
 
-        const modalContentVerification = newHTML('div', 'modal-content-verification', modalContent);
-        modalContentVerification.innerHTML = `
+    ConnectP3.modalDiv = newHTML('div', 'connection-modal', frame);
+    ConnectP3.modalDiv.addEventListener('click', ConnectP3.onConnectionModalClick);
+    // modal-content-icon
+    // modal-content-verification
+    // modal-content-bottom-buttons
+    const modalContent = newHTML('div', 'modal-content', ConnectP3.modalDiv);
+    modalContent.addEventListener('click', ConnectP3.onContentClick);
+
+    const modalContentIcon = newHTML('div', 'modal-content-icon', modalContent);
+    const icon = newHTML('img', 'icon', modalContentIcon);
+    icon.src = 'assets/logoBlue.png';
+
+    const modalContentVerification = newHTML('div', 'modal-content-verification', modalContent);
+    modalContentVerification.innerHTML = `
             <div class="p3-name">${p3Name}</div>
             <p class="io-text-light-text">Are the lights on IO displaying like this?</p>
             <div class="io-image">Please wait...</div>
         `;
 
-        newHTML('div', 'modal-content-bottom-buttons', modalContent);
-    }
+    newHTML('div', 'modal-content-bottom-buttons', modalContent);
+  }
 
-    static setLights(lights) {
-        ConnectP3.promise = new Promise((resolve, reject) => {
-            ConnectP3.resolve = resolve;
-            ConnectP3.reject = reject;
-            const svg = ConnectP3.modalDiv.querySelector('.io-image');
-            svg.innerHTML = IOLightsSVG(lights);
+  static setLights(lights) {
+    ConnectP3.promise = new Promise((resolve, reject) => {
+      ConnectP3.resolve = resolve;
+      ConnectP3.reject = reject;
+      const svg = ConnectP3.modalDiv.querySelector('.io-image');
+      svg.innerHTML = IOLightsSVG(lights);
 
-            const modalContentBottomButtons = ConnectP3.modalDiv.querySelector('.modal-content-bottom-buttons');
-            const cancelButton = newHTML('button', 'cancel-button', modalContentBottomButtons);
-            cancelButton.innerText = 'No';
-            cancelButton.addEventListener('click', ConnectP3.onCancelButtonClick);
-            const connectButton = newHTML('button', 'connect-button', modalContentBottomButtons);
-            connectButton.innerText = 'Yes';
-            connectButton.addEventListener('click', ConnectP3.onConnectButtonClick);
-        });
-        return ConnectP3.promise;
-    }
+      const modalContentBottomButtons = ConnectP3.modalDiv.querySelector('.modal-content-bottom-buttons');
+      const cancelButton = newHTML('button', 'cancel-button', modalContentBottomButtons);
+      cancelButton.innerText = 'No';
+      cancelButton.addEventListener('click', ConnectP3.onCancelButtonClick);
+      const connectButton = newHTML('button', 'connect-button', modalContentBottomButtons);
+      connectButton.innerText = 'Yes';
+      connectButton.addEventListener('click', ConnectP3.onConnectButtonClick);
+    });
+    return ConnectP3.promise;
+  }
 
-    static onCancelButtonClick() {
-        ConnectP3.resolve(false);
-        ConnectP3.destroy();
-    }
+  static onCancelButtonClick() {
+    ConnectP3.resolve(false);
+    ConnectP3.destroy();
+  }
 
-    static onConnectButtonClick() {
-        ConnectP3.resolve(true);
-        ConnectP3.destroy();
-    }
+  static onConnectButtonClick() {
+    ConnectP3.resolve(true);
+    ConnectP3.destroy();
+  }
 
-    static onContentClick(e) {
-        e.stopPropagation();
-    }
+  static onContentClick(e) {
+    e.stopPropagation();
+  }
 
-    static onConnectionModalClick() {
-        ConnectP3.resolve(false);
-        ConnectP3.destroy();
-    }
+  static onConnectionModalClick() {
+    ConnectP3.resolve(false);
+    ConnectP3.destroy();
+  }
 
-    static destroy() {
-        ConnectP3.modalDiv.remove();
-    }
+  static destroy() {
+    ConnectP3.modalDiv.remove();
+  }
 }
 
 
-const IOLightsSVG = (lights) => `
+const IOLightsSVG = (lights) => {
+  // pushing the index by 5 for all of them, to align the lights with the correct orientation of p3
+  const lightsReIndexed = lights.map((light, index) => lights[(index + 5) % 12]);
+
+  return `
 <?xml version="1.0" encoding="UTF-8"?>
 <svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 66">
   <defs>
@@ -125,55 +129,55 @@ const IOLightsSVG = (lights) => `
       <path class="cls-5" d="M34.72,36.47c-1.86-1.86-1.86-4.89,0-6.75s4.89-1.86,6.75,0,1.86,4.89,0,6.75-4.89,1.86-6.75,0ZM40.77,30.43c-1.47-1.47-3.86-1.47-5.34,0s-1.47,3.86,0,5.33,3.86,1.47,5.33,0,1.47-3.86,0-5.33Z"/>
     </g>
     <g>
-      <circle id="circle--2" class="cls-2" cx="47.83" cy="27.44" r="2.48" fill="${lights[2]}"/>
+      <circle id="circle--2" class="cls-2" cx="47.83" cy="27.44" r="2.48" fill="${lightsReIndexed[2]}"/>
       <path class="cls-1" d="M45.98,29.28c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM49.49,25.77c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
     <g>
-      <circle id="circle--3" class="cls-2" cx="28.37" cy="38.75" r="2.48" fill="${lights[8]}"/>
+      <circle id="circle--3" class="cls-2" cx="28.37" cy="38.75" r="2.48" fill="${lightsReIndexed[8]}"/>
       <path class="cls-1" d="M26.53,40.6c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM30.04,37.09c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
     <g>
-      <circle id="circle--4" class="cls-2" cx="32.44" cy="23.37" r="2.48" fill="${lights[11]}"/>
+      <circle id="circle--4" class="cls-2" cx="32.44" cy="23.37" r="2.48" fill="${lightsReIndexed[11]}"/>
       <path class="cls-1" d="M30.6,25.21c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM34.11,21.7c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
     <g>
-      <circle id="circle--5" class="cls-2" cx="43.75" cy="42.82" r="2.48" fill="${lights[5]}"/>
+      <circle id="circle--5" class="cls-2" cx="43.75" cy="42.82" r="2.48" fill="${lightsReIndexed[5]}"/>
       <path class="cls-1" d="M41.91,44.67c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM45.42,41.16c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
     <g>
-      <circle id="circle--6" class="cls-2" cx="28.46" cy="27.46" r="2.48" fill="${lights[10]}"/>
+      <circle id="circle--6" class="cls-2" cx="28.46" cy="27.46" r="2.48" fill="${lightsReIndexed[10]}"/>
       <path class="cls-1" d="M26.62,29.3c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM30.13,25.79c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
     <g>
-      <circle id="circle--7" class="cls-2" cx="26.99" cy="33.14" r="2.48" fill="${lights[9]}"/>
+      <circle id="circle--7" class="cls-2" cx="26.99" cy="33.14" r="2.48" fill="${lightsReIndexed[9]}"/>
       <path class="cls-1" d="M25.15,34.98c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM28.66,31.47c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
     <g>
-      <circle id="circle--8" class="cls-2" cx="37.89" cy="21.81" r="2.48" fill="${lights[0]}"/>
+      <circle id="circle--8" class="cls-2" cx="37.89" cy="21.81" r="2.48" fill="${lightsReIndexed[0]}"/>
       <path class="cls-1" d="M36.05,23.66c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM39.56,20.15c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
     <g>
-      <circle id="circle--13" class="cls-2" cx="43.85" cy="23.34" r="2.48" fill="${lights[1]}"/>
+      <circle id="circle--13" class="cls-2" cx="43.85" cy="23.34" r="2.48" fill="${lightsReIndexed[1]}"/>
       <path class="cls-1" d="M42,25.18c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM45.51,21.67c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
     <g>
-      <circle id="circle--9" class="cls-2" cx="47.77" cy="38.8" r="2.48" fill="${lights[4]}"/>
+      <circle id="circle--9" class="cls-2" cx="47.77" cy="38.8" r="2.48" fill="${lightsReIndexed[4]}"/>
       <path class="cls-1" d="M45.93,40.64c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM49.44,37.13c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
     <g>
-      <circle id="circle--10" class="cls-2" cx="49.23" cy="33.21" r="2.48" fill="${lights[3]}"/>
+      <circle id="circle--10" class="cls-2" cx="49.23" cy="33.21" r="2.48" fill="${lightsReIndexed[3]}"/>
       <path class="cls-1" d="M47.39,35.05c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM50.9,31.54c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
     <g>
-      <circle id="circle--11" class="cls-2" cx="32.51" cy="42.93" r="2.48" fill="${lights[7]}"/>
+      <circle id="circle--11" class="cls-2" cx="32.51" cy="42.93" r="2.48" fill="${lightsReIndexed[7]}"/>
       <path class="cls-1" d="M30.66,44.77c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM34.17,41.26c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
     <g>
-      <circle id="circle--12" class="cls-2" cx="38.27" cy="44.32" r="2.48" fill="${lights[6]}"/>
+      <circle id="circle--12" class="cls-2" cx="38.27" cy="44.32" r="2.48" fill="${lightsReIndexed[6]}"/>
       <path class="cls-1" d="M36.43,46.17c-1.02-1.02-1.02-2.67,0-3.69s2.67-1.02,3.69,0,1.02,2.67,0,3.69-2.67,1.02-3.69,0ZM39.93,42.66c-.92-.92-2.41-.92-3.33,0s-.92,2.41,0,3.33,2.41.92,3.33,0,.92-2.41,0-3.33Z"/>
     </g>
   </g>
   <polygon class="cls-6" points="29.44 18.75 46.56 18.75 38 13.81 29.44 18.75"/>
   <path class="cls-3" d="M47.53,19h-19.07c-.14,0-.25-.11-.25-.25s.11-.25.25-.25h19.07c.14,0,.25.11.25.25s-.11.25-.25.25Z"/>
 </svg>
-`
+`};
