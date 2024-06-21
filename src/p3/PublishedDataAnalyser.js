@@ -70,7 +70,7 @@ class TiltDetection {
     static detectTilt(data, { onTiltLeft, onTiltRight, onTiltForward, onTiltBackward }, isMoving = false) {
         if (isMoving) return;
 
-        const { x, y, z } = this.rotateAccelData(data.LSM6DS.ax, data.LSM6DS.ay, data.LSM6DS.az, window.tilt_rotate_z_deg || -30);
+        const { x, y, z } = this.rotateAccelData(data.LSM6DS.ax, data.LSM6DS.ay, data.LSM6DS.az, window.tilt_rotate_z_deg || 30);
         const pitch = Math.atan2(x, this.distance(y, z));
         const roll = Math.atan2(y, this.distance(x, z));
         const yaw = Math.atan2(z, this.distance(x, y));
@@ -311,8 +311,8 @@ class ButtonClickDetection {
     When the threshold is exceeded, the button is clicked, but we want to send the event when the button is released 
     so that the event is triggered only once. 
     */
-    static clickThreshold = 1300;
-    static releaseThreshold = 1100;
+    static clickThreshold = 1800;
+    static releaseThreshold = 1600;
     static lastTime = 0;
     static buttonClicked = false;
     static buttonClickCallback;
