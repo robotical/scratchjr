@@ -14,10 +14,10 @@ export default class PublishedDataAnalyser {
 
     analyse(data, p3vm) {
         this.publisher = p3vm.publish.bind(p3vm);
-        this.detectMovement(data);
-        this.detectTilt(data);
-        this.detectRotation(data);
         this.detectButtonClick(data);
+        this.detectRotation(data);
+        this.detectTilt(data);
+        this.detectMovement(data);
     }
 
     detectTilt(data) {
