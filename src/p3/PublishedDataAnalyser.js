@@ -87,7 +87,7 @@ class ShakeDetector {
 }
 
 class ButtonClickDetection {
-    /* Determing if Cog's button is clicked using the IR sensor value irVals[2] */
+    /* Determing if Cog's button is clicked using the IR sensor value */
 
     static detectButtonClick(buttonValue, onButtonClicked) {
     }
