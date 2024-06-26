@@ -74,15 +74,10 @@ class TiltDetection {
         const pitch = Math.atan2(x, this.distance(y, z));
         const roll = Math.atan2(y, this.distance(x, z));
         const yaw = Math.atan2(z, this.distance(x, y));
-        // no tilt example values: pitch: 0.00, roll: 0.00, yaw: 1.50
-        // tilt left example values: pitch: 0.00, roll: -1.00, yaw: 0.50
-        // tilt right example values: pitch: 0.00, roll: 1.00, yaw: 0.50
-        // tilt forward example values: pitch: -1.00, roll: 0.00, yaw: 0.50
-        // tilt backward example values: pitch: 1.00, roll: 0.00, yaw: 0.50
 
         const forwardBackwardThreshold = window.tilt_fw_bw || 20 * (Math.PI / 180); // threshold for forward and backward tilt
         const leftRightThreshold = window.tilt_left_right || 20 * (Math.PI / 180); // threshold for left and right tilt
-        const upDownThreshold = window.tilt_up_down || 0.5; // threshold for up and down tilt
+        // const upDownThreshold = window.tilt_up_down || 0.5; // threshold for up and down tilt
 
         let tiltDirection = "";
         if (pitch < -forwardBackwardThreshold){// && Math.abs(yaw) < upDownThreshold) {
@@ -221,7 +216,6 @@ class ShakeDetector {
 
             if (mag > this.thresholdAcceleration || this.shakeInProgress){
                 this.shakeInProgress = true;
-                const diffThresh = this.thresholdAcceleration;
                 if (mag > this.thresholdAcceleration){
                     console.log('large magnitude movement ', x, y, z, this.gravityVector);
                     // check if the acc vector is significantly changed from the previous large value
@@ -249,17 +243,6 @@ class ShakeDetector {
             }
         
         return this.moveInProgress;
-        /*
-        if (this.sensorBundles.length === 0 || timestamp - this.lastTime > this.interval) {
-            // Check if we should reset based on time since last recorded shake
-            if (this.sensorBundles.length > 0 && (timestamp - this.sensorBundles[0].timestamp) > this.maxShakeDuration) {
-                this.sensorBundles = []; // Reset the sensor data if the shakes are too far apart
-            }
-            this.sensorBundles.push({ xAcc, yAcc, zAcc, timestamp });
-            this.lastTime = timestamp;
-            this.performCheck();
-        }
-        */
         }
     }
 
@@ -276,10 +259,7 @@ class ShakeDetector {
             this.updateAxis(2, bundle.zAcc, matrix, -1);
         }
 
-        // check if any of the negatives and the positives are greater than the threshold
-        const negativesTotal = matrix.reduce((acc, axis) => acc + axis[1], 0);
-        const positivesTotal = matrix.reduce((acc, axis) => acc + axis[0], 0);
-
+        // check if the number of shakes is above the threshold
         if (matrix.some(axis => axis[0] >= this.thresholdShakeNumber && axis[1] >= this.thresholdShakeNumber)) {
             // if (positivesTotal >= this.thresholdShakeNumber && negativesTotal >= this.thresholdShakeNumber) {
 
@@ -295,6 +275,7 @@ class ShakeDetector {
     }
 
     static updateAxis(index, acceleration, matrix, adjustment = 0) {
+        /* Update the matrix with the number of shakes in the positive and negative direction */
         const accelerationAdjusted = acceleration + adjustment;
         if (accelerationAdjusted > this.thresholdAcceleration) {
             matrix[index][0]++;
