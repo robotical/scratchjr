@@ -57,7 +57,8 @@ export default class SVG2Canvas {
         svgerror = false;
         setCanvasSize(spr.outline, spr.originalImg.width, spr.originalImg.height);
         var ctx = spr.outline.getContext('2d');
-        SVG2Canvas.drawImage(spr.svg, ctx);
+        // SVG2Canvas.drawImage(spr.svg, ctx);
+        ctx.drawImage(spr.img, 0, 0); // using the srpite image instead of the svg because our svg's are not read correctly
     }
 
     static drawLayers(svg, ctx, fcn) {
@@ -392,6 +393,7 @@ export default class SVG2Canvas {
         var d = spr.getAttribute('d');
         var commands = SVG2Canvas.getCommandList(d);
         if (!commands) {
+            console.warn(`No commands found for ${spr.id}`);
             return;
         }
         acurve = false;
@@ -515,6 +517,11 @@ export default class SVG2Canvas {
     }
 
     static splitNumericArgs(str) {
+        try {
+           return str.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/g).map(Number);
+        } catch (e) {
+            return [];
+        }
         var res = [];
         if (!str) {
             return res;
@@ -768,7 +775,8 @@ export default class SVG2Canvas {
         }
         var absolute = SVG2Canvas.getAbsoluteCommands(commands);
         var path = SVG2Canvas.arrayToString(absolute);
-        spr.setAttribute('d', path);
+        // NT: note. This is a workaround that doesn't really solve the 'edit svg' problem, but at least makes the editing look better
+        spr.setAttribute('d', d);
     }
 
     static getSVGcommands(shape) {
@@ -801,7 +809,51 @@ export default class SVG2Canvas {
             str += cmd[0];
             if (cmd.length > 1) {
                 cmd.shift();
-                str += cmd.toString();
+                // str += cmd.join('');
+                cmd.forEach(function (item, idx) {
+                    let hasCommaBefore = false;
+                    // if this is the last number in the array, add a comma first
+                    if (
+                        item >= 1 && // if this is a positive number bigger or equal to 1
+                        idx !== 0 &&// and it's not the first number in the array
+                        !hasCommaBefore // and there is no comma before
+                    ) {
+                        str += ','
+                        hasCommaBefore = true
+                    }
+                    if (
+                        item === 0 && // if this is a positive number bigger or equal to 1
+                        idx !== 0 && // and it's not the first number in the array
+                        !hasCommaBefore
+                    ) {
+                        str += ','
+                        hasCommaBefore = true
+                    }
+                    // if the previous number is 0, and the current number is positive, add a comma first
+                    if (
+                        idx !== 0 && // if it's not the first number in the array
+                        cmd[idx - 1] === 0 &&  // and the previous number is 0
+                        item >= 0 && // and the current number is positive
+                        !hasCommaBefore
+                    ) {
+                        str += ','
+                        hasCommaBefore = true
+                    }
+                    // if the previous number is a non-zero integer add a comma first
+                    if (
+                        idx !== 0 && // if it's not the first number in the array
+                        Number.isInteger(cmd[idx - 1]) && // and the previous number is an integer
+                        cmd[idx - 1] !== 0 && // and the previous number is not 0
+                        !hasCommaBefore
+                    ) {
+                        str += ','
+                        hasCommaBefore = true
+                    }
+                    // if the number is a decimal, convert to string and remove leading 0 (take into account negative numbers, that is, it should still be negative after removing the leading 0)
+                    if (item) {
+                        str += item.toString().replace(/(?<=^|[-\s])0+(?=\.\d)/, '');
+                    }
+                });
             }
         }
         return str;
@@ -824,7 +876,7 @@ export default class SVG2Canvas {
         } catch (e) {
             console.log("key", key);
             console.log("cmd", cmd);
-            console.log("dispatchAbsouluteCmd",dispatchAbsouluteCmd)
+            console.log("dispatchAbsouluteCmd", dispatchAbsouluteCmd)
         }
     }
 
@@ -983,15 +1035,23 @@ export default class SVG2Canvas {
     }
 
     static setRelativeQCurve(cmd) {
-        lastcxy = Vector.sum(endp, {
+        // Calculate the control point
+        const lastcxy = Vector.sum(endp, {
             x: cmd[1],
             y: cmd[2]
         });
-        endp = Vector.sum(endp, {
+    
+        // Calculate the new endpoint
+        const newEndp = Vector.sum(endp, {
             x: cmd[3],
             y: cmd[4]
         });
-        return ['Q', lastcxy.x, lastcxy.y, null, null];
+    
+        // Update the global endpoint variable
+        endp = newEndp;
+    
+        // Return the correct Q command with control point and endpoint
+        return ['Q', lastcxy.x, lastcxy.y, newEndp.x, newEndp.y];
     }
 
     static setAbsoluteQSmooth(cmd) {
