@@ -47,6 +47,7 @@ export default class P3vm extends Observable {
         // get name of the device
         console.log("setting the ui with the name")
         const sysInfo = await connManager.getConnector().getRaftSystemUtils().getSystemInfo();
+        window.sysInfo = sysInfo;
         UIConnectP3.init(sysInfo.Friendly || "Cog");
 
         // send command to start the verification process (set the lights)
