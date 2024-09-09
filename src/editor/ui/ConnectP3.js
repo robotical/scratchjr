@@ -81,7 +81,8 @@ export default class ConnectP3 {
 
 const IOLightsSVG = (lights) => {
   // pushing the index by 5 for all of them, to align the lights with the correct orientation of p3
-  const lightsReIndexed = lights.map((light, index) => lights[(index + 5) % 12]);
+  const correctedIdxFactor = window.correctedIdxFactor || 5;
+  const lightsReIndexed = lights.map((light, index) => lights[(index + correctedIdxFactor) % 12]);
 
   return `
 <?xml version="1.0" encoding="UTF-8"?>
