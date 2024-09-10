@@ -56,13 +56,15 @@ class TiltDetection {
         let rotatedY = y;
         let rotatedZ = 0-z;
 
+        const initialRotatedX = rotatedX; 
+
         // Calculate cosine and sine of the rotation angle
         const cosTheta = Math.cos(radians);
         const sinTheta = Math.sin(radians);
 
         // Rotate around the z-axis
-        rotatedX = rotatedX * cosTheta - rotatedY * sinTheta;
-        rotatedY = rotatedX * sinTheta + rotatedY * cosTheta;
+        rotatedX = initialRotatedX * cosTheta - rotatedY * sinTheta;
+        rotatedY = initialRotatedX * sinTheta + rotatedY * cosTheta;
         rotatedZ = rotatedZ;  // z remains unchanged as the rotation is around the z-axis
 
         return { x: rotatedX, y: rotatedY, z: rotatedZ };
