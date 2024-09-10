@@ -74,7 +74,7 @@ class TiltDetection {
         if (isMoving) return;
 
         const tiltCorrectionForOlderCog = 30;
-        const tiltCorrectionForNewerCog = 300;
+        const tiltCorrectionForNewerCog = 90;
         const correctionCutOffVersion = "1.2.0";
         let tiltCorrection = tiltCorrectionForOlderCog;
 
@@ -304,15 +304,25 @@ class ButtonClickDetection {
     When the threshold is exceeded, the button is clicked, but we want to send the event when the button is released 
     so that the event is triggered only once. 
     */
-    static clickThreshold = 1600;
-    static releaseThreshold = 1500;
-    static lastTime = 0;
-    static buttonClicked = false;
-    static buttonClickCallback;
-
-    static detectButtonClick(buttonValue, buttonClickCallback) {
-        this.clickThreshold = window.button_click_threshold || this.clickThreshold;
-        this.releaseThreshold = window.button_release_threshold || this.releaseThreshold;
+   
+   static clickThreshold = 1600;
+   static releaseThreshold = 1500;
+   static lastTime = 0;
+   static buttonClicked = false;
+   static buttonClickCallback;
+   
+   static detectButtonClick(buttonValue, buttonClickCallback) {
+        const correctionCutOffVersion = "1.2.0";
+        let clickThreshold = 1600;
+        if (isVersionGreater_errorCatching(window.P3vm.getInstance().sysInfo.SystemVersion, correctionCutOffVersion)) {
+            clickThreshold = 2400;
+        }
+        let releaseThreshold = 1500;
+        if (isVersionGreater_errorCatching(window.P3vm.getInstance().sysInfo.SystemVersion, correctionCutOffVersion)) {
+            releaseThreshold = 2100;
+        }
+        this.clickThreshold = window.button_click_threshold || clickThreshold;
+        this.releaseThreshold = window.button_release_threshold || releaseThreshold;
         this.buttonClickCallback = buttonClickCallback;
         const currentTime = Date.now();
         if (buttonValue > this.clickThreshold && !this.buttonClicked) {
