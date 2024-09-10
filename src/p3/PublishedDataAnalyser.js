@@ -1,3 +1,4 @@
+import { isVersionGreater_errorCatching } from "../utils/compare-version";
 import P3vmEvents from "./P3EventEnum";
 
 export default class PublishedDataAnalyser {
@@ -70,7 +71,16 @@ class TiltDetection {
     static detectTilt(data, { onTiltLeft, onTiltRight, onTiltForward, onTiltBackward }, isMoving = false) {
         if (isMoving) return;
 
-        const { x, y, z } = this.rotateAccelData(data.LSM6DS.ax, data.LSM6DS.ay, data.LSM6DS.az, window.tilt_rotate_z_deg || 30);
+        const tiltCorrectionForOlderCog = 30;
+        const tiltCorrectionForNewerCog = 300;
+        const correctionCutOffVersion = "1.2.0";
+        let tiltCorrection = tiltCorrectionForOlderCog;
+
+        if (isVersionGreater_errorCatching(window.P3vm.getInstance().sysInfo.SystemVersion, correctionCutOffVersion)) {
+            tiltCorrection = tiltCorrectionForNewerCog;
+        }
+
+        const { x, y, z } = this.rotateAccelData(data.LSM6DS.ax, data.LSM6DS.ay, data.LSM6DS.az, window.tilt_rotate_z_deg || tiltCorrection);
         const pitch = Math.atan2(x, this.distance(y, z));
         const roll = Math.atan2(y, this.distance(x, z));
         const yaw = Math.atan2(z, this.distance(x, y));

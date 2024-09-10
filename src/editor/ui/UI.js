@@ -750,6 +750,7 @@ export default class UI {
     }
 
     static putInPaintEditor(e) {
+        return;
         ScratchJr.unfocus(e);
         var s = ScratchJr.getSprite();
         if (!s) {

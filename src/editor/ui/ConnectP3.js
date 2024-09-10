@@ -1,3 +1,4 @@
+import { isVersionGreater_errorCatching } from '../../utils/compare-version';
 import { frame, newHTML } from '../../utils/lib';
 
 
@@ -81,8 +82,16 @@ export default class ConnectP3 {
 
 const IOLightsSVG = (lights) => {
   // pushing the index by 5 for all of them, to align the lights with the correct orientation of p3
-  const correctedIdxFactor = window.correctedIdxFactor || 5;
-  const lightsReIndexed = lights.map((light, index) => lights[(index + correctedIdxFactor) % 12]);
+  const correctedIdxFactorForOlderP3 = 5;
+  const correctedIdxFactorForNewerP3 = 12;
+  const LEDAndAccelerometerVersionCutOff = "1.2.0";
+  let correctedIdxFactor = correctedIdxFactorForOlderP3;
+
+  if (isVersionGreater_errorCatching(window.P3vm.getInstance().sysInfo.SystemVersion, LEDAndAccelerometerVersionCutOff)) {
+    correctedIdxFactor = correctedIdxFactorForNewerP3;
+  }
+
+  const lightsReIndexed = lights.map((light, index) => lights[(index + (window.correctedIdxFactor || correctedIdxFactor)) % 12]);
 
   return `
 <?xml version="1.0" encoding="UTF-8"?>

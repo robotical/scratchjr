@@ -12,6 +12,7 @@ const ledLcdColours = [
 ];
 export default class P3vm extends Observable {
     static instance = null;
+    static sysInfo = {};
 
     isP3Connected = false;
 
@@ -48,6 +49,7 @@ export default class P3vm extends Observable {
         console.log("setting the ui with the name")
         const sysInfo = await connManager.getConnector().getRaftSystemUtils().getSystemInfo();
         window.sysInfo = sysInfo;
+        this.sysInfo = sysInfo;
         UIConnectP3.init(sysInfo.Friendly || "Cog");
 
         // send command to start the verification process (set the lights)
