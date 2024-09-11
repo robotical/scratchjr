@@ -74,7 +74,7 @@ class TiltDetection {
         if (isMoving) return;
 
         const tiltCorrectionForOlderCog = 30;
-        const tiltCorrectionForNewerCog = 90;
+        const tiltCorrectionForNewerCog = -90;
         const correctionCutOffVersion = "1.2.0";
         let tiltCorrection = tiltCorrectionForOlderCog;
 
@@ -315,7 +315,7 @@ class ButtonClickDetection {
         const correctionCutOffVersion = "1.2.0";
         let clickThreshold = 1600;
         if (isVersionGreater_errorCatching(window.P3vm.getInstance().sysInfo.SystemVersion, correctionCutOffVersion)) {
-            clickThreshold = 2400;
+            clickThreshold = 2300;
         }
         let releaseThreshold = 1500;
         if (isVersionGreater_errorCatching(window.P3vm.getInstance().sysInfo.SystemVersion, correctionCutOffVersion)) {
