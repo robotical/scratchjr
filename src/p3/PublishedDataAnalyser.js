@@ -328,11 +328,11 @@ class ButtonClickDetection {
         if (buttonValue > this.clickThreshold && !this.buttonClicked) {
             console.log("Button clicked", buttonValue);
             this.buttonClicked = true;
+            this.buttonClickCallback();
             this.lastTime = currentTime;
         } else if (buttonValue < this.releaseThreshold && this.buttonClicked) {
             console.log("Button released", buttonValue);
             this.buttonClicked = false;
-            this.buttonClickCallback();
         }
     }
 
