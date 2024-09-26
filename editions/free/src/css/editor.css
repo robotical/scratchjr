@@ -27,7 +27,7 @@ div.frame {
     padding: ${css_vh(0)};
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0)};
     width: 100%;
-    height: ${css_vh(61.2)};
+    height: ${css_vh(63)};
     background:  url('../assets/ui/backgrounds.png');
     background-size: 100% 100%;
 }
@@ -187,8 +187,8 @@ div.frame {
 
 /*Editor UI*/
 
-#blockspalette {
-    position: relative;
+#blockspalette {  
+    position: relative; 
     left: 0;
     right: 0;
     height: ${64 * scaleMultiplier}px;
@@ -226,7 +226,8 @@ div.frame {
 #blockspalette .categoryselector{
     display: inline-block;
     word-spacing: -1;
-    position: relative;
+    position: absolute;
+    top: -55px;
     margin: ${css_vh(0)};
     z-index: 60;
     width: ${354 * scaleMultiplier}px;
@@ -234,7 +235,22 @@ div.frame {
     overflow: hidden;
 }
 
+#blockspalette .categoryselectorright{
+    display: inline-block;
+    word-spacing: -1;
+    position: absolute;
+    top: -55px;
+    right: 0;
+    margin: ${css_vh(0)};
+    z-index: 60;
+    width: ${180 * scaleMultiplier}px;
+    height: ${64 * scaleMultiplier}px;
+    overflow: hidden;
+}
+
+#blockspalette .categoryselectorright .catbkg,
 #blockspalette .categoryselector .catbkg{
+    display: none;
     position: relative;
     width: ${708 * scaleMultiplier}px;
     height: ${128 * scaleMultiplier}px;
@@ -251,11 +267,12 @@ div.frame {
 }
 
 #blockspalette .palette{
-    display: inline-block;
+    display: block;
     position: relative;
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0)};
     height: ${64 * scaleMultiplier}px;
-    width: ${659 * scaleMultiplier}px;
+    /* width: ${659 * scaleMultiplier}px; */
+    width: 85%;
     z-index:4;
     overflow: hidden;
 }

@@ -25,8 +25,11 @@ import {
     getIdFor, isTablet, newDiv, newTextInput, isAndroid, getDocumentWidth, getDocumentHeight,
     setProps, globalx
 } from '../../utils/lib';
-import P3vm from '../../p3/P3vm';
-import P3vmEvents from '../../p3/P3EventEnum';
+import { cogSvg } from '../../html-svgs/cog';
+import { martySvg } from '../../html-svgs/marty';
+import { raftDisconnectedSubscriptionHelper, raftVerifiedSubscriptionHelper } from '../../utils/raft-subscription-helpers';
+import { CogManager } from '../../cog/CogManager';
+console.log("CogManager", CogManager); // This needs to be here to execute the CogManager file
 
 let projectNameTextInput = null;
 let info = null;
@@ -91,42 +94,81 @@ export default class UI {
         UI.rightPanel(div);
     }
 
-    static manageConnectButtonSubscriptions(connectText, connectButton, connectDotDiv) {
-        const CONNECT_SUBSCRIPTION_ID = 'connectToP3Subscription';
-        const DISCONNECT_SUBSCRIPTION_ID = 'disconnectFromP3Subscription';
-        const p3vm = P3vm.getInstance();
-        p3vm.subscribe(CONNECT_SUBSCRIPTION_ID, P3vmEvents.P3_CONNECTED, () => {
-            connectText.textContent = "Disconnect";
-            connectButton.onclick = p3vm.disconnect.bind(p3vm);
-            connectDotDiv.style.backgroundColor = 'green';
-        });
-        p3vm.subscribe(DISCONNECT_SUBSCRIPTION_ID, P3vmEvents.P3_DISCONNECTED, () => {
-            connectText.textContent = "Connect to Cog";
-            connectButton.onclick = p3vm.connect.bind(p3vm);
-            connectDotDiv.style.backgroundColor = 'black';
-        });
+    // Function to create a connect button with an icon and title (for cog and marty buttons)
+    static createConnectButton(parent, iconName, buttonText, onClick) {
+        // Create button container
+        const connectButton = newHTML('div', 'connectButton', parent);
+
+        // Create icon container (icon on the left)
+        const iconDiv = newHTML('div', 'connectIcon', connectButton);
+        iconDiv.innerHTML = iconName; // Add the icon (could be an <i> tag or an SVG)
+
+        // Create text container (title on the right)
+        const connectText = newHTML('div', 'connectText', connectButton);
+        connectText.innerHTML = buttonText; // Add the button title
+
+        // Action to perform when the button is clicked
+        connectButton.onclick = () => {
+            onClick(connectButton);
+        }
+
+        return connectButton;
     }
 
-    static createConnectButton(leftPanel) {
+    static createConnectionButtons(leftPanel) {
+        const connectionButtonsArea = newHTML('div', 'connectionButtonsArea', leftPanel);
 
-        var connectButton = newHTML('div', 'connectButton', leftPanel);
-        const connectDotDiv = newHTML('div', 'connectDot', connectButton);
-        var connectText = newHTML('div', 'connectText', connectButton);
+        UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', (connectButton) => {
+            window.applicationManager.connectGeneric((raft) => {
+                // set subscription to raft events so we can update the UI when:
+                // - the raft is connected
+                // - the raft is disconnected
+                raftVerifiedSubscriptionHelper(raft).subscribe(() => {
+                    // when raft is connected, update the UI to reflect the raft connection status
+                    connectButton.classList.add('connectButtonConnected');
 
-        connectText.textContent = "Connect to Cog";
-        connectButton.onclick = function () {
-            const p3vm = P3vm.getInstance();
-            p3vm.connect();
-        };
+                    // adding the raft to the cog manager
+                    window.cogManager.addCog(raft);
+                    window.cogManager.wireCogWithBlocks(raft.id);
 
-        UI.manageConnectButtonSubscriptions(connectText, connectButton, connectDotDiv);
+                    // turn off the verified subscription to avoid memory leaks
+                    raftVerifiedSubscriptionHelper(raft).unsubscribe();
+
+                    // store the old onClick function so we can restore it when the raft is disconnected
+                    const oldOnClick = connectButton.onclick;
+
+                    // set the new onClick function to disconnect the raft
+                    connectButton.onclick = () => {
+                        window.applicationManager.disconnectGeneric(raft);
+                    }
+
+                    // set up a subscription to the raft disconnected event
+                    raftDisconnectedSubscriptionHelper(raft).subscribe(() => {
+                        // when raft is disconnected, update the UI to reflect the raft connection status
+                        connectButton.classList.remove('connectButtonConnected');
+
+                        // remove the raft from the cog manager
+                        window.cogManager.removeCog(raft);
+
+                        // turn off the disconnected subscription
+                        raftDisconnectedSubscriptionHelper(raft).unsubscribe();
+
+                        // restore the old onClick function
+                        connectButton.onclick = oldOnClick;
+                    });
+                })
+            })
+        });
+        UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty',);
+
+
     }
 
     static leftPanel(div) {
         // sprite library
         var sl = newHTML('div', 'leftpanel', div);
         var flip = newHTML('div', 'flipme', sl);
-        UI.createConnectButton(sl);
+        UI.createConnectionButtons(sl);
 
         flip.setAttribute('id', 'flip');
         flip.onclick = function (evt) {
@@ -779,6 +821,49 @@ export default class UI {
         UI.createTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
         UI.createTopBarClicky(div, 'full', 'fullscreen', ScratchJr.fullScreen);
         UI.setShowGrid(false);
+    }
+
+    static createCounter() {
+        const stageDiv = gn('stage');
+        const counter = newHTML('div', 'counter', stageDiv);
+        counter.setAttribute('id', 'counter');
+
+        return counter;
+    }
+
+    static destroyCounter() {
+        const counter = gn('counter');
+        if (counter) {
+            counter.remove();
+        }
+    }
+
+    static addTextToCounter(text) {
+        const counter = gn('counter');
+        if (counter) {
+            counter.textContent = text;
+
+            // Adjust font size based on the value
+            if (parseInt(text) > 999 || parseInt(text) < -999) {
+                counter.style.fontSize = '1.8rem';
+            } else {
+                counter.style.fontSize = ''; // Reset to default font size
+            }
+
+            // Trigger animation by adding and removing the animate class
+            counter.classList.remove('animate'); // Remove class if it exists
+            void counter.offsetWidth; // Trigger reflow to restart the animation
+            counter.classList.add('animate'); // Add class to trigger animation
+        }
+    }
+
+    static getCounterText() {
+        const counter = gn('counter');
+        return counter ? counter.textContent : '';
+    }
+
+    static counterExist() {
+        return !!gn('counter');
     }
 
     static resetAllSprites(e) {

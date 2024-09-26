@@ -518,7 +518,7 @@ export default class SVG2Canvas {
 
     static splitNumericArgs(str) {
         try {
-           return str.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/g).map(Number);
+            return str.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/g).map(Number);
         } catch (e) {
             return [];
         }
@@ -851,7 +851,7 @@ export default class SVG2Canvas {
                     }
                     // if the number is a decimal, convert to string and remove leading 0 (take into account negative numbers, that is, it should still be negative after removing the leading 0)
                     if (item) {
-                        str += item.toString().replace(/(?<=^|[-\s])0+(?=\.\d)/, '');
+                        str += item.toString().replace(/(?:^|[-\s])0+(?=\.\d)/g, match => match.replace(/0+$/, ''));
                     }
                 });
             }
@@ -1040,16 +1040,16 @@ export default class SVG2Canvas {
             x: cmd[1],
             y: cmd[2]
         });
-    
+
         // Calculate the new endpoint
         const newEndp = Vector.sum(endp, {
             x: cmd[3],
             y: cmd[4]
         });
-    
+
         // Update the global endpoint variable
         endp = newEndp;
-    
+
         // Return the correct Q command with control point and endpoint
         return ['Q', lastcxy.x, lastcxy.y, newEndp.x, newEndp.y];
     }

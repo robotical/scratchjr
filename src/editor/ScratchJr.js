@@ -441,8 +441,12 @@ export default class ScratchJr {
             gn('go').className = isOff ? 'go on presentationmode' : 'go off presentationmode';
             UI.updatePageControls();
         } else {
-            gn('go').className = isOff ? 'go on' : 'go off';
-            Grid.updateCursor();
+            try {
+                gn('go').className = isOff ? 'go on' : 'go off';
+                Grid.updateCursor();
+            } catch (e) {
+                // ignore
+            }
         }
         if (ScratchJr.getSprite()) {
             if (isOff && !inFullscreen) {

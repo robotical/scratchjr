@@ -1,4 +1,4 @@
-import P3vmEvents from "../p3/P3EventEnum";
+import CogvmEvents from "../cog/CogEventEnum";
 
 /**
  * Abstract class representing an observable in code assessment context.
@@ -17,7 +17,7 @@ class Observable {
      * Subscribe to this observable.
      */
     subscribe(id, typeOfEvent, cb,) {
-        const PublishedEventsEnum = Object.values(P3vmEvents);
+        const PublishedEventsEnum = Object.values(CogvmEvents);
         if (!Object.values(PublishedEventsEnum).includes(typeOfEvent)) {
             throw new TypeError(`The type of event "${typeOfEvent}" is not valid. Valid types are: ${Object.values(PublishedEventsEnum).join(", ")}`);
         }

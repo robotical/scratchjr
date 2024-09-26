@@ -16,6 +16,8 @@ buildAllAndCpToWebApp () {
 }
 
 cpToWebapp () {
+    setopt rm_star_silent
+    setopt rm_star_wait
     rm -rf $WebappHome/public/MartyBlocksJR/*
     cp -r $MBJRHome/editions/free/src/* $WebappHome/public/MartyBlocksJR
 }

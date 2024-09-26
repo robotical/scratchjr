@@ -9,6 +9,13 @@
       "height": 360,
       "ext": "svg",
       "name": "Farm"
+    },
+    {
+      "md5": "Country_Park.svg",
+      "width": 480,
+      "height": 360,
+      "ext": "svg",
+      "name": "Country Park"
     }
   ],
   "sprites": [

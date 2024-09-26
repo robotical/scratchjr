@@ -24,7 +24,9 @@ let fontsizes = [16, 24, 36, 48, 56, 72];
 const tiltshapes = ['tiltright', 'tiltleft', 'tiltbackward', 'tiltforward', 'tiltbackwardforward', 'tiltleftright']
 const moveshapes = [
     'onmove',
-     'onshake'];
+    'onshake'];
+const distanceshapes = ['onclosedistance', 'onfardistance'];
+const lightshapes = ['onhighlight', 'onmidlight', 'onlowlight'];
 const rotateshapes = ['onrotateclockwise', 'onrotatecounterclockwise'];
 const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];
 const colourshapes = ['selectcolourred', 'selectcolourgreen', 'selectcolourblue', 'selectcolourpurple', 'selectcolourorange', 'selectcolouryellow'];
@@ -63,7 +65,10 @@ export default class BlockSpecs {
         BlockSpecs.loadGraphics();
         BlockSpecs.defs = BlockSpecs.setupBlocksSpecs();
         BlockSpecs.palettes = BlockSpecs.setupPalettesDef();
+        BlockSpecs.palettesRight = BlockSpecs.setupPalettesDefRight();
         BlockSpecs.categories = BlockSpecs.setupCategories();
+        BlockSpecs.categoriesRight = BlockSpecs.setupCategoriesRight();
+
         if (window.Settings.edition == 'PBS') {
             BlockSpecs.canvasMask = BlockSpecs.getImageFrom('assets/ui/canvasmask', 'svg');
         } else {
@@ -147,6 +152,27 @@ export default class BlockSpecs {
         }
     }
 
+    static setupCategoriesRight() {
+        return new Array(
+            [
+                BlockSpecs.getImageFrom('assets/categories/CogStartOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/CogStartOff', 'svg'),
+                window.Settings.categoryStartColor
+            ],
+            [
+                BlockSpecs.getImageFrom('assets/categories/CogLooksOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/CogLooksOff', 'svg'),
+                window.Settings.categoryLooksColor
+            ],
+            [
+                BlockSpecs.getImageFrom('assets/categories/CogSoundOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/CogSoundOff', 'svg'),
+                window.Settings.categorySoundColor
+            ],
+        );
+    }
+
+
     static setupCategories() {
         return new Array(
             [
@@ -182,14 +208,20 @@ export default class BlockSpecs {
         );
     }
 
-
     static setupPalettesDef() {
-        return [['onflag', 'tiltany', 'ontouchp3', 'onmove', 'onrotate', 'onclick', 'ontouch', 'onmessage', 'message'],
+        return [['onmessage', 'message', 'onclick', 'ontouch'],
         ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'],
-        ['setpattern', 'selectcolour', 'clearcolours', 'say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'],
-        ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote'],
-        ['wait', 'stopmine', 'setspeed', 'repeat'],
+        ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'],
+        [],
+        ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'],
         ['endstack', 'forever']];
+    }
+
+    static setupPalettesDefRight() {
+        return [['onflag', 'tiltany', 'ontouchcog', 'onmove', 'ondistance', 'onlight', 'onrotate', 'onmessage', 'message'],
+        ['setpattern', 'selectcolour', 'clearcolours'],
+        ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote'],
+        ];
     }
 
     ///////////////////////////////
@@ -215,10 +247,14 @@ export default class BlockSpecs {
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'tiltany': ['tiltany', tiltshapes,
                 BlockSpecs.yellowStart, 'm', 'tiltright', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
-            'ontouchp3': ['ontouchp3', BlockSpecs.getImageFrom('assets/blockicons/ontouchp3', 'svg'),
+            'ontouchcog': ['ontouchcog', BlockSpecs.getImageFrom('assets/blockicons/ontouchcog', 'svg'),
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'onmove': ['onmove', moveshapes,
                 BlockSpecs.yellowStart, 'm', 'onmove', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'ondistance': ['ondistance', distanceshapes,
+                BlockSpecs.yellowStart, 'm', 'onclosedistance', BlockSpecs.yellowStartH, 0, 100, BlockSpecs.startS],
+            'onlight': ['onlight', lightshapes,
+                BlockSpecs.yellowStart, 'm', 'onhighlight', BlockSpecs.yellowStartH, 0, 100, BlockSpecs.startS],
             'onrotate': ['onrotate', rotateshapes,
                 BlockSpecs.yellowStart, 'm', 'onrotateclockwise', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'onmessage': ['onmessage', getshapes, BlockSpecs.yellowStart, 'm', 'Orange',
@@ -256,6 +292,12 @@ export default class BlockSpecs {
             'setspeed': ['setspeed', speeds, BlockSpecs.orangeCmd, 'd', 1,
                 BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
             'stopmine': ['stopmine', BlockSpecs.getImageFrom('assets/blockicons/Stop', 'svg'),
+                BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
+            'startstopcounter': ['startstopcounter', BlockSpecs.getImageFrom('assets/blockicons/counter_start-reset', 'svg'),
+                BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
+            'increasecounter': ['increasecounter', BlockSpecs.getImageFrom('assets/blockicons/counter_increase', 'svg'),
+                BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
+            'decreasecounter': ['decreasecounter', BlockSpecs.getImageFrom('assets/blockicons/counter_decrease', 'svg'),
                 BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
 
             'setpattern': ['setpattern', patternshapes,
@@ -318,8 +360,10 @@ export default class BlockSpecs {
         return {
             'onflag': Localization.localize('BLOCK_DESC_GREEN_FLAG'),
             'tiltany': Localization.localize('BLOCK_DESC_ON_TILT'),
-            'ontouchp3': Localization.localize('BLOCK_DESC_ON_TOUCH_P3'),
+            'ontouchcog': Localization.localize('BLOCK_DESC_ON_TOUCH_Cog'),
             'onmove': Localization.localize('BLOCK_DESC_ON_MOVE'),
+            'ondistance': Localization.localize('BLOCK_DESC_ON_DISTANCE'),
+            'onlight': Localization.localize('BLOCK_DESC_ON_LIGHT'),
             'onrotate': Localization.localize('BLOCK_DESC_ON_ROTATE'),
             'onclick': Localization.localize('BLOCK_DESC_ON_TAP', {
                 CHARACTER_NAME: spr.name
@@ -344,6 +388,9 @@ export default class BlockSpecs {
             'stopmine': Localization.localize('BLOCK_DESC_STOP', {
                 CHARACTER_NAME: spr.name ? spr.name : spr.str
             }),
+            'startstopcounter': Localization.localize('BLOCK_DESC_START_STOP_COUNTER'),
+            'increasecounter': Localization.localize('BLOCK_DESC_INCREASE_COUNTER'),
+            'decreasecounter': Localization.localize('BLOCK_DESC_DECREASE_COUNTER'),
             'setpattern': Localization.localize('BLOCK_DESC_SET_PATTERN'),
             'clearcolours': Localization.localize('BLOCK_DESC_CLEAR_COLOURS'),
             'selectcolour': Localization.localize('BLOCK_DESC_SELECT_COLOUR'),

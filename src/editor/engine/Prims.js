@@ -3,27 +3,12 @@ import ScratchAudio from '../../utils/ScratchAudio';
 import Grid from '../ui/Grid';
 import Vector from '../../geom/Vector';
 import { gn } from '../../utils/lib';
-import P3Blocks from '../../p3/P3Blocks';
-import P3vmEvents from '../../p3/P3EventEnum';
-import PublishedDataAnalyser from '../../p3/PublishedDataAnalyser';
-import { clock_1, counterClock_1 } from '../../p3/dummy-rotation-data';
+import UI from '../ui/UI';
 
 let tinterval = 1;
 let hopList = [-48, -30, -22, -14, -6, 0, 6, 14, 22, 30, 48];
 export const LINEAR_GRADIENT_COLOUR = "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)";
 
-const P3_EVENT_SUBSCRIPTIONS = {
-    ON_TOUCH: 'ontouch_sub',
-    TILT_BACKWARD: 'tiltbackward_sub',
-    TILT_FORWARD: 'tiltforward_sub',
-    TILT_RIGHT: 'tiltright_sub',
-    TILT_LEFT: 'tiltleft_sub',
-    ON_MOVE: 'onmove_sub',
-    ON_SHAKE: 'onshake_sub',
-    ON_ROTATE_CLOCKWISE: 'onrotateclockwise_sub',
-    ON_ROTATE_COUNTER_CLOCKWISE: 'onrotatecounterclockwise_sub',
-    ON_BUTTON_CLICK: 'onbuttonclick_sub'
-}
 
 export default class Prims {
     static get hopList() {
@@ -36,8 +21,10 @@ export default class Prims {
         Prims.table.missing = Prims.Ignore;
         Prims.table.onflag = Prims.Ignore;
         Prims.table.tiltany = Prims.Ignore; //
-        Prims.table.ontouchp3 = Prims.Ignore; //
+        Prims.table.ontouchcog = Prims.Ignore; //
         Prims.table.onmove = Prims.Ignore; // 
+        Prims.table.ondistance = Prims.Ignore; // 
+        Prims.table.onlight = Prims.Ignore; // 
         Prims.table.onrotate = Prims.Ignore; //
         Prims.table.onmessage = Prims.Ignore;
         Prims.table.onclick = Prims.Ignore;
@@ -65,6 +52,9 @@ export default class Prims {
         Prims.table.endstack = Prims.DoNextBlock;
         Prims.table.stopall = Prims.StopAll;
         Prims.table.stopmine = Prims.StopMine;
+        Prims.table.startstopcounter = Prims.StartStopCounter;
+        Prims.table.increasecounter = Prims.IncreaseCounter;
+        Prims.table.decreasecounter = Prims.DecreaseCounter;
         Prims.table.forever = Prims.Forever;
         Prims.table.hop = Prims.Hop;
         Prims.table.show = Prims.Show;
@@ -83,37 +73,6 @@ export default class Prims {
         Prims.table.selectcolour = Prims.selectColour; //
         Prims.table.clearcolours = Prims.clearColours; //
         Prims.table.say = Prims.Say;
-
-        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_TOUCH, P3vmEvents.ON_TOUCH, () => {
-            Prims.OnP3Event("ontouch");
-        });
-        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_RIGHT, P3vmEvents.TILT_RIGHT, () => {
-            Prims.OnP3Event("tiltright");
-        });
-        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_LEFT, P3vmEvents.TILE_LEFT, () => {
-            Prims.OnP3Event("tiltleft");
-        });
-        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_BACKWARD, P3vmEvents.TILT_BACKWARD, () => {
-            Prims.OnP3Event("tiltbackward");
-        });
-        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.TILT_FORWARD, P3vmEvents.TILT_FORWARD, () => {
-            Prims.OnP3Event("tiltforward");
-        });
-        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_MOVE, P3vmEvents.ON_MOVE, () => {
-            Prims.OnP3Event("onmove");
-        });
-        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_SHAKE, P3vmEvents.ON_SHAKE, () => {
-            Prims.OnP3Event("onshake");
-        });
-        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_ROTATE_CLOCKWISE, P3vmEvents.ON_ROTATE_CLOCKWISE, () => {
-            Prims.OnP3Event("onrotateclockwise");
-        });
-        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_ROTATE_COUNTER_CLOCKWISE, P3vmEvents.ON_ROTATE_COUNTER_CLOCKWISE, () => {
-            Prims.OnP3Event("onrotatecounterclockwise");
-        });
-        window.P3vm.getInstance().subscribe(P3_EVENT_SUBSCRIPTIONS.ON_BUTTON_CLICK, P3vmEvents.ON_BUTTON_CLICK, () => {
-            Prims.OnP3Event("ontouch");
-        });
     }
 
     static Done(strip) {
@@ -158,7 +117,7 @@ export default class Prims {
     static playConfusion(strip) {
         const durationInSeconds = 10;
         console.log("playing confusion");
-        P3Blocks.getInstance().playSound("confusion");
+        Prims.cogBlocks?.playSound("confusion");
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
@@ -167,18 +126,16 @@ export default class Prims {
     static playDisbelief(strip) {
         const durationInSeconds = 6;
         console.log("playing disbelief")
-        P3Blocks.getInstance().playSound("disbelief");
+        Prims.cogBlocks?.playSound("disbelief");
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
-
-
     static playExcitement(strip) {
         const durationInSeconds = 5;
         console.log("playing excitement")
-        P3Blocks.getInstance().playSound("excitement");
+        Prims.cogBlocks?.playSound("excitement");
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
@@ -187,7 +144,7 @@ export default class Prims {
     static playNoway(strip) {
         const durationInSeconds = 6;
         console.log("playing noway")
-        P3Blocks.getInstance().playSound("noway");
+        Prims.cogBlocks?.playSound("noway");
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
@@ -196,7 +153,7 @@ export default class Prims {
     static playNo(strip) {
         const durationInSeconds = 3;
         console.log("playing no")
-        P3Blocks.getInstance().playSound("no");
+        Prims.cogBlocks?.playSound("no");
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
@@ -205,7 +162,7 @@ export default class Prims {
     static playWhistle(strip) {
         const durationInSeconds = 3;
         console.log("playing whistle")
-        P3Blocks.getInstance().playSound("whistle");
+        Prims.cogBlocks?.playSound("whistle");
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
@@ -215,7 +172,7 @@ export default class Prims {
         const durationInSeconds = .5;
         const note = strip.thisblock.getArgValue();
         console.log("playing note: ", note)
-        P3Blocks.getInstance().playNote(note);
+        Prims.cogBlocks?.playNote(note);
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
@@ -246,7 +203,7 @@ export default class Prims {
     static setPattern(strip) {
         const pattern = strip.thisblock.getArgValue();
         console.log("setting pattern: ", pattern)
-        P3Blocks.getInstance().setPattern(pattern);
+        Prims.cogBlocks?.setPattern(pattern);
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
@@ -255,7 +212,7 @@ export default class Prims {
     static selectColour(strip) {
         const colour = strip.thisblock.getArgValue();
         console.log("selecting colour: ", colour)
-        P3Blocks.getInstance().selectColour(colour);
+        Prims.cogBlocks?.selectColour(colour);
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
@@ -263,7 +220,7 @@ export default class Prims {
 
     static clearColours(strip) {
         console.log("clearing colours")
-        P3Blocks.getInstance().clearColours();
+        Prims.cogBlocks?.clearColours();
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
@@ -536,7 +493,6 @@ export default class Prims {
     }
 
     static Right(strip) {
-        // processRotationData(clock_1);
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 30;
         if (strip.count < 0) {
@@ -556,7 +512,6 @@ export default class Prims {
     }
 
     static Left(strip) {
-        // processRotationData(counterClock_1);
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 30;
         if (strip.count < 0) {
@@ -719,6 +674,62 @@ export default class Prims {
         }
     }
 
+    static StartStopCounter(strip) {
+        const durationInSeconds = .2
+        Prims.setTime(strip);
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
+        strip.thisblock = strip.thisblock.next;
+
+        Prims.startStopCounter_();
+    }
+
+    static IncreaseCounter(strip) {
+        const durationInSeconds = .2
+        Prims.setTime(strip);
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
+        strip.thisblock = strip.thisblock.next;
+
+        Prims.increaseCounter_();
+    }
+
+    static DecreaseCounter(strip) {
+        const durationInSeconds = .2
+        Prims.setTime(strip);
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
+        strip.thisblock = strip.thisblock.next;
+
+        Prims.decreaseCounter_();
+    }
+
+    static startStopCounter_() {
+        if (!UI.counterExist()) {
+            UI.createCounter();
+        }
+        UI.addTextToCounter(0);
+    }
+
+    static increaseCounter_() {
+        if (UI.counterExist()) {
+            const currentValue = UI.getCounterText();
+            const newValue = parseInt(currentValue) + 1;
+            UI.addTextToCounter(newValue);
+        } else {
+            UI.createCounter();
+            UI.addTextToCounter(1);
+        }
+    }
+
+    static decreaseCounter_() {
+        if (UI.counterExist()) {
+            const currentValue = UI.getCounterText();
+            const newValue = parseInt(currentValue) - 1;
+            UI.addTextToCounter(newValue);
+        } else {
+            UI.createCounter();
+            UI.addTextToCounter(-1);
+        }
+    }
+
     static OnTouch(strip) {
         var s = strip.spr;
         if (s.touchingAny()) {
@@ -728,14 +739,14 @@ export default class Prims {
         strip.waitTimer = tinterval;
     }
 
-    static OnP3Event(event) {
-        console.log("onP3Event")
+    static OnCogEvent(event) {
+        // console.log("onCogEvent")
 
         var pair;
         var receivers = [];
 
         var findReceivers = function (block, s) {
-            if (block.blocktype == 'ontouchp3' && event == 'ontouch') {
+            if (block.blocktype == 'ontouchcog' && event == 'ontouch') {
                 receivers.push([s, block]);
             }
             if (block.blocktype == 'tiltany') {
@@ -766,6 +777,25 @@ export default class Prims {
                     receivers.push([s, block]);
                 }
             }
+            if (block.blocktype == 'ondistance') {
+                if (block.getArgValue() == 'onclosedistance' && event == 'onclosedistance') {
+                    receivers.push([s, block]);
+                }
+                if (block.getArgValue() == 'onfardistance' && event == 'onfardistance') {
+                    receivers.push([s, block]);
+                }
+            }
+            if (block.blocktype == 'onlight') {
+                if (block.getArgValue() == 'onlowlight' && event == 'onlowlight') {
+                    receivers.push([s, block]);
+                }
+                if (block.getArgValue() == 'onhighlight' && event == 'onhighlight') {
+                    receivers.push([s, block]);
+                }
+                if (block.getArgValue() == 'onmidlight' && event == 'onmidlight') {
+                    receivers.push([s, block]);
+                }
+            }
             if (block.blocktype == 'onrotate') {
                 if (block.getArgValue() == 'onrotateclockwise' && event == 'onrotateclockwise') {
                     receivers.push([s, block]);
@@ -776,7 +806,7 @@ export default class Prims {
             }
         }
 
-        Prims.applyToAllStrips(['ontouchp3', 'tiltany', 'onmove', 'onrotate'], findReceivers);
+        Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onmove', 'onrotate', 'ondistance', 'onlight'], findReceivers);
         var newthreads = [];
         for (var i in receivers) {
             pair = receivers[i];
@@ -853,24 +883,8 @@ export default class Prims {
 }
 
 
-window.p3Event = function (event) {
-    Prims.OnP3Event(event);
-}
-
-
-let processDataLastTime = 0;
-async function processRotationData(data) {
-    const currentTime = new Date().getTime();
-    if (currentTime - processDataLastTime < 500) {
-        return;
-    }
-    processDataLastTime = currentTime;
-    for (const c of data) {
-        PublishedDataAnalyser.getInstance().analyse({ LSM6DS: { gx: c, gy: c, gz: c, ax: 0, ay: 0, az: 1 } }, window.P3vm.getInstance());
-
-        // Wait for 100ms before processing the next item
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
+window.cogEvent = function (event) {
+    Prims.OnCogEvent(event);
 }
 
 

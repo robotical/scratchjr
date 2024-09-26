@@ -2,7 +2,7 @@
 // Home Screen
 //////////////////////////////////////////////////
 
-import {libInit, getUrlVars, gn, isAndroid, newHTML} from '../utils/lib';
+import { libInit, getUrlVars, gn, isAndroid, newHTML } from '../utils/lib';
 import ScratchAudio from '../utils/ScratchAudio';
 import OS from '../tablet/OS';
 import Localization from '../utils/Localization';
@@ -19,19 +19,19 @@ let currentPage = null;
 
 export default class Lobby {
     // Getters/setters for properties used in other classes
-    static get version () {
+    static get version() {
         return version;
     }
 
-    static set busy (newBusy) {
+    static set busy(newBusy) {
         busy = newBusy;
     }
 
-    static get errorTimer () {
+    static get errorTimer() {
         return errorTimer;
     }
 
-    static appinit (v) {
+    static appinit(v) {
         libInit();
         version = v;
         var urlvars = getUrlVars();
@@ -50,11 +50,15 @@ export default class Lobby {
                 Lobby.setPage('home');
             }
         };
-        gn('helptab').onclick = function () {
-            if (gn('helptab').className != 'help on') {
-                Lobby.setPage('help');
-            }
-        };
+        try {
+            gn('helptab').onclick = function () {
+                if (gn('helptab').className != 'help on') {
+                    Lobby.setPage('help');
+                }
+            };
+        } catch (e) {
+            // Do nothing -- Help tab is not present in our version
+        }
         gn('booktab').onclick = function () {
             if (gn('booktab').className != 'book on') {
                 Lobby.setPage('book');
@@ -95,7 +99,7 @@ export default class Lobby {
         }
     }
 
-    static setPage (page) {
+    static setPage(page) {
         if (busy) {
             return;
         }
@@ -111,7 +115,7 @@ export default class Lobby {
         }
     }
 
-    static changePage (page) {
+    static changePage(page) {
         Lobby.selectButton(page);
         document.documentElement.scrollTop = 0;
         var div = gn('wrapc');
@@ -119,30 +123,30 @@ export default class Lobby {
             div.removeChild(div.childNodes[0]);
         }
         switch (page) {
-        case 'home':
-            busy = true;
-            ScratchAudio.sndFX('tap.wav');
-            Lobby.loadProjects(div);
-            break;
-        case 'help':
-            busy = true;
-            ScratchAudio.sndFX('tap.wav');
-            Lobby.loadSamples(div);
-            break;
-        case 'book':
-            Lobby.loadGuide(div);
-            break;
-        case 'gear':
-            ScratchAudio.sndFX('tap.wav');
-            Lobby.loadSettings(div);
-            break;
-        default:
-            break;
+            case 'home':
+                busy = true;
+                ScratchAudio.sndFX('tap.wav');
+                Lobby.loadProjects(div);
+                break;
+            case 'help':
+                busy = true;
+                ScratchAudio.sndFX('tap.wav');
+                Lobby.loadSamples(div);
+                break;
+            case 'book':
+                Lobby.loadGuide(div);
+                break;
+            case 'gear':
+                ScratchAudio.sndFX('tap.wav');
+                Lobby.loadSettings(div);
+                break;
+            default:
+                break;
         }
         currentPage = page;
     }
 
-    static loadProjects (p) {
+    static loadProjects(p) {
         document.ontouchmove = undefined;
         document.onmousemove = undefined;
         gn('topsection').className = 'topsection home';
@@ -156,7 +160,7 @@ export default class Lobby {
         Home.init();
     }
 
-    static loadSamples (p) {
+    static loadSamples(p) {
         gn('topsection').className = 'topsection help';
         gn('tabheader').textContent = Localization.localize('QUICK_INTRO');
         gn('subtitle').textContent = Localization.localize('SAMPLE_PROJECTS');
@@ -174,7 +178,7 @@ export default class Lobby {
         Samples.init();
     }
 
-    static loadGuide (p) {
+    static loadGuide(p) {
         gn('topsection').className = 'topsection book';
         gn('footer').className = 'footer on';
         var div = newHTML('div', 'htmlcontents home', p);
@@ -184,7 +188,7 @@ export default class Lobby {
         }, 250);
     }
 
-    static loadSettings (p) {
+    static loadSettings(p) {
         // loadProjects without the header
         gn('topsection').className = 'topsection book';
         gn('footer').className = 'footer off';
@@ -218,7 +222,7 @@ export default class Lobby {
         }
     }
 
-    static setSubMenu (page) {
+    static setSubMenu(page) {
         if (busy) {
             return;
         }
@@ -235,46 +239,46 @@ export default class Lobby {
         }
         var url;
         switch (page) {
-        case 'about':
-            url = host + 'about.html';
-            Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
-            break;
-        case 'interface':
-            document.ontouchmove = function (e) {
-                e.preventDefault();
-            };
-            document.onmousemove = function (e) {
-                e.preventDefault();
-            };
-            url = host + 'interface.html';
-            Lobby.loadLink(div, url, 'contentwrap noscroll', 'htmlcontents fixed');
-            break;
-        case 'paint':
-            document.ontouchmove = function (e) {
-                e.preventDefault();
-            };
-            document.onmousemove = function (e) {
-                e.preventDefault();
-            };
-            url = host + 'paint.html';
-            Lobby.loadLink(div, url, 'contentwrap noscroll', 'htmlcontents fixed');
-            break;
-        case 'blocks':
-            url = host + 'blocks.html';
-            Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
-            break;
-        case 'privacy':
-            url = host + 'privacy.html';
-            Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
-            break;
-        default:
-            Lobby.missing(page, div);
-            break;
-        //url =  Lobby.loadProjects(div); break;
+            case 'about':
+                url = host + 'about.html';
+                Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
+                break;
+            case 'interface':
+                document.ontouchmove = function (e) {
+                    e.preventDefault();
+                };
+                document.onmousemove = function (e) {
+                    e.preventDefault();
+                };
+                url = host + 'interface.html';
+                Lobby.loadLink(div, url, 'contentwrap noscroll', 'htmlcontents fixed');
+                break;
+            case 'paint':
+                document.ontouchmove = function (e) {
+                    e.preventDefault();
+                };
+                document.onmousemove = function (e) {
+                    e.preventDefault();
+                };
+                url = host + 'paint.html';
+                Lobby.loadLink(div, url, 'contentwrap noscroll', 'htmlcontents fixed');
+                break;
+            case 'blocks':
+                url = host + 'blocks.html';
+                Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
+                break;
+            case 'privacy':
+                url = host + 'privacy.html';
+                Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
+                break;
+            default:
+                Lobby.missing(page, div);
+                break;
+            //url =  Lobby.loadProjects(div); break;
         }
     }
 
-    static selectSubButton (str) {
+    static selectSubButton(str) {
         var list = ['about', 'interface', 'paint', 'blocks', 'privacy'];
         for (var i = 0; i < list.length; i++) {
             var kid = gn(list[i] + 'tab');
@@ -283,7 +287,7 @@ export default class Lobby {
         }
     }
 
-    static selectButton (str) {
+    static selectButton(str) {
         var list = ['home', 'help', 'book', 'gear'];
         for (var i = 0; i < list.length; i++) {
             if (str == list[i]) {
@@ -298,7 +302,7 @@ export default class Lobby {
         }
     }
 
-    static loadLink (p, url, css, css2) {
+    static loadLink(p, url, css, css2) {
         document.documentElement.scrollTop = 0;
         gn('wrapc').scrollTop = 0;
         gn('wrapc').className = css;
@@ -319,7 +323,7 @@ export default class Lobby {
         }, 20000);
     }
 
-    static errorLoading (str) {
+    static errorLoading(str) {
         if (errorTimer) {
             clearTimeout(errorTimer);
         }
@@ -336,7 +340,7 @@ export default class Lobby {
         busy = false;
     }
 
-    static missing (page, p) {
+    static missing(page, p) {
         gn('wrapc').className = 'contentwrap scroll';
         var div = newHTML('div', 'htmlcontents', p);
         div.setAttribute('id', 'htmlcontents');
@@ -346,7 +350,7 @@ export default class Lobby {
         busy = false;
     }
 
-    static goHome () {
+    static goHome() {
         if (currentPage === 'home') {
             window.location.href = 'index.html?back=true';
         } else {
@@ -354,7 +358,7 @@ export default class Lobby {
         }
     }
 
-    static refresh () {
+    static refresh() {
         if (gn('hometab') !== null) { // Check if we're on the lobby page
             Lobby.setPage('home');
         }

@@ -14,9 +14,11 @@ import Rectangle from '../../geom/Rectangle';
 import DrawPath from '../../utils/DrawPath';
 import ScratchAudio from '../../utils/ScratchAudio';
 import Record from './Record';
-import {frame, gn, localx, newHTML, scaleMultiplier, isTablet, newDiv,
+import {
+    frame, gn, localx, newHTML, scaleMultiplier, isTablet, newDiv,
     setProps, globalx, localy, globaly, drawScaled, newCanvas,
-    setCanvasSize, hitRect, writeText, getStringSize} from '../../utils/lib';
+    setCanvasSize, hitRect, writeText, getStringSize
+} from '../../utils/lib';
 
 
 let blockscale = 0.75;
@@ -28,24 +30,25 @@ let helpballoon = undefined;
 let dxblocks = 10;
 
 export default class Palette {
-    static get numcat () {
+    static get numcat() {
         return numcat;
     }
 
-    static get helpballoon () {
+    static get helpballoon() {
         return helpballoon;
     }
 
-    static set helpballoon (newHelpballoon) {
+    static set helpballoon(newHelpballoon) {
         helpballoon = newHelpballoon;
     }
 
-    static setup (parent) {
+    static setup(parent) {
         blockscale *= scaleMultiplier;
         blockdy *= scaleMultiplier;
         Palette.blockdx *= scaleMultiplier; // XXX
         betweenblocks = 90 * blockscale;
         Palette.createCategorySelectors(parent);
+        Palette.createCategorySelectorsRight(parent);
         var div = newHTML('div', 'palette', parent);
         div.setAttribute('id', 'palette');
         div.ontouchstart = function (evt) {
@@ -58,7 +61,7 @@ export default class Palette {
         newHTML('div', 'withstyle', pc);
     }
 
-    static createCategorySelectors (parent) {
+    static createCategorySelectors(parent) {
         var sel = newHTML('div', 'categoryselector', parent);
         sel.setAttribute('id', 'selectors');
         var bkg = newHTML('div', 'catbkg', sel);
@@ -70,7 +73,19 @@ export default class Palette {
         }
     }
 
-    static paletteMouseDown (e) {
+    static createCategorySelectorsRight(parent) {
+        var sel = newHTML('div', 'categoryselectorright', parent);
+        sel.setAttribute('id', 'selectorsright');
+        var bkg = newHTML('div', 'catbkg', sel);
+        newHTML('div', 'catimage', bkg);
+        var leftPx = 15 * scaleMultiplier;
+        var widthPx = 54 * scaleMultiplier;
+        for (var i = 0; i < BlockSpecs.categoriesRight.length; i++) {
+            Palette.createSelector(sel, BlockSpecs.categories.length + i, leftPx + i * widthPx, 0, BlockSpecs.categoriesRight[i]);
+        }
+    }
+
+    static paletteMouseDown(e) {
         if (isTablet && e.touches && (e.touches.length > 1)) {
             return;
         }
@@ -100,13 +115,13 @@ export default class Palette {
         ScratchJr.clearSelection();
     }
 
-    static isRecorded (ths) {
+    static isRecorded(ths) {
         var val = ths.owner.getArgValue();
         var list = ScratchJr.getActiveScript().owner.spr.sounds;
         return list.indexOf(val) > 0;
     }
 
-    static removeSound (ths) {
+    static removeSound(ths) {
         ScratchAudio.sndFX('cut.wav');
         var indx = ths.owner.getArgValue();
         var spr = ScratchJr.getSprite();
@@ -142,7 +157,7 @@ export default class Palette {
         Palette.selectCategory(3);
     }
 
-    static showHelp (e, b) {
+    static showHelp(e, b) {
         var block = b.owner;
         var help = BlockSpecs.blockDesc(block, ScratchJr.getSprite());
         var str = help[block.blocktype];
@@ -153,7 +168,7 @@ export default class Palette {
         timeoutid = setTimeout(Palette.closeHelpBalloon, 2000);
     }
 
-    static startShaking (b) {
+    static startShaking(b) {
         if (!b.owner) {
             return;
         }
@@ -166,7 +181,7 @@ export default class Palette {
         newHTML('div', 'deletesound', b);
     }
 
-    static clickBlock (e, b) {
+    static clickBlock(e, b) {
         if (ScratchJr.shaking && (b == ScratchJr.shaking)) {
             Palette.removeSound(b);
         } else {
@@ -175,7 +190,7 @@ export default class Palette {
         }
     }
 
-    static stopShaking (b) {
+    static stopShaking(b) {
         if (!b.owner) {
             return;
         }
@@ -188,7 +203,7 @@ export default class Palette {
         }
     }
 
-    static openPaletteBalloon (obj, label) {
+    static openPaletteBalloon(obj, label) {
         if (helpballoon) {
             Palette.closeHelpBalloon();
         }
@@ -219,18 +234,18 @@ export default class Palette {
             21 * window.devicePixelRatio * scaleMultiplier, 8 * window.devicePixelRatio * scaleMultiplier);
     }
 
-    static hide () {
+    static hide() {
         gn('blockspalette').childNodes[0].style.display = 'none';
         gn('blockspalette').childNodes[1].style.display = 'none';
     }
 
-    static show () {
+    static show() {
         gn('blockspalette').childNodes[0].style.display = 'inline-block';
         gn('blockspalette').childNodes[1].style.display = 'inline-block';
     }
 
 
-    static closeHelpBalloon () {
+    static closeHelpBalloon() {
         if (timeoutid) {
             clearTimeout(timeoutid);
         }
@@ -241,7 +256,7 @@ export default class Palette {
         timeoutid = undefined;
     }
 
-    static drawBalloon (ctx, w, h) {
+    static drawBalloon(ctx, w, h) {
         var curve = 4;
         var path = new Array(['M', 0, curve], ['q', 0, -curve, curve, -curve], ['h', w - curve * 2],
             ['q', curve, 0, curve, curve], ['v', h - 11 - curve * 2], ['q', 0, curve, -curve, curve],
@@ -255,10 +270,10 @@ export default class Palette {
         ctx.beginPath();
         DrawPath.render(ctx, path);
         ctx.fill();
-    //  ctx.stroke();
+        //  ctx.stroke();
     }
 
-    static prepareForDrag (e) {
+    static prepareForDrag(e) {
         e.preventDefault();
         ScratchAudio.sndFX('grab.wav');
         if (!ScratchJr.runtime.inactive()) {
@@ -286,7 +301,7 @@ export default class Palette {
         sc.prepareCaret(Events.dragcanvas.owner);
     }
 
-    static getBlockNamed (str) {
+    static getBlockNamed(str) {
         var pal = gn('palette');
         for (var i = 0; i < pal.childElementCount; i++) {
             if (pal.childNodes[i].owner.blocktype == str) {
@@ -296,7 +311,7 @@ export default class Palette {
         return null;
     }
 
-    static createSelector (parent, n, dx, dy, spec) {
+    static createSelector(parent, n, dx, dy, spec) {
         var pxWidth = 51 * scaleMultiplier;
         var pxHeight = 57 * scaleMultiplier;
         var div = newDiv(parent, dx, dy, pxWidth, pxHeight, {
@@ -330,13 +345,13 @@ export default class Palette {
         };
     }
 
-    static getPaletteSize () {
+    static getPaletteSize() {
         var first = gn('palette').childNodes[0];
         var last = gn('palette').childNodes[gn('palette').childElementCount - 1];
         return last.offsetLeft + last.offsetWidth - first.offsetLeft;
     }
 
-    static clickOnCategory (e) {
+    static clickOnCategory(e) {
         if (!e) {
             return;
         }
@@ -348,16 +363,29 @@ export default class Palette {
         Palette.selectCategory(index);
     }
 
-    static selectCategory (n) {
+    static selectCategory(n) {
         var div = gn('selectors');
+        // if the number is greater than the number of categories (in the left categories div), then it is in the right categories div
+        const isRightCategories = n >= div.childNodes.length - 1;
+        n = isRightCategories ? n - (div.childNodes.length - 1) : n;
+        div = isRightCategories ? gn('selectorsright') : gn('selectors');
         // set the icons for text or sprite
         numcat = n;
         var currentSel = div.childNodes[n + 1];
         for (var i = 1; i < div.childElementCount; i++) {
             var sel = div.childNodes[i];
-            sel.childNodes[0].style.visibility = (sel.index != n) ? 'visible' : 'hidden';
-            sel.childNodes[1].style.visibility = (sel.index == n) ? 'visible' : 'hidden';
+            const selIndex = isRightCategories ? sel.index - (gn('selectors').childNodes.length - 1) : sel.index;
+            sel.childNodes[0].style.visibility = (selIndex != n) ? 'visible' : 'hidden';
+            sel.childNodes[1].style.visibility = (selIndex == n) ? 'visible' : 'hidden';
         }
+        // set to hidden the selectors for the other side categories
+        const otherSideDiv = isRightCategories ? gn('selectors') : gn('selectorsright');
+        for (var i = 1; i < otherSideDiv.childElementCount; i++) {
+            var sel = otherSideDiv.childNodes[i];
+            sel.childNodes[0].style.visibility = 'visible';
+            sel.childNodes[1].style.visibility = 'hidden';
+        }
+
         var pal = gn('palette');
         gn('blockspalette').style.background = currentSel.bkg;
         while (pal.childElementCount > 0) {
@@ -366,30 +394,46 @@ export default class Palette {
         if (!ScratchJr.getSprite()) {
             return;
         }
-        var list = (BlockSpecs.palettes[n]).concat();
+        const pallets = isRightCategories ? BlockSpecs.palettesRight : BlockSpecs.palettes;
+        var list = (pallets[n]).concat();
         var dx = dxblocks;
+        if (isRightCategories) {
+            dx = gn('palette').offsetWidth;
+        }
         for (var k = 0; k < list.length; k++) {
+            // if is the right categories, then we need to align the blocks to the right.
+            // to do so, we need to change the dx value to be the width of the palette minus the width of the block
+            // and the betweenblocks value to be negative
             if (list[k] == 'space') {
-                dx += 30 * blockscale;
+                if (isRightCategories) {
+                    dx -= 30 * blockscale;
+                } else {
+                    dx += 30 * blockscale;
+                }
             } else {
                 var newb = Palette.newScaledBlock(pal, list[k],
                     ((list[k] == 'repeat') ? 0.65 * scaleMultiplier : blockscale), dx, blockdy);
                 newb.lift();
-                dx += betweenblocks;
+                if (isRightCategories) {
+                    dx -= betweenblocks;
+                } else {
+                    dx += betweenblocks;
+                }
             }
         }
         dx += 30;
-        if ((n == (BlockSpecs.categories.length - 1)) && (ScratchJr.stage.pages.length > 1)) {
+        const categoriesLength = isRightCategories ? BlockSpecs.categoriesRight.length : BlockSpecs.categories.length;
+        if ((n == (categoriesLength - 1)) && (ScratchJr.stage.pages.length > 1)) {
             Palette.addPagesBlocks(dx);
         }
-         //TODO: they hard coded n==3 to be sound, but we don't want the sound blocks for alpha release
+        //TODO: they hard coded n==3 to be sound, but we don't want the sound blocks for alpha release
         //need to clean this up before we re-add in the sound blocks
         // if ((n == 3) && (ScratchJr.getSprite().sounds.length > 0)) {
         //     Palette.addSoundsBlocks(dxblocks);
         // }
     }
 
-    static reset () {
+    static reset() {
         if (numcat == (BlockSpecs.categories.length - 1)) {
             Palette.selectCategory(BlockSpecs.categories.length - 1);
         }
@@ -398,7 +442,7 @@ export default class Palette {
         }
     }
 
-    static showSelectors (b) {
+    static showSelectors(b) {
         var n = numcat;
         var div = gn('selectors');
         for (var i = 0; i < div.childElementCount; i++) {
@@ -410,7 +454,7 @@ export default class Palette {
         }
     }
 
-    static addPagesBlocks (dx) {
+    static addPagesBlocks(dx) {
         var pal = gn('palette');
         var spec = BlockSpecs.defs.gotopage;
         for (var i = 0; i < ScratchJr.stage.pages.length; i++) {
@@ -424,7 +468,7 @@ export default class Palette {
         }
     }
 
-    static addSoundsBlocks (dx) {
+    static addSoundsBlocks(dx) {
         var pal = gn('palette');
         var spr = ScratchJr.getSprite();
         var list = spr ? spr.sounds : [];
@@ -440,7 +484,7 @@ export default class Palette {
         }
     }
 
-    static addBlockSound (parent, op, val, dx, dy) {
+    static addBlockSound(parent, op, val, dx, dy) {
         var spec = BlockSpecs.defs[op];
         var old = spec[4];
         spec[4] = val;
@@ -449,7 +493,7 @@ export default class Palette {
         return newb;
     }
 
-    static drawRecordSound (w, h, dx) {
+    static drawRecordSound(w, h, dx) {
         var pal = gn('palette');
         var div = newDiv(pal, dx, 0, w, h, {
             top: (6 * scaleMultiplier) + 'px'
@@ -459,11 +503,11 @@ export default class Palette {
             div.offsetHeight * window.devicePixelRatio,
             {
                 webkitTransform: 'translate(' +
-                (-div.offsetWidth * window.devicePixelRatio / 2) + 'px, ' +
-                (-div.offsetHeight * window.devicePixelRatio / 2) + 'px) ' +
-                'scale(' + (1 / window.devicePixelRatio) + ') translate(' +
-                (div.offsetWidth * window.devicePixelRatio / 2) + 'px, ' +
-                (div.offsetHeight * window.devicePixelRatio / 2) + 'px)'
+                    (-div.offsetWidth * window.devicePixelRatio / 2) + 'px, ' +
+                    (-div.offsetHeight * window.devicePixelRatio / 2) + 'px) ' +
+                    'scale(' + (1 / window.devicePixelRatio) + ') translate(' +
+                    (div.offsetWidth * window.devicePixelRatio / 2) + 'px, ' +
+                    (div.offsetHeight * window.devicePixelRatio / 2) + 'px)'
             }
         );
         if (BlockSpecs.mic.complete) {
@@ -477,21 +521,21 @@ export default class Palette {
         div.onmousedown = Palette.recordSound;
     }
 
-    static recordSound (e) {
+    static recordSound(e) {
         e.preventDefault();
         e.stopPropagation();
         ScratchJr.clearSelection();
         Record.appear();
     }
 
-    static inStatesPalette () {
+    static inStatesPalette() {
         var div = gn('selectors');
         var sel = div.childNodes[div.childElementCount - 1];
         return sel.childNodes[0].style.visibility == 'hidden';
     }
 
     // move to scratch jr app
-    static getLandingPlace (el, e, scale) {
+    static getLandingPlace(el, e, scale) {
         scale = typeof scale !== 'undefined' ? scale : 1;
         var sc = ScratchJr.getActiveScript().owner;
         var pt = e ? Events.getTargetPoint(e) : null;
@@ -500,12 +544,12 @@ export default class Palette {
         }
         var box = new Rectangle(el.left / scale, el.top / scale, el.offsetWidth / scale, el.offsetHeight / scale);
         var box2 = new Rectangle(globalx(gn('palette')), globaly(gn('palette')),
-                                 gn('palette').offsetWidth, gn('palette').offsetHeight);
+            gn('palette').offsetWidth, gn('palette').offsetHeight);
         if ((sc.flowCaret != null) && ((sc.flowCaret.prev != null) ||
             (sc.flowCaret.next != null) || (sc.flowCaret.inside != null))) {
             return 'scripts';
         }
-        if (box2.overlapElemBy(box, 0.4) && box2.hitRect({x: el.left / scale, y: el.top / scale})) {
+        if (box2.overlapElemBy(box, 0.4) && box2.hitRect({ x: el.left / scale, y: el.top / scale })) {
             return 'palette';
         }
         if (pt && box2.hitRect(pt)) {
@@ -526,18 +570,18 @@ export default class Palette {
         return null;
     }
 
-    static overlapsWith (el, box) {
+    static overlapsWith(el, box) {
         var box2 = new Rectangle(globalx(el), globaly(el), el.offsetWidth, el.offsetHeight);
         return box.intersects(box2);
     }
 
-    static overlapsWith2 (el, box) {
+    static overlapsWith2(el, box) {
         var box2 = new Rectangle(el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight);
         return box.intersects(box2);
     }
 
 
-    static getBlockfromChild (div) {
+    static getBlockfromChild(div) {
         while (div != null) {
             if (div.owner) {
                 return div;
@@ -547,7 +591,7 @@ export default class Palette {
         return null;
     }
 
-    static getHittedThumb (el, div, scale) {
+    static getHittedThumb(el, div, scale) {
         scale = typeof scale !== 'undefined' ? scale : 1;
         var box1 = new Rectangle(el.left / scale, el.top / scale, el.offsetWidth / scale, el.offsetHeight / scale);
         var area = 0;
@@ -574,7 +618,7 @@ export default class Palette {
     //  Palette Block
     /////////////////////////////////////
 
-    static newScaledBlock (parent, op, scale, dx, dy) {
+    static newScaledBlock(parent, op, scale, dx, dy) {
         var bbx = new Block(BlockSpecs.defs[op], true, scale);
         setProps(bbx.div.style, {
             position: 'absolute',
@@ -585,27 +629,27 @@ export default class Palette {
         return bbx;
     }
 
-    static dropBlockFromPalette (e, element) {
+    static dropBlockFromPalette(e, element) {
         e.preventDefault();
         switch (Palette.getLandingPlace(element, e)) {
-        case 'scripts':
-            OS.analyticsEvent('editor', 'new_block_' + element.owner.blocktype);
-            var sc = ScratchJr.getActiveScript();
-            var dx = localx(sc, element.left);
-            var dy = localy(sc, element.top);
-            ScriptsPane.blockDropped(sc, dx, dy);
-            var spr = ScratchJr.getActiveScript().owner.spr;
-            Undo.record({
-                action: 'scripts',
-                where: spr.div.parentNode.owner.id,
-                who: spr.id
-            });
-            // Record a change for sample projects in story-starter mode
-            ScratchJr.storyStart('Palette.dropBlockFromPalette');
-            break;
-        default:
-            ScratchJr.getActiveScript().owner.deleteBlocks();
-            break;
+            case 'scripts':
+                OS.analyticsEvent('editor', 'new_block_' + element.owner.blocktype);
+                var sc = ScratchJr.getActiveScript();
+                var dx = localx(sc, element.left);
+                var dy = localy(sc, element.top);
+                ScriptsPane.blockDropped(sc, dx, dy);
+                var spr = ScratchJr.getActiveScript().owner.spr;
+                Undo.record({
+                    action: 'scripts',
+                    where: spr.div.parentNode.owner.id,
+                    who: spr.id
+                });
+                // Record a change for sample projects in story-starter mode
+                ScratchJr.storyStart('Palette.dropBlockFromPalette');
+                break;
+            default:
+                ScratchJr.getActiveScript().owner.deleteBlocks();
+                break;
         }
         ScratchJr.getActiveScript().owner.dragList = [];
     }

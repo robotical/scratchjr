@@ -13,26 +13,59 @@
     height: ${css_vh(8.20)};
 }
 
-.connectButton {
+/* Styles for the connection buttons area */
+.connectionButtonsArea {
     position: absolute;
+    top: -${css_vh(1)};
+    left: ${css_vh(10.94)};
+    font-family: Lato Regular;
+
+    display: flex;
+    justify-content: space-between; /* Space between the two buttons */
+    gap: 10px; /* Gap between buttons */
+    width: fit-content; /* Adjust the width based on content */
+    margin-top: 20px; /* Adjust margin as needed */
+}
+
+/* Styles for each connect button */
+.connectButton {
     margin: 0px;
     padding: 0px;
-    top: ${css_vh(1.7)};
-    left: ${css_vh(10.94)};
-    width: ${css_vh(20.20)};
-    height: ${css_vh(5.20)};
-
+    width: ${css_vh(12)}; 
+    height: ${css_vh(5.5)};
     background: #4bd8fa;
     border: 2px solid white;
-    border-radius: 30px;
-    box-shadow: 1px 2px 2px 0px rgba(0, 0, 0, 0.75);
+    border-radius: 4px;
     display: flex;
     justify-content: center;
     align-items: center;
-
-    font-family: Lato Regular;
-    column-gap: 5px;
+    column-gap: 10px; /* Space between icon and text */
     cursor: pointer;
+}
+
+.connectButtonConnected {
+    background: #4bfaa3;
+}
+
+/* Styles for the icon part of the button */
+.connectIcon {
+    font-size: 18px; /* Adjust size as needed */
+}
+
+/* Styles for the text part of the button */
+.connectText {
+    font-family: 'Lato Regular'; /* Ensure this font is loaded in your project */
+    font-size: 16px; /* Adjust size as needed */
+}
+
+/* .connectText media query for smaller screens */
+@media (max-width: 930px) {
+    .connectText {
+        display: none; /* Hide text on smaller screens */
+    }
+    .connectButton {
+        width: ${css_vh(8)}; 
+    }
 }
 
 .connectDot {
