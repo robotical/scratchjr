@@ -25,7 +25,8 @@ const tiltshapes = ['tiltright', 'tiltleft', 'tiltbackward', 'tiltforward', 'til
 const moveshapes = [
     'onmove',
     'onshake'];
-const distanceshapes = ['onclosedistance', 'onfardistance'];
+// const distanceshapes = ['onclosedistance', 'onfardistance'];
+const distanceshapes = ['onclosedistance'];
 const lightshapes = ['onhighlight', 'onmidlight', 'onlowlight'];
 const rotateshapes = ['onrotateclockwise', 'onrotatecounterclockwise'];
 const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];

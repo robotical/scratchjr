@@ -1,7 +1,7 @@
 import Prims from "../editor/engine/Prims";
 import CogBlocks from "./CogBlocks";
 
-export class CogManager {
+class CogManager {
     constructor() {
         this.cogs = {};
     }
@@ -11,7 +11,7 @@ export class CogManager {
     }
 
     removeCog(cog) {
-        cog.destroy();
+        cog.blocks.destroy();
         delete this.cogs[cog.id];
     }
 
@@ -19,6 +19,7 @@ export class CogManager {
         const cog = this.cogs[cogId];
         if (cog) {
             const cogBlocks = new CogBlocks(cog);
+            cog.blocks = cogBlocks;
             Prims.cogBlocks = cogBlocks;
         } else {
             console.error(`Cog with id ${cogId} not found`);
@@ -26,8 +27,4 @@ export class CogManager {
     }
 }
 
-
-const cogManager = new CogManager();
-window.cogManager = cogManager;
-
-export default cogManager;
+export default CogManager;

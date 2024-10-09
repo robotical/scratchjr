@@ -398,7 +398,7 @@ export default class Palette {
         var list = (pallets[n]).concat();
         var dx = dxblocks;
         if (isRightCategories) {
-            dx = gn('palette').offsetWidth;
+            dx = gn('palette').offsetWidth - 60;
         }
         for (var k = 0; k < list.length; k++) {
             // if is the right categories, then we need to align the blocks to the right.

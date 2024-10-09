@@ -227,7 +227,7 @@ div.frame {
     display: inline-block;
     word-spacing: -1;
     position: absolute;
-    top: -55px;
+    top: ${css_vh(-8)};
     margin: ${css_vh(0)};
     z-index: 60;
     width: ${354 * scaleMultiplier}px;
@@ -239,7 +239,7 @@ div.frame {
     display: inline-block;
     word-spacing: -1;
     position: absolute;
-    top: -55px;
+    top: ${css_vh(-8)};
     right: 0;
     margin: ${css_vh(0)};
     z-index: 60;

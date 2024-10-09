@@ -28,8 +28,6 @@ import {
 import { cogSvg } from '../../html-svgs/cog';
 import { martySvg } from '../../html-svgs/marty';
 import { raftDisconnectedSubscriptionHelper, raftVerifiedSubscriptionHelper } from '../../utils/raft-subscription-helpers';
-import { CogManager } from '../../cog/CogManager';
-console.log("CogManager", CogManager); // This needs to be here to execute the CogManager file
 
 let projectNameTextInput = null;
 let info = null;
@@ -118,50 +116,68 @@ export default class UI {
     static createConnectionButtons(leftPanel) {
         const connectionButtonsArea = newHTML('div', 'connectionButtonsArea', leftPanel);
 
-        UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', (connectButton) => {
+        const cogButotn = UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', (connectButton) => {
             window.applicationManager.connectGeneric((raft) => {
                 // set subscription to raft events so we can update the UI when:
                 // - the raft is connected
                 // - the raft is disconnected
                 raftVerifiedSubscriptionHelper(raft).subscribe(() => {
-                    // when raft is connected, update the UI to reflect the raft connection status
-                    connectButton.classList.add('connectButtonConnected');
-
-                    // adding the raft to the cog manager
-                    window.cogManager.addCog(raft);
-                    window.cogManager.wireCogWithBlocks(raft.id);
-
+                    UI.setupConnectionButton(connectButton, raft);
                     // turn off the verified subscription to avoid memory leaks
                     raftVerifiedSubscriptionHelper(raft).unsubscribe();
-
-                    // store the old onClick function so we can restore it when the raft is disconnected
-                    const oldOnClick = connectButton.onclick;
-
-                    // set the new onClick function to disconnect the raft
-                    connectButton.onclick = () => {
-                        window.applicationManager.disconnectGeneric(raft);
-                    }
-
-                    // set up a subscription to the raft disconnected event
-                    raftDisconnectedSubscriptionHelper(raft).subscribe(() => {
-                        // when raft is disconnected, update the UI to reflect the raft connection status
-                        connectButton.classList.remove('connectButtonConnected');
-
-                        // remove the raft from the cog manager
-                        window.cogManager.removeCog(raft);
-
-                        // turn off the disconnected subscription
-                        raftDisconnectedSubscriptionHelper(raft).unsubscribe();
-
-                        // restore the old onClick function
-                        connectButton.onclick = oldOnClick;
-                    });
                 })
             })
         });
-        UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty',);
 
 
+        // check if we're alredy connected to a cog, and if so, update the UI button
+        const connectedRafts = window.applicationManager?.connectedRafts || {};
+        let connectedCog;
+        for (const raftId in connectedRafts) {
+            const raft = connectedRafts[raftId];
+            if (raft.type === 'Cog') {
+                connectedCog = raft;
+                // TODO: manage multiple connected cogs
+                break;
+            }
+        }
+
+        if (connectedCog) {
+            UI.setupConnectionButton(cogButotn, connectedCog);
+        }
+
+        // UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty',);
+
+    }
+
+    static setupConnectionButton(button, raft) {
+        // Add the connected class to the button
+        button.classList.add('connectButtonConnected');
+
+        // Add the raft to the cog manager and wire it with blocks
+        window.cogManager.addCog(raft);
+        window.cogManager.wireCogWithBlocks(raft.id);
+
+        // Store the old onClick function to restore it later
+        const oldOnClick = button.onclick;
+
+        // Set the new onClick function to disconnect the raft
+        button.onclick = () => {
+            window.applicationManager.disconnectGeneric(raft);
+        }
+
+        // Set up a subscription to the raft disconnected event
+        raftDisconnectedSubscriptionHelper(raft).subscribe(() => {
+            // When raft is disconnected, update the UI and remove the raft
+            button.classList.remove('connectButtonConnected');
+            window.cogManager.removeCog(raft);
+
+            // Unsubscribe from the disconnected event to avoid memory leaks
+            raftDisconnectedSubscriptionHelper(raft).unsubscribe();
+
+            // Restore the old onClick function
+            button.onclick = oldOnClick;
+        });
     }
 
     static leftPanel(div) {

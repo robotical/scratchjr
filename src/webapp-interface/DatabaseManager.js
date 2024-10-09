@@ -20,7 +20,7 @@ export default class DatabaseManager {
       }
     }
 
-    if (window.ReactNativeWebView) {
+    if (window.applicationManager && window.applicationManager.isPhoneApp()) {
       // we are on the phone app, so we need to load the database from local storage
       dbExists = false;
     }
@@ -29,7 +29,7 @@ export default class DatabaseManager {
       console.log("db doesn't exist, looking at local storage...");
       // if it doesn't exist, and we are on the phone app, look at local storage
       const localStorageBuffer = await this.getFromDeviceLocalStorage();
-      if (localStorageBuffer) {
+      if (localStorageBuffer && localStorageBuffer.byteLength > 10) {
         console.log("opening from local storage...");
         await this.openFromLocalStorage(localStorageBuffer);
       } else {
@@ -142,27 +142,19 @@ export default class DatabaseManager {
   }
 
   saveToDeviceLocalStorage(buffer) {
-    if (window.ReactNativeWebView) {
+    if (window.applicationManager && window.applicationManager.isPhoneApp()) {
       const base64String = this.arrayBufferToBase64(buffer);
-      return mv2.sendCommand({
-        command: "saveFile",
-        fileName: SCRATCH_JR_DB_NAME_LOCAL_STORAGE,
-        contents: base64String
-      });
+      return window.applicationManager.saveFileOnDeviceLocalStorage('scratchjr', SCRATCH_JR_DB_NAME_LOCAL_STORAGE, base64String);
     }
     return null;
   }
 
   async getFromDeviceLocalStorage() {
     // if we are on a the phone app, load the database from local storage
-    if (window.ReactNativeWebView) {
+    if (window.applicationManager && window.applicationManager.isPhoneApp()) {
       try {
-
-        const response = await mv2.sendCommand({
-          command: "loadFile",
-          fileName: SCRATCH_JR_DB_NAME_LOCAL_STORAGE
-        });
-        const base64String = response.contents;
+        const response = await window.applicationManager.loadFileFromDeviceLocalStorage('scratchjr', SCRATCH_JR_DB_NAME_LOCAL_STORAGE);
+        const base64String = response;
         if (base64String) {
           return this.base64ToArrayBuffer(base64String);
         } else {
@@ -172,8 +164,6 @@ export default class DatabaseManager {
         console.log("failed to load from local storage:", e);
         return null;
       }
-    } else {
-      return null;
     }
   }
 

@@ -356,6 +356,7 @@ class ObjectSenseDetection {
     static detectObjectInEitherDirection(objectSenseValue, onCloseDistance, onFarDistance) {
         const irSensor0Value = objectSenseValue[0];
         const irSensor1Value = objectSenseValue[1];
+        // console.log("IR sensor 0: ", irSensor0Value, "IR sensor 1: ", irSensor1Value);
         if (irSensor0Value > this.irSensor0Thresholds.close || irSensor1Value > this.irSensor1Thresholds.close) {
             onCloseDistance();
         } else if (irSensor0Value > this.irSensor0Thresholds.far || irSensor1Value > this.irSensor1Thresholds.far) {

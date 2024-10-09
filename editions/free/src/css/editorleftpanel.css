@@ -59,7 +59,7 @@
 }
 
 /* .connectText media query for smaller screens */
-@media (max-width: 930px) {
+@media (max-width: 1140px) {
     .connectText {
         display: none; /* Hide text on smaller screens */
     }

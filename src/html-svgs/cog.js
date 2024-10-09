@@ -1,5 +1,5 @@
 export const cogSvg = `
-<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="20 0 46 60" width="25">
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="15 0 46 60" width="25">
   <defs>
     <style>
       .cls-1 {

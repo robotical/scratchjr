@@ -1,7 +1,17 @@
-export const raftVerifiedSubscriptionHelper = (raft) => ({
-    subscribe: (callback) => raft.subscribe(raftVerifiedSubscriptionObserver_(callback), ["conn"]),
-    unsubscribe: () => raft.unsubscribe(raftVerifiedSubscriptionObserver_(() => { }))
-});
+export const raftVerifiedSubscriptionHelper = (raft) => {
+    let observer = null;
+    return {
+        subscribe: (callback) => {
+            observer = raftVerifiedSubscriptionObserver_(callback);
+            raft.subscribe(observer, ["conn"]);
+        },
+        unsubscribe: () => {
+            if (observer) {
+                raft.unsubscribe(observer);
+            }
+        }
+    };
+};
 
 const raftVerifiedSubscriptionObserver_ = (callback) => {
     return {
@@ -26,10 +36,20 @@ const raftVerifiedSubscriptionObserver_ = (callback) => {
     };
 };
 
-export const raftDisconnectedSubscriptionHelper = (raft) => ({
-    subscribe: (callback) => raft.subscribe(raftDisconnectedSubscriptionObserver_(callback), ["conn"]),
-    unsubscribe: () => raft.unsubscribe(raftDisconnectedSubscriptionObserver_(() => { }))
-});
+export const raftDisconnectedSubscriptionHelper = (raft) => {
+    let observer = null;
+    return {
+        subscribe: (callback) => {
+            observer = raftDisconnectedSubscriptionObserver_(callback);
+            raft.subscribe(observer, ["conn"]);
+        },
+        unsubscribe: () => {
+            if (observer) {
+                raft.unsubscribe(observer);
+            }
+        }
+    };
+};
 
 const raftDisconnectedSubscriptionObserver_ = (callback) => {
     return {
@@ -54,10 +74,20 @@ const raftDisconnectedSubscriptionObserver_ = (callback) => {
     };
 };
 
-export const raftPubSubscriptionHelper = (raft) => ({
-    subscribe: (callback) => raft.subscribe(raftPubSubscriptionObserver_(callback), ["raftinfo"]),
-    unsubscribe: () => raft.unsubscribe(raftPubSubscriptionObserver_(() => { }))
-});
+export const raftPubSubscriptionHelper = (raft) => {
+    let observer = null;
+    return {
+        subscribe: (callback) => {
+            observer = raftPubSubscriptionObserver_(callback);
+            raft.subscribe(raftPubSubscriptionObserver_(callback), ["raftinfo"]);
+        },
+        unsubscribe: () => {
+            if (observer) {
+                raft.unsubscribe(observer);
+            }
+        }
+    };
+};
 
 const raftPubSubscriptionObserver_ = (callback) => {
     return {

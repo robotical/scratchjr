@@ -24,7 +24,7 @@ export default class CogBlocks {
     }
 
     destroy() {
-        raftPubSubscriptionHelper.unsubscribe();
+        raftPubSubscriptionHelper(this.cog).unsubscribe();
     }
 
     onTiltLeft() {

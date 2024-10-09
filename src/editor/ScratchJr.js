@@ -17,8 +17,11 @@ import Events from '../utils/Events';
 import BlockSpecs from './blocks/BlockSpecs';
 import Runtime from './engine/Runtime';
 import Localization from '../utils/Localization';
-import {libInit, gn, scaleMultiplier, newHTML,
-    isAndroid, getUrlVars, CSSTransition3D, frame} from '../utils/lib';
+import {
+    libInit, gn, scaleMultiplier, newHTML,
+    isAndroid, getUrlVars, CSSTransition3D, frame
+} from '../utils/lib';
+import CogManager from "../cog/CogManager";
 
 let workingCanvas = document.createElement('canvas');
 let workingCanvas2 = document.createElement('canvas');
@@ -63,128 +66,128 @@ let autoSaveSetInterval = null;
 let onBackButtonCallback = [];
 
 export default class ScratchJr {
-    static get workingCanvas () {
+    static get workingCanvas() {
         return workingCanvas;
     }
 
-    static get workingCanvas2 () {
+    static get workingCanvas2() {
         return workingCanvas2;
     }
 
-    static get activeFocus () {
+    static get activeFocus() {
         return activeFocus;
     }
 
-    static set activeFocus (newActiveFocus) {
+    static set activeFocus(newActiveFocus) {
         activeFocus = newActiveFocus;
     }
 
-    static set changed (newChanged) {
+    static set changed(newChanged) {
         changed = newChanged;
     }
 
-    static get changed () {
+    static get changed() {
         return changed;
     }
 
-    static set storyStarted (newStoryStarted) {
+    static set storyStarted(newStoryStarted) {
         storyStarted = newStoryStarted;
     }
 
-    static get runtime () {
+    static get runtime() {
         return runtime;
     }
 
-    static get stage () {
+    static get stage() {
         return stage;
     }
 
-    static set stage (newStage) {
+    static set stage(newStage) {
         stage = newStage;
     }
 
-    static get inFullscreen () {
+    static get inFullscreen() {
         return inFullscreen;
     }
 
 
-    static get stagecolor () {
+    static get stagecolor() {
         return stagecolor;
     }
 
-    static get defaultSprite () {
+    static get defaultSprite() {
         return defaultSprite;
     }
 
-    static get layerTop () {
+    static get layerTop() {
         return layerTop;
     }
 
-    static get layerAboveBottom () {
+    static get layerAboveBottom() {
         return layerAboveBottom;
     }
 
-    static get dragginLayer () {
+    static get dragginLayer() {
         return dragginLayer;
     }
 
-    static get currentProject () {
+    static get currentProject() {
         return currentProject;
     }
 
-    static set currentProject (md5) {
+    static set currentProject(md5) {
         currentProject = md5;
     }
 
-    static get editmode () {
+    static get editmode() {
         return editmode;
     }
 
-    static set editmode (newEditmode) {
+    static set editmode(newEditmode) {
         editmode = newEditmode;
     }
 
-    static set time (newTime) {
+    static set time(newTime) {
         time = newTime;
     }
 
-    static set userStart (newUserStart) {
+    static set userStart(newUserStart) {
         userStart = newUserStart;
     }
 
-    static get onHold () {
+    static get onHold() {
         return onHold;
     }
 
-    static set onHold (newOnHold) {
+    static set onHold(newOnHold) {
         onHold = newOnHold;
     }
 
-    static get shaking () {
+    static get shaking() {
         return shaking;
     }
 
-    static set shaking (newShaking) {
+    static set shaking(newShaking) {
         shaking = newShaking;
     }
 
-    static get stopShaking () {
+    static get stopShaking() {
         return stopShaking;
     }
 
-    static set stopShaking (newStopShaking) {
+    static set stopShaking(newStopShaking) {
         stopShaking = newStopShaking;
     }
 
-    static get version () {
+    static get version() {
         return version;
     }
 
-    static get onBackButtonCallback () {
+    static get onBackButtonCallback() {
         return onBackButtonCallback;
     }
 
-    static appinit (v) {
+    static appinit(v) {
         stagecolor = window.Settings.stageColor;
         defaultSprite = window.Settings.defaultSprite;
         version = v;
@@ -227,12 +230,12 @@ export default class ScratchJr {
     // Event handler for when a story is started
     // When called and enabled, this will trigger sample projects to save copies
     // Here for debugging, run-time filtering, etc.
-    static storyStart (/*eventName*/) {
+    static storyStart(/*eventName*/) {
         // console.log("Story started: " + eventName);
         storyStarted = true;
     }
 
-    static editorEvents () {
+    static editorEvents() {
         document.ongesturestart = undefined;
         window.ontouchstart = ScratchJr.unfocus;
         window.onmousedown = ScratchJr.unfocus;
@@ -240,7 +243,7 @@ export default class ScratchJr {
         window.onmouseup = undefined;
     }
 
-    static unfocus (evt) {
+    static unfocus(evt) {
         if (Palette.helpballoon) {
             Palette.helpballoon.parentNode.removeChild(Palette.helpballoon);
             Palette.helpballoon = undefined;
@@ -267,13 +270,13 @@ export default class ScratchJr {
         ScratchJr.blur();
     }
 
-    static clearSelection () {
+    static clearSelection() {
         if (shaking) {
             stopShaking(shaking);
         }
     }
 
-    static blur () {
+    static blur() {
         if (ScratchAudio.firstTime) {
             ScratchAudio.firstClick();
         }
@@ -281,7 +284,7 @@ export default class ScratchJr {
         Menu.closeMyOpenMenu();
     }
 
-    static getSprite () {
+    static getSprite() {
         if (!stage.currentPage.currentSpriteName) {
             return undefined;
         }
@@ -291,14 +294,14 @@ export default class ScratchJr {
         return gn(stage.currentPage.currentSpriteName).owner;
     }
 
-    static gestureStart (e) {
+    static gestureStart(e) {
         e.preventDefault();
         if (ScratchAudio.firstTime) {
             ScratchAudio.firstClick();
         }
     }
 
-    static log () {
+    static log() {
         if (!isDebugging) {
             return;
         }
@@ -311,14 +314,14 @@ export default class ScratchJr {
         console.log(res); //eslint-disable-line no-console
     }
 
-    static getTime () {
+    static getTime() {
         return ((new Date()) - time) / 1000;
     }
 
-    static isSampleOrStarter () {
+    static isSampleOrStarter() {
         return editmode == 'look' || editmode == 'storyStarter';
     }
-    static isEditable () {
+    static isEditable() {
         return editmode != 'look';
     }
 
@@ -327,7 +330,7 @@ export default class ScratchJr {
     // Note that on Android Lollipop and up we have much more limited
     // opportunity to save progress, etc. before the app is
     // paused, and so we just suspend the whole webview and then restore it here.
-    static onResume () {
+    static onResume() {
         // no nothing special, for now.
         if (Record.dialogOpen) {
             Record.recordError();
@@ -344,12 +347,12 @@ export default class ScratchJr {
         }, window.Settings.autoSaveInterval);
     }
 
-    static onPause () {
+    static onPause() {
         autoSaveEnabled = false;
         window.clearInterval(autoSaveSetInterval);
     }
 
-    static saveProject (e, onDone) {
+    static saveProject(e, onDone) {
         if (ScratchJr.isEditable() && !Project.error && changed) {
             if (editmode != 'storyStarter') {
                 if (currentProject) {
@@ -370,7 +373,7 @@ export default class ScratchJr {
      * Save the story as a new project so that the user can
      * continue to edit or share it in the future.
      */
-    static saveStory (onDone) {
+    static saveStory(onDone) {
         OS.analyticsEvent('samples', 'story_starter_edited', Project.metadata.name);
         // Localize sample project names
         var sampleName = Localization.localizeSampleName(Project.metadata.name);
@@ -395,7 +398,7 @@ export default class ScratchJr {
         }, true);
     }
 
-    static saveAndFlip (e) {
+    static saveAndFlip(e) {
         onHold = true;
         ScratchJr.stopStripsFromTop(e);
         ScratchJr.unfocus(e);
@@ -403,19 +406,19 @@ export default class ScratchJr {
         OS.analyticsEvent('editor', 'project_editor_close');
     }
 
-    static flippage () {
+    static flippage() {
         Alert.close();
         OS.cleanassets('wav', doNext);
-        function doNext () {
+        function doNext() {
             OS.cleanassets('svg', ScratchJr.switchPage);
         }
     }
 
-    static switchPage () {
+    static switchPage() {
         window.location.href = ScratchJr.getGotoLink();
     }
 
-    static getGotoLink () {
+    static getGotoLink() {
         if (editmode == 'storyStarter') {
             if (!storyStarted) {
                 return 'home.html?place=help';
@@ -435,7 +438,7 @@ export default class ScratchJr {
         }
     }
 
-    static updateRunStopButtons () {
+    static updateRunStopButtons() {
         var isOff = runtime.inactive();
         if (inFullscreen) {
             gn('go').className = isOff ? 'go on presentationmode' : 'go off presentationmode';
@@ -462,20 +465,20 @@ export default class ScratchJr {
         }
     }
 
-    static runStrips (e) {
+    static runStrips(e) {
         ScratchJr.stopStripsFromTop(e);
         ScratchJr.unfocus(e);
         ScratchJr.startGreenFlagThreads();
         userStart = true;
-    //  time = (new Date()) - 0;
+        //  time = (new Date()) - 0;
     }
 
-    static startGreenFlagThreads () {
+    static startGreenFlagThreads() {
         ScratchJr.resetSprites();
         ScratchJr.startCurrentPageStrips(['onflag', 'ontouch']);
     }
 
-    static startCurrentPageStrips (list) {
+    static startCurrentPageStrips(list) {
         var page = stage.currentPage.div;
         for (var i = 0; i < page.childElementCount; i++) {
             var spr = page.childNodes[i].owner;
@@ -489,7 +492,7 @@ export default class ScratchJr {
         }
     }
 
-    static startScriptsFor (spr, list) {
+    static startScriptsFor(spr, list) {
         var sc = gn(spr.id + '_scripts');
         var topblocks = sc.owner.getBlocksType(list);
         for (var j = 0; j < topblocks.length; j++) {
@@ -498,7 +501,7 @@ export default class ScratchJr {
         }
     }
 
-    static stopStripsFromTop (e) {
+    static stopStripsFromTop(e) {
         e.preventDefault();
         e.stopPropagation();
         ScratchJr.unfocus(e);
@@ -506,16 +509,16 @@ export default class ScratchJr {
         userStart = false;
     }
 
-    static stopStrips () {
+    static stopStrips() {
         runtime.stopThreads();
         stage.currentPage.updateThumb();
     }
 
-    static resetSprites () {
+    static resetSprites() {
         stage.resetPage(stage.currentPage);
     }
 
-    static fullScreen (e) {
+    static fullScreen(e) {
         if (gn('full').className == 'fullscreen') {
             onBackButtonCallback.push(function () {
                 var fakeEvent = document.createEvent('TouchEvent');
@@ -529,7 +532,7 @@ export default class ScratchJr {
         }
     }
 
-    static displayStatus (type) {
+    static displayStatus(type) {
         var ids = ['topsection', 'blockspalette', 'scripts', 'flip', 'projectinfo'];
         for (var i = 0; i < ids.length; i++) {
             if (gn(ids[i])) {
@@ -538,7 +541,7 @@ export default class ScratchJr {
         }
     }
 
-    static enterFullScreen (e) {
+    static enterFullScreen(e) {
         if (onHold) {
             return;
         }
@@ -552,7 +555,7 @@ export default class ScratchJr {
         document.body.style.background = 'black';
     }
 
-    static quitFullScreen (e) {
+    static quitFullScreen(e) {
         //  time = (new Date()) - 0;
         e.preventDefault();
         e.stopPropagation();
@@ -568,12 +571,12 @@ export default class ScratchJr {
     //UI calls
     /////////////////////////////////////////
 
-    static getActiveScript () {
+    static getActiveScript() {
         var str = stage.currentPage.currentSpriteName + '_scripts';
         return gn(str);
     }
 
-    static getBlocks () {
+    static getBlocks() {
         return ScratchJr.getActiveScript().owner.getBlocks();
     }
 
@@ -581,7 +584,7 @@ export default class ScratchJr {
     //Setup editable field
 
 
-    static setupEditableField () {
+    static setupEditableField() {
         textForm = newHTML('form', 'textform', frame);
         textForm.name = 'editable';
         var ti = newHTML('input', 'textinput', textForm);
@@ -592,13 +595,13 @@ export default class ScratchJr {
         textForm.onsubmit = function (evt) {
             submitOverride(evt);
         };
-        function handleKeyPress (e) {
+        function handleKeyPress(e) {
             var key = e.keyCode || e.which;
             if (key == 13) {
                 submitOverride(e);
             }
         }
-        function submitOverride (e) {
+        function submitOverride(e) {
             e.preventDefault();
             e.stopPropagation();
             var input = e.target;
@@ -617,7 +620,7 @@ export default class ScratchJr {
     //Argument Clicked
 
 
-    static editArg (e, ti) {
+    static editArg(e, ti) {
         e.preventDefault();
         e.stopPropagation();
         if (ti && ti.owner.isText()) {
@@ -631,7 +634,7 @@ export default class ScratchJr {
         });
     }
 
-    static textClicked (e, div) {
+    static textClicked(e, div) {
         var b = div.owner; // b is a BlockArg
         activeFocus = b;
         var pt = b.getScreenPt();
@@ -658,13 +661,13 @@ export default class ScratchJr {
         ti.focus();
     }
 
-    static handleTextFieldFocus (e) {
+    static handleTextFieldFocus(e) {
         e.preventDefault();
         e.stopPropagation();
         activeFocus.oldvalue = activeFocus.input.textContent;
     }
 
-    static handleTextFieldBlur (e) {
+    static handleTextFieldBlur(e) {
         onBackButtonCallback.pop();
         e.preventDefault();
         e.stopPropagation();
@@ -697,7 +700,7 @@ export default class ScratchJr {
     //Numeric keyboard
     /////////////////////////////////////////
 
-    static setupKeypad () {
+    static setupKeypad() {
         keypad = newHTML('div', 'picokeyboard', frame);
         keypad.ontouchstart = ScratchJr.eatEvent;
         keypad.onmousedown = ScratchJr.eatEvent;
@@ -709,15 +712,15 @@ export default class ScratchJr {
         //  ScratchJr.keyboardAddKey (pad, undefined, 'onekey space');
         ScratchJr.keyboardAddKey(pad, '0', 'onekey');
         ScratchJr.keyboardAddKey(pad, undefined, 'onekey delete');
-    //  var keym = newHTML("div", 'onkey' ,pad);
+        //  var keym = newHTML("div", 'onkey' ,pad);
     }
 
-    static eatEvent (e) {
+    static eatEvent(e) {
         e.preventDefault();
         e.stopPropagation();
     }
 
-    static keyboardAddKey (p, str, c) {
+    static keyboardAddKey(p, str, c) {
         var keym = newHTML('div', c, p);
         var mk = newHTML('span', undefined, keym);
         mk.textContent = str ? str : '';
@@ -730,7 +733,7 @@ export default class ScratchJr {
     //Number Clicked
 
 
-    static numberClicked (e, ti) {
+    static numberClicked(e, ti) {
         var delta = (activeFocus) ? activeFocus.delta : 0;
         if (activeFocus && (activeFocus.type == 'blockarg')) {
             activeFocus.div.className = 'numfield off';
@@ -758,7 +761,7 @@ export default class ScratchJr {
         window.onkeydown = ScratchJr.handleKeyDown;
     }
 
-    static needsToScroll (b) {
+    static needsToScroll(b) {
         // needs scroll
         var look = ScratchJr.getActiveScript(); // look canvas
         var dx = b.daddy.div.left + b.daddy.div.offsetWidth + look.left;
@@ -780,7 +783,7 @@ export default class ScratchJr {
         activeFocus.delta = delta;
     }
 
-    static handleKeyDown (evt) {
+    static handleKeyDown(evt) {
         // 48 is the keyCode for 0
         // 57 is the keyCode for 9
         // For the detail of keyCode of keyboard event
@@ -795,7 +798,7 @@ export default class ScratchJr {
         }
     }
 
-    static numEditKey (e) {
+    static numEditKey(e) {
         e.preventDefault();
         e.stopPropagation();
         var t = e.target;
@@ -822,7 +825,7 @@ export default class ScratchJr {
      * Fill active focus with value `c`
      * @param c The input char, should be 0...9 or `-`
      */
-    static fillValueWithKey (c) {
+    static fillValueWithKey(c) {
         var input = activeFocus.input;
         var val = input.textContent;
         if (editfirst) {
@@ -845,25 +848,25 @@ export default class ScratchJr {
         }
     }
 
-    static setSpaceKey () {
+    static setSpaceKey() {
         keypad.childNodes[0].childNodes[9].className = 'onekey space';
         keypad.childNodes[0].childNodes[9].childNodes[0].textContent = '';
     }
 
-    static setMinusKey () {
+    static setMinusKey() {
         keypad.childNodes[0].childNodes[9].className = 'onekey minus';
         keypad.childNodes[0].childNodes[9].childNodes[0].textContent = '-';
     }
 
-    static validateNumber (val) {
+    static validateNumber(val) {
         return Number(val);
     }
 
-    static revokeInput (val) {
+    static revokeInput(val) {
         return val;
     }
 
-    static numEditDelete () {
+    static numEditDelete() {
         var val = activeFocus.input.textContent;
         if (val.length != 0) {
             val = val.substring(0, val.length - 1);
@@ -874,7 +877,7 @@ export default class ScratchJr {
         activeFocus.setValue(val);
     }
 
-    static editDone () {
+    static editDone() {
         if (document.activeElement.tagName === 'INPUT') {
             document.activeElement.blur();
         }
@@ -892,7 +895,7 @@ export default class ScratchJr {
         }
     }
 
-    static closeNumberEdit () {
+    static closeNumberEdit() {
         ScratchJr.numEditDone();
         ScratchJr.resetScroll();
         keypad.className = 'picokeyboard off';
@@ -902,7 +905,7 @@ export default class ScratchJr {
         window.onkeydown = undefined;
     }
 
-    static numEditDone () {
+    static numEditDone() {
         var val = activeFocus.input.textContent;
         if (val == '-') {
             val = 0;
@@ -930,7 +933,7 @@ export default class ScratchJr {
         }
     }
 
-    static resetScroll () {
+    static resetScroll() {
         var delta = activeFocus.delta;
         if (delta < 0) {
             var look = ScratchJr.getActiveScript(); // look canvas
@@ -948,7 +951,7 @@ export default class ScratchJr {
         }
     }
 
-    static validate (str, name) {
+    static validate(str, name) {
         var str2 = str.replace(/\s*/g, '');
         if (str2.length == 0) {
             return name;
@@ -956,7 +959,7 @@ export default class ScratchJr {
         return str;
     }
 
-    static makeThumb (svgName, width, height) {
+    static makeThumb(svgName, width, height) {
         IO.getAsset(svgName, function (svgDataUrl) {
             var svgBase64 = svgDataUrl.split(',')[1];
             var dataurl = IO.getThumbnail(atob(svgBase64), width, height, 120, 90);
@@ -983,7 +986,7 @@ export default class ScratchJr {
      * or popup, so it is the responsibility of popup components to correctly cleanup
      * the onBackButtonCallback.
      */
-    static goBack () {
+    static goBack() {
         if (onBackButtonCallback.length === 0) {
             var e = document.createEvent('TouchEvent');
             e.initTouchEvent();
@@ -999,3 +1002,4 @@ export default class ScratchJr {
 
 // Expose ScratchJr to global
 window.ScratchJr = ScratchJr;
+window.cogManager = new CogManager();
