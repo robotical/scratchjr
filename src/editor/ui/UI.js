@@ -117,7 +117,7 @@ export default class UI {
         const connectionButtonsArea = newHTML('div', 'connectionButtonsArea', leftPanel);
 
         const cogButotn = UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', (connectButton) => {
-            window.applicationManager.connectGeneric((raft) => {
+            window.applicationManager.connectGenericCog((raft) => {
                 // set subscription to raft events so we can update the UI when:
                 // - the raft is connected
                 // - the raft is disconnected
