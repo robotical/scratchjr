@@ -288,6 +288,7 @@ export default class Record {
 
     // Press OK (check)
     static saveSoundAndClose () {
+        console.log("saveSoundAndClose");
         if (error || !recordedSound) {
             Record.killRecorder();
         } else {

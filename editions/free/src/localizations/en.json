@@ -82,6 +82,7 @@
   "BLOCK_PLAY_NO_SOUND_DESCRIPTION": "Plays a 'No!' sound. This will either play through the robot when connected or through this device if the robot is disconnected.",
   "BLOCK_PLAY_WHISTLE_SOUND": "Play 'Whistle' sound",
   "BLOCK_PLAY_WHISTLE_SOUND_DESCRIPTION": "Plays a 'Whistle' sound. This will either play through the robot when connected or through this device if the robot is disconnected.",
+  "BLOCK_PLAY_POP_SOUND": "Play 'Pop' sound",
   "BLOCK_PLAY_NOTE": "Play note",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Play note",
   "BLOCKS_POP": "Pop",

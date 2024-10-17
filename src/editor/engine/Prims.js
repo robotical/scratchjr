@@ -72,6 +72,8 @@ export default class Prims {
         Prims.table.setpattern = Prims.setPattern; //
         Prims.table.selectcolour = Prims.selectColour; //
         Prims.table.clearcolours = Prims.clearColours; //
+        Prims.table.playsnd = Prims.playSound;
+        Prims.table.playusersnd = Prims.playSound;
         Prims.table.say = Prims.Say;
     }
 
@@ -178,12 +180,33 @@ export default class Prims {
         strip.thisblock = strip.thisblock.next;
     }
 
+    static getSoundHelper(name, extIdx = -1) {
+        const extensions = ['mp3', 'ogg', 'wav'];
+        const ext = extensions[extIdx];
+        if (extIdx < 0) {
+            const sound = ScratchAudio.projectSounds[name];
+            if (sound) {
+                return sound;
+            } else {
+                return Prims.getSoundHelper(name, 0);
+            }
+        }
+        if (extIdx >= extensions.length) {
+            return null;
+        }
+        const sound = ScratchAudio.projectSounds[name + '.' + ext];
+        if (sound) {
+            return sound;
+        } else {
+            return Prims.getSoundHelper(name, extIdx + 1);
+        }
+    }
+
     static playSound(strip) {
         var b = strip.thisblock;
         var name = b.getSoundName(strip.spr.sounds);
-        //	console.log ('playSound', name);
         if (!strip.audio) {
-            var snd = ScratchAudio.projectSounds[name];
+            var snd = Prims.getSoundHelper(name);
             if (!snd) {
                 strip.thisblock = strip.thisblock.next;
                 return;
@@ -704,6 +727,10 @@ export default class Prims {
     static startStopCounter_() {
         if (!UI.counterExist()) {
             UI.createCounter();
+        }
+        
+        if (UI.counterExist() && UI.getCounterText() === "0") {
+            UI.destroyCounter();
         }
         UI.addTextToCounter(0);
     }

@@ -7,6 +7,7 @@ export function editorMain() {
   OS.martyCmd({ cmd: "hide-back-arrow" });
   OS.getsettings(doNext);
   OS.analyticsEvent("editor", "project_editor_open");
+  window.applicationManager?.hideBackHomeButton();
   function doNext(str) {
     var list = str.split(",");
     OS.path = list[1] == "0" ? list[0] + "/" : undefined;

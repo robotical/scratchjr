@@ -267,6 +267,7 @@ export default class iOS {
 
     static recorddisappear (b, fcn) {
         (async () => {
+            console.log("Calling recorddisappear");
             var result = iOS.call('recordsound_recordclose', b);
             if (fcn) {
                 fcn(result);

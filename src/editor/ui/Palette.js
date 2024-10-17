@@ -426,11 +426,11 @@ export default class Palette {
         if ((n == (categoriesLength - 1)) && (ScratchJr.stage.pages.length > 1)) {
             Palette.addPagesBlocks(dx);
         }
-        //TODO: they hard coded n==3 to be sound, but we don't want the sound blocks for alpha release
-        //need to clean this up before we re-add in the sound blocks
-        // if ((n == 3) && (ScratchJr.getSprite().sounds.length > 0)) {
-        //     Palette.addSoundsBlocks(dxblocks);
-        // }
+        // TODO: they hard coded n==3 to be sound, but we don't want the sound blocks for alpha release
+        // need to clean this up before we re-add in the sound blocks
+        if (!isRightCategories && (n == 3) && (ScratchJr.getSprite().sounds.length > 0)) {
+            Palette.addSoundsBlocks(dxblocks);
+        }
     }
 
     static reset() {
@@ -479,6 +479,7 @@ export default class Palette {
             newb.lift();
             dx += betweenblocks;
         }
+        console.log("should be adding record sound");
         if ((list.length < 6) && Record.available) {
             Palette.drawRecordSound(newb.div.offsetWidth, newb.div.offsetHeight, dx);
         }
@@ -579,7 +580,6 @@ export default class Palette {
         var box2 = new Rectangle(el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight);
         return box.intersects(box2);
     }
-
 
     static getBlockfromChild(div) {
         while (div != null) {

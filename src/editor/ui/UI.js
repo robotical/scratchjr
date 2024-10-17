@@ -131,17 +131,7 @@ export default class UI {
 
 
         // check if we're alredy connected to a cog, and if so, update the UI button
-        const connectedRafts = window.applicationManager?.connectedRafts || {};
-        let connectedCog;
-        for (const raftId in connectedRafts) {
-            const raft = connectedRafts[raftId];
-            if (raft.type === 'Cog') {
-                connectedCog = raft;
-                // TODO: manage multiple connected cogs
-                break;
-            }
-        }
-
+        const connectedCog = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Cog');
         if (connectedCog) {
             UI.setupConnectionButton(cogButotn, connectedCog);
         }

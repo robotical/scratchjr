@@ -1,11 +1,12 @@
 import { dataStoreInstance } from "./ScratchJRDataStore";
-import { soundManagerInstance } from "./SoundManager";
+import SoundManager, { soundManagerInstance } from "./SoundManager";
 import cameraInstance from "./Camera";
 import path from "path-browserify";
 import Camera from "../painteditor/Camera";
+import AudioCapture from "./SoundRecording";
 
 export default class WebappInterface {
-  constructor() {}
+  constructor() { }
 
   static assetLibraryVersion;
   static assetList = [];
@@ -182,7 +183,7 @@ export default class WebappInterface {
     }
   }
 
-  static scratchjr_choosecamera(mode) { 
+  static scratchjr_choosecamera(mode) {
     const cameraSide = mode === "front" ? "user" : "environment";
     cameraInstance.cameraFacing = cameraSide;
     WebappInterface.scratchjr_stopfeed();
@@ -198,7 +199,7 @@ export default class WebappInterface {
       if (imgData) {
         let base64resultNoDataPrefix = imgData.split(",")[1];
         Camera.processimage(base64resultNoDataPrefix); // eslint-disable-line no-undef
-    }
+      }
 
     }
   }
@@ -221,6 +222,80 @@ export default class WebappInterface {
     for (let i = 0; i < length; i++) {
       WebappInterface.assetList.push(assetsSplitted[i]);
     }
+  }
+
+  static recordsound_recordstart() {
+    return this.getAudioCaptureElement().startRecord();
+  }
+
+  /** called when the stop button is pressed or the tickmark is pressed during the record operation*/
+  static recordsound_recordstop() {
+
+    this.getAudioCaptureElement().stopRecord();
+
+  }
+
+  /** called during recording to display volume on the volume meter */
+  static recordsound_volume() {
+    return this.getAudioCaptureElement().getVolume();
+
+  }
+
+  /** called when the tickmark is chosen in the record dialog*/
+  static async recordsound_recordclose(keep) {
+
+    try {
+
+      console.log("saving blob");
+      let audioCaptureElement = this.getAudioCaptureElement();
+
+      if (keep === 'YES') {
+
+        let blob = await audioCaptureElement.captureRecordingAsBlob();
+        if (blob) {
+          let filename = audioCaptureElement.getId();
+          console.log("saving sound", filename);
+          let fileReader = new FileReader();
+          fileReader.onload = async function () {
+            console.log("filereader loaded", filename);
+            // saving new sound...  will save as a webm file.
+            const fn = await WebappInterface.io_setmedianame(fileReader.result, filename, 'webm');
+            console.log("fn", fn);
+            soundManagerInstance.loadSoundFromDataURI(filename + '.webm', fileReader.result);
+
+          };
+          fileReader.readAsDataURL(blob);
+        }
+
+      }
+    } catch (e) {
+      console.log("Error saving sound", e);
+    }
+
+  }
+
+
+  static recordsound_startplay() {
+    this.getAudioCaptureElement().startPlay();
+
+
+
+  }
+  static recordsound_stopplay() {
+    this.getAudioCaptureElement().stopPlay();
+
+  }
+
+
+  static getAudioCaptureElement() {
+    if (!WebappInterface.audioCaptureElement) {
+      WebappInterface.audioCaptureElement = new AudioCapture();
+      // this is mainly used for debugging purposes
+      // so we can test when there is no microphone.
+      WebappInterface.audioCaptureElement.isRecordingPermitted = true;
+
+    }
+    return WebappInterface.audioCaptureElement;
   }
 
   static libraryHasAsset(md5) {

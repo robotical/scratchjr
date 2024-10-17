@@ -210,7 +210,7 @@ export default class BlockSpecs {
     }
 
     static setupPalettesDef() {
-        return [['onflag','onmessage', 'message', 'onclick', 'ontouch'],
+        return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'],
         ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'],
         ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'],
         [],
@@ -219,7 +219,7 @@ export default class BlockSpecs {
     }
 
     static setupPalettesDefRight() {
-        return [['onflag', 'tiltany', 'ontouchcog', 'onmove', 'ondistance', 'onlight', 'onrotate', 'onmessage', 'message'],
+        return [[ 'tiltany', 'ontouchcog', 'onmove', 'ondistance', 'onlight', 'onrotate'],
         ['setpattern', 'selectcolour', 'clearcolours'],
         ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote'],
         ];
@@ -336,6 +336,10 @@ export default class BlockSpecs {
             'playnote': ['playnote', noteshapes,
                 BlockSpecs.limeCmd, 'm', 'notec', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS, 'green'],
 
+            'playsnd': ['playsnd', BlockSpecs.getImageFrom('assets/blockicons/Speaker', 'svg'),
+                BlockSpecs.limeCmd, 's', 'pop.mp3', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'playusersnd': ['playusersnd', BlockSpecs.getImageFrom('assets/blockicons/Microphone', 'svg'),
+                BlockSpecs.limeCmd, 'r', '1', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
 
             'endstack': ['endstack', null, BlockSpecs.redEnd, null, null,
                 BlockSpecs.redEndH, null, null, BlockSpecs.endS],
@@ -408,6 +412,7 @@ export default class BlockSpecs {
             'no': Localization.localize('BLOCK_PLAY_NO_SOUND'),
             'whistle': Localization.localize('BLOCK_PLAY_WHISTLE_SOUND'),
             'playnote': Localization.localize('BLOCK_PLAY_NOTE'),
+            'pop': Localization.localize('BLOCK_PLAY_POP_SOUND'),
             'endstack': Localization.localize('BLOCK_DESC_END'),
             'stopall': Localization.localize('BLOCK_DESC_STOP', {
                 CHARACTER_NAME: spr.name ? spr.name : ''

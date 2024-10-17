@@ -4,11 +4,13 @@ import OS from "../tablet/OS";
 import Lobby from "../lobby/Lobby";
 import goToLink from "../utils/goToLink";
 
+
 export function homeMain() {
   OS.martyCmd({cmd: "show-back-arrow"});
   gn("logotab").onclick = homeGoBack;
   homeStrings();
   OS.getsettings(doNext);
+  window.applicationManager?.showBackHomeButton();
   function doNext(str) {
     var list = str.split(",");
     OS.path = list[1] == "0" ? list[0] + "/" : undefined;

@@ -25,6 +25,8 @@ export default class ScratchAudio {
     }
 
     static sndFXWithVolume (name, volume) {
+        console.log("sndFXWithVolume: " + name + " " + volume);
+        console.log("isAndroid: " + isAndroid);
         if (!isAndroid) {
             if (!uiSounds[name]) {
                 return;
