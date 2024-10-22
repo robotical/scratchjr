@@ -9,7 +9,6 @@ let tinterval = 1;
 let hopList = [-48, -30, -22, -14, -6, 0, 6, 14, 22, 30, 48];
 export const LINEAR_GRADIENT_COLOUR = "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)";
 
-
 export default class Prims {
     static get hopList() {
         return hopList;
@@ -23,7 +22,7 @@ export default class Prims {
         Prims.table.tiltany = Prims.Ignore; //
         Prims.table.ontouchcog = Prims.Ignore; //
         Prims.table.onmove = Prims.Ignore; // 
-        Prims.table.ondistance = Prims.Ignore; // 
+        Prims.table.onobjectsensed = Prims.Ignore; // 
         Prims.table.onlight = Prims.Ignore; // 
         Prims.table.onrotate = Prims.Ignore; //
         Prims.table.onmessage = Prims.Ignore;
@@ -804,11 +803,14 @@ export default class Prims {
                     receivers.push([s, block]);
                 }
             }
-            if (block.blocktype == 'ondistance') {
-                if (block.getArgValue() == 'onclosedistance' && event == 'onclosedistance') {
+            if (block.blocktype == 'onobjectsensed') {
+                if (block.getArgValue() == 'onobjectsensedleft' && event == 'onobjectsensedleft') {
                     receivers.push([s, block]);
                 }
-                if (block.getArgValue() == 'onfardistance' && event == 'onfardistance') {
+                if (block.getArgValue() == 'onobjectsensedright' && event == 'onobjectsensedright') {
+                    receivers.push([s, block]);
+                }
+                if (block.getArgValue() == 'onnoobjectsensed' && event == 'onnoobjectsensed') {
                     receivers.push([s, block]);
                 }
             }
@@ -830,10 +832,14 @@ export default class Prims {
                 if (block.getArgValue() == 'onrotatecounterclockwise' && event == 'onrotatecounterclockwise') {
                     receivers.push([s, block]);
                 }
+                if ((block.getArgValue() == 'onrotatecounterclockwise' && event == 'onrotatecounterclockwise') || 
+                    (block.getArgValue() == 'onrotateclockwise' && event == 'onrotateclockwise')) {
+                    receivers.push([s, block]);
+                }
             }
         }
 
-        Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onmove', 'onrotate', 'ondistance', 'onlight'], findReceivers);
+        Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onmove', 'onrotate', 'onobjectsensed', 'onlight'], findReceivers);
         var newthreads = [];
         for (var i in receivers) {
             pair = receivers[i];

@@ -75,12 +75,16 @@ export default class CogBlocks {
         Prims.OnCogEvent("onmidlight");
     }
 
-    onCloseDistance() {
-        Prims.OnCogEvent("onclosedistance");
+    onObjectSensedRight() {
+        Prims.OnCogEvent("onobjectsensedright");
     }
 
-    onFarDistance() {
-        Prims.OnCogEvent("onfardistance");
+    onObjectSensedLeft() {
+        Prims.OnCogEvent("onobjectsensedleft");
+    }
+
+    onNoObjectSensed() {
+        Prims.OnCogEvent("onnoobjectsensed");
     }
 
     async playSound(sound) {
@@ -154,20 +158,20 @@ export default class CogBlocks {
     async setPattern(pattern) {
         switch (pattern) {
             case "patternrainbow":
-                await this.cog.sendRestMessage('led//pattern/RainbowSnake');
+                await this.cog.sendRestMessage('led/ring/pattern/RainbowSnake');
                 break;
             case "patternpinwheel":
                 if (this.selectedColour) {
-                    await this.cog.sendRestMessage(`led//pattern/Spin?numPix=12&mod=1&c=${this.selectedColour}`);
+                    await this.cog.sendRestMessage(`led/ring/pattern/Spin?numPix=12&mod=1&c=${this.selectedColour}`);
                 } else {
-                    await this.cog.sendRestMessage('led//pattern/Spin?numPix=12&mod=1');
+                    await this.cog.sendRestMessage('led/ring/pattern/Spin?numPix=12&mod=1');
                 }
                 break;
             case "patternshowoff":
                 if (this.selectedColour) {
-                    await this.cog.sendRestMessage(`led//pattern/Flash?c=${this.selectedColour}`);
+                    await this.cog.sendRestMessage(`led/ring/pattern/Flash?c=${this.selectedColour}`);
                 } else {
-                    await this.cog.sendRestMessage('led//pattern/Flash?c=112233');
+                    await this.cog.sendRestMessage('led/ring/pattern/Flash?c=112233');
                 }
                 break;
 
@@ -180,27 +184,27 @@ export default class CogBlocks {
         switch (colour) {
             case "selectcolourred":
                 this.selectedColour = "ff0000";
-                await this.cog.sendRestMessage('led//color/ff0000');
+                await this.cog.sendRestMessage('led/ring/color/ff0000');
                 break;
             case "selectcolourgreen":
                 this.selectedColour = "00ff00";
-                await this.cog.sendRestMessage('led//color/00ff00');
+                await this.cog.sendRestMessage('led/ring/color/00ff00');
                 break;
             case "selectcolourblue":
                 this.selectedColour = "0000ff";
-                await this.cog.sendRestMessage('led//color/0000ff');
+                await this.cog.sendRestMessage('led/ring/color/0000ff');
                 break;
             case "selectcolourpurple":
                 this.selectedColour = "800080";
-                await this.cog.sendRestMessage('led//color/800080');
+                await this.cog.sendRestMessage('led/ring/color/800080');
                 break;
             case "selectcolourorange":
                 this.selectedColour = "ffa500";
-                await this.cog.sendRestMessage('led//color/ffa500');
+                await this.cog.sendRestMessage('led/ring/color/ffa500');
                 break;
             case "selectcolouryellow":
                 this.selectedColour = "ffff00";
-                await this.cog.sendRestMessage('led//color/ffff00');
+                await this.cog.sendRestMessage('led/ring/color/ffff00');
                 break;
 
             default:
@@ -210,6 +214,6 @@ export default class CogBlocks {
 
     async clearColours() {
         this.selectedColour = null;
-        await this.cog.sendRestMessage('led//off');
+        await this.cog.sendRestMessage('led/ring/color/000000');
     }
 }

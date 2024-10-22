@@ -477,7 +477,7 @@ export default class Project {
             saving = false;
             if (whenDone) {
                 setTimeout(whenDone, 3000);
-                whenDone();
+                // whenDone();
             }
         }
     }

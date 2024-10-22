@@ -45,7 +45,7 @@ export default class PublishedDataAnalyser {
     }
 
     detectObjet(data) {
-        ObjectSenseDetection.detectObjectInEitherDirection(data.Light.irVals, this.cogBlocks.onCloseDistance, this.cogBlocks.onFarDistance);
+        ObjectSenseDetection.onObjectSensed(data.Light.irVals, this.cogBlocks.onObjectSensedLeft, this.cogBlocks.onObjectSensedRight, this.cogBlocks.onNoObjectSensed);
     }
 
     detectLight(data) {
@@ -325,11 +325,11 @@ class ButtonClickDetection {
         const correctionCutOffVersion = "1.2.0";
         let clickThreshold = 1600;
         if (isVersionGreater_errorCatching(cogVersion, correctionCutOffVersion)) {
-            clickThreshold = 2300;
+            clickThreshold = 1500;
         }
         let releaseThreshold = 1500;
         if (isVersionGreater_errorCatching(cogVersion, correctionCutOffVersion)) {
-            releaseThreshold = 2100;
+            releaseThreshold = 1490;
         }
         this.clickThreshold = window.button_click_threshold || clickThreshold;
         this.releaseThreshold = window.button_release_threshold || releaseThreshold;
@@ -349,18 +349,19 @@ class ButtonClickDetection {
 }
 
 class ObjectSenseDetection {
-     // close: everything above this value is considered close, far: everything above this value is considered far but if it is below close value, it is considered close
-    static irSensor0Thresholds = { close: 1300, far: 1150 };
-    static irSensor1Thresholds = { close: 1500, far: 1350 };
+    static objectSensed0Threshold = 2500; // left of the arrow
+    static objectSensed1Threshold = 2500; // right of the arrow
+    static objectSensed2Threshold = 1500; // button
 
-    static detectObjectInEitherDirection(objectSenseValue, onCloseDistance, onFarDistance) {
-        const irSensor0Value = objectSenseValue[0];
-        const irSensor1Value = objectSenseValue[1];
-        // console.log("IR sensor 0: ", irSensor0Value, "IR sensor 1: ", irSensor1Value);
-        if (irSensor0Value > this.irSensor0Thresholds.close || irSensor1Value > this.irSensor1Thresholds.close) {
-            onCloseDistance();
-        } else if (irSensor0Value > this.irSensor0Thresholds.far || irSensor1Value > this.irSensor1Thresholds.far) {
-            onFarDistance();
+    static onObjectSensed(objectSenseValue, onObjectSensedLeft, onObjectSensedRight, onNoObjectSensed) {
+        const leftIrSensorValue = objectSenseValue[0];
+        const rightIrSensorValue = objectSenseValue[1];
+        if (leftIrSensorValue > this.objectSensed0Threshold) {
+            onObjectSensedLeft();
+        } else if (rightIrSensorValue > this.objectSensed1Threshold) {
+            onObjectSensedRight();
+        } else {
+            onNoObjectSensed();
         }
     }
 }

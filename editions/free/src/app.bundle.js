@@ -75,11 +75,14 @@ class CogBlocks {
   onMidLight() {
     _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__["default"].OnCogEvent("onmidlight");
   }
-  onCloseDistance() {
-    _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__["default"].OnCogEvent("onclosedistance");
+  onObjectSensedRight() {
+    _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__["default"].OnCogEvent("onobjectsensedright");
   }
-  onFarDistance() {
-    _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__["default"].OnCogEvent("onfardistance");
+  onObjectSensedLeft() {
+    _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__["default"].OnCogEvent("onobjectsensedleft");
+  }
+  onNoObjectSensed() {
+    _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__["default"].OnCogEvent("onnoobjectsensed");
   }
   async playSound(sound) {
     switch (sound) {
@@ -150,20 +153,20 @@ class CogBlocks {
   async setPattern(pattern) {
     switch (pattern) {
       case "patternrainbow":
-        await this.cog.sendRestMessage('led//pattern/RainbowSnake');
+        await this.cog.sendRestMessage('led/ring/pattern/RainbowSnake');
         break;
       case "patternpinwheel":
         if (this.selectedColour) {
-          await this.cog.sendRestMessage(`led//pattern/Spin?numPix=12&mod=1&c=${this.selectedColour}`);
+          await this.cog.sendRestMessage(`led/ring/pattern/Spin?numPix=12&mod=1&c=${this.selectedColour}`);
         } else {
-          await this.cog.sendRestMessage('led//pattern/Spin?numPix=12&mod=1');
+          await this.cog.sendRestMessage('led/ring/pattern/Spin?numPix=12&mod=1');
         }
         break;
       case "patternshowoff":
         if (this.selectedColour) {
-          await this.cog.sendRestMessage(`led//pattern/Flash?c=${this.selectedColour}`);
+          await this.cog.sendRestMessage(`led/ring/pattern/Flash?c=${this.selectedColour}`);
         } else {
-          await this.cog.sendRestMessage('led//pattern/Flash?c=112233');
+          await this.cog.sendRestMessage('led/ring/pattern/Flash?c=112233');
         }
         break;
       default:
@@ -174,27 +177,27 @@ class CogBlocks {
     switch (colour) {
       case "selectcolourred":
         this.selectedColour = "ff0000";
-        await this.cog.sendRestMessage('led//color/ff0000');
+        await this.cog.sendRestMessage('led/ring/color/ff0000');
         break;
       case "selectcolourgreen":
         this.selectedColour = "00ff00";
-        await this.cog.sendRestMessage('led//color/00ff00');
+        await this.cog.sendRestMessage('led/ring/color/00ff00');
         break;
       case "selectcolourblue":
         this.selectedColour = "0000ff";
-        await this.cog.sendRestMessage('led//color/0000ff');
+        await this.cog.sendRestMessage('led/ring/color/0000ff');
         break;
       case "selectcolourpurple":
         this.selectedColour = "800080";
-        await this.cog.sendRestMessage('led//color/800080');
+        await this.cog.sendRestMessage('led/ring/color/800080');
         break;
       case "selectcolourorange":
         this.selectedColour = "ffa500";
-        await this.cog.sendRestMessage('led//color/ffa500');
+        await this.cog.sendRestMessage('led/ring/color/ffa500');
         break;
       case "selectcolouryellow":
         this.selectedColour = "ffff00";
-        await this.cog.sendRestMessage('led//color/ffff00');
+        await this.cog.sendRestMessage('led/ring/color/ffff00');
         break;
       default:
         break;
@@ -202,7 +205,7 @@ class CogBlocks {
   }
   async clearColours() {
     this.selectedColour = null;
-    await this.cog.sendRestMessage('led//off');
+    await this.cog.sendRestMessage('led/ring/color/000000');
   }
 }
 
@@ -293,7 +296,7 @@ class PublishedDataAnalyser {
     ButtonClickDetection.detectButtonClick(data.Light.irVals[2], this.cogBlocks.onButtonClick, this.cog.systemInfo.SystemVersion);
   }
   detectObjet(data) {
-    ObjectSenseDetection.detectObjectInEitherDirection(data.Light.irVals, this.cogBlocks.onCloseDistance, this.cogBlocks.onFarDistance);
+    ObjectSenseDetection.onObjectSensed(data.Light.irVals, this.cogBlocks.onObjectSensedLeft, this.cogBlocks.onObjectSensedRight, this.cogBlocks.onNoObjectSensed);
   }
   detectLight(data) {
     LightSenseDetection.detectLightSense(data.Light.ambientVals[0], this.cogBlocks.onLowLight, this.cogBlocks.onMidLight, this.cogBlocks.onHighLight);
@@ -569,11 +572,11 @@ class ButtonClickDetection {
     const correctionCutOffVersion = "1.2.0";
     let clickThreshold = 1600;
     if ((0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__.isVersionGreater_errorCatching)(cogVersion, correctionCutOffVersion)) {
-      clickThreshold = 2300;
+      clickThreshold = 1500;
     }
     let releaseThreshold = 1500;
     if ((0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__.isVersionGreater_errorCatching)(cogVersion, correctionCutOffVersion)) {
-      releaseThreshold = 2100;
+      releaseThreshold = 1490;
     }
     this.clickThreshold = window.button_click_threshold || clickThreshold;
     this.releaseThreshold = window.button_release_threshold || releaseThreshold;
@@ -591,23 +594,19 @@ class ButtonClickDetection {
   }
 }
 class ObjectSenseDetection {
-  // close: everything above this value is considered close, far: everything above this value is considered far but if it is below close value, it is considered close
-  static irSensor0Thresholds = {
-    close: 1300,
-    far: 1150
-  };
-  static irSensor1Thresholds = {
-    close: 1500,
-    far: 1350
-  };
-  static detectObjectInEitherDirection(objectSenseValue, onCloseDistance, onFarDistance) {
-    const irSensor0Value = objectSenseValue[0];
-    const irSensor1Value = objectSenseValue[1];
-    // console.log("IR sensor 0: ", irSensor0Value, "IR sensor 1: ", irSensor1Value);
-    if (irSensor0Value > this.irSensor0Thresholds.close || irSensor1Value > this.irSensor1Thresholds.close) {
-      onCloseDistance();
-    } else if (irSensor0Value > this.irSensor0Thresholds.far || irSensor1Value > this.irSensor1Thresholds.far) {
-      onFarDistance();
+  static objectSensed0Threshold = 2500; // left of the arrow
+  static objectSensed1Threshold = 2500; // right of the arrow
+  static objectSensed2Threshold = 1500; // button
+
+  static onObjectSensed(objectSenseValue, onObjectSensedLeft, onObjectSensedRight, onNoObjectSensed) {
+    const leftIrSensorValue = objectSenseValue[0];
+    const rightIrSensorValue = objectSenseValue[1];
+    if (leftIrSensorValue > this.objectSensed0Threshold) {
+      onObjectSensedLeft();
+    } else if (rightIrSensorValue > this.objectSensed1Threshold) {
+      onObjectSensedRight();
+    } else {
+      onNoObjectSensed();
     }
   }
 }
@@ -2516,10 +2515,9 @@ let fontcolors = [fontred, fontorange, fontyellow, fontdarkgreen, fontblue, font
 let fontsizes = [16, 24, 36, 48, 56, 72];
 const tiltshapes = ['tiltright', 'tiltleft', 'tiltbackward', 'tiltforward', 'tiltbackwardforward', 'tiltleftright'];
 const moveshapes = ['onmove', 'onshake'];
-// const distanceshapes = ['onclosedistance', 'onfardistance'];
-const distanceshapes = ['onclosedistance'];
+const onobjectsensedshapes = ['onobjectsensedleft', 'onobjectsensedright', 'onnoobjectsensed'];
 const lightshapes = ['onhighlight', 'onmidlight', 'onlowlight'];
-const rotateshapes = ['onrotateclockwise', 'onrotatecounterclockwise'];
+const rotateshapes = ['onrotateeither', 'onrotateclockwise', 'onrotatecounterclockwise'];
 const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];
 const colourshapes = ['selectcolourred', 'selectcolourgreen', 'selectcolourblue', 'selectcolourpurple', 'selectcolourorange', 'selectcolouryellow'];
 const noteshapes = ['notec', 'notecsharp', 'noted', 'notedsharp', 'notee', 'notef', 'notefsharp', 'noteg', 'notegsharp', 'notea', 'noteasharp', 'noteb'];
@@ -2626,7 +2624,7 @@ class BlockSpecs {
     return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'], ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'], ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'], [], ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'], ['endstack', 'forever']];
   }
   static setupPalettesDefRight() {
-    return [['tiltany', 'ontouchcog', 'onmove', 'ondistance', 'onlight', 'onrotate'], ['setpattern', 'selectcolour', 'clearcolours'], ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote']];
+    return [['tiltany', 'ontouchcog', 'onmove', 'onobjectsensed', 'onlight', 'onrotate'], ['setpattern', 'selectcolour', 'clearcolours'], ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote']];
   }
 
   ///////////////////////////////
@@ -2652,9 +2650,9 @@ class BlockSpecs {
       'tiltany': ['tiltany', tiltshapes, BlockSpecs.yellowStart, 'm', 'tiltright', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
       'ontouchcog': ['ontouchcog', BlockSpecs.getImageFrom('assets/blockicons/ontouchcog', 'svg'), BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
       'onmove': ['onmove', moveshapes, BlockSpecs.yellowStart, 'm', 'onmove', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
-      'ondistance': ['ondistance', distanceshapes, BlockSpecs.yellowStart, 'm', 'onclosedistance', BlockSpecs.yellowStartH, 0, 100, BlockSpecs.startS],
+      'onobjectsensed': ['onobjectsensed', onobjectsensedshapes, BlockSpecs.yellowStart, 'm', 'onobjectsensedleft', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
       'onlight': ['onlight', lightshapes, BlockSpecs.yellowStart, 'm', 'onhighlight', BlockSpecs.yellowStartH, 0, 100, BlockSpecs.startS],
-      'onrotate': ['onrotate', rotateshapes, BlockSpecs.yellowStart, 'm', 'onrotateclockwise', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+      'onrotate': ['onrotate', rotateshapes, BlockSpecs.yellowStart, 'm', 'onrotateeither', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
       'onmessage': ['onmessage', getshapes, BlockSpecs.yellowStart, 'm', 'Orange', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
       'onclick': ['onclick', BlockSpecs.getImageFrom('assets/blockicons/OnTouch', 'svg'), BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
       'ontouch': ['ontouch', BlockSpecs.getImageFrom('assets/blockicons/Bump', 'svg'), BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
@@ -2708,7 +2706,7 @@ class BlockSpecs {
       'tiltany': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_TILT'),
       'ontouchcog': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_TOUCH_Cog'),
       'onmove': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_MOVE'),
-      'ondistance': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_DISTANCE'),
+      'onobjectsensed': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_OBJECT_SENSED'),
       'onlight': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_LIGHT'),
       'onrotate': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_ROTATE'),
       'onclick': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_TAP', {
@@ -3473,7 +3471,7 @@ class Prims {
     Prims.table.tiltany = Prims.Ignore; //
     Prims.table.ontouchcog = Prims.Ignore; //
     Prims.table.onmove = Prims.Ignore; // 
-    Prims.table.ondistance = Prims.Ignore; // 
+    Prims.table.onobjectsensed = Prims.Ignore; // 
     Prims.table.onlight = Prims.Ignore; // 
     Prims.table.onrotate = Prims.Ignore; //
     Prims.table.onmessage = Prims.Ignore;
@@ -4200,11 +4198,14 @@ class Prims {
           receivers.push([s, block]);
         }
       }
-      if (block.blocktype == 'ondistance') {
-        if (block.getArgValue() == 'onclosedistance' && event == 'onclosedistance') {
+      if (block.blocktype == 'onobjectsensed') {
+        if (block.getArgValue() == 'onobjectsensedleft' && event == 'onobjectsensedleft') {
           receivers.push([s, block]);
         }
-        if (block.getArgValue() == 'onfardistance' && event == 'onfardistance') {
+        if (block.getArgValue() == 'onobjectsensedright' && event == 'onobjectsensedright') {
+          receivers.push([s, block]);
+        }
+        if (block.getArgValue() == 'onnoobjectsensed' && event == 'onnoobjectsensed') {
           receivers.push([s, block]);
         }
       }
@@ -4226,9 +4227,12 @@ class Prims {
         if (block.getArgValue() == 'onrotatecounterclockwise' && event == 'onrotatecounterclockwise') {
           receivers.push([s, block]);
         }
+        if (block.getArgValue() == 'onrotatecounterclockwise' && event == 'onrotatecounterclockwise' || block.getArgValue() == 'onrotateclockwise' && event == 'onrotateclockwise') {
+          receivers.push([s, block]);
+        }
       }
     };
-    Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onmove', 'onrotate', 'ondistance', 'onlight'], findReceivers);
+    Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onmove', 'onrotate', 'onobjectsensed', 'onlight'], findReceivers);
     var newthreads = [];
     for (var i in receivers) {
       pair = receivers[i];
@@ -8565,7 +8569,7 @@ class Project {
       saving = false;
       if (whenDone) {
         setTimeout(whenDone, 3000);
-        whenDone();
+        // whenDone();
       }
     }
   }

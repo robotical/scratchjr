@@ -25,10 +25,9 @@ const tiltshapes = ['tiltright', 'tiltleft', 'tiltbackward', 'tiltforward', 'til
 const moveshapes = [
     'onmove',
     'onshake'];
-// const distanceshapes = ['onclosedistance', 'onfardistance'];
-const distanceshapes = ['onclosedistance'];
+const onobjectsensedshapes = ['onobjectsensedleft', 'onobjectsensedright', 'onnoobjectsensed'];
 const lightshapes = ['onhighlight', 'onmidlight', 'onlowlight'];
-const rotateshapes = ['onrotateclockwise', 'onrotatecounterclockwise'];
+const rotateshapes = ['onrotateeither', 'onrotateclockwise', 'onrotatecounterclockwise'];
 const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];
 const colourshapes = ['selectcolourred', 'selectcolourgreen', 'selectcolourblue', 'selectcolourpurple', 'selectcolourorange', 'selectcolouryellow'];
 const noteshapes = ['notec', 'notecsharp', 'noted', 'notedsharp', 'notee', 'notef', 'notefsharp', 'noteg', 'notegsharp', 'notea', 'noteasharp', 'noteb'];
@@ -219,7 +218,7 @@ export default class BlockSpecs {
     }
 
     static setupPalettesDefRight() {
-        return [[ 'tiltany', 'ontouchcog', 'onmove', 'ondistance', 'onlight', 'onrotate'],
+        return [[ 'tiltany', 'ontouchcog', 'onmove', 'onobjectsensed', 'onlight', 'onrotate'],
         ['setpattern', 'selectcolour', 'clearcolours'],
         ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote'],
         ];
@@ -252,12 +251,12 @@ export default class BlockSpecs {
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'onmove': ['onmove', moveshapes,
                 BlockSpecs.yellowStart, 'm', 'onmove', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
-            'ondistance': ['ondistance', distanceshapes,
-                BlockSpecs.yellowStart, 'm', 'onclosedistance', BlockSpecs.yellowStartH, 0, 100, BlockSpecs.startS],
+            'onobjectsensed': ['onobjectsensed', onobjectsensedshapes,
+                BlockSpecs.yellowStart, 'm', 'onobjectsensedleft', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'onlight': ['onlight', lightshapes,
                 BlockSpecs.yellowStart, 'm', 'onhighlight', BlockSpecs.yellowStartH, 0, 100, BlockSpecs.startS],
             'onrotate': ['onrotate', rotateshapes,
-                BlockSpecs.yellowStart, 'm', 'onrotateclockwise', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+                BlockSpecs.yellowStart, 'm', 'onrotateeither', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'onmessage': ['onmessage', getshapes, BlockSpecs.yellowStart, 'm', 'Orange',
                 BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'onclick': ['onclick', BlockSpecs.getImageFrom('assets/blockicons/OnTouch', 'svg'),
@@ -367,7 +366,7 @@ export default class BlockSpecs {
             'tiltany': Localization.localize('BLOCK_DESC_ON_TILT'),
             'ontouchcog': Localization.localize('BLOCK_DESC_ON_TOUCH_Cog'),
             'onmove': Localization.localize('BLOCK_DESC_ON_MOVE'),
-            'ondistance': Localization.localize('BLOCK_DESC_ON_DISTANCE'),
+            'onobjectsensed': Localization.localize('BLOCK_DESC_ON_OBJECT_SENSED'),
             'onlight': Localization.localize('BLOCK_DESC_ON_LIGHT'),
             'onrotate': Localization.localize('BLOCK_DESC_ON_ROTATE'),
             'onclick': Localization.localize('BLOCK_DESC_ON_TAP', {
