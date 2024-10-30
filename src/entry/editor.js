@@ -18,7 +18,5 @@ export function editorMain() {
       Camera.available = list[3] == "YES" ? true : false;
     }
     ScratchJr.appinit(window.Settings.scratchJrVersion);
-
-    // setTimeout(mv2.updateConnectionInfo, 2000);
   }
 }

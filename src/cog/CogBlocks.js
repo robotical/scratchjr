@@ -4,27 +4,58 @@
  * provides methods to interact with the cog.
  */
 import Prims from "../editor/engine/Prims";
-import { raftPubSubscriptionHelper } from "../utils/raft-subscription-helpers";
-import PublishedDataAnalyser from "./PublishedDataAnalyser";
 
 export default class CogBlocks {
     static selectedColour = null;
 
     constructor(cog) {
         this.cog = cog;
-        this.publishedDataAnalyser = new PublishedDataAnalyser(this);
-        this.subscribeToPublishedDataEvent();
-    }
 
-    subscribeToPublishedDataEvent() {
-        raftPubSubscriptionHelper(this.cog).subscribe(data => {
-            const stateInfo = data.stateInfo;
-            this.publishedDataAnalyser.analyse(stateInfo);
-        });
+        // Subscribe to the published data events of the cog
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.tilt.left, this.onTiltLeft.bind(this));
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.tilt.right, this.onTiltRight.bind(this));
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.tilt.forward, this.onTiltForward.bind(this));
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.tilt.backward, this.onTiltBackward.bind(this));
+
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.movementType.shake, this.onShake.bind(this));
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.movementType.move, this.onMove.bind(this));
+
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.rotation.clockwise, this.onRotateClockwise.bind(this));
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.rotation.counterClockwise, this.onRotateCounterClockwise.bind(this));
+
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.buttonClick.click, this.onButtonClick.bind(this));
+
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.lightSense.high, this.onHighLight.bind(this));
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.lightSense.mid, this.onMidLight.bind(this));
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.lightSense.low, this.onLowLight.bind(this));
+
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.objectSense.right, this.onObjectSensedRight.bind(this));
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.objectSense.left, this.onObjectSensedLeft.bind(this));
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.objectSense.none, this.onNoObjectSensed.bind(this));
     }
 
     destroy() {
-        raftPubSubscriptionHelper(this.cog).unsubscribe();
+        // Unsubscribe from the published data events of the cog
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.tilt.left, this.onTiltLeft.bind(this));
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.tilt.right, this.onTiltRight.bind(this));
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.tilt.forward, this.onTiltForward.bind(this));
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.tilt.backward, this.onTiltBackward.bind(this));
+
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.movementType.shake, this.onShake.bind(this));
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.movementType.move, this.onMove.bind(this));
+
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.rotation.clockwise, this.onRotateClockwise.bind(this));
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.rotation.counterClockwise, this.onRotateCounterClockwise.bind(this));
+
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.buttonClick.click, this.onButtonClick.bind(this));
+
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.lightSense.high, this.onHighLight.bind(this));
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.lightSense.mid, this.onMidLight.bind(this));
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.lightSense.low, this.onLowLight.bind(this));
+
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.objectSense.right, this.onObjectSensedRight.bind(this));
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.objectSense.left, this.onObjectSensedLeft.bind(this));
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.objectSense.none, this.onNoObjectSensed.bind(this));
     }
 
     onTiltLeft() {
@@ -56,7 +87,7 @@ export default class CogBlocks {
     }
 
     onRotateCounterClockwise() {
-        Prims.OnCogEvent("onrotatecounter");
+        Prims.OnCogEvent("onrotatecounterclockwise");
     }
 
     onButtonClick() {
@@ -67,12 +98,12 @@ export default class CogBlocks {
         Prims.OnCogEvent("onlowlight");
     }
 
-    onHighLight() {
-        Prims.OnCogEvent("onhighlight");
-    }
-
     onMidLight() {
         Prims.OnCogEvent("onmidlight");
+    }
+
+    onHighLight() {
+        Prims.OnCogEvent("onhighlight");
     }
 
     onObjectSensedRight() {

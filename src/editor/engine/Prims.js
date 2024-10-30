@@ -832,8 +832,8 @@ export default class Prims {
                 if (block.getArgValue() == 'onrotatecounterclockwise' && event == 'onrotatecounterclockwise') {
                     receivers.push([s, block]);
                 }
-                if ((block.getArgValue() == 'onrotatecounterclockwise' && event == 'onrotatecounterclockwise') || 
-                    (block.getArgValue() == 'onrotateclockwise' && event == 'onrotateclockwise')) {
+                if ((block.getArgValue() == 'onrotateeither' && event == 'onrotatecounterclockwise') || 
+                    (block.getArgValue() == 'onrotateeither' && event == 'onrotateclockwise')) {
                     receivers.push([s, block]);
                 }
             }
