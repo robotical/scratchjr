@@ -89,6 +89,7 @@ window.onload = () => {
       preprocessAndLoadCss("css", "css/marty-battery-level.css");
       preprocessAndLoadCss("css", "css/marty-signal-strength.css");
       preprocessAndLoadCss("css", "css/connection-modal.css");
+      preprocessAndLoadCss("css", "css/tutorial.css");
       entryFunction = () => OS.waitForInterface(editorMain);
       break;
     case "gettingStarted":

@@ -30,6 +30,8 @@ div.frame {
     height: ${css_vh(63)};
     background:  url('../assets/ui/backgrounds.png');
     background-size: 100% 100%;
+
+    position: relative;
 }
 
 *.leftpanel {

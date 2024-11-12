@@ -170,17 +170,20 @@ export default class BlockSpecs {
             [
                 BlockSpecs.getImageFrom('assets/categories/CogStartOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/CogStartOff', 'svg'),
-                window.Settings.categoryStartColor
+                window.Settings.categoryStartColor,
+                'cog-start'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/CogLooksOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/CogLooksOff', 'svg'),
-                window.Settings.categoryLooksColor
+                window.Settings.categoryLooksColor,
+                'cog-looks'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/CogSoundOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/CogSoundOff', 'svg'),
-                window.Settings.categorySoundColor
+                window.Settings.categorySoundColor,
+                'cog-sound'
             ],
         );
     }
@@ -190,78 +193,79 @@ export default class BlockSpecs {
             [
                 BlockSpecs.getImageFrom('assets/categories/MartyStartOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/MartyStartOff', 'svg'),
-                window.Settings.categoryStartColor
+                window.Settings.categoryStartColor,
+                'marty-start'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/MartyMotionOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/MartyMotionOff', 'svg'),
-                window.Settings.categoryMotionColor
+                window.Settings.categoryMotionColor,
+                'marty-motion'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/MartyLooksOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/MartyLooksOff', 'svg'),
-                window.Settings.categoryLooksColor
+                window.Settings.categoryLooksColor,
+                'marty-looks'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/MartySoundOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/MartySoundOff', 'svg'),
-                window.Settings.categorySoundColor
+                window.Settings.categorySoundColor,
+                'marty-sound'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/MartyFlowOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/MartyFlowOff', 'svg'),
-                window.Settings.categoryFlowColor
+                window.Settings.categoryFlowColor,
+                'marty-flow'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/MartyStopOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/MartyStopOff', 'svg'),
-                window.Settings.categoryStopColor
+                window.Settings.categoryStopColor,
+                'marty-stop'
             ]
-            // [
-            //     BlockSpecs.getImageFrom('assets/categories/MartyLooksOn', 'svg'),
-            //     BlockSpecs.getImageFrom('assets/categories/MartyLooksOff', 'svg'),
-            //     window.Settings.categoryLooksColor
-            // ],
-            // [
-            //     BlockSpecs.getImageFrom('assets/categories/MartySoundOn', 'svg'),
-            //     BlockSpecs.getImageFrom('assets/categories/MartySoundOff', 'svg'),
-            //     window.Settings.categorySoundColor
-            // ],
         );
     }
-
 
     static setupCategories() {
         return new Array(
             [
                 BlockSpecs.getImageFrom('assets/categories/StartOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/StartOff', 'svg'),
-                window.Settings.categoryStartColor
+                window.Settings.categoryStartColor,
+                'sprite-start'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/MotionOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/MotionOff', 'svg'),
-                window.Settings.categoryMotionColor
+                window.Settings.categoryMotionColor,
+                'sprite-motion'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/LooksOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/LooksOff', 'svg'),
-                window.Settings.categoryLooksColor
+                window.Settings.categoryLooksColor,
+                'sprite-looks'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/SoundOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/SoundOff', 'svg'),
-                window.Settings.categorySoundColor
+                window.Settings.categorySoundColor,
+                'sprite-sound'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/FlowOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/FlowOff', 'svg'),
-                window.Settings.categoryFlowColor
+                window.Settings.categoryFlowColor,
+                'sprite-flow'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/StopOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/StopOff', 'svg'),
-                window.Settings.categoryStopColor
+                window.Settings.categoryStopColor,
+                'sprite-stop'
             ]
         );
     }
@@ -539,14 +543,14 @@ export default class BlockSpecs {
             'pop': Localization.localize('BLOCK_PLAY_POP_SOUND'),
             'endstack': Localization.localize('BLOCK_DESC_END'),
             'stopall': Localization.localize('BLOCK_DESC_STOP', {
-            CHARACTER_NAME: spr.name ? spr.name : ''
+                CHARACTER_NAME: spr.name ? spr.name : ''
             }),
             'forever': Localization.localize('BLOCK_DESC_REPEAT_FOREVER'),
             'gotopage': Localization.localize('BLOCK_DESC_GO_TO_PAGE', {
-            PAGE: str
+                PAGE: str
             }),
             'message': Localization.localize('BLOCK_DESC_SEND_MESSAGE', {
-            COLOR: Localization.localize('BLOCK_DESC_MESSAGE_COLOR_ORANGE')
+                COLOR: Localization.localize('BLOCK_DESC_MESSAGE_COLOR_ORANGE')
             }),
 
             'martyGetReady': Localization.localize('BLOCK_DESC_MOVE_MARTY_GETREADY'),

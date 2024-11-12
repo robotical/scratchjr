@@ -28,6 +28,7 @@ import {
 import { cogSvg } from '../../html-svgs/cog';
 import { martySvg } from '../../html-svgs/marty';
 import { raftDisconnectedSubscriptionHelper, raftVerifiedSubscriptionHelper } from '../../utils/raft-subscription-helpers';
+import TutorialUI from './TutorialUI';
 
 let projectNameTextInput = null;
 let info = null;
@@ -52,6 +53,7 @@ export default class UI {
         ScratchJr.setupKeypad();
         ScratchJr.setupEditableField();
         UI.aspectRatioAdjustment();
+        TutorialUI.setupUI(frame);
     }
 
     // Helps debug on Android 4.2 by enabling the user to type in a

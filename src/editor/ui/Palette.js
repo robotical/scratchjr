@@ -357,6 +357,7 @@ export default class Palette {
         var div = newDiv(parent, dx, dy, pxWidth, pxHeight, {
             position: 'absolute'
         });
+        div.setAttribute('id', spec[3]);
         div.index = n;
         var officon = spec[1].cloneNode(true);
         officon.width = pxWidth;
@@ -664,6 +665,7 @@ export default class Palette {
 
     static newScaledBlock(parent, op, scale, dx, dy) {
         var bbx = new Block(BlockSpecs.defs[op], true, scale);
+        bbx.div.setAttribute('id', op+"_block");
         setProps(bbx.div.style, {
             position: 'absolute',
             left: dx + 'px',
