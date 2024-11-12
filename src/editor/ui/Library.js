@@ -229,6 +229,12 @@ export default class Library {
         tb.w = Number(data.width);
         tb.h = Number(data.height);
 
+        /*MartyMode*/
+        // if md5 is MartyBirdsEye.svg don't show
+        if (md5 == 'MartyBirdsEye.svg') {
+            tb.style.display = 'none';
+        }
+
         var img = newHTML('img', undefined, tb);
         var scale = Math.min(w / tb.w, h / tb.h);
         img.style.height = tb.h * scale + 'px';

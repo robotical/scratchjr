@@ -437,6 +437,7 @@ export default class Project {
     }
 
     static save (id, whenDone) {
+        console.log(Error().stack);
         saving = true;
         var th = metadata.thumbnail;
         if (th && ScratchJr.editmode != 'storyStarter') { // Don't try to delete the thumbnail in a sample project
@@ -444,7 +445,8 @@ export default class Project {
             if (thumb.md5.indexOf('samples/') < 0) { // In case we've exited story-starter mode
                 Project.thumbnailUnique(thumb.md5, id, function (isUnique) {
                     if (isUnique) {
-                        OS.remove(thumb.md5, OS.trace); // remove thumb;
+                        // the following removes the thumbnail the second time we save a project, but we actually need the thumb
+                        // OS.remove(thumb.md5, OS.trace); // remove thumb;
                     }
                 });
             }

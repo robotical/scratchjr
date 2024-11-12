@@ -19,9 +19,12 @@ import Runtime from './engine/Runtime';
 import Localization from '../utils/Localization';
 import {
     libInit, gn, scaleMultiplier, newHTML,
-    isAndroid, getUrlVars, CSSTransition3D, frame
+    isAndroid, getUrlVars, CSSTransition3D, frame,
+    isTablet
 } from '../utils/lib';
 import CogManager from "../cog/CogManager";
+import MartyManager from '../marty/MartyManager';
+import Thumbs from './ui/Thumbs';
 
 let workingCanvas = document.createElement('canvas');
 let workingCanvas2 = document.createElement('canvas');
@@ -35,6 +38,7 @@ let runtime = undefined;
 let stage = undefined;
 let inFullscreen = false;
 let keypad = undefined;
+let colpad = undefined;
 let textForm = undefined;
 let editfirst = false;
 let stagecolor;
@@ -52,7 +56,7 @@ let dragginLayer = 7000;
 let currentProject = undefined;
 let editmode;
 
-let isDebugging = false;
+let isDebugging = true;
 let time;
 let userStart = false;
 let onHold = false;
@@ -63,7 +67,12 @@ let version = undefined;
 let autoSaveEnabled = true;
 let autoSaveSetInterval = null;
 
+/*MartyMode*/
+let isMartyModeEnabled = false;
+
 let onBackButtonCallback = [];
+
+let BIRDS_EYE_SPRITE_NAME = "Marty Bird's Eye";
 
 export default class ScratchJr {
     static get workingCanvas() {
@@ -185,6 +194,52 @@ export default class ScratchJr {
 
     static get onBackButtonCallback() {
         return onBackButtonCallback;
+    }
+
+    /*MartyMode*/
+    static get isMartyModeEnabled() {
+        return isMartyModeEnabled;
+    }
+
+    static get BIRDS_EYE_SPRITE_NAME() {
+        return BIRDS_EYE_SPRITE_NAME;
+    }
+
+    /*MartyMode*/
+    static set isMartyModeEnabled(newIsMartyModeEnabled) {
+        console.log("Setting Marty mode to: " + newIsMartyModeEnabled);
+        isMartyModeEnabled = newIsMartyModeEnabled;
+        Palette.recreateCategories();
+
+        const martyBirdsEyeSprite = stage.currentPage.getMartyBirdsEyeSprite();
+
+        // if we are enabling Marty mode, we deselct all sprites
+        if (isMartyModeEnabled) {
+            // if already sprite exist, don't add it again
+            if (martyBirdsEyeSprite) {
+                stage.currentPage.setCurrentSprite(martyBirdsEyeSprite);
+                Thumbs.selectThisSprite(martyBirdsEyeSprite);
+            } else { // if Marty Bird's Eye sprite doesn't exist, add it
+                stage.currentPage.addSprite(0.5, "MartyBirdsEye.svg", BIRDS_EYE_SPRITE_NAME, stage.currentPage.martyBirdsEyeSpriteAdded);
+            }
+
+            stage.currentPage.toggleMartyBirdsEyeSpriteVisibility(true, martyBirdsEyeSprite);
+        } else { // if we are disabling Marty mode, we select the first sprite
+            const allSprites = stage.currentPage.getSprites();
+            const firstSpriteBesidesMarty = allSprites.filter(sprite => !sprite.includes(BIRDS_EYE_SPRITE_NAME))[0];
+            if (firstSpriteBesidesMarty) {
+                const spr = stage.currentPage.getSprite(firstSpriteBesidesMarty);
+                if (spr) {
+                    stage.currentPage.setCurrentSprite(spr);
+                    Thumbs.selectThisSprite(spr);
+                }
+            } else {
+                stage.currentPage.setCurrentSprite(undefined);
+            }
+
+            stage.currentPage.toggleMartyBirdsEyeSpriteVisibility(false, martyBirdsEyeSprite);
+        }
+        stage.currentPage.updateThumb();
     }
 
     static appinit(v) {
@@ -623,7 +678,9 @@ export default class ScratchJr {
     static editArg(e, ti) {
         e.preventDefault();
         e.stopPropagation();
-        if (ti && ti.owner.isText()) {
+        if (ti && ti.owner.isColour()) {
+            ScratchJr.colourClicked(e, ti);
+        } else if (ti && ti.owner.isText()) {
             ScratchJr.textClicked(e, ti);
         } else {
             ScratchJr.numberClicked(e, ti);
@@ -693,6 +750,69 @@ export default class ScratchJr {
         document.body.scrollLeft = 0;
         if (isAndroid) {
             AndroidInterface.scratchjr_forceHideKeyboard();
+        }
+    }
+
+    /////////////////////////////////////////
+    //Colour keyboard
+    /////////////////////////////////////////
+    static setupColKeypad() {
+        colpad = newHTML("div", "colkeyboard", frame);
+        if (isTablet) {
+            colpad.ontouchstart = ScratchJr.eatEvent;
+        } else {
+            colpad.onpointerdown = ScratchJr.eatEvent;
+        }
+        // var pad = newHTML('div', 'insidekeyboard', colpad);
+        const colours = [
+            "#e30613",
+            "#009640",
+            "#009fe3",
+            "#662483",
+            "#e94e1b",
+            "#ffed00",
+        ];
+        for (const colour of colours) {
+            ScratchJr.keyboardAddCol(colpad, colour, "onecol");
+        }
+    }
+
+    static keyboardAddCol(p, col, c) {
+        var keym = newHTML("div", c, p);
+        keym.style.background = col;
+        // var mk = newHTML('span', undefined, keym);
+        // mk.textContent = col ? col : '';
+        if (isTablet) {
+            keym.ontouchstart = ScratchJr.colEditKey;
+        } else {
+            keym.onpointerdown = ScratchJr.colEditKey;
+        }
+    }
+
+    /////////////////////////////////////////////////
+    //Colour Clicked
+    /////////////////////////////////////////
+    static colourClicked(e, ti) {
+        var delta = activeFocus ? activeFocus.delta : 0;
+        if (activeFocus && activeFocus.type == "blockarg") {
+            activeFocus.div.className = "colfield off";
+            ScratchJr.colEditDone();
+        }
+        var b = ti.owner; // b is a BlockArg
+        activeFocus = b;
+        activeFocus.delta = delta;
+        b.oldvalue = ti.style.background;
+        activeFocus.div.className = "colfield on";
+        colpad.className = "colkeyboard on";
+        editfirst = true;
+        var p = ti.parentNode.parentNode.owner;
+        // if (Number(p.min) < 0) {
+        //     ScratchJr.setMinusKey();
+        // } else {
+        //     ScratchJr.setSpaceKey();
+        // }
+        if (delta == 0) {
+            ScratchJr.needsToScroll(b);
         }
     }
 
@@ -821,6 +941,30 @@ export default class ScratchJr {
         ScratchJr.fillValueWithKey(c);
     }
 
+    static colEditKey(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var t = e.target;
+        if (!t) {
+            return;
+        }
+        if (t.className == "") {
+            t = t.parentNode;
+        }
+        ScratchAudio.sndFX("keydown.wav");
+        var c = t.style.background;
+        if (!c) {
+            if (
+                t.parentNode.className == "onecol delete" ||
+                t.className == "onecol delete"
+            ) {
+                ScratchJr.numEditDelete();
+            }
+            return;
+        }
+        ScratchJr.fillValueWithCol(c);
+    }
+
     /**
      * Fill active focus with value `c`
      * @param c The input char, should be 0...9 or `-`
@@ -846,6 +990,16 @@ export default class ScratchJr {
         } else {
             activeFocus.setValue(val);
         }
+    }
+
+    /**
+     * Fill active focus with value `c`
+     * @param c The input char, should be string colour
+     */
+    static fillValueWithCol(c) {
+        var input = activeFocus.input;
+        input.style.background = c;
+        activeFocus.setCol(c);
     }
 
     static setSpaceKey() {
@@ -887,7 +1041,10 @@ export default class ScratchJr {
         if (activeFocus.type != 'blockarg') {
             return;
         }
-        if (activeFocus.isText()) {
+        if (activeFocus.isColour()) {
+            ScratchJr.closeColEdit();
+            onBackButtonCallback.pop();
+        } else if (activeFocus.isText()) {
             document.forms.editable.field.blur();
         } else {
             ScratchJr.closeNumberEdit();
@@ -903,6 +1060,37 @@ export default class ScratchJr {
         activeFocus = undefined;
         // stop accepting keyboard events
         window.onkeydown = undefined;
+    }
+
+    static closeColEdit() {
+        ScratchJr.colEditDone();
+        ScratchJr.resetScroll();
+        colpad.className = "colkeyboard off";
+        activeFocus.div.className = "colfield off";
+        activeFocus = undefined;
+        // stop accepting keyboard events
+        window.onkeydown = undefined;
+    }
+
+    static colEditDone() {
+        var col = activeFocus.argValue;
+        var ba = activeFocus;
+        activeFocus.setCol(col);
+        ba.argValue = col;
+        if (ba.daddy && ba.daddy.div.parentNode.owner) {
+            var spr = ba.daddy.div.parentNode.owner.spr;
+            if (spr && spr.div.parentNode) {
+                var action = {
+                    action: "scripts",
+                    where: spr.div.parentNode.owner.id,
+                    who: spr.id,
+                };
+                if (ba.argValue != ba.oldvalue) {
+                    ScratchJr.storyStart("ScratchJr.numEditDone");
+                    Undo.record(action);
+                }
+            }
+        }
     }
 
     static numEditDone() {
@@ -1003,3 +1191,4 @@ export default class ScratchJr {
 // Expose ScratchJr to global
 window.ScratchJr = ScratchJr;
 window.cogManager = new CogManager();
+window.martyManager = new MartyManager();

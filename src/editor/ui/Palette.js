@@ -19,6 +19,7 @@ import {
     setProps, globalx, localy, globaly, drawScaled, newCanvas,
     setCanvasSize, hitRect, writeText, getStringSize
 } from '../../utils/lib';
+import UI from './UI';
 
 
 let blockscale = 0.75;
@@ -42,7 +43,42 @@ export default class Palette {
         helpballoon = newHelpballoon;
     }
 
+
+    static recreateCategories() {
+        Palette.recreateLeftCategory();
+        Palette.recreateRightCategory();
+
+        Palette.selectCategory(0);
+    }
+
+    static recreateLeftCategory() {
+        /* This function is called when the Marty mode is toggled to reset the palette and show the appropriate blocks */
+        // Destroy the old Right Category selectors
+        const selectorsLeft = gn('selectors');
+        if (selectorsLeft) {
+            selectorsLeft.parentElement.removeChild(selectorsLeft);
+        }
+
+        // Create the new Right Category selectors
+        Palette.createCategorySelectors(Palette.parent);
+
+        Palette.recreateRightCategory();
+    }
+
+    static recreateRightCategory() {
+        /* This function is called when the Marty mode is toggled to reset the palette and show the appropriate blocks */
+        // Destroy the old Right Category selectors
+        const selectorsRight = gn('selectorsright');
+        if (selectorsRight) {
+            selectorsRight.parentElement.removeChild(selectorsRight);
+        }
+
+        // Create the new Right Category selectors
+        Palette.createCategorySelectorsRight(Palette.parent);
+    }
+
     static setup(parent) {
+        Palette.parent = parent;
         blockscale *= scaleMultiplier;
         blockdy *= scaleMultiplier;
         Palette.blockdx *= scaleMultiplier; // XXX
@@ -68,8 +104,10 @@ export default class Palette {
         newHTML('div', 'catimage', bkg);
         var leftPx = 15 * scaleMultiplier;
         var widthPx = 54 * scaleMultiplier;
-        for (var i = 0; i < BlockSpecs.categories.length; i++) {
-            Palette.createSelector(sel, i, leftPx + i * widthPx, 0, BlockSpecs.categories[i]);
+        /*MartyMode*/
+        const categoriesLeft = ScratchJr.isMartyModeEnabled ? BlockSpecs.categoriesMarty : BlockSpecs.categories;
+        for (var i = 0; i < categoriesLeft.length; i++) {
+            Palette.createSelector(sel, i, leftPx + i * widthPx, 0, categoriesLeft[i]);
         }
     }
 
@@ -80,8 +118,10 @@ export default class Palette {
         newHTML('div', 'catimage', bkg);
         var leftPx = 15 * scaleMultiplier;
         var widthPx = 54 * scaleMultiplier;
-        for (var i = 0; i < BlockSpecs.categoriesRight.length; i++) {
-            Palette.createSelector(sel, BlockSpecs.categories.length + i, leftPx + i * widthPx, 0, BlockSpecs.categoriesRight[i]);
+        /*MartyMode*/
+        const leftCategoriesLength = ScratchJr.isMartyModeEnabled ? BlockSpecs.categoriesMarty.length : BlockSpecs.categories.length;
+        for (var i = 0; i < BlockSpecs.categoriesCog.length; i++) {
+            Palette.createSelector(sel, leftCategoriesLength + i, leftPx + i * widthPx, 0, BlockSpecs.categoriesCog[i]);
         }
     }
 
@@ -235,13 +275,13 @@ export default class Palette {
     }
 
     static hide() {
-        gn('blockspalette').childNodes[0].style.display = 'none';
-        gn('blockspalette').childNodes[1].style.display = 'none';
+        gn('blockspalette').querySelector('#selectors').style.display = 'none';
+        gn('blockspalette').querySelector('#selectorsright').style.display = 'none';
     }
 
     static show() {
-        gn('blockspalette').childNodes[0].style.display = 'inline-block';
-        gn('blockspalette').childNodes[1].style.display = 'inline-block';
+        gn('blockspalette').querySelector('#selectors').style.display = 'inline-block';
+        gn('blockspalette').querySelector('#selectorsright').style.display = 'inline-block';
     }
 
 
@@ -394,7 +434,11 @@ export default class Palette {
         if (!ScratchJr.getSprite()) {
             return;
         }
-        const pallets = isRightCategories ? BlockSpecs.palettesRight : BlockSpecs.palettes;
+        /*MartyMode*/
+        let pallets = isRightCategories ? BlockSpecs.palettesCog : BlockSpecs.palettes;
+        if (!isRightCategories && ScratchJr.isMartyModeEnabled) {
+            pallets = BlockSpecs.palettesMarty;
+        }
         var list = (pallets[n]).concat();
         var dx = dxblocks;
         if (isRightCategories) {
@@ -422,24 +466,24 @@ export default class Palette {
             }
         }
         dx += 30;
-        const categoriesLength = isRightCategories ? BlockSpecs.categoriesRight.length : BlockSpecs.categories.length;
+        let categoriesLength = isRightCategories ? BlockSpecs.categoriesCog.length : BlockSpecs.categories.length;
+        /*MartyMode*/
+        if (!isRightCategories && ScratchJr.isMartyModeEnabled) {
+            categoriesLength = BlockSpecs.categoriesMarty.length;
+        }
         if ((n == (categoriesLength - 1)) && (ScratchJr.stage.pages.length > 1)) {
             Palette.addPagesBlocks(dx);
         }
         // TODO: they hard coded n==3 to be sound, but we don't want the sound blocks for alpha release
         // need to clean this up before we re-add in the sound blocks
-        if (!isRightCategories && (n == 3) && (ScratchJr.getSprite().sounds.length > 0)) {
+        /*MartyMode*/
+        if (!isRightCategories && !ScratchJr.isMartyModeEnabled && (n == 3) && (ScratchJr.getSprite().sounds.length > 0)) {
             Palette.addSoundsBlocks(dxblocks);
         }
     }
 
     static reset() {
-        if (numcat == (BlockSpecs.categories.length - 1)) {
-            Palette.selectCategory(BlockSpecs.categories.length - 1);
-        }
-        if (numcat == 3) {
-            Palette.selectCategory(3);
-        }
+        Palette.selectCategory(0);
     }
 
     static showSelectors(b) {

@@ -304,6 +304,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_Localization__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../utils/Localization */ "./src/utils/Localization.js");
 /* harmony import */ var _utils_lib__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../utils/lib */ "./src/utils/lib.js");
 /* harmony import */ var _cog_CogManager__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../cog/CogManager */ "./src/cog/CogManager.js");
+/* harmony import */ var _marty_MartyManager__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../marty/MartyManager */ "./src/marty/MartyManager.js");
+/* harmony import */ var _ui_Thumbs__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./ui/Thumbs */ "./src/editor/ui/Thumbs.js");
+
+
 
 
 
@@ -337,6 +341,7 @@ let runtime = undefined;
 let stage = undefined;
 let inFullscreen = false;
 let keypad = undefined;
+let colpad = undefined;
 let textForm = undefined;
 let editfirst = false;
 let stagecolor;
@@ -352,7 +357,7 @@ let layerAboveBottom = 4;
 let dragginLayer = 7000;
 let currentProject = undefined;
 let editmode;
-let isDebugging = false;
+let isDebugging = true;
 let time;
 let userStart = false;
 let onHold = false;
@@ -361,7 +366,11 @@ let stopShaking = undefined;
 let version = undefined;
 let autoSaveEnabled = true;
 let autoSaveSetInterval = null;
+
+/*MartyMode*/
+let isMartyModeEnabled = false;
 let onBackButtonCallback = [];
+let BIRDS_EYE_SPRITE_NAME = "Marty Bird's Eye";
 class ScratchJr {
   static get workingCanvas() {
     return workingCanvas;
@@ -452,6 +461,50 @@ class ScratchJr {
   }
   static get onBackButtonCallback() {
     return onBackButtonCallback;
+  }
+
+  /*MartyMode*/
+  static get isMartyModeEnabled() {
+    return isMartyModeEnabled;
+  }
+  static get BIRDS_EYE_SPRITE_NAME() {
+    return BIRDS_EYE_SPRITE_NAME;
+  }
+
+  /*MartyMode*/
+  static set isMartyModeEnabled(newIsMartyModeEnabled) {
+    console.log("Setting Marty mode to: " + newIsMartyModeEnabled);
+    isMartyModeEnabled = newIsMartyModeEnabled;
+    _ui_Palette__WEBPACK_IMPORTED_MODULE_6__["default"].recreateCategories();
+    const martyBirdsEyeSprite = stage.currentPage.getMartyBirdsEyeSprite();
+
+    // if we are enabling Marty mode, we deselct all sprites
+    if (isMartyModeEnabled) {
+      // if already sprite exist, don't add it again
+      if (martyBirdsEyeSprite) {
+        stage.currentPage.setCurrentSprite(martyBirdsEyeSprite);
+        _ui_Thumbs__WEBPACK_IMPORTED_MODULE_22__["default"].selectThisSprite(martyBirdsEyeSprite);
+      } else {
+        // if Marty Bird's Eye sprite doesn't exist, add it
+        stage.currentPage.addSprite(0.5, "MartyBirdsEye.svg", BIRDS_EYE_SPRITE_NAME, stage.currentPage.martyBirdsEyeSpriteAdded);
+      }
+      stage.currentPage.toggleMartyBirdsEyeSpriteVisibility(true, martyBirdsEyeSprite);
+    } else {
+      // if we are disabling Marty mode, we select the first sprite
+      const allSprites = stage.currentPage.getSprites();
+      const firstSpriteBesidesMarty = allSprites.filter(sprite => !sprite.includes(BIRDS_EYE_SPRITE_NAME))[0];
+      if (firstSpriteBesidesMarty) {
+        const spr = stage.currentPage.getSprite(firstSpriteBesidesMarty);
+        if (spr) {
+          stage.currentPage.setCurrentSprite(spr);
+          _ui_Thumbs__WEBPACK_IMPORTED_MODULE_22__["default"].selectThisSprite(spr);
+        }
+      } else {
+        stage.currentPage.setCurrentSprite(undefined);
+      }
+      stage.currentPage.toggleMartyBirdsEyeSpriteVisibility(false, martyBirdsEyeSprite);
+    }
+    stage.currentPage.updateThumb();
   }
   static appinit(v) {
     stagecolor = window.Settings.stageColor;
@@ -857,7 +910,9 @@ class ScratchJr {
   static editArg(e, ti) {
     e.preventDefault();
     e.stopPropagation();
-    if (ti && ti.owner.isText()) {
+    if (ti && ti.owner.isColour()) {
+      ScratchJr.colourClicked(e, ti);
+    } else if (ti && ti.owner.isText()) {
       ScratchJr.textClicked(e, ti);
     } else {
       ScratchJr.numberClicked(e, ti);
@@ -921,6 +976,61 @@ class ScratchJr {
     document.body.scrollLeft = 0;
     if (_utils_lib__WEBPACK_IMPORTED_MODULE_19__.isAndroid) {
       AndroidInterface.scratchjr_forceHideKeyboard();
+    }
+  }
+
+  /////////////////////////////////////////
+  //Colour keyboard
+  /////////////////////////////////////////
+  static setupColKeypad() {
+    colpad = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_19__.newHTML)("div", "colkeyboard", _utils_lib__WEBPACK_IMPORTED_MODULE_19__.frame);
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_19__.isTablet) {
+      colpad.ontouchstart = ScratchJr.eatEvent;
+    } else {
+      colpad.onpointerdown = ScratchJr.eatEvent;
+    }
+    // var pad = newHTML('div', 'insidekeyboard', colpad);
+    const colours = ["#e30613", "#009640", "#009fe3", "#662483", "#e94e1b", "#ffed00"];
+    for (const colour of colours) {
+      ScratchJr.keyboardAddCol(colpad, colour, "onecol");
+    }
+  }
+  static keyboardAddCol(p, col, c) {
+    var keym = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_19__.newHTML)("div", c, p);
+    keym.style.background = col;
+    // var mk = newHTML('span', undefined, keym);
+    // mk.textContent = col ? col : '';
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_19__.isTablet) {
+      keym.ontouchstart = ScratchJr.colEditKey;
+    } else {
+      keym.onpointerdown = ScratchJr.colEditKey;
+    }
+  }
+
+  /////////////////////////////////////////////////
+  //Colour Clicked
+  /////////////////////////////////////////
+  static colourClicked(e, ti) {
+    var delta = activeFocus ? activeFocus.delta : 0;
+    if (activeFocus && activeFocus.type == "blockarg") {
+      activeFocus.div.className = "colfield off";
+      ScratchJr.colEditDone();
+    }
+    var b = ti.owner; // b is a BlockArg
+    activeFocus = b;
+    activeFocus.delta = delta;
+    b.oldvalue = ti.style.background;
+    activeFocus.div.className = "colfield on";
+    colpad.className = "colkeyboard on";
+    editfirst = true;
+    var p = ti.parentNode.parentNode.owner;
+    // if (Number(p.min) < 0) {
+    //     ScratchJr.setMinusKey();
+    // } else {
+    //     ScratchJr.setSpaceKey();
+    // }
+    if (delta == 0) {
+      ScratchJr.needsToScroll(b);
     }
   }
 
@@ -1041,6 +1151,26 @@ class ScratchJr {
     }
     ScratchJr.fillValueWithKey(c);
   }
+  static colEditKey(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var t = e.target;
+    if (!t) {
+      return;
+    }
+    if (t.className == "") {
+      t = t.parentNode;
+    }
+    _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_1__["default"].sndFX("keydown.wav");
+    var c = t.style.background;
+    if (!c) {
+      if (t.parentNode.className == "onecol delete" || t.className == "onecol delete") {
+        ScratchJr.numEditDelete();
+      }
+      return;
+    }
+    ScratchJr.fillValueWithCol(c);
+  }
 
   /**
    * Fill active focus with value `c`
@@ -1067,6 +1197,16 @@ class ScratchJr {
     } else {
       activeFocus.setValue(val);
     }
+  }
+
+  /**
+   * Fill active focus with value `c`
+   * @param c The input char, should be string colour
+   */
+  static fillValueWithCol(c) {
+    var input = activeFocus.input;
+    input.style.background = c;
+    activeFocus.setCol(c);
   }
   static setSpaceKey() {
     keypad.childNodes[0].childNodes[9].className = 'onekey space';
@@ -1102,7 +1242,10 @@ class ScratchJr {
     if (activeFocus.type != 'blockarg') {
       return;
     }
-    if (activeFocus.isText()) {
+    if (activeFocus.isColour()) {
+      ScratchJr.closeColEdit();
+      onBackButtonCallback.pop();
+    } else if (activeFocus.isText()) {
       document.forms.editable.field.blur();
     } else {
       ScratchJr.closeNumberEdit();
@@ -1117,6 +1260,35 @@ class ScratchJr {
     activeFocus = undefined;
     // stop accepting keyboard events
     window.onkeydown = undefined;
+  }
+  static closeColEdit() {
+    ScratchJr.colEditDone();
+    ScratchJr.resetScroll();
+    colpad.className = "colkeyboard off";
+    activeFocus.div.className = "colfield off";
+    activeFocus = undefined;
+    // stop accepting keyboard events
+    window.onkeydown = undefined;
+  }
+  static colEditDone() {
+    var col = activeFocus.argValue;
+    var ba = activeFocus;
+    activeFocus.setCol(col);
+    ba.argValue = col;
+    if (ba.daddy && ba.daddy.div.parentNode.owner) {
+      var spr = ba.daddy.div.parentNode.owner.spr;
+      if (spr && spr.div.parentNode) {
+        var action = {
+          action: "scripts",
+          where: spr.div.parentNode.owner.id,
+          who: spr.id
+        };
+        if (ba.argValue != ba.oldvalue) {
+          ScratchJr.storyStart("ScratchJr.numEditDone");
+          _ui_Undo__WEBPACK_IMPORTED_MODULE_4__["default"].record(action);
+        }
+      }
+    }
   }
   static numEditDone() {
     var val = activeFocus.input.textContent;
@@ -1212,6 +1384,7 @@ class ScratchJr {
 // Expose ScratchJr to global
 window.ScratchJr = ScratchJr;
 window.cogManager = new _cog_CogManager__WEBPACK_IMPORTED_MODULE_20__["default"]();
+window.martyManager = new _marty_MartyManager__WEBPACK_IMPORTED_MODULE_21__["default"]();
 
 /***/ }),
 
@@ -1725,6 +1898,10 @@ class BlockArg {
     this.type = 'blockarg';
     this.argType = block.spec[3];
     switch (this.argType) {
+      case 'c':
+        this.argValue = block.spec[4];
+        this.div = this.addColArg();
+        break;
       case 'n':
         this.argValue = block.spec[4];
         this.div = this.addNumArg();
@@ -1802,6 +1979,14 @@ class BlockArg {
       return this.addNumArgument(str);
     }
   }
+  addColArg() {
+    var str = this.argValue.toString();
+    if (this.daddy.inpalette) {
+      return this.addColLabel(str);
+    } else {
+      return this.addColArgument(str);
+    }
+  }
   addTextArg() {
     var str = this.argValue.toString();
     if (this.daddy.inpalette) {
@@ -1809,6 +1994,44 @@ class BlockArg {
     } else {
       return this.addTextArgument(str, true);
     }
+  }
+  addColLabel(col) {
+    var scale = this.daddy.scale;
+    var dx = 16;
+    var dy = 57;
+    if (this.daddy.blocktype == 'repeat') {
+      dx = Math.round(this.daddy.blockshape.width / window.devicePixelRatio / scale) - 60;
+      dy = Math.round(this.daddy.blockshape.height / window.devicePixelRatio / scale) - 10;
+    }
+    var img = _BlockSpecs__WEBPACK_IMPORTED_MODULE_1__["default"].numfieldimg;
+    var w = 36;
+    var h = 17;
+    var field = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.newCanvas)(this.daddy.div, 0, 0, w * window.devicePixelRatio, h * window.devicePixelRatio, {
+      position: 'absolute',
+      webkitTransform: 'translate(' + -w * window.devicePixelRatio / 2 + 'px, ' + -h * window.devicePixelRatio / 2 + 'px) ' + 'scale(' + scale / window.devicePixelRatio + ') ' + 'translate(' + (dx * window.devicePixelRatio + w * window.devicePixelRatio / 2) + 'px, ' + (dy * window.devicePixelRatio + h * window.devicePixelRatio / 2) + 'px)',
+      pointerEvents: 'all'
+    });
+    var ctx = field.getContext('2d');
+    if (!img.complete) {
+      img.onload = function () {
+        ctx.drawImage(img, 0, 0, w, h, 0, 0, w * window.devicePixelRatio, h * window.devicePixelRatio);
+      };
+    } else {
+      ctx.drawImage(img, 0, 0, w, h, 0, 0, w * window.devicePixelRatio, h * window.devicePixelRatio);
+    }
+    var div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.newDiv)(this.daddy.div, dx, dy, w, h, {
+      position: 'absolute',
+      zoom: scale * 100 + '%',
+      margin: '0px',
+      padding: '0px'
+    });
+    var cnv = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.newCanvas)(div, 0, 0, w * window.devicePixelRatio, h * window.devicePixelRatio, {
+      position: 'absolute',
+      webkitTransform: 'translate(' + -w * window.devicePixelRatio / 2 + 'px, ' + -h * window.devicePixelRatio / 2 + 'px) ' + 'scale(' + 1 / window.devicePixelRatio + ') ' + 'translate(' + w * window.devicePixelRatio / 2 + 'px, ' + h * window.devicePixelRatio / 2 + 'px)'
+    });
+    ctx = cnv.getContext('2d');
+    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.addCol)(ctx, col, cnv.width, cnv.height);
+    return div;
   }
   addLabel(str, isText) {
     var scale = this.daddy.scale;
@@ -1870,6 +2093,26 @@ class BlockArg {
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.setCanvasSize)(div.parentNode, div.parentNode.width, div.parentNode.height);
     return div;
   }
+  addColArgument(col) {
+    var div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.newHTML)('div', 'colfield', this.daddy.div);
+    if (this.daddy.blocktype == 'repeat') {
+      (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.setProps)(div.style, {
+        left: this.daddy.blockshape.width / window.devicePixelRatio - 62 * this.daddy.scale + 'px',
+        top: this.daddy.blockshape.height / window.devicePixelRatio - 11 * this.daddy.scale + 'px'
+      });
+    }
+    var ti = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.newHTML)('h3', 'colfield-div', div);
+    this.input = ti;
+    ti.owner = this;
+    ti.style.background = col;
+    this.arg = div;
+    // Expand the parent div to incorporate the size of the button,
+    // else on Android 4.2 the bottom part of the button
+    // will not be clickable.
+    div.parentNode.height += 10 * window.devicePixelRatio;
+    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.setCanvasSize)(div.parentNode, div.parentNode.width, div.parentNode.height);
+    return div;
+  }
   addTextArgument(str) {
     var div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.newHTML)('div', 'textfield', this.daddy.div);
     var ti = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.newHTML)('h3', undefined, div);
@@ -1884,6 +2127,16 @@ class BlockArg {
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.setCanvasSize)(div.parentNode, div.parentNode.width, div.parentNode.height);
     return div;
   }
+  setCol(col) {
+    if (!this.input) {
+      return;
+    }
+    this.argValue = col;
+    // if (this.argType == 'c') {
+    //     this.argValue = 0;
+    // }
+    this.input.style.background = col;
+  }
   setValue(val) {
     if (!this.input) {
       return;
@@ -1896,6 +2149,9 @@ class BlockArg {
   }
   isText() {
     return this.argType != 'n';
+  }
+  isColour() {
+    return this.argType === 'c';
   }
 
   /////////////////////////////////
@@ -2141,6 +2397,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _utils_Localization__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/Localization */ "./src/utils/Localization.js");
 /* harmony import */ var _tablet_IO__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../tablet/IO */ "./src/tablet/IO.js");
+/* harmony import */ var _engine_Prims__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../engine/Prims */ "./src/editor/engine/Prims.js");
+
 
 
 let loadCount = 0;
@@ -2184,14 +2442,22 @@ class BlockSpecs {
   static get speeds() {
     return speeds;
   }
+  static palettes = [];
+  static palettesCog = [];
+  static palettesMarty = [];
+  static categories = [];
+  static categoriesCog = [];
+  static categoriesMarty = [];
   static initBlocks() {
     loadassets = new Object();
     BlockSpecs.loadGraphics();
     BlockSpecs.defs = BlockSpecs.setupBlocksSpecs();
     BlockSpecs.palettes = BlockSpecs.setupPalettesDef();
-    BlockSpecs.palettesRight = BlockSpecs.setupPalettesDefRight();
+    BlockSpecs.palettesCog = BlockSpecs.setupPalettesDefCog();
+    BlockSpecs.palettesMarty = BlockSpecs.setupPalettesDefMarty();
     BlockSpecs.categories = BlockSpecs.setupCategories();
-    BlockSpecs.categoriesRight = BlockSpecs.setupCategoriesRight();
+    BlockSpecs.categoriesCog = BlockSpecs.setupCategoriesCog();
+    BlockSpecs.categoriesMarty = BlockSpecs.setupCategoriesMarty();
     if (window.Settings.edition == 'PBS') {
       BlockSpecs.canvasMask = BlockSpecs.getImageFrom('assets/ui/canvasmask', 'svg');
     } else {
@@ -2258,8 +2524,22 @@ class BlockSpecs {
       }
     }
   }
-  static setupCategoriesRight() {
+  static setupCategoriesCog() {
     return new Array([BlockSpecs.getImageFrom('assets/categories/CogStartOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/CogStartOff', 'svg'), window.Settings.categoryStartColor], [BlockSpecs.getImageFrom('assets/categories/CogLooksOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/CogLooksOff', 'svg'), window.Settings.categoryLooksColor], [BlockSpecs.getImageFrom('assets/categories/CogSoundOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/CogSoundOff', 'svg'), window.Settings.categorySoundColor]);
+  }
+  static setupCategoriesMarty() {
+    return new Array([BlockSpecs.getImageFrom('assets/categories/MartyStartOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/MartyStartOff', 'svg'), window.Settings.categoryStartColor], [BlockSpecs.getImageFrom('assets/categories/MartyMotionOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/MartyMotionOff', 'svg'), window.Settings.categoryMotionColor], [BlockSpecs.getImageFrom('assets/categories/MartyLooksOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/MartyLooksOff', 'svg'), window.Settings.categoryLooksColor], [BlockSpecs.getImageFrom('assets/categories/MartySoundOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/MartySoundOff', 'svg'), window.Settings.categorySoundColor], [BlockSpecs.getImageFrom('assets/categories/MartyFlowOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/MartyFlowOff', 'svg'), window.Settings.categoryFlowColor], [BlockSpecs.getImageFrom('assets/categories/MartyStopOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/MartyStopOff', 'svg'), window.Settings.categoryStopColor]
+    // [
+    //     BlockSpecs.getImageFrom('assets/categories/MartyLooksOn', 'svg'),
+    //     BlockSpecs.getImageFrom('assets/categories/MartyLooksOff', 'svg'),
+    //     window.Settings.categoryLooksColor
+    // ],
+    // [
+    //     BlockSpecs.getImageFrom('assets/categories/MartySoundOn', 'svg'),
+    //     BlockSpecs.getImageFrom('assets/categories/MartySoundOff', 'svg'),
+    //     window.Settings.categorySoundColor
+    // ],
+    );
   }
   static setupCategories() {
     return new Array([BlockSpecs.getImageFrom('assets/categories/StartOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/StartOff', 'svg'), window.Settings.categoryStartColor], [BlockSpecs.getImageFrom('assets/categories/MotionOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/MotionOff', 'svg'), window.Settings.categoryMotionColor], [BlockSpecs.getImageFrom('assets/categories/LooksOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/LooksOff', 'svg'), window.Settings.categoryLooksColor], [BlockSpecs.getImageFrom('assets/categories/SoundOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/SoundOff', 'svg'), window.Settings.categorySoundColor], [BlockSpecs.getImageFrom('assets/categories/FlowOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/FlowOff', 'svg'), window.Settings.categoryFlowColor], [BlockSpecs.getImageFrom('assets/categories/StopOn', 'svg'), BlockSpecs.getImageFrom('assets/categories/StopOff', 'svg'), window.Settings.categoryStopColor]);
@@ -2267,8 +2547,11 @@ class BlockSpecs {
   static setupPalettesDef() {
     return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'], ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'], ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'], [], ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'], ['endstack', 'forever']];
   }
-  static setupPalettesDefRight() {
+  static setupPalettesDefCog() {
     return [['tiltany', 'ontouchcog', 'onmove', 'onobjectsensed', 'onlight', 'onrotate'], ['setpattern', 'selectcolour', 'clearcolours'], ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote']];
+  }
+  static setupPalettesDefMarty() {
+    return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'], ['martyGetReady', 'martyStepForward', 'martyStepBackward', 'martyStepRight', 'martyStepLeft', 'martyTurnRight', 'martyTurnLeft', 'martyDance', 'martyKickLeft', 'martyKickRight'], ['martyEyesExcited', 'martyEyesWide', 'martyEyesAngry', 'martyEyesNormal', 'martyEyesWiggle', 'martyWaveLeft', 'martyWaveRight', 'martyCelebrate', 'martyLedEyesP1', 'martyLedEyesP2', 'martyLedEyesColour'], ['martyConfusion', 'martyDisbelief', 'martyExcitement', 'martyNoway', 'martyNo', 'martyWhistle'], ['wait', 'stopmine', 'repeat'], ['endstack', 'forever']];
   }
 
   ///////////////////////////////
@@ -2290,13 +2573,8 @@ class BlockSpecs {
 
   static setupBlocksSpecs() {
     return {
+      /* ScratchJr Blocks */
       'onflag': ['onflag', BlockSpecs.getImageFrom('assets/blockicons/greenFlag', 'svg'), BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
-      'tiltany': ['tiltany', tiltshapes, BlockSpecs.yellowStart, 'm', 'tiltright', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
-      'ontouchcog': ['ontouchcog', BlockSpecs.getImageFrom('assets/blockicons/ontouchcog', 'svg'), BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
-      'onmove': ['onmove', moveshapes, BlockSpecs.yellowStart, 'm', 'onmove', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
-      'onobjectsensed': ['onobjectsensed', onobjectsensedshapes, BlockSpecs.yellowStart, 'm', 'onobjectsensedleft', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
-      'onlight': ['onlight', lightshapes, BlockSpecs.yellowStart, 'm', 'onhighlight', BlockSpecs.yellowStartH, 0, 100, BlockSpecs.startS],
-      'onrotate': ['onrotate', rotateshapes, BlockSpecs.yellowStart, 'm', 'onrotateeither', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
       'onmessage': ['onmessage', getshapes, BlockSpecs.yellowStart, 'm', 'Orange', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
       'onclick': ['onclick', BlockSpecs.getImageFrom('assets/blockicons/OnTouch', 'svg'), BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
       'ontouch': ['ontouch', BlockSpecs.getImageFrom('assets/blockicons/Bump', 'svg'), BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
@@ -2316,22 +2594,12 @@ class BlockSpecs {
       'startstopcounter': ['startstopcounter', BlockSpecs.getImageFrom('assets/blockicons/counter_start-reset', 'svg'), BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
       'increasecounter': ['increasecounter', BlockSpecs.getImageFrom('assets/blockicons/counter_increase', 'svg'), BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
       'decreasecounter': ['decreasecounter', BlockSpecs.getImageFrom('assets/blockicons/counter_decrease', 'svg'), BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
-      'setpattern': ['setpattern', patternshapes, BlockSpecs.pinkCmd, 'm', 'patternrainbow', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS, 'purple'],
-      'clearcolours': ['clearcolours', BlockSpecs.getImageFrom('assets/blockicons/clearcolours', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-      'selectcolour': ['selectcolour', colourshapes, BlockSpecs.pinkCmd, 'm', 'selectcolourred', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS, 'purple'],
       'say': ['say', BlockSpecs.getImageFrom('assets/blockicons/Say', 'svg'), BlockSpecs.pinkCmd, 't', _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('SAY_BLOCK_DEFAULT_ARGUMENT'), BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
       'show': ['show', BlockSpecs.getImageFrom('assets/blockicons/Appear', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
       'hide': ['hide', BlockSpecs.getImageFrom('assets/blockicons/Disappear', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
       'grow': ['grow', BlockSpecs.getImageFrom('assets/blockicons/Grow', 'svg'), BlockSpecs.pinkCmd, 'n', 2, BlockSpecs.pinkCmdH, -10, 10, BlockSpecs.cmdS],
       'shrink': ['shrink', BlockSpecs.getImageFrom('assets/blockicons/Shrink', 'svg'), BlockSpecs.pinkCmd, 'n', 2, BlockSpecs.pinkCmdH, -10, 10, BlockSpecs.cmdS],
       'same': ['same', BlockSpecs.getImageFrom('assets/blockicons/Reset', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-      'confusion': ['confusion', BlockSpecs.getImageFrom('assets/blockicons/MartyConfusion', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-      'disbelief': ['disbelief', BlockSpecs.getImageFrom('assets/blockicons/MartyDisbelief', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-      'excitement': ['excitement', BlockSpecs.getImageFrom('assets/blockicons/MartyExcitment', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-      'noway': ['noway', BlockSpecs.getImageFrom('assets/blockicons/MartyNoWay', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-      'no': ['no', BlockSpecs.getImageFrom('assets/blockicons/MartyNo', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-      'whistle': ['whistle', BlockSpecs.getImageFrom('assets/blockicons/MartyWhistle', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-      'playnote': ['playnote', noteshapes, BlockSpecs.limeCmd, 'm', 'notec', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS, 'green'],
       'playsnd': ['playsnd', BlockSpecs.getImageFrom('assets/blockicons/Speaker', 'svg'), BlockSpecs.limeCmd, 's', 'pop.mp3', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
       'playusersnd': ['playusersnd', BlockSpecs.getImageFrom('assets/blockicons/Microphone', 'svg'), BlockSpecs.limeCmd, 'r', '1', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
       'endstack': ['endstack', null, BlockSpecs.redEnd, null, null, BlockSpecs.redEndH, null, null, BlockSpecs.endS],
@@ -2340,7 +2608,52 @@ class BlockSpecs {
       'caretstart': ['caretstart', null, BlockSpecs.getImageFrom('assets/blocks/caretstart', 'svg'), null, null, null, null, null],
       'caretend': ['caretend', null, BlockSpecs.getImageFrom('assets/blocks/caretend', 'svg'), null, null, null, null, null],
       'caretrepeat': ['caretrepeat', null, BlockSpecs.getImageFrom('assets/blocks/caretrepeat'), null, null, null, null, null],
-      'caretcmd': ['caretcmd', null, BlockSpecs.getImageFrom('assets/blocks/caretcmd', 'svg'), null, null, null, null, null]
+      'caretcmd': ['caretcmd', null, BlockSpecs.getImageFrom('assets/blocks/caretcmd', 'svg'), null, null, null, null, null],
+      /* Cog Blocks */
+      'tiltany': ['tiltany', tiltshapes, BlockSpecs.yellowStart, 'm', 'tiltright', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+      'ontouchcog': ['ontouchcog', BlockSpecs.getImageFrom('assets/blockicons/ontouchcog', 'svg'), BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
+      'onmove': ['onmove', moveshapes, BlockSpecs.yellowStart, 'm', 'onmove', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+      'onobjectsensed': ['onobjectsensed', onobjectsensedshapes, BlockSpecs.yellowStart, 'm', 'onobjectsensedleft', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+      'onlight': ['onlight', lightshapes, BlockSpecs.yellowStart, 'm', 'onhighlight', BlockSpecs.yellowStartH, 0, 100, BlockSpecs.startS],
+      'onrotate': ['onrotate', rotateshapes, BlockSpecs.yellowStart, 'm', 'onrotateeither', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+      'setpattern': ['setpattern', patternshapes, BlockSpecs.pinkCmd, 'm', 'patternrainbow', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS, 'purple'],
+      'clearcolours': ['clearcolours', BlockSpecs.getImageFrom('assets/blockicons/clearcolours', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+      'selectcolour': ['selectcolour', colourshapes, BlockSpecs.pinkCmd, 'm', 'selectcolourred', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS, 'purple'],
+      'confusion': ['confusion', BlockSpecs.getImageFrom('assets/blockicons/MartyConfusion', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+      'disbelief': ['disbelief', BlockSpecs.getImageFrom('assets/blockicons/MartyDisbelief', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+      'excitement': ['excitement', BlockSpecs.getImageFrom('assets/blockicons/MartyExcitment', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+      'noway': ['noway', BlockSpecs.getImageFrom('assets/blockicons/MartyNoWay', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+      'no': ['no', BlockSpecs.getImageFrom('assets/blockicons/MartyNo', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+      'whistle': ['whistle', BlockSpecs.getImageFrom('assets/blockicons/MartyWhistle', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+      'playnote': ['playnote', noteshapes, BlockSpecs.limeCmd, 'm', 'notec', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS, 'green'],
+      /* Marty Blocks */
+      'martyGetReady': ['martyGetReady', BlockSpecs.getImageFrom('assets/blockicons/MartyGetReady', 'svg'), BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+      'martyDance': ['martyDance', BlockSpecs.getImageFrom('assets/blockicons/MartyDance', 'svg'), BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+      'martyStepForward': ['martyStepForward', BlockSpecs.getImageFrom('assets/blockicons/Up', 'svg'), BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+      'martyStepBackward': ['martyStepBackward', BlockSpecs.getImageFrom('assets/blockicons/Down', 'svg'), BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+      'martyStepLeft': ['martyStepLeft', BlockSpecs.getImageFrom('assets/blockicons/Back', 'svg'), BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+      'martyStepRight': ['martyStepRight', BlockSpecs.getImageFrom('assets/blockicons/Foward', 'svg'), BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+      'martyTurnRight': ['martyTurnRight', BlockSpecs.getImageFrom('assets/blockicons/Right', 'svg'), BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+      'martyTurnLeft': ['martyTurnLeft', BlockSpecs.getImageFrom('assets/blockicons/Left', 'svg'), BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+      'martyKickRight': ['martyKickRight', BlockSpecs.getImageFrom('assets/blockicons/MartyKickRight', 'svg'), BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 10, BlockSpecs.cmdS],
+      'martyKickLeft': ['martyKickLeft', BlockSpecs.getImageFrom('assets/blockicons/MartyKickLeft', 'svg'), BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 10, BlockSpecs.cmdS],
+      'martyEyesExcited': ['martyEyesExcited', BlockSpecs.getImageFrom('assets/blockicons/MartyExcited', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+      'martyEyesWide': ['martyEyesWide', BlockSpecs.getImageFrom('assets/blockicons/MartyWide', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+      'martyEyesAngry': ['martyEyesAngry', BlockSpecs.getImageFrom('assets/blockicons/MartyAngry', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+      'martyEyesNormal': ['martyEyesNormal', BlockSpecs.getImageFrom('assets/blockicons/MartyNormal', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+      'martyEyesWiggle': ['martyEyesWiggle', BlockSpecs.getImageFrom('assets/blockicons/MartyWiggle', 'svg'), BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
+      'martyWaveLeft': ['martyWaveLeft', BlockSpecs.getImageFrom('assets/blockicons/MartyWaveLeft', 'svg'), BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
+      'martyWaveRight': ['martyWaveRight', BlockSpecs.getImageFrom('assets/blockicons/MartyWaveRight', 'svg'), BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
+      'martyCelebrate': ['martyCelebrate', BlockSpecs.getImageFrom('assets/blockicons/MartyCelebrate', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+      'martyLedEyesP1': ['martyLedEyesP1', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP1', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+      'martyLedEyesP2': ['martyLedEyesP2', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP2', 'svg'), BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+      'martyLedEyesColour': ['martyLedEyesColour', BlockSpecs.getImageFrom('assets/blockicons/MartyEyesColour', 'svg'), BlockSpecs.pinkCmd, 'c', _engine_Prims__WEBPACK_IMPORTED_MODULE_2__.LINEAR_GRADIENT_COLOUR, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+      'martyConfusion': ['martyConfusion', BlockSpecs.getImageFrom('assets/blockicons/MartyConfusion', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+      'martyDisbelief': ['martyDisbelief', BlockSpecs.getImageFrom('assets/blockicons/MartyDisbelief', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+      'martyExcitement': ['martyExcitement', BlockSpecs.getImageFrom('assets/blockicons/MartyExcitment', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+      'martyNoway': ['martyNoway', BlockSpecs.getImageFrom('assets/blockicons/MartyNoWay', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+      'martyNo': ['martyNo', BlockSpecs.getImageFrom('assets/blockicons/MartyNo', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+      'martyWhistle': ['martyWhistle', BlockSpecs.getImageFrom('assets/blockicons/MartyWhistle', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS]
     };
   }
   static blockDesc(b, spr) {
@@ -2406,7 +2719,37 @@ class BlockSpecs {
       }),
       'message': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_SEND_MESSAGE', {
         COLOR: _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_MESSAGE_COLOR_ORANGE')
-      })
+      }),
+      'martyGetReady': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_MOVE_MARTY_GETREADY'),
+      'martyDance': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_MOVE_MARTY_DANCE'),
+      'martyStepRight': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_MOVE_MARTY_RIGHT'),
+      'martyStepLeft': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_MOVE_MARTY_LEFT'),
+      'martyStepForward': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_MOVE_MARTY_UP'),
+      'martyStepBackward': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_MOVE_MARTY_DOWN'),
+      'martyHome': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_GO_MARTY_HOME'),
+      'martyTurnLeft': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_TURN_MARTY_LEFT'),
+      'martyTurnRight': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_TURN_MARTY_RIGHT'),
+      'martyStepRight': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_MOVE_MARTY_FORWARD'),
+      'martyStepLeft': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_MOVE_MARTY_BACK'),
+      'martyKickLeft': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_KICK_MARTY_LEFT'),
+      'martyKickRight': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_KICK_MARTY_RIGHT'),
+      'martyEyesExcited': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_EYES_MARTY_EXCITED'),
+      'martyEyesWide': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_EYES_MARTY_WIDE'),
+      'martyEyesAngry': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_EYES_MARTY_ANGRY'),
+      'martyEyesNormal': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_EYES_MARTY_NORMAL'),
+      'martyEyesWiggle': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_EYES_MARTY_WIGGLE'),
+      'martyWaveLeft': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_WAVE_MARTY_LEFT'),
+      'martyWaveRight': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_WAVE_MARTY_RIGHT'),
+      'martyLedEyesP1': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_LED_MARTY_EYES_P1'),
+      'martyLedEyesP2': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_LED_MARTY_EYES_P2'),
+      'martyLedEyesColour': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_LED_MARTY_EYES_COLOUR'),
+      'martyCelebrate': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_MARTY_CELEBRATE'),
+      'martyConfusion': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_PLAY_MARTY_CONFUSION_SOUND'),
+      'martyDisbelief': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_PLAY_MARTY_DISBELIEF_SOUND'),
+      'martyExcitement': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_PLAY_MARTY_EXCITEMENT_SOUND'),
+      'martyNoway': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_PLAY_MARTY_NOWAY_SOUND'),
+      'martyNo': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_PLAY_MARTY_NO_SOUND'),
+      'martyWhistle': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_PLAY_MARTY_WHISTLE_SOUND')
     };
   }
 }
@@ -2587,8 +2930,9 @@ class Page {
       this.loadPageData(data, fcn);
     }
   }
-  loadPageData(data, fcn) {
+  async loadPageData(data, fcn) {
     this.currentSpriteName = data.lastSprite;
+    const me = this;
     if (data.textstartat) {
       this.textstartat = Number(data.textstartat);
     }
@@ -2609,6 +2953,13 @@ class Page {
       }
     }
     function checkCount() {
+      /*MartyMode*/
+      // Checkout cb will run when a sprite is added to the page. 
+      // When a sprite is added, we check if the current sprite is a marty bird's eye sprite and if so, we enable Marty Mode
+      if (me.currentSpriteName && me.currentSpriteName.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME)) {
+        _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled = true;
+        _ui_UI__WEBPACK_IMPORTED_MODULE_3__["default"].renderCorrectMartyModeIcon(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled);
+      }
       if (!fcn) {
         return;
       }
@@ -2625,6 +2976,7 @@ class Page {
         fcn();
       }
     }
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
   emptyPage() {
     this.clearBackground();
@@ -2637,14 +2989,20 @@ class Page {
     }
     if (spr) {
       this.currentSpriteName = spr.id;
-      spr.div.style.visibility = 'visible';
+      /*MartyMode*/
+      // only set visible if the sprite is not a bird's eye sprite
+      if (!spr.name.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME)) {
+        spr.div.style.visibility = 'visible';
+      }
       _ui_Palette__WEBPACK_IMPORTED_MODULE_5__["default"].show();
       (0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.gn)('scripts').style.display = _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].inFullscreen ? 'none' : 'block';
+      (0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.gn)('palette').style.display = 'block';
       spr.activate();
     } else {
       this.currentSpriteName = undefined;
       _ui_Palette__WEBPACK_IMPORTED_MODULE_5__["default"].hide();
       (0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.gn)('scripts').style.display = 'none';
+      (0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.gn)('palette').style.display = 'none';
     }
   }
   clearBackground() {
@@ -2760,11 +3118,51 @@ class Page {
       }
     }
   }
-  setPageSprites(showstate) {
-    var list = JSON.parse(this.sprites);
-    for (var i = 0; i < list.length; i++) {
-      (0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.gn)(list[i]).style.visibility = showstate;
+
+  /*MartyMode*/
+  // Method that toggles the visibility of the Marty Bird's Eye sprite and all other sprites in the stage
+  toggleMartyBirdsEyeSpriteVisibility(showBirdsEye, martyBirdsEyeSprite) {
+    console.log(`Setting visibility of Marty Bird's Eye sprite to: ${showBirdsEye}`);
+    console.log(`Setting visibility of all other sprites to: ${!showBirdsEye}`);
+
+    // Check if martyBirdsEyeSprite exists
+    if (martyBirdsEyeSprite) {
+      martyBirdsEyeSprite.div.style.visibility = showBirdsEye ? 'visible' : 'hidden';
     }
+
+    // Retrieve all sprites on the current page
+    const allSprites = this.getSprites();
+
+    // Loop through each sprite and set visibility based on `showBirdsEye`
+    allSprites.forEach(sprite => {
+      const spr = this.getSprite(sprite);
+
+      // Set visibility of all other sprites
+      if (spr && !sprite.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME)) {
+        spr.div.style.visibility = showBirdsEye ? 'hidden' : 'visible';
+      }
+    });
+  }
+  setPageSprites(showstate) {
+    if (showstate == 'hidden') {
+      var list = JSON.parse(this.sprites);
+      for (var i = 0; i < list.length; i++) {
+        (0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.gn)(list[i]).style.visibility = showstate;
+      }
+      return;
+    }
+    /*MartyMode*/
+    // If the showstate is 'visible', we show the Marty Bird's Eye sprite only if Marty Mode is enabled
+    // we show only the marty birds eye sprite and hide all other sprites
+    // OR, we show all sprites and hide the marty birds eye sprite
+    const martyBirdsEyeSprite = this.getMartyBirdsEyeSprite();
+    this.toggleMartyBirdsEyeSpriteVisibility(showstate === 'visible' && _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled, martyBirdsEyeSprite);
+
+    // var list = JSON.parse(this.sprites);
+    // for (var i = 0; i < list.length; i++) {
+    //     console.log("setting sprite", list[i], "to", showstate);
+    //     gn(list[i]).style.visibility = showstate;
+    // }
   }
   redoChangeBkg(data) {
     var me = this;
@@ -2837,7 +3235,19 @@ class Page {
       if (!spr) {
         continue;
       }
-      this.stampSpriteAt(ctx, spr, scale);
+      /*MartyMode*/
+      // only print MartyBird's eye sprite if we are in MartyMode,
+      // otherwise print all the rest sprites
+      if (this.currentSpriteName && this.currentSpriteName.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME)) {
+        if (spr.name.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME)) {
+          this.stampSpriteAt(ctx, spr, scale);
+        }
+      }
+      if (this.currentSpriteName && !this.currentSpriteName.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME)) {
+        if (!spr.name.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME)) {
+          this.stampSpriteAt(ctx, spr, scale);
+        }
+      }
     }
     if (window.Settings.edition != 'PBS') {
       ctx.save();
@@ -2936,6 +3346,21 @@ class Page {
     }
     return res;
   }
+  getSprite(spriteName) {
+    if (!(0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.gn)(spriteName)) {
+      return undefined;
+    }
+    return (0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.gn)(spriteName).owner;
+  }
+  getMartyBirdsEyeSprite() {
+    /*MartyMode*/
+    // get Marty Bird's Eye sprite of the current page
+    const allPageSprites = this.getSprites();
+    const martyBirdsEyeSprite = allPageSprites.find(sprite => sprite.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME));
+    if (martyBirdsEyeSprite) {
+      return this.getSprite(martyBirdsEyeSprite);
+    }
+  }
 
   /////////////////////////////
   // Object creation
@@ -2967,11 +3392,24 @@ class Page {
     textAttr.id = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.getIdFor)('Text');
     new _Sprite__WEBPACK_IMPORTED_MODULE_4__["default"](textAttr);
   }
-  createCat() {
+  async createCat() {
     var sprAttr = _ui_UI__WEBPACK_IMPORTED_MODULE_3__["default"].mascotData(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.currentPage);
     _ui_Project__WEBPACK_IMPORTED_MODULE_1__["default"].mediaCount++;
     var me = this;
-    new _Sprite__WEBPACK_IMPORTED_MODULE_4__["default"](sprAttr, me.pageAdded);
+    /*MartyMode*/
+    // if Marty Bird's Eye sprite exists, add just the cat sprite
+    // if (this.getMartyBirdsEyeSprite()) {
+    // if Marty Bird's Eye sprite exists, add just the cat sprite
+    // new Sprite(sprAttr, me.pageAdded);
+    // } else { // if Marty Bird's Eye sprite doesn't exist, add it and when it's added, add the cat sprite
+    this.addSprite(0.5, "MartyBirdsEye.svg", _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME, spr => {
+      // also disable Marty Mode
+      _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled = false;
+      _ui_UI__WEBPACK_IMPORTED_MODULE_3__["default"].renderCorrectMartyModeIcon(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled);
+      new _Sprite__WEBPACK_IMPORTED_MODULE_4__["default"](sprAttr, me.pageAdded);
+      me.martyBirdsEyeSpriteAdded(spr);
+    });
+    // }
   }
   update(spr) {
     if (spr) {
@@ -3005,10 +3443,21 @@ class Page {
     _ui_Thumbs__WEBPACK_IMPORTED_MODULE_2__["default"].updatePages();
   }
   spriteAdded(spr) {
+    if (spr.name !== _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME) {
+      /*MartyMode*/
+      _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled = false;
+      _ui_UI__WEBPACK_IMPORTED_MODULE_3__["default"].renderCorrectMartyModeIcon(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled);
+    }
     var me = spr.div.parentNode.owner;
     me.setCurrentSprite(spr);
     me.update(spr);
     _ui_UI__WEBPACK_IMPORTED_MODULE_3__["default"].spriteInView(spr);
+    _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].onHold = false;
+  }
+  martyBirdsEyeSpriteAdded(spr) {
+    var me = spr.div.parentNode.owner;
+    me.update(spr);
+    _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getSprite().unselect();
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].onHold = false;
   }
   pageAdded(spr) {
@@ -3026,7 +3475,7 @@ class Page {
     _ui_Thumbs__WEBPACK_IMPORTED_MODULE_2__["default"].updateSprites();
     _ui_Thumbs__WEBPACK_IMPORTED_MODULE_2__["default"].updatePages();
   }
-  addSprite(scale, md5, cname) {
+  addSprite(scale, md5, cname, fcn) {
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].onHold = true;
     var sprAttr = {
       flip: false,
@@ -3050,7 +3499,7 @@ class Page {
     sprAttr.id = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.getIdFor)(cname);
     sprAttr.name = cname;
     sprAttr.md5 = md5;
-    new _Sprite__WEBPACK_IMPORTED_MODULE_4__["default"](sprAttr, this.spriteAdded);
+    new _Sprite__WEBPACK_IMPORTED_MODULE_4__["default"](sprAttr, fcn || this.spriteAdded);
   }
   createSprite(data) {
     new _Sprite__WEBPACK_IMPORTED_MODULE_4__["default"](data, this.spriteAdded);
@@ -3104,6 +3553,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _geom_Vector__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../geom/Vector */ "./src/geom/Vector.js");
 /* harmony import */ var _utils_lib__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/lib */ "./src/utils/lib.js");
 /* harmony import */ var _ui_UI__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../ui/UI */ "./src/editor/ui/UI.js");
+/* harmony import */ var _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../marty/MartyBlocks */ "./src/marty/MartyBlocks.js");
+/* harmony import */ var _marty_celebrate_helper__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../marty/celebrate-helper */ "./src/marty/celebrate-helper.js");
+
+
 
 
 
@@ -3113,6 +3566,8 @@ __webpack_require__.r(__webpack_exports__);
 let tinterval = 1;
 let hopList = [-48, -30, -22, -14, -6, 0, 6, 14, 22, 30, 48];
 const LINEAR_GRADIENT_COLOUR = "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)";
+const intervalToSeconds = 31.25; // runtime tick is set at 32ms by Runtime.js. 32*31.25 = 1s
+
 class Prims {
   static get hopList() {
     return hopList;
@@ -3177,6 +3632,36 @@ class Prims {
     Prims.table.playsnd = Prims.playSound;
     Prims.table.playusersnd = Prims.playSound;
     Prims.table.say = Prims.Say;
+
+    /* Marty Prims */
+    Prims.table.martyDance = Prims.martyDance;
+    Prims.table.martyGetReady = Prims.martyGetReady;
+    Prims.table.martyStepForward = Prims.martyStepForward;
+    Prims.table.martyStepBackward = Prims.martyStepBackward;
+    Prims.table.martyStepLeft = Prims.martyStepLeft;
+    Prims.table.martyStepRight = Prims.martyStepRight;
+    Prims.table.martyTurnLeft = Prims.martyTurnLeft;
+    Prims.table.martyTurnRight = Prims.martyTurnRight;
+    Prims.table.martyKickLeft = Prims.martyKickLeft;
+    Prims.table.martyKickRight = Prims.martyKickRight;
+    Prims.table.martyEyesExcited = Prims.martyEyesExcited;
+    Prims.table.martyEyesWide = Prims.martyEyesWide;
+    Prims.table.martyEyesAngry = Prims.martyEyesAngry;
+    Prims.table.martyEyesNormal = Prims.martyEyesNormal;
+    Prims.table.martyEyesWiggle = Prims.martyEyesWiggle;
+    Prims.table.martyWaveLeft = Prims.martyWaveLeft;
+    Prims.table.martyWaveRight = Prims.martyWaveRight;
+    Prims.table.martyCelebrate = Prims.martyCelebrate;
+    Prims.table.martyLedEyesP1 = Prims.martyLedEyesP1;
+    Prims.table.martyLedEyesP2 = Prims.martyLedEyesP2;
+    Prims.table.martyLedEyesP3 = Prims.martyLedEyesP3;
+    Prims.table.martyLedEyesColour = Prims.martyLedEyesColour;
+    Prims.table.martyConfusion = Prims.martyConfusion;
+    Prims.table.martyDisbelief = Prims.martyDisbelief;
+    Prims.table.martyExcitement = Prims.martyExcitement;
+    Prims.table.martyNoway = Prims.martyNoway;
+    Prims.table.martyNo = Prims.martyNo;
+    Prims.table.martyWhistle = Prims.martyWhistle;
   }
   static Done(strip) {
     if (strip.oldblock != null) {
@@ -3582,6 +4067,26 @@ class Prims {
       strip.distance = distance;
     }
   }
+  static martyMoveAtSpeed(strip) {
+    var s = strip.spr;
+    var distance = strip.distance;
+    distance -= Math.abs(_geom_Vector__WEBPACK_IMPORTED_MODULE_3__["default"].len(strip.stepVector));
+    if (distance < 0) {
+      s.setPos(strip.finalPosition.x, strip.finalPosition.y);
+      strip.distance = -1;
+      strip.vector = {
+        x: 0,
+        y: 0
+      };
+      strip.cmdSent = false;
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      s.setPos(s.xcoor + strip.stepVector.x, s.ycoor + strip.stepVector.y);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * strip.waitTime);
+      strip.distance = distance;
+    }
+  }
   static Right(strip) {
     var s = strip.spr;
     var num = Number(strip.thisblock.getArgValue()) * 30;
@@ -3814,6 +4319,537 @@ class Prims {
       strip.thisblock = strip.thisblock.next;
     }
     strip.waitTimer = tinterval;
+  }
+
+  /* Marty Blcoks */
+  static martyDance(strip) {
+    let reps = Math.abs(Number(strip.thisblock.getArgValue()));
+    reps = Prims.sanitiseArgument(reps);
+    const moveTime = 3000;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.dance(reps, moveTime);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+      return;
+    } else {
+      Prims.playMartyServo(strip);
+      return;
+    }
+  }
+  static martyGetReady(strip) {
+    const moveTime = 3000;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.getReady(moveTime);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+      return;
+    } else {
+      Prims.playMartyServo(strip);
+      return;
+    }
+  }
+  static stopMartyCommandedAfterTime(strip, time) {
+    const timeout = setTimeout(() => {
+      console.log("stopping Marty after time");
+      strip.cmdSent = false;
+      clearTimeout(timeout);
+    }, time);
+  }
+  static martyStepForward(strip) {
+    let s = strip.spr;
+    const moveTime = _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].stepMoveTime;
+    let steps = Math.abs(Number(strip.thisblock.getArgValue()));
+    steps = Prims.sanitiseArgument(steps);
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+      steps = Math.min(Math.max(steps, 1), 20);
+      Prims.martyBlocks.stepForward(steps);
+      strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+      Prims.stopMartyCommandedAfterTime(strip, moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer);
+    }
+    if (steps == 0) {
+      strip.thisblock = strip.thisblock.next;
+      strip.waitTimer = tinterval;
+      strip.distance = -1;
+      strip.cmdSent = false;
+      strip.vector = {
+        x: 0,
+        y: 0
+      };
+      return;
+    } else if (strip.distance < 0) {
+      strip.waitTime = (moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+      var res = {};
+      var rad = s.angle * (Math.PI / 180);
+      res.x = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].YStepSize * 0.5 * Math.sin(rad);
+      res.y = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].YStepSize * 0.5 * Math.cos(rad) * -1;
+      strip.distance = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].YStepSize * 0.5;
+      strip.vector = {
+        x: res.x,
+        y: res.y
+      };
+      let finX = res.x + s.xcoor;
+      let finY = res.y + s.ycoor;
+      strip.finalPosition = {
+        x: finX,
+        y: finY
+      };
+      strip.waitTime = strip.waitTime * 0.1;
+      strip.stepVector = _geom_Vector__WEBPACK_IMPORTED_MODULE_3__["default"].scale(strip.vector, 0.1 / steps);
+      Prims.setTime(strip);
+    }
+    Prims.martyMoveAtSpeed(strip);
+  }
+  static martyStepBackward(strip) {
+    let s = strip.spr;
+    const moveTime = _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].stepMoveTime;
+    let steps = Math.abs(Number(strip.thisblock.getArgValue()));
+    steps = Prims.sanitiseArgument(steps);
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+      steps = Math.min(Math.max(steps, 1), 20);
+      Prims.martyBlocks.stepBackward(steps);
+      strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+      Prims.stopMartyCommandedAfterTime(strip, moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer);
+    }
+    if (steps == 0) {
+      strip.thisblock = strip.thisblock.next;
+      strip.waitTimer = tinterval;
+      strip.distance = -1;
+      strip.cmdSent = false;
+      strip.vector = {
+        x: 0,
+        y: 0
+      };
+      return;
+    } else if (strip.distance < 0) {
+      strip.waitTime = (moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+      var res = {};
+      var rad = s.angle * (Math.PI / 180);
+      res.x = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].YStepSize * 0.5 * Math.sin(rad) * -1;
+      res.y = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].YStepSize * 0.5 * Math.cos(rad);
+      strip.distance = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].YStepSize * 0.5;
+      strip.vector = {
+        x: res.x,
+        y: res.y
+      };
+      let finX = res.x + s.xcoor;
+      let finY = res.y + s.ycoor;
+      strip.finalPosition = {
+        x: finX,
+        y: finY
+      };
+      strip.waitTime = strip.waitTime * 0.1;
+      strip.stepVector = _geom_Vector__WEBPACK_IMPORTED_MODULE_3__["default"].scale(strip.vector, 0.1 / steps);
+      Prims.setTime(strip);
+    }
+    Prims.martyMoveAtSpeed(strip);
+  }
+  static martyStepLeft(strip) {
+    let s = strip.spr;
+    const moveTime = _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].stepMoveTime;
+    let steps = Math.abs(Number(strip.thisblock.getArgValue()));
+    steps = Prims.sanitiseArgument(steps);
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+      steps = Math.min(Math.max(steps, 1), 20);
+      Prims.martyBlocks.stepLeft(steps);
+      strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+      Prims.stopMartyCommandedAfterTime(strip, moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer);
+    }
+    if (steps == 0) {
+      strip.thisblock = strip.thisblock.next;
+      strip.waitTimer = tinterval;
+      strip.distance = -1;
+      strip.vector = {
+        x: 0,
+        y: 0
+      };
+      return;
+    } else if (strip.distance < 0) {
+      strip.waitTime = (moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+      var res = {};
+      var rad = (s.angle - 90) * (Math.PI / 180);
+      res.x = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].XStepSize * 0.5 * Math.sin(rad);
+      res.y = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].XStepSize * 0.5 * Math.cos(rad) * -1;
+      strip.distance = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].XStepSize * 0.5;
+      strip.vector = {
+        x: res.x,
+        y: res.y
+      };
+      let finX = res.x + s.xcoor;
+      let finY = res.y + s.ycoor;
+      strip.finalPosition = {
+        x: finX,
+        y: finY
+      };
+      strip.waitTime = strip.waitTime * 0.1;
+      strip.stepVector = _geom_Vector__WEBPACK_IMPORTED_MODULE_3__["default"].scale(strip.vector, 0.1 / steps);
+      Prims.setTime(strip);
+    }
+    Prims.martyMoveAtSpeed(strip);
+  }
+  static martyStepRight(strip) {
+    var s = strip.spr;
+    const moveTime = _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].stepMoveTime;
+    var steps = Math.abs(Number(strip.thisblock.getArgValue()));
+    steps = Prims.sanitiseArgument(steps);
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+      steps = Math.min(Math.max(steps, 1), 20);
+      Prims.martyBlocks.stepRight(steps);
+      strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+      Prims.stopMartyCommandedAfterTime(strip, moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer);
+    }
+    if (steps == 0) {
+      strip.thisblock = strip.thisblock.next;
+      strip.waitTimer = tinterval;
+      strip.distance = -1;
+      strip.vector = {
+        x: 0,
+        y: 0
+      };
+      return;
+    } else if (strip.distance < 0) {
+      strip.waitTime = (moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+      var res = {};
+      var rad = (s.angle + 90) * (Math.PI / 180);
+      res.x = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].XStepSize * 0.5 * Math.sin(rad);
+      res.y = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].XStepSize * 0.5 * Math.cos(rad) * -1;
+      strip.distance = steps * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].XStepSize * 0.5;
+      strip.vector = {
+        x: res.x,
+        y: res.y
+      };
+      let finX = res.x + s.xcoor;
+      let finY = res.y + s.ycoor;
+      strip.finalPosition = {
+        x: finX,
+        y: finY
+      };
+      strip.waitTime = strip.waitTime * 0.1;
+      strip.stepVector = _geom_Vector__WEBPACK_IMPORTED_MODULE_3__["default"].scale(strip.vector, 0.1 / steps);
+      Prims.setTime(strip);
+    }
+    Prims.martyMoveAtSpeed(strip);
+  }
+  static martyTurnRight(strip) {
+    var num = Number(strip.thisblock.getArgValue()) * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnSize * 1.4;
+    var s = strip.spr;
+    const moveTime = _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnMoveTime;
+    let steps = Number(strip.thisblock.getArgValue());
+    steps = Prims.sanitiseArgument(steps);
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+      steps = Math.min(Math.max(steps, 1), 20);
+      Prims.martyBlocks.turnRight(steps);
+      strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+      Prims.stopMartyCommandedAfterTime(strip, moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer);
+    }
+    if (strip.count < 0) {
+      strip.waitTime = (moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer) * steps / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+      strip.count = Math.floor(Math.abs(steps) * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnStepCount); //how many steps do we want to break the movement down into?
+      strip.waitTime = strip.waitTime / strip.count;
+      strip.angleStep = _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnSize / _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnStepCount; //Break the total turn size down by number of steps the sprite should take
+      strip.finalAngle = s.angle + num; //Final position is current angle sub rotation angle
+      strip.finalAngle = strip.finalAngle % 360; //Correct for rolling over 360
+      if (strip.finalAngle < 0) {
+        strip.finalAngle += 360;
+      }
+      if (strip.finalAngle > 360) {
+        strip.finalAngle -= 360;
+      }
+      Prims.setTime(strip);
+    }
+    Prims.turning(strip);
+  }
+  static martyTurnLeft(strip) {
+    var num = Number(strip.thisblock.getArgValue()) * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnSize * 1.4;
+    var s = strip.spr;
+    const moveTime = _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnMoveTime;
+    let steps = Number(strip.thisblock.getArgValue());
+    steps = Prims.sanitiseArgument(steps);
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+      steps = Math.min(Math.max(steps, 1), 20);
+      Prims.martyBlocks.turnLeft(steps);
+      strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+      Prims.stopMartyCommandedAfterTime(strip, moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer);
+    }
+    if (strip.count < 0) {
+      strip.waitTime = (moveTime + _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].moveTimeBuffer) * steps / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+      strip.count = Math.floor(Math.abs(steps) * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnStepCount); //how many steps do we want to break the movement down into?
+      strip.waitTime = strip.waitTime / strip.count;
+      strip.angleStep = -_marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnSize / _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnStepCount; //Break the total turn size down by number of steps the sprite should take
+      strip.finalAngle = s.angle - num; //Final position is current angle sub rotation angle
+      strip.finalAngle = strip.finalAngle % 360; //Correct for rolling over 360
+      if (strip.finalAngle < 0) {
+        strip.finalAngle += 360;
+      }
+      if (strip.finalAngle > 360) {
+        strip.finalAngle -= 360;
+      }
+      Prims.setTime(strip);
+    }
+    Prims.turning(strip);
+  }
+  static martyEyesExcited(strip) {
+    const moveTime = 1000;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.eyesExcited();
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static martyEyesWide(strip) {
+    const moveTime = 1000;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.eyesWide();
+      Prims.showTime(strip);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static martyEyesAngry(strip) {
+    const moveTime = 1000;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.eyesAngry();
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static martyEyesNormal(strip) {
+    const moveTime = 1000;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.eyesNormal();
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static martyEyesWiggle(strip) {
+    const reps = Number(strip.thisblock.getArgValue());
+    const moveTime = 2000;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.eyesWiggle(reps);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static martyWaveLeft(strip) {
+    const reps = Number(strip.thisblock.getArgValue());
+    const moveTime = 2500;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.waveLeft(reps);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static martyWaveRight(strip) {
+    const reps = Number(strip.thisblock.getArgValue());
+    const moveTime = 2500;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.waveRight(reps);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static martyLedEyesP1(strip) {
+    const duration = 2500;
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.ledEyesP1(duration);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (duration / 1000));
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static martyLedEyesP2(strip) {
+    const duration = 2500;
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.ledEyesP2(duration);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (duration / 1000));
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static martyLedEyesP3(strip) {
+    // Not implemented yet
+    return Prims.playMartyServo(strip);
+  }
+  static martyLedEyesColour(strip) {
+    const duration = 1500;
+    let colour = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_4__.rgbToHex)(strip.thisblock.getArgValue()).replace("#", "");
+    if (colour === LINEAR_GRADIENT_COLOUR) {
+      colour = "000000";
+    }
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.ledEyesColour(colour);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (duration / 1000));
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static martyCelebrate(strip) {
+    (0,_marty_celebrate_helper__WEBPACK_IMPORTED_MODULE_7__["default"])(Prims.martyBlocks, Prims, strip, tinterval, intervalToSeconds);
+  }
+  static martyKickLeft(strip) {
+    const reps = Number(strip.thisblock.getArgValue());
+    const moveTime = 2500;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.kickLeft(reps);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static martyKickRight(strip) {
+    const reps = Number(strip.thisblock.getArgValue());
+    const moveTime = 2500;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.kickRight(reps);
+      strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+      Prims.showTime(strip);
+      strip.thisblock = strip.thisblock.next;
+    } else {
+      Prims.playMartyServo(strip);
+    }
+  }
+  static playMartyServo(strip) {
+    const moveTime = 850;
+    _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_1__["default"].sndFX('marty_eyes_servo.wav');
+    strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+    strip.thisblock = strip.thisblock.next;
+    return;
+  }
+  static isMartyCommanded(strip) {
+    return !!strip.cmdSent;
+  }
+  static martyConfusion(strip) {
+    const moveTime = 2500;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.confusion();
+      Prims.showTime(strip);
+    } else {
+      _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_1__["default"].sndFX('confused.wav');
+    }
+    strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+    strip.thisblock = strip.thisblock.next;
+  }
+  static martyDisbelief(strip) {
+    const moveTime = 2500;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.disbelief();
+      Prims.showTime(strip);
+    } else {
+      _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_1__["default"].sndFX('disbelief.wav');
+    }
+    strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+    strip.thisblock = strip.thisblock.next;
+  }
+  static martyExcitement(strip) {
+    const moveTime = 2500;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.excitement();
+      Prims.showTime(strip);
+    } else {
+      _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_1__["default"].sndFX('excited.wav');
+    }
+    strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+    strip.thisblock = strip.thisblock.next;
+  }
+  static martyNoway(strip) {
+    const moveTime = 2500;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.noway();
+      Prims.showTime(strip);
+    } else {
+      _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_1__["default"].sndFX('no_way.wav');
+    }
+    strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+    strip.thisblock = strip.thisblock.next;
+  }
+  static martyNo(strip) {
+    const moveTime = 2500;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.no();
+      Prims.showTime(strip);
+    } else {
+      _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_1__["default"].sndFX('no.wav');
+    }
+    strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+    strip.thisblock = strip.thisblock.next;
+  }
+  static martyWhistle(strip) {
+    const moveTime = 2500;
+    Prims.setTime(strip);
+    if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+      Prims.martyBlocks.whistle();
+      Prims.showTime(strip);
+    } else {
+      _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_1__["default"].sndFX('whistle.wav');
+    }
+    strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+    strip.thisblock = strip.thisblock.next;
+  }
+
+  /* End Marty Blocks */
+
+  static sanitiseArgument(argValue) {
+    const maxStepArgument = 20; //the maxmum number of steps we can make in one REST command
+    if (argValue > maxStepArgument) {
+      return maxStepArgument;
+    } else {
+      return argValue;
+    }
   }
   static OnCogEvent(event) {
     // console.log("onCogEvent")
@@ -4217,6 +5253,7 @@ __webpack_require__.r(__webpack_exports__);
 
 class Sprite {
   constructor(attr, whenDone) {
+    console.log('adding sprite', attr.name);
     if (attr.type == 'sprite') {
       this.createSprite(attr.page, attr.md5, attr.id, attr, whenDone);
     } else {
@@ -4326,6 +5363,9 @@ class Sprite {
       img.onload = function () {
         sprite.displaySprite(fcn);
       };
+      img.onerror = function () {
+        console.log('Error loading image for sprite ' + sprite.name);
+      };
     } else {
       sprite.displaySprite(fcn);
     }
@@ -4397,6 +5437,11 @@ class Sprite {
     p.textContent = this.name;
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_17__.newHTML)('div', 'brush', tb);
     this.thumbnail = tb;
+    /*MartyMode*/
+    // we only display the sprite thumbnail if it is not the birds eye sprite
+    if (this.name === _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME) {
+      this.thumbnail.style.display = 'none';
+    }
     return tb;
   }
   updateSpriteThumb() {
@@ -4429,7 +5474,9 @@ class Sprite {
     var ih = Math.floor(scale * imgh);
     var ix = Math.floor((w - scale * imgw) / 2);
     var iy = Math.floor((h - scale * imgh) / 2);
-    ctx.drawImage(this.border, 0, 0, this.border.width, this.border.height, ix, iy, iw, ih);
+    if (this.border) {
+      ctx.drawImage(this.border, 0, 0, this.border.width, this.border.height, ix, iy, iw, ih);
+    }
     if (!img.complete) {
       img.onload = function () {
         ctx.drawImage(img, 0, 0, imgw, imgh, ix, iy, iw, ih);
@@ -5125,6 +6172,10 @@ class Sprite {
       div.removeChild(div.childNodes[0]);
     }
     var img = this.getSVGimage(this.watermark);
+    /*MartyMode*/
+    if (this.name === _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME) {
+      img.style.filter = 'grayscale(100%)';
+    }
     div.appendChild(img);
     var attr = {
       width: this.w + 'px',
@@ -5137,7 +6188,12 @@ class Sprite {
   }
   getSVGimage(svg) {
     var img = document.createElement('img');
-    var str = new XMLSerializer().serializeToString(svg);
+    let str;
+    if (svg) {
+      str = new XMLSerializer().serializeToString(svg);
+    } else {
+      str = '<svg></svg>';
+    }
     str = str.replace(/ href="data:image/g, ' xlink:href="data:image');
     img.src = 'data:image/svg+xml;base64,' + btoa(str);
     return img;
@@ -5457,6 +6513,7 @@ class Stage {
     this.setPage(this.pages[n - 1], true);
   }
   setPage(page, isOn) {
+    console.log("SET PAGE CALLED");
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stopStrips();
     var sc = _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getSprite() ? (0,_utils_lib__WEBPACK_IMPORTED_MODULE_11__.gn)(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.currentPage.currentSpriteName + '_scripts') : undefined;
     if (sc) {
@@ -5472,6 +6529,19 @@ class Stage {
     _ui_Thumbs__WEBPACK_IMPORTED_MODULE_2__["default"].updatePages();
     var spr = _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getSprite();
     if (spr) {
+      /*MartyMode*/
+      // if the sprite of the current page is a bird's eye sprite, set MartyMode
+      if (spr.name.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME)) {
+        if (!_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled) {
+          _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled = true;
+          _ui_UI__WEBPACK_IMPORTED_MODULE_3__["default"].renderCorrectMartyModeIcon(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled);
+        }
+      } else {
+        if (_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled) {
+          _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled = false;
+          _ui_UI__WEBPACK_IMPORTED_MODULE_3__["default"].renderCorrectMartyModeIcon(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled);
+        }
+      }
       spr.activate();
     }
     if (isOn) {
@@ -5522,7 +6592,12 @@ class Stage {
     var stg = this;
     var whenDone = function (spr) {
       if (spr.page.id == _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.currentPage.id) {
-        spr.div.style.visibility = 'visible';
+        /*MartyMode*/
+        // only set visible if the sprite is not a bird's eye sprite
+        console.log("In copySprite whenDone, sprite name: " + spr.name, ". Before setting visibility to visible");
+        if (!spr.name.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME)) {
+          spr.div.style.visibility = 'visible';
+        }
       }
       if (!page.currentSpriteName) {
         page.currentSpriteName = spr.id;
@@ -5961,7 +7036,18 @@ class Stage {
     th.parentNode.removeChild(th);
     if (sprite && sprite.id == spr.id) {
       var sprites = page.getSprites();
-      page.setCurrentSprite(sprites.length > 0 ? (0,_utils_lib__WEBPACK_IMPORTED_MODULE_11__.gn)(sprites[0]).owner : undefined);
+      /*MartyMode*/
+      // if there are sprites other than Marty's bird's eye sprite, set the current sprite to the first sprite
+      // otherwise, enable Marty mode
+      const allSpritesBesidesMartyBirdsEye = sprites.filter(sprite => !sprite.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME));
+      if (allSpritesBesidesMartyBirdsEye.length > 0) {
+        page.setCurrentSprite((0,_utils_lib__WEBPACK_IMPORTED_MODULE_11__.gn)(allSpritesBesidesMartyBirdsEye[0]).owner);
+      } else {
+        if (!_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled) {
+          _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled = true;
+          _ui_UI__WEBPACK_IMPORTED_MODULE_3__["default"].renderCorrectMartyModeIcon(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled);
+        }
+      }
     }
   }
   renumberPageBlocks(list) {
@@ -6814,6 +7900,12 @@ class Library {
     tb.fieldname = data.name;
     tb.w = Number(data.width);
     tb.h = Number(data.height);
+
+    /*MartyMode*/
+    // if md5 is MartyBirdsEye.svg don't show
+    if (md5 == 'MartyBirdsEye.svg') {
+      tb.style.display = 'none';
+    }
     var img = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_8__.newHTML)('img', undefined, tb);
     var scale = Math.min(w / tb.w, h / tb.h);
     img.style.height = tb.h * scale + 'px';
@@ -7161,9 +8253,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../utils/ScratchAudio */ "./src/utils/ScratchAudio.js");
 /* harmony import */ var _Record__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./Record */ "./src/editor/ui/Record.js");
 /* harmony import */ var _utils_lib__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../utils/lib */ "./src/utils/lib.js");
+/* harmony import */ var _UI__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./UI */ "./src/editor/ui/UI.js");
 ///////////////////////////////////
 //  Blocks Categories Palettes
 ///////////////////////////////////
+
 
 
 
@@ -7195,7 +8289,36 @@ class Palette {
   static set helpballoon(newHelpballoon) {
     helpballoon = newHelpballoon;
   }
+  static recreateCategories() {
+    Palette.recreateLeftCategory();
+    Palette.recreateRightCategory();
+    Palette.selectCategory(0);
+  }
+  static recreateLeftCategory() {
+    /* This function is called when the Marty mode is toggled to reset the palette and show the appropriate blocks */
+    // Destroy the old Right Category selectors
+    const selectorsLeft = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('selectors');
+    if (selectorsLeft) {
+      selectorsLeft.parentElement.removeChild(selectorsLeft);
+    }
+
+    // Create the new Right Category selectors
+    Palette.createCategorySelectors(Palette.parent);
+    Palette.recreateRightCategory();
+  }
+  static recreateRightCategory() {
+    /* This function is called when the Marty mode is toggled to reset the palette and show the appropriate blocks */
+    // Destroy the old Right Category selectors
+    const selectorsRight = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('selectorsright');
+    if (selectorsRight) {
+      selectorsRight.parentElement.removeChild(selectorsRight);
+    }
+
+    // Create the new Right Category selectors
+    Palette.createCategorySelectorsRight(Palette.parent);
+  }
   static setup(parent) {
+    Palette.parent = parent;
     blockscale *= _utils_lib__WEBPACK_IMPORTED_MODULE_12__.scaleMultiplier;
     blockdy *= _utils_lib__WEBPACK_IMPORTED_MODULE_12__.scaleMultiplier;
     Palette.blockdx *= _utils_lib__WEBPACK_IMPORTED_MODULE_12__.scaleMultiplier; // XXX
@@ -7220,8 +8343,10 @@ class Palette {
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.newHTML)('div', 'catimage', bkg);
     var leftPx = 15 * _utils_lib__WEBPACK_IMPORTED_MODULE_12__.scaleMultiplier;
     var widthPx = 54 * _utils_lib__WEBPACK_IMPORTED_MODULE_12__.scaleMultiplier;
-    for (var i = 0; i < _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categories.length; i++) {
-      Palette.createSelector(sel, i, leftPx + i * widthPx, 0, _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categories[i]);
+    /*MartyMode*/
+    const categoriesLeft = _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled ? _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categoriesMarty : _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categories;
+    for (var i = 0; i < categoriesLeft.length; i++) {
+      Palette.createSelector(sel, i, leftPx + i * widthPx, 0, categoriesLeft[i]);
     }
   }
   static createCategorySelectorsRight(parent) {
@@ -7231,8 +8356,10 @@ class Palette {
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.newHTML)('div', 'catimage', bkg);
     var leftPx = 15 * _utils_lib__WEBPACK_IMPORTED_MODULE_12__.scaleMultiplier;
     var widthPx = 54 * _utils_lib__WEBPACK_IMPORTED_MODULE_12__.scaleMultiplier;
-    for (var i = 0; i < _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categoriesRight.length; i++) {
-      Palette.createSelector(sel, _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categories.length + i, leftPx + i * widthPx, 0, _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categoriesRight[i]);
+    /*MartyMode*/
+    const leftCategoriesLength = _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled ? _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categoriesMarty.length : _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categories.length;
+    for (var i = 0; i < _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categoriesCog.length; i++) {
+      Palette.createSelector(sel, leftCategoriesLength + i, leftPx + i * widthPx, 0, _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categoriesCog[i]);
     }
   }
   static paletteMouseDown(e) {
@@ -7374,12 +8501,12 @@ class Palette {
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.writeText)(ctx, 'bold ' + fontSize + 'px ' + window.Settings.paletteBalloonFont, 'white', label, 21 * window.devicePixelRatio * _utils_lib__WEBPACK_IMPORTED_MODULE_12__.scaleMultiplier, 8 * window.devicePixelRatio * _utils_lib__WEBPACK_IMPORTED_MODULE_12__.scaleMultiplier);
   }
   static hide() {
-    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('blockspalette').childNodes[0].style.display = 'none';
-    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('blockspalette').childNodes[1].style.display = 'none';
+    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('blockspalette').querySelector('#selectors').style.display = 'none';
+    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('blockspalette').querySelector('#selectorsright').style.display = 'none';
   }
   static show() {
-    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('blockspalette').childNodes[0].style.display = 'inline-block';
-    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('blockspalette').childNodes[1].style.display = 'inline-block';
+    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('blockspalette').querySelector('#selectors').style.display = 'inline-block';
+    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('blockspalette').querySelector('#selectorsright').style.display = 'inline-block';
   }
   static closeHelpBalloon() {
     if (timeoutid) {
@@ -7519,7 +8646,11 @@ class Palette {
     if (!_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getSprite()) {
       return;
     }
-    const pallets = isRightCategories ? _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].palettesRight : _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].palettes;
+    /*MartyMode*/
+    let pallets = isRightCategories ? _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].palettesCog : _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].palettes;
+    if (!isRightCategories && _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled) {
+      pallets = _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].palettesMarty;
+    }
     var list = pallets[n].concat();
     var dx = dxblocks;
     if (isRightCategories) {
@@ -7546,23 +8677,23 @@ class Palette {
       }
     }
     dx += 30;
-    const categoriesLength = isRightCategories ? _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categoriesRight.length : _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categories.length;
+    let categoriesLength = isRightCategories ? _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categoriesCog.length : _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categories.length;
+    /*MartyMode*/
+    if (!isRightCategories && _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled) {
+      categoriesLength = _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categoriesMarty.length;
+    }
     if (n == categoriesLength - 1 && _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.pages.length > 1) {
       Palette.addPagesBlocks(dx);
     }
     // TODO: they hard coded n==3 to be sound, but we don't want the sound blocks for alpha release
     // need to clean this up before we re-add in the sound blocks
-    if (!isRightCategories && n == 3 && _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getSprite().sounds.length > 0) {
+    /*MartyMode*/
+    if (!isRightCategories && !_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled && n == 3 && _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getSprite().sounds.length > 0) {
       Palette.addSoundsBlocks(dxblocks);
     }
   }
   static reset() {
-    if (numcat == _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categories.length - 1) {
-      Palette.selectCategory(_blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categories.length - 1);
-    }
-    if (numcat == 3) {
-      Palette.selectCategory(3);
-    }
+    Palette.selectCategory(0);
   }
   static showSelectors(b) {
     var n = numcat;
@@ -8184,6 +9315,7 @@ class Project {
     });
   }
   static save(id, whenDone) {
+    console.log(Error().stack);
     saving = true;
     var th = metadata.thumbnail;
     if (th && _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].editmode != 'storyStarter') {
@@ -8193,7 +9325,8 @@ class Project {
         // In case we've exited story-starter mode
         Project.thumbnailUnique(thumb.md5, id, function (isUnique) {
           if (isUnique) {
-            _tablet_OS__WEBPACK_IMPORTED_MODULE_7__["default"].remove(thumb.md5, _tablet_OS__WEBPACK_IMPORTED_MODULE_7__["default"].trace); // remove thumb;
+            // the following removes the thumbnail the second time we save a project, but we actually need the thumb
+            // OS.remove(thumb.md5, OS.trace); // remove thumb;
           }
         });
       }
@@ -10652,9 +11785,9 @@ class Thumbs {
       }
       var th = spr.spriteThumbnail(costumes);
       if (spr.id == _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.currentPage.currentSpriteName) {
-        Thumbs.highlighSprite(th);
+        if (th) Thumbs.highlighSprite(th);
       } else {
-        Thumbs.unhighlighSprite(th);
+        if (th) Thumbs.unhighlighSprite(th);
       }
     }
     if (!_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getSprite()) {
@@ -10744,6 +11877,10 @@ class Thumbs {
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].unfocus(e);
     var spr = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)(spritename).owner;
     var page = spr.div.parentNode.owner;
+
+    /*MartyMode*/
+    _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled = false;
+    _UI__WEBPACK_IMPORTED_MODULE_5__["default"].renderCorrectMartyModeIcon(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled);
     page.setCurrentSprite(spr);
     Thumbs.selectThisSprite(spr);
   }
@@ -10958,6 +12095,7 @@ class UI {
     UI.BottomSection();
     UI.fullscreenControls();
     UI.createFormForText(_utils_lib__WEBPACK_IMPORTED_MODULE_18__.frame);
+    _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].setupColKeypad();
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].setupKeypad();
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].setupEditableField();
     UI.aspectRatioAdjustment();
@@ -11022,13 +12160,15 @@ class UI {
   }
   static createConnectionButtons(leftPanel) {
     const connectionButtonsArea = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'connectionButtonsArea', leftPanel);
+
+    /* COG */
     const cogButotn = UI.createConnectButton(connectionButtonsArea, _html_svgs_cog__WEBPACK_IMPORTED_MODULE_19__.cogSvg, 'Cog', connectButton => {
       window.applicationManager.connectGenericCog(raft => {
         // set subscription to raft events so we can update the UI when:
         // - the raft is connected
         // - the raft is disconnected
         (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__.raftVerifiedSubscriptionHelper)(raft).subscribe(() => {
-          UI.setupConnectionButton(connectButton, raft);
+          UI.setupCogConnectionButton(connectButton, raft);
           // turn off the verified subscription to avoid memory leaks
           (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__.raftVerifiedSubscriptionHelper)(raft).unsubscribe();
         });
@@ -11038,12 +12178,37 @@ class UI {
     // check if we're alredy connected to a cog, and if so, update the UI button
     const connectedCog = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Cog');
     if (connectedCog) {
-      UI.setupConnectionButton(cogButotn, connectedCog);
+      UI.setupCogConnectionButton(cogButotn, connectedCog);
     }
+    /* END COG */
+    /* MARTY */
+    UI.createConnectButton(connectionButtonsArea, _html_svgs_marty__WEBPACK_IMPORTED_MODULE_20__.martySvg, 'Marty', connectButton => {
+      window.applicationManager.connectGenericMarty(raft => {
+        // set subscription to raft events so we can update the UI when:
+        // - the raft is connected
+        // - the raft is disconnected
+        (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__.raftVerifiedSubscriptionHelper)(raft).subscribe(() => {
+          UI.setupMartyConnectionButton(connectButton, raft);
+          // turn off the verified subscription to avoid memory leaks
+          (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__.raftVerifiedSubscriptionHelper)(raft).unsubscribe();
+        });
 
-    // UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty',);
+        // Activate Marty Mode if not already activated
+        /*MartyMode*/
+        if (!_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled) {
+          UI.toggleMartyMode();
+        }
+      });
+    });
+
+    // check if we're alredy connected to a marty, and if so, update the UI button
+    const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
+    if (connectedMarty) {
+      UI.setupMartyConnectionButton(cogButotn, connectedMarty);
+    }
+    /* END MARTY */
   }
-  static setupConnectionButton(button, raft) {
+  static setupCogConnectionButton(button, raft) {
     // Add the connected class to the button
     button.classList.add('connectButtonConnected');
 
@@ -11064,6 +12229,35 @@ class UI {
       // When raft is disconnected, update the UI and remove the raft
       button.classList.remove('connectButtonConnected');
       window.cogManager.removeCog(raft);
+
+      // Unsubscribe from the disconnected event to avoid memory leaks
+      (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__.raftDisconnectedSubscriptionHelper)(raft).unsubscribe();
+
+      // Restore the old onClick function
+      button.onclick = oldOnClick;
+    });
+  }
+  static setupMartyConnectionButton(button, raft) {
+    // Add the connected class to the button
+    button.classList.add('connectButtonConnected');
+
+    // Add the raft to the marty manager and wire it with blocks
+    window.martyManager.addMarty(raft);
+    window.martyManager.wireMartyWithBlocks(raft.id);
+
+    // Store the old onClick function to restore it later
+    const oldOnClick = button.onclick;
+
+    // Set the new onClick function to disconnect the raft
+    button.onclick = () => {
+      window.applicationManager.disconnectGeneric(raft);
+    };
+
+    // Set up a subscription to the raft disconnected event
+    (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__.raftDisconnectedSubscriptionHelper)(raft).subscribe(() => {
+      // When raft is disconnected, update the UI and remove the raft
+      button.classList.remove('connectButtonConnected');
+      window.martyManager.removeMarty(raft);
 
       // Unsubscribe from the disconnected event to avoid memory leaks
       (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__.raftDisconnectedSubscriptionHelper)(raft).unsubscribe();
@@ -11815,6 +13009,35 @@ class UI {
     tb.setAttribute('id', 'pages');
     var ndiv = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'pagescc', tb);
     ndiv.setAttribute('id', 'pagecc');
+    UI.addMartyModeButton(rp);
+  }
+  static addMartyModeButton(rightPanel) {
+    var mm = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'martyMode', rightPanel);
+    mm.setAttribute('id', 'martyMode');
+    mm.onclick = UI.toggleMartyMode;
+
+    // Add SVG asset
+    var svgDiv = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'martyModeIcon', mm);
+    svgDiv.innerHTML = '<img src="./assets/ui/martyModeDisabled.svg" alt="Marty Mode Disabled">';
+  }
+  /*MartyMode*/
+  static renderCorrectMartyModeIcon(isMartyModeEnabled) {
+    // Toggle the SVG asset
+    var martyModeIcon = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.gn)('martyMode').querySelector('.martyModeIcon img');
+    if (_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled) {
+      martyModeIcon.src = './assets/ui/martyModeEnabled.svg';
+      martyModeIcon.alt = 'Marty Mode Enabled';
+    } else {
+      martyModeIcon.src = './assets/ui/martyModeDisabled.svg';
+      martyModeIcon.alt = 'Marty Mode Disabled';
+    }
+  }
+
+  /*MartyMode*/
+  static toggleMartyMode() {
+    _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_17__["default"].sndFX('tap.wav');
+    _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled = !_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled;
+    UI.renderCorrectMartyModeIcon(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled);
   }
 
   //////////////////////////////////////
@@ -12392,7 +13615,12 @@ class Undo {
     var fcn = function (spr) {
       if (spr.type == 'sprite') {
         if (page == _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.currentPage.id) {
-          spr.div.style.visibility = 'visible';
+          /*MartyMode*/
+          // only set visible if the sprite is not a bird's eye sprite
+          console.log("In copySprite, sprite name: " + spr.name, ". Before setting visibility to visible");
+          if (!spr.name.includes(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].BIRDS_EYE_SPRITE_NAME)) {
+            spr.div.style.visibility = 'visible';
+          }
         }
         Undo.setSprite(page, data);
       } else {
@@ -14911,7 +16139,7 @@ const martySvg = `<svg
             d="M580.61,174.09c-.11-.01-.22-.05-.31-.12l-1.62-1.24-1.84,.88c-.23,.11-.51,.07-.7-.11l-1.47-1.4-1.93,.68c-.24,.09-.51,.01-.68-.18l-1.31-1.54-1.99,.47c-.25,.06-.51-.04-.66-.25l-1.14-1.67-2.02,.26c-.25,.03-.5-.09-.63-.32l-.96-1.78-2.04,.05c-.26,0-.49-.15-.59-.38l-.78-1.88-2.03-.17c-.25-.03-.47-.2-.55-.44l-.58-1.95-1.99-.36c-.25-.05-.45-.24-.5-.5l-.37-2-1.95-.59c-.24-.07-.42-.29-.44-.54l-.17-2.03-1.88-.78c-.24-.1-.39-.33-.38-.59l.06-2.02-1.79-.97c-.23-.12-.35-.37-.32-.63l.26-2.02-1.67-1.15c-.21-.15-.31-.41-.25-.66l.47-1.98-1.54-1.31c-.19-.17-.27-.44-.18-.68l.68-1.92-1.4-1.46c-.18-.19-.22-.46-.11-.69l.87-1.85-1.23-1.6c-.16-.2-.17-.48-.04-.7l1.06-1.74-1.07-1.73c-.13-.22-.12-.5,.04-.7l1.24-1.62-.88-1.84c-.11-.23-.07-.51,.11-.7l1.4-1.47-.68-1.93c-.08-.24-.01-.51,.18-.68l1.54-1.31-.47-1.99c-.06-.25,.04-.51,.25-.66l1.67-1.14-.26-2.02c-.03-.25,.09-.5,.32-.63l1.78-.97-.05-2.04c0-.26,.15-.49,.38-.59l1.87-.78,.17-2.03c.02-.26,.2-.47,.44-.55l1.95-.58,.36-1.99c.05-.25,.24-.45,.5-.5l2-.37,.59-1.95c.07-.25,.29-.42,.54-.44l2.03-.17,.78-1.88c.1-.24,.33-.39,.59-.38l2.03,.05,.97-1.78c.12-.22,.38-.36,.62-.32l2.02,.26,1.15-1.67c.15-.21,.4-.31,.66-.25l1.98,.47,1.31-1.54c.17-.19,.44-.26,.68-.18l1.92,.68,1.46-1.4c.19-.18,.46-.22,.69-.11l1.85,.87,1.6-1.23c.2-.16,.48-.17,.7-.04l1.74,1.06,1.73-1.07c.22-.13,.5-.12,.7,.04l1.62,1.24,1.84-.88c.23-.11,.51-.07,.7,.11l1.47,1.4,1.93-.68c.24-.09,.51-.01,.68,.18l1.31,1.54,1.99-.47c.25-.06,.51,.04,.66,.25l1.14,1.67,2.02-.26c.25-.03,.5,.09,.63,.32l.96,1.77,2.04-.05c.26,0,.49,.15,.59,.38l.78,1.88,2.03,.17c.25,0,.47,.2,.54,.44l.58,1.94,1.99,.38c.25,.05,.45,.24,.5,.5l.37,2,1.95,.59c.25,.07,.42,.29,.44,.54l.17,2.03,1.88,.78c.24,.1,.39,.33,.38,.59l-.05,2.03,1.78,.97c.22,.12,.35,.37,.32,.62l-.26,2.02,1.67,1.15c.21,.15,.31,.41,.25,.66l-.47,1.98,1.54,1.31c.19,.17,.27,.44,.18,.68l-.68,1.92,1.4,1.46c.18,.19,.22,.46,.11,.69l-.87,1.85,1.23,1.6c.16,.2,.17,.48,.04,.7l-1.06,1.74,1.07,1.73c.13,.22,.12,.5-.04,.7l-1.24,1.62,.88,1.84c.11,.23,.07,.51-.11,.7l-1.4,1.47,.68,1.93c.08,.24,.01,.51-.18,.68l-1.54,1.31,.47,1.99c.06,.25-.04,.51-.25,.66l-1.67,1.14,.26,2.02c.03,.25-.09,.5-.32,.63l-1.78,.97,.05,2.04c0,.26-.15,.49-.38,.59l-1.88,.78-.17,2.03c-.02,.26-.2,.47-.44,.54l-1.94,.58-.37,1.99c-.05,.25-.24,.45-.5,.5l-2,.37-.59,1.95c-.07,.25-.29,.42-.54,.44l-2.03,.17-.78,1.88c-.1,.24-.33,.39-.59,.38l-2.02-.06-.97,1.78c-.12,.22-.38,.34-.63,.32l-2.02-.26-1.15,1.67c-.15,.21-.4,.31-.66,.25l-1.98-.47-1.31,1.54c-.17,.2-.44,.26-.68,.18l-1.93-.68-1.46,1.4c-.19,.18-.46,.22-.69,.11l-1.85-.87-1.6,1.23c-.2,.16-.48,.17-.7,.04l-1.74-1.06-1.73,1.07c-.12,.07-.26,.1-.39,.09Zm-5.71-3.33c.13,.01,.26,.07,.36,.17l1.43,1.37,1.79-.86c.21-.1,.46-.07,.65,.07l1.58,1.21,1.69-1.04c.2-.12,.45-.12,.65,0l1.7,1.04,1.56-1.2c.18-.14,.43-.17,.64-.07l1.8,.85,1.43-1.37c.17-.16,.42-.21,.64-.14l1.88,.66,1.28-1.5c.15-.18,.38-.25,.62-.2l1.94,.46,1.12-1.64c.13-.19,.35-.3,.59-.26l1.97,.25,.95-1.75c.11-.21,.33-.33,.56-.32l1.98,.06,.76-1.83c.09-.21,.29-.36,.52-.38l1.98-.16,.57-1.9c.07-.22,.25-.39,.48-.43l1.96-.36,.37-1.95c.04-.23,.21-.41,.43-.48l1.89-.57,.16-1.98c.02-.23,.17-.43,.38-.52l1.83-.76-.05-1.99c0-.23,.12-.45,.32-.56l1.73-.94-.26-1.98c-.03-.23,.07-.46,.27-.59l1.64-1.12-.46-1.94c-.05-.23,.02-.46,.2-.62l1.5-1.28-.66-1.88c-.08-.22-.02-.47,.14-.63l1.37-1.43-.86-1.8c-.1-.21-.07-.46,.07-.65l1.21-1.58-1.04-1.69c-.12-.2-.12-.45,0-.65l1.04-1.7-1.2-1.56c-.14-.19-.17-.43-.07-.64l.85-1.8-1.37-1.43c-.16-.17-.22-.41-.14-.64l.66-1.88-1.5-1.28c-.18-.15-.25-.39-.2-.61l.46-1.94-1.64-1.12c-.19-.13-.29-.36-.26-.59l.25-1.97-1.73-.95c-.2-.11-.33-.33-.32-.56l.05-1.98-1.84-.76c-.21-.09-.36-.29-.38-.52l-.16-1.98-1.9-.57c-.22-.07-.39-.25-.43-.48l-.36-1.95-1.95-.37c-.23-.04-.41-.21-.48-.43l-.57-1.89-1.98-.16c-.24-.01-.43-.17-.52-.38l-.76-1.83-1.99,.05c-.24,0-.45-.12-.56-.33l-.94-1.73-1.98,.26c-.23,.03-.46-.07-.59-.27l-1.12-1.64-1.94,.46c-.23,.05-.47-.03-.62-.2l-1.28-1.5-1.88,.66c-.22,.08-.47,.02-.63-.14l-1.43-1.37-1.8,.86c-.21,.1-.46,.07-.65-.07l-1.58-1.21-1.69,1.04c-.2,.12-.45,.12-.65,0l-1.7-1.04-1.56,1.2c-.18,.14-.43,.17-.64,.07l-1.8-.85-1.43,1.37c-.17,.16-.42,.21-.64,.14l-1.88-.66-1.28,1.5c-.15,.18-.38,.25-.62,.2l-1.94-.46-1.12,1.64c-.13,.19-.38,.29-.59,.26l-1.97-.25-.95,1.73c-.11,.2-.33,.33-.56,.32l-1.98-.05-.76,1.84c-.09,.21-.29,.36-.52,.38l-1.98,.16-.57,1.9c-.07,.22-.25,.39-.48,.43l-1.95,.36-.36,1.94c-.04,.23-.21,.42-.43,.48l-1.91,.57-.16,1.98c-.02,.23-.17,.43-.38,.52l-1.83,.76,.05,1.99c0,.23-.12,.45-.32,.56l-1.73,.94,.26,1.98c.03,.23-.07,.46-.27,.59l-1.64,1.12,.46,1.94c.05,.23-.02,.46-.2,.62l-1.5,1.28,.66,1.88c.08,.22,.02,.47-.14,.63l-1.37,1.43,.86,1.8c.1,.21,.07,.46-.07,.65l-1.21,1.58,1.04,1.69c.12,.2,.12,.45,0,.65l-1.04,1.7,1.2,1.56c.14,.19,.17,.43,.07,.64l-.85,1.8,1.37,1.43c.16,.17,.22,.41,.14,.64l-.66,1.88,1.5,1.28c.18,.15,.25,.39,.2,.61l-.46,1.94,1.63,1.12c.19,.13,.29,.36,.26,.59l-.25,1.97,1.75,.95c.21,.11,.33,.33,.32,.56l-.06,1.98,1.83,.76c.21,.09,.36,.29,.38,.52l.16,1.98,1.9,.57c.22,.07,.39,.25,.43,.48l.36,1.95,1.94,.36c.23,.04,.42,.21,.48,.43l.57,1.91,1.98,.16c.22,.02,.43,.17,.52,.38l.76,1.83,1.99-.05c.24,0,.45,.12,.56,.32l.94,1.73,1.98-.26c.23-.03,.46,.07,.59,.27l1.12,1.64,1.94-.46c.23-.05,.47,.03,.62,.2l1.28,1.5,1.88-.66c.09-.03,.18-.04,.27-.03Z"
           />
         </g>
-        <g id="go">
+        <g>
           <circle
             cx="582.97"
             cy="135.1"
@@ -15796,6 +17024,325 @@ class Samples {
     }
   }
 }
+
+/***/ }),
+
+/***/ "./src/marty/MartyBlocks.js":
+/*!**********************************!*\
+  !*** ./src/marty/MartyBlocks.js ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ MartyBlocks)
+/* harmony export */ });
+/* harmony import */ var _utils_compare_version__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/compare-version */ "./src/utils/compare-version.js");
+/* harmony import */ var _utils_versionChecker__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/versionChecker */ "./src/utils/versionChecker.js");
+/**
+ * Each MartyBlocks instance is associated with a single marty.
+ * It subscribes to the published data events of the marty and
+ * provides methods to interact with the marty.
+ */
+
+
+class MartyBlocks {
+  static moveTimeBuffer = 200; //(in ms) this is a little extra time added to move time to allow Marty to keep up with the Sprite
+  static turnSize = 20; //the angle in degrees that a turn should be, this is both sent to Marty and used in the Sprite
+  static turnStepCount = 50; //the number of sprite 'steps' to make in a single turn
+  static turnMoveTime = 1500; //the movetime parameter for left and right turns
+  static stepMoveTime = 1500; //the movetime parameter for forward, backward, left and right steps
+  static YStepSize = 25; //the size of a forward/backward step used by the sprite and Marty
+  static XStepSize = 35; //the size of a left/right step used by the sprite and Marty
+  static maxStepArgument = 20; //the maxmum number of steps we can make in one REST command
+
+  static LED_EYES_FW_VERSION = "1.2.0"; // greater versions than this support the LED_EYE functionality
+  static LED_MS_PARAMETER_SUPPORT = "1.2.46"; // greater versions than this support the ms parameter for LEDs
+  static FILE_RUN_CHANGES_VERSION = "1.3.1"; // greater versions than this support the new sound file location
+
+  static MARTY_SOUNDS_NOT_IN_FW = "1.3.0"; // greater versions than this support the new sound file location
+
+  constructor(marty) {
+    this.marty = marty;
+  }
+  destroy() {
+    this.marty = null;
+  }
+  dance(reps, moveTime) {
+    this.marty.sendRestMessage(`traj/dance/${reps}?moveTime=${moveTime}`);
+  }
+  getReady(moveTime) {
+    this.marty.sendRestMessage(`traj/getReady/?moveTime=${moveTime}`);
+  }
+  stepForward(steps) {
+    this.marty.sendRestMessage(`traj/step/${steps}/?moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.YStepSize}`);
+  }
+  stepBackward(steps) {
+    this.marty.sendRestMessage(`traj/step/${steps}/?moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.YStepSize * -1}`);
+  }
+  stepLeft(steps) {
+    this.marty.sendRestMessage(`traj/sidestep/${steps}/?side=0&moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.XStepSize}`);
+  }
+  stepRight(steps) {
+    this.marty.sendRestMessage(`traj/sidestep/${steps}/?side=1&moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.XStepSize}`);
+  }
+  turnRight(steps) {
+    this.marty.sendRestMessage(`traj/step/${steps}/?moveTime=${MartyBlocks.turnMoveTime}&turn=${-1 * MartyBlocks.turnSize}&stepLength=1`);
+  }
+  turnLeft(steps) {
+    this.marty.sendRestMessage(`traj/step/${steps}/?moveTime=${MartyBlocks.turnMoveTime}&turn=${MartyBlocks.turnSize}&stepLength=1`);
+  }
+  eyesExcited() {
+    this.marty.sendRestMessage("traj/eyesExcited");
+  }
+  eyesWide() {
+    this.marty.sendRestMessage("traj/eyesWide");
+  }
+  eyesAngry() {
+    this.marty.sendRestMessage("traj/eyesAngry");
+  }
+  eyesNormal() {
+    this.marty.sendRestMessage("traj/eyesNormal");
+  }
+  eyesWiggle(reps) {
+    this.marty.sendRestMessage(`traj/wiggleEyes/${reps}`);
+  }
+  waveLeft(reps) {
+    this.marty.sendRestMessage(`traj/wave/${reps}/?side=0`);
+  }
+  waveRight(reps) {
+    this.marty.sendRestMessage(`traj/wave/${reps}/?side=1`);
+  }
+  ledEyesP1(duration) {
+    if (!(0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__.isVersionGreater_errorCatching)(this.marty.getRaftVersion(), MartyBlocks.LED_EYES_FW_VERSION)) {
+      return window.applicationManager.toaster.warn("Marty's firmware is not up to date for this feature. Please update Marty's firmware.");
+    }
+    this.clearLedsIn(duration - 100);
+    this.marty.sendRestMessage("led/LEDeye/pattern/show-off");
+    this.marty.sendRestMessage("led/LEDarm/pattern/show-off");
+    this.marty.sendRestMessage("led/LEDfoot/pattern/show-off");
+  }
+  ledEyesP2(duration) {
+    if (!(0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__.isVersionGreater_errorCatching)(this.marty.getRaftVersion(), MartyBlocks.LED_EYES_FW_VERSION)) {
+      return window.applicationManager.toaster.warn("Marty's firmware is not up to date for this feature. Please update Marty's firmware.");
+    }
+    this.clearLedsIn(duration - 100);
+    this.marty.sendRestMessage("led/LEDeye/pattern/pinwheel");
+    this.marty.sendRestMessage("led/LEDarm/pattern/pinwheel");
+    this.marty.sendRestMessage("led/LEDfoot/pattern/pinwheel");
+  }
+  ledEyesP3() {}
+  clearLedsIn(timeoutInterval) {
+    const turnOffLedEyesTimer = setTimeout(() => {
+      this.marty.sendRestMessage("led/LEDeye/color/000000");
+      this.marty.sendRestMessage("led/LEDarm/color/000000");
+      this.marty.sendRestMessage("led/LEDfoot/color/000000");
+      clearTimeout(turnOffLedEyesTimer);
+    }, timeoutInterval);
+  }
+  ledEyesColour() {
+    if (!(0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__.isVersionGreater_errorCatching)(this.marty.getRaftVersion(), MartyBlocks.LED_EYES_FW_VERSION)) {
+      return window.applicationManager.toaster.warn("Marty's firmware is not up to date for this feature. Please update Marty's firmware.");
+    }
+    if ((0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__["default"])(this.marty.getRaftVersion(), MartyBlocks.LED_MS_PARAMETER_SUPPORT)) {
+      // Marty supports ms parameter
+      this.marty.sendRestMessage(`led/LEDeye/color/${colour}?ms=${duration + 100}`); // +100 so the leds are turning off after the blocks duration (cf if the are in a for loop this will keep the leds on)
+      this.marty.sendRestMessage(`led/LEDarm/color/${colour}?ms=${duration + 100}`);
+      this.marty.sendRestMessage(`led/LEDfoot/color/${colour}?ms=${duration + 100}`);
+      return;
+    }
+    // Marty does not support ms parameter
+    this.marty.sendRestMessage(`led/LEDeye/color/${colour}`);
+    this.marty.sendRestMessage(`led/LEDarm/color/${colour}`);
+    this.marty.sendRestMessage(`led/LEDfoot/color/${colour}`);
+    this.clearLedsIn(duration - 100);
+  }
+  kickLeft(reps) {
+    this.marty.sendRestMessage(`traj/kick/${reps}/?side=0`);
+  }
+  kickRight(reps) {
+    this.marty.sendRestMessage(`traj/kick/${reps}/?side=1`);
+  }
+  confusion() {
+    if ((0,_utils_versionChecker__WEBPACK_IMPORTED_MODULE_1__.isVersionEqual)(this.marty.getRaftVersion(), MartyBlocks.MARTY_SOUNDS_NOT_IN_FW)) {
+      return window.applicationManager.toaster.warn("Marty's firmware is not up to date for this feature. Please update Marty's firmware.");
+    } else if (!(0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__["default"])(this.marty.getRaftVersion(), MartyBlocks.FILE_RUN_CHANGES_VERSION)) {
+      this.marty.sendRestMessage("filerun/spiffs/confused.raw");
+    } else {
+      this.marty.sendRestMessage("filerun/confused.mp3");
+    }
+  }
+  disbelief() {
+    if ((0,_utils_versionChecker__WEBPACK_IMPORTED_MODULE_1__.isVersionEqual)(this.marty.getRaftVersion(), MartyBlocks.MARTY_SOUNDS_NOT_IN_FW)) {
+      return window.applicationManager.toaster.warn("Marty's firmware is not up to date for this feature. Please update Marty's firmware.");
+    } else if (!(0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__["default"])(this.marty.getRaftVersion(), MartyBlocks.FILE_RUN_CHANGES_VERSION)) {
+      this.marty.sendRestMessage("filerun/spiffs/disbelief.raw");
+    } else {
+      this.marty.sendRestMessage("filerun/disbelief.mp3");
+    }
+  }
+  excitement() {
+    if ((0,_utils_versionChecker__WEBPACK_IMPORTED_MODULE_1__.isVersionEqual)(this.marty.getRaftVersion(), MartyBlocks.MARTY_SOUNDS_NOT_IN_FW)) {
+      return window.applicationManager.toaster.warn("Marty's firmware is not up to date for this feature. Please update Marty's firmware.");
+    } else if (!(0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__["default"])(this.marty.getRaftVersion(), MartyBlocks.FILE_RUN_CHANGES_VERSION)) {
+      this.marty.sendRestMessage("filerun/spiffs/excited.raw");
+    } else {
+      this.marty.sendRestMessage("filerun/excited.mp3");
+    }
+  }
+  noway() {
+    if ((0,_utils_versionChecker__WEBPACK_IMPORTED_MODULE_1__.isVersionEqual)(this.marty.getRaftVersion(), MartyBlocks.MARTY_SOUNDS_NOT_IN_FW)) {
+      return window.applicationManager.toaster.warn("Marty's firmware is not up to date for this feature. Please update Marty's firmware.");
+    } else if (!(0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__["default"])(this.marty.getRaftVersion(), MartyBlocks.FILE_RUN_CHANGES_VERSION)) {
+      this.marty.sendRestMessage("filerun/spiffs/no_way.raw");
+    } else {
+      this.marty.sendRestMessage("filerun/no_way.mp3");
+    }
+  }
+  no() {
+    if ((0,_utils_versionChecker__WEBPACK_IMPORTED_MODULE_1__.isVersionEqual)(this.marty.getRaftVersion(), MartyBlocks.MARTY_SOUNDS_NOT_IN_FW)) {
+      return window.applicationManager.toaster.warn("Marty's firmware is not up to date for this feature. Please update Marty's firmware.");
+    } else if (!(0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__["default"])(this.marty.getRaftVersion(), MartyBlocks.FILE_RUN_CHANGES_VERSION)) {
+      this.marty.sendRestMessage("filerun/spiffs/no.raw");
+    } else {
+      this.marty.sendRestMessage("filerun/no.mp3");
+    }
+  }
+  whistle() {
+    if ((0,_utils_versionChecker__WEBPACK_IMPORTED_MODULE_1__.isVersionEqual)(this.marty.getRaftVersion(), MartyBlocks.MARTY_SOUNDS_NOT_IN_FW)) {
+      return window.applicationManager.toaster.warn("Marty's firmware is not up to date for this feature. Please update Marty's firmware.");
+    } else if (!(0,_utils_compare_version__WEBPACK_IMPORTED_MODULE_0__["default"])(this.marty.getRaftVersion(), MartyBlocks.FILE_RUN_CHANGES_VERSION)) {
+      this.marty.sendRestMessage("filerun/spiffs/whistle.raw");
+    } else {
+      this.marty.sendRestMessage("filerun/whistle.mp3");
+    }
+  }
+}
+
+/***/ }),
+
+/***/ "./src/marty/MartyManager.js":
+/*!***********************************!*\
+  !*** ./src/marty/MartyManager.js ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../editor/engine/Prims */ "./src/editor/engine/Prims.js");
+/* harmony import */ var _MartyBlocks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MartyBlocks */ "./src/marty/MartyBlocks.js");
+
+
+class MartyManager {
+  constructor() {
+    this.martys = {};
+  }
+  addMarty(marty) {
+    this.martys[marty.id] = marty;
+  }
+  removeMarty(marty) {
+    marty.blocks.destroy();
+    delete this.martys[marty.id];
+  }
+  wireMartyWithBlocks(martyId) {
+    const marty = this.martys[martyId];
+    if (marty) {
+      const martyBlocks = new _MartyBlocks__WEBPACK_IMPORTED_MODULE_1__["default"](marty);
+      marty.blocks = martyBlocks;
+      _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__["default"].martyBlocks = martyBlocks;
+    } else {
+      console.error(`Marty with id ${martyId} not found`);
+    }
+  }
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MartyManager);
+
+/***/ }),
+
+/***/ "./src/marty/celebrate-helper.js":
+/*!***************************************!*\
+  !*** ./src/marty/celebrate-helper.js ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ celebrateHelper),
+/* harmony export */   discoChangeBlockPattern: () => (/* binding */ discoChangeBlockPattern)
+/* harmony export */ });
+/* harmony import */ var _utils_versionChecker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/versionChecker */ "./src/utils/versionChecker.js");
+/* harmony import */ var _MartyBlocks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MartyBlocks */ "./src/marty/MartyBlocks.js");
+
+
+const RIC_WHOAMI_TYPE_CODE_ADDON_LEDFOOT = "LEDfoot";
+const RIC_WHOAMI_TYPE_CODE_ADDON_LEDARM = "LEDarm";
+const RIC_WHOAMI_TYPE_CODE_ADDON_LEDEYE = "LEDeye";
+function celebrateHelper(martyBlocks, Prims, strip, tinterval, intervalToSeconds) {
+  const timesOfDancing = 2;
+  const moveSpeed = 3800;
+  const danceTrajectoryMessage = `traj/dance?moveTime=${moveSpeed}`;
+  const soundMessageOld = "filerun/spiffs/sax-in-the-city.raw";
+  const soundMessageNew = "filerun/celebrate.mp3";
+  Prims.setTime(strip);
+  if (martyBlocks && martyBlocks.marty) {
+    discoChangeBlockPattern("on", martyBlocks);
+    if ((0,_utils_versionChecker__WEBPACK_IMPORTED_MODULE_0__["default"])(_MartyBlocks__WEBPACK_IMPORTED_MODULE_1__["default"].FILE_RUN_CHANGES_VERSION, martyBlocks.marty.getRaftVersion())) {
+      martyBlocks.marty.sendRestMessage(soundMessageOld);
+    } else {
+      martyBlocks.marty.sendRestMessage(soundMessageNew);
+    }
+    martyBlocks.marty.sendRestMessage(danceTrajectoryMessage);
+    martyBlocks.marty.sendRestMessage(danceTrajectoryMessage);
+    strip.waitTimer = parseInt(tinterval * intervalToSeconds * ((moveSpeed * timesOfDancing + 800) / 1000));
+    Prims.showTime(strip);
+    strip.thisblock = strip.thisblock.next;
+    const timeout = setTimeout(() => {
+      discoChangeBlockPattern("off", martyBlocks);
+      clearTimeout(timeout);
+    }, moveSpeed * timesOfDancing + 800);
+    return;
+  } else {
+    if (Prims.playMartyServo) {
+      Prims.playMartyServo(strip);
+      return;
+    }
+    strip.thisblock = strip.thisblock.next;
+    return;
+  }
+}
+const discoChangeBlockPattern = (onOff, martyBlocks) => {
+  const addons = martyBlocks?.marty?.raftStateInfo.addOnInfo.addons || [];
+
+  //so if it's set in a forever loop give 0.2s break between each update
+  const resolveTime = 200;
+
+  // select all LED addons found
+  const addressList = getAllDiscoBoards(addons);
+  let numberOfLEDAddons = addressList.length;
+  for (var i = 0; i < numberOfLEDAddons; i++) {
+    let ledDeviceName = addressList.pop();
+    let ledCmd = `led/${ledDeviceName}/pattern/show-off`;
+    if (onOff === "off") {
+      ledCmd = `led/${ledDeviceName}/off`;
+    }
+    martyBlocks.marty.sendRestMessage(ledCmd);
+  }
+  return new Promise(resolve => setTimeout(resolve, resolveTime));
+};
+const getAllDiscoBoards = addons => {
+  var addressList = [];
+  for (let addon of addons) {
+    if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_LEDEYE || addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_LEDARM || addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_LEDFOOT) {
+      addressList.push(addon.name);
+    }
+  }
+  return addressList;
+};
 
 /***/ }),
 
@@ -22953,7 +24500,6 @@ class SVGTools {
   ///////////////////////////////
 
   static getWatermark(shape, color) {
-    console.log("sprites");
     var svg = SVGTools.getCopy(shape);
     SVGTools.removeExtras(svg);
     SVGTools.removeStylesInDefs(svg);
@@ -22975,7 +24521,7 @@ class SVGTools {
     var valid = n < svg.childElementCount;
     while (valid) {
       var elem = svg.childNodes[n];
-      if (elem.nodeName == 'image' || elem.nodeName == 'clipPath') {
+      if (elem.nodeName == 'clipPath') {
         svg.removeChild(elem);
       } else {
         if (elem.tagName == 'g') {
@@ -24765,8 +26311,8 @@ class Webapp {
   }
 
   // IO functions
-  static cleanassets(ft, fcn) {
-    _webapp_interface_WebappInterface__WEBPACK_IMPORTED_MODULE_0__["default"].io_cleanassets(ft);
+  static async cleanassets(ft, fcn) {
+    await _webapp_interface_WebappInterface__WEBPACK_IMPORTED_MODULE_0__["default"].io_cleanassets(ft);
     fcn();
   }
   static getmedia(file, fcn) {
@@ -27205,7 +28751,7 @@ __webpack_require__.r(__webpack_exports__);
 ////////////////////////////////////////////////////
 
 let uiSounds = {};
-let defaultSounds = ['cut.wav', 'snap.wav', 'copy.wav', 'grab.wav', 'boing.wav', 'tap.wav', 'keydown.wav', 'entertap.wav', 'exittap.wav', 'splash.wav'];
+let defaultSounds = ['boing.wav', 'confused.wav', 'copy.wav', 'cut.wav', 'disbelief.wav', 'entertap.wav', 'excited.wav', 'exittap.wav', 'grab.wav', 'keydown.wav', 'marty_eyes_servo.wav', 'no_way.wav', 'no.wav', 'snap.wav', 'splash.wav', 'tap.wav', 'whistle.wav'];
 let projectSounds = {};
 class ScratchAudio {
   static get uiSounds() {
@@ -27355,6 +28901,40 @@ class Sound {
       _tablet_OS__WEBPACK_IMPORTED_MODULE_1__["default"].stopSound(this.name);
       this.playing = false;
     }
+  }
+}
+
+/***/ }),
+
+/***/ "./src/utils/compare-version.js":
+/*!**************************************!*\
+  !*** ./src/utils/compare-version.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ isVersionGreater),
+/* harmony export */   isVersionGreater_errorCatching: () => (/* binding */ isVersionGreater_errorCatching)
+/* harmony export */ });
+/* harmony import */ var semver_functions_gt__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! semver/functions/gt */ "./node_modules/semver/functions/gt.js");
+/* harmony import */ var semver_functions_gt__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(semver_functions_gt__WEBPACK_IMPORTED_MODULE_0__);
+
+function isVersionGreater(v1, v2) {
+  try {
+    return semver_functions_gt__WEBPACK_IMPORTED_MODULE_0___default()(v1, v2);
+  } catch (e) {
+    console.log(e, v1, v2);
+    return false;
+  }
+}
+function isVersionGreater_errorCatching(v1, v2) {
+  try {
+    return semver_functions_gt__WEBPACK_IMPORTED_MODULE_0___default()(v1, v2);
+  } catch (e) {
+    console.log(e, v1, v2);
+    return null;
   }
 }
 
@@ -28088,7 +29668,7 @@ function rgb2hsb(str) {
   return new Array(hue, sat / 100, val / 100);
 }
 function rgbToHex(str) {
-  if (str.indexOf("rgb") < 0) {
+  if ((str || "").indexOf("rgb") < 0) {
     return str;
   }
   var res = str.substring(4, str.length - 1);
@@ -28293,6 +29873,43 @@ const raftPubSubscriptionObserver_ = callback => {
     }
   };
 };
+
+/***/ }),
+
+/***/ "./src/utils/versionChecker.js":
+/*!*************************************!*\
+  !*** ./src/utils/versionChecker.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ isVersionGreater),
+/* harmony export */   isVersionEqual: () => (/* binding */ isVersionEqual)
+/* harmony export */ });
+/* harmony import */ var semver_functions_gt__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! semver/functions/gt */ "./node_modules/semver/functions/gt.js");
+/* harmony import */ var semver_functions_gt__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(semver_functions_gt__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var semver_functions_eq__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! semver/functions/eq */ "./node_modules/semver/functions/eq.js");
+/* harmony import */ var semver_functions_eq__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(semver_functions_eq__WEBPACK_IMPORTED_MODULE_1__);
+
+
+function isVersionGreater(v1, v2) {
+  try {
+    return semver_functions_gt__WEBPACK_IMPORTED_MODULE_0___default()(v1, v2);
+  } catch (e) {
+    console.log(e, v1, v2);
+    return false;
+  }
+}
+function isVersionEqual(v1, v2) {
+  try {
+    return semver_functions_eq__WEBPACK_IMPORTED_MODULE_1___default()(v1, v2);
+  } catch (e) {
+    console.log(e, v1, v2);
+    return false;
+  }
+}
 
 /***/ }),
 
@@ -29633,7 +31250,6 @@ class WebappInterface {
     return filename;
   }
   static async io_cleanassets(fileType) {
-    console.log("cleanAssets - ", fileType);
     const db = await _ScratchJRDataStore__WEBPACK_IMPORTED_MODULE_0__.dataStoreInstance.getDatabaseManager();
     if (db) {
       db.cleanProjectFiles(fileType);
@@ -29733,19 +31349,15 @@ class WebappInterface {
   /** called when the tickmark is chosen in the record dialog*/
   static async recordsound_recordclose(keep) {
     try {
-      console.log("saving blob");
       let audioCaptureElement = this.getAudioCaptureElement();
       if (keep === 'YES') {
         let blob = await audioCaptureElement.captureRecordingAsBlob();
         if (blob) {
           let filename = audioCaptureElement.getId();
-          console.log("saving sound", filename);
           let fileReader = new FileReader();
           fileReader.onload = async function () {
-            console.log("filereader loaded", filename);
             // saving new sound...  will save as a webm file.
             const fn = await WebappInterface.io_setmedianame(fileReader.result, filename, 'webm');
-            console.log("fn", fn);
             _SoundManager__WEBPACK_IMPORTED_MODULE_1__.soundManagerInstance.loadSoundFromDataURI(filename + '.webm', fileReader.result);
           };
           fileReader.readAsDataURL(blob);
@@ -114839,6 +116451,708 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   }
   return buffer.SlowBuffer(size)
 }
+
+
+/***/ }),
+
+/***/ "./node_modules/semver/classes/semver.js":
+/*!***********************************************!*\
+  !*** ./node_modules/semver/classes/semver.js ***!
+  \***********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const debug = __webpack_require__(/*! ../internal/debug */ "./node_modules/semver/internal/debug.js")
+const { MAX_LENGTH, MAX_SAFE_INTEGER } = __webpack_require__(/*! ../internal/constants */ "./node_modules/semver/internal/constants.js")
+const { safeRe: re, t } = __webpack_require__(/*! ../internal/re */ "./node_modules/semver/internal/re.js")
+
+const parseOptions = __webpack_require__(/*! ../internal/parse-options */ "./node_modules/semver/internal/parse-options.js")
+const { compareIdentifiers } = __webpack_require__(/*! ../internal/identifiers */ "./node_modules/semver/internal/identifiers.js")
+class SemVer {
+  constructor (version, options) {
+    options = parseOptions(options)
+
+    if (version instanceof SemVer) {
+      if (version.loose === !!options.loose &&
+          version.includePrerelease === !!options.includePrerelease) {
+        return version
+      } else {
+        version = version.version
+      }
+    } else if (typeof version !== 'string') {
+      throw new TypeError(`Invalid version. Must be a string. Got type "${typeof version}".`)
+    }
+
+    if (version.length > MAX_LENGTH) {
+      throw new TypeError(
+        `version is longer than ${MAX_LENGTH} characters`
+      )
+    }
+
+    debug('SemVer', version, options)
+    this.options = options
+    this.loose = !!options.loose
+    // this isn't actually relevant for versions, but keep it so that we
+    // don't run into trouble passing this.options around.
+    this.includePrerelease = !!options.includePrerelease
+
+    const m = version.trim().match(options.loose ? re[t.LOOSE] : re[t.FULL])
+
+    if (!m) {
+      throw new TypeError(`Invalid Version: ${version}`)
+    }
+
+    this.raw = version
+
+    // these are actually numbers
+    this.major = +m[1]
+    this.minor = +m[2]
+    this.patch = +m[3]
+
+    if (this.major > MAX_SAFE_INTEGER || this.major < 0) {
+      throw new TypeError('Invalid major version')
+    }
+
+    if (this.minor > MAX_SAFE_INTEGER || this.minor < 0) {
+      throw new TypeError('Invalid minor version')
+    }
+
+    if (this.patch > MAX_SAFE_INTEGER || this.patch < 0) {
+      throw new TypeError('Invalid patch version')
+    }
+
+    // numberify any prerelease numeric ids
+    if (!m[4]) {
+      this.prerelease = []
+    } else {
+      this.prerelease = m[4].split('.').map((id) => {
+        if (/^[0-9]+$/.test(id)) {
+          const num = +id
+          if (num >= 0 && num < MAX_SAFE_INTEGER) {
+            return num
+          }
+        }
+        return id
+      })
+    }
+
+    this.build = m[5] ? m[5].split('.') : []
+    this.format()
+  }
+
+  format () {
+    this.version = `${this.major}.${this.minor}.${this.patch}`
+    if (this.prerelease.length) {
+      this.version += `-${this.prerelease.join('.')}`
+    }
+    return this.version
+  }
+
+  toString () {
+    return this.version
+  }
+
+  compare (other) {
+    debug('SemVer.compare', this.version, this.options, other)
+    if (!(other instanceof SemVer)) {
+      if (typeof other === 'string' && other === this.version) {
+        return 0
+      }
+      other = new SemVer(other, this.options)
+    }
+
+    if (other.version === this.version) {
+      return 0
+    }
+
+    return this.compareMain(other) || this.comparePre(other)
+  }
+
+  compareMain (other) {
+    if (!(other instanceof SemVer)) {
+      other = new SemVer(other, this.options)
+    }
+
+    return (
+      compareIdentifiers(this.major, other.major) ||
+      compareIdentifiers(this.minor, other.minor) ||
+      compareIdentifiers(this.patch, other.patch)
+    )
+  }
+
+  comparePre (other) {
+    if (!(other instanceof SemVer)) {
+      other = new SemVer(other, this.options)
+    }
+
+    // NOT having a prerelease is > having one
+    if (this.prerelease.length && !other.prerelease.length) {
+      return -1
+    } else if (!this.prerelease.length && other.prerelease.length) {
+      return 1
+    } else if (!this.prerelease.length && !other.prerelease.length) {
+      return 0
+    }
+
+    let i = 0
+    do {
+      const a = this.prerelease[i]
+      const b = other.prerelease[i]
+      debug('prerelease compare', i, a, b)
+      if (a === undefined && b === undefined) {
+        return 0
+      } else if (b === undefined) {
+        return 1
+      } else if (a === undefined) {
+        return -1
+      } else if (a === b) {
+        continue
+      } else {
+        return compareIdentifiers(a, b)
+      }
+    } while (++i)
+  }
+
+  compareBuild (other) {
+    if (!(other instanceof SemVer)) {
+      other = new SemVer(other, this.options)
+    }
+
+    let i = 0
+    do {
+      const a = this.build[i]
+      const b = other.build[i]
+      debug('build compare', i, a, b)
+      if (a === undefined && b === undefined) {
+        return 0
+      } else if (b === undefined) {
+        return 1
+      } else if (a === undefined) {
+        return -1
+      } else if (a === b) {
+        continue
+      } else {
+        return compareIdentifiers(a, b)
+      }
+    } while (++i)
+  }
+
+  // preminor will bump the version up to the next minor release, and immediately
+  // down to pre-release. premajor and prepatch work the same way.
+  inc (release, identifier, identifierBase) {
+    switch (release) {
+      case 'premajor':
+        this.prerelease.length = 0
+        this.patch = 0
+        this.minor = 0
+        this.major++
+        this.inc('pre', identifier, identifierBase)
+        break
+      case 'preminor':
+        this.prerelease.length = 0
+        this.patch = 0
+        this.minor++
+        this.inc('pre', identifier, identifierBase)
+        break
+      case 'prepatch':
+        // If this is already a prerelease, it will bump to the next version
+        // drop any prereleases that might already exist, since they are not
+        // relevant at this point.
+        this.prerelease.length = 0
+        this.inc('patch', identifier, identifierBase)
+        this.inc('pre', identifier, identifierBase)
+        break
+      // If the input is a non-prerelease version, this acts the same as
+      // prepatch.
+      case 'prerelease':
+        if (this.prerelease.length === 0) {
+          this.inc('patch', identifier, identifierBase)
+        }
+        this.inc('pre', identifier, identifierBase)
+        break
+
+      case 'major':
+        // If this is a pre-major version, bump up to the same major version.
+        // Otherwise increment major.
+        // 1.0.0-5 bumps to 1.0.0
+        // 1.1.0 bumps to 2.0.0
+        if (
+          this.minor !== 0 ||
+          this.patch !== 0 ||
+          this.prerelease.length === 0
+        ) {
+          this.major++
+        }
+        this.minor = 0
+        this.patch = 0
+        this.prerelease = []
+        break
+      case 'minor':
+        // If this is a pre-minor version, bump up to the same minor version.
+        // Otherwise increment minor.
+        // 1.2.0-5 bumps to 1.2.0
+        // 1.2.1 bumps to 1.3.0
+        if (this.patch !== 0 || this.prerelease.length === 0) {
+          this.minor++
+        }
+        this.patch = 0
+        this.prerelease = []
+        break
+      case 'patch':
+        // If this is not a pre-release version, it will increment the patch.
+        // If it is a pre-release it will bump up to the same patch version.
+        // 1.2.0-5 patches to 1.2.0
+        // 1.2.0 patches to 1.2.1
+        if (this.prerelease.length === 0) {
+          this.patch++
+        }
+        this.prerelease = []
+        break
+      // This probably shouldn't be used publicly.
+      // 1.0.0 'pre' would become 1.0.0-0 which is the wrong direction.
+      case 'pre': {
+        const base = Number(identifierBase) ? 1 : 0
+
+        if (!identifier && identifierBase === false) {
+          throw new Error('invalid increment argument: identifier is empty')
+        }
+
+        if (this.prerelease.length === 0) {
+          this.prerelease = [base]
+        } else {
+          let i = this.prerelease.length
+          while (--i >= 0) {
+            if (typeof this.prerelease[i] === 'number') {
+              this.prerelease[i]++
+              i = -2
+            }
+          }
+          if (i === -1) {
+            // didn't increment anything
+            if (identifier === this.prerelease.join('.') && identifierBase === false) {
+              throw new Error('invalid increment argument: identifier already exists')
+            }
+            this.prerelease.push(base)
+          }
+        }
+        if (identifier) {
+          // 1.2.0-beta.1 bumps to 1.2.0-beta.2,
+          // 1.2.0-beta.fooblz or 1.2.0-beta bumps to 1.2.0-beta.0
+          let prerelease = [identifier, base]
+          if (identifierBase === false) {
+            prerelease = [identifier]
+          }
+          if (compareIdentifiers(this.prerelease[0], identifier) === 0) {
+            if (isNaN(this.prerelease[1])) {
+              this.prerelease = prerelease
+            }
+          } else {
+            this.prerelease = prerelease
+          }
+        }
+        break
+      }
+      default:
+        throw new Error(`invalid increment argument: ${release}`)
+    }
+    this.raw = this.format()
+    if (this.build.length) {
+      this.raw += `+${this.build.join('.')}`
+    }
+    return this
+  }
+}
+
+module.exports = SemVer
+
+
+/***/ }),
+
+/***/ "./node_modules/semver/functions/compare.js":
+/*!**************************************************!*\
+  !*** ./node_modules/semver/functions/compare.js ***!
+  \**************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const SemVer = __webpack_require__(/*! ../classes/semver */ "./node_modules/semver/classes/semver.js")
+const compare = (a, b, loose) =>
+  new SemVer(a, loose).compare(new SemVer(b, loose))
+
+module.exports = compare
+
+
+/***/ }),
+
+/***/ "./node_modules/semver/functions/eq.js":
+/*!*********************************************!*\
+  !*** ./node_modules/semver/functions/eq.js ***!
+  \*********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const compare = __webpack_require__(/*! ./compare */ "./node_modules/semver/functions/compare.js")
+const eq = (a, b, loose) => compare(a, b, loose) === 0
+module.exports = eq
+
+
+/***/ }),
+
+/***/ "./node_modules/semver/functions/gt.js":
+/*!*********************************************!*\
+  !*** ./node_modules/semver/functions/gt.js ***!
+  \*********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const compare = __webpack_require__(/*! ./compare */ "./node_modules/semver/functions/compare.js")
+const gt = (a, b, loose) => compare(a, b, loose) > 0
+module.exports = gt
+
+
+/***/ }),
+
+/***/ "./node_modules/semver/internal/constants.js":
+/*!***************************************************!*\
+  !*** ./node_modules/semver/internal/constants.js ***!
+  \***************************************************/
+/***/ ((module) => {
+
+// Note: this is the semver.org version of the spec that it implements
+// Not necessarily the package version of this code.
+const SEMVER_SPEC_VERSION = '2.0.0'
+
+const MAX_LENGTH = 256
+const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER ||
+/* istanbul ignore next */ 9007199254740991
+
+// Max safe segment length for coercion.
+const MAX_SAFE_COMPONENT_LENGTH = 16
+
+// Max safe length for a build identifier. The max length minus 6 characters for
+// the shortest version with a build 0.0.0+BUILD.
+const MAX_SAFE_BUILD_LENGTH = MAX_LENGTH - 6
+
+const RELEASE_TYPES = [
+  'major',
+  'premajor',
+  'minor',
+  'preminor',
+  'patch',
+  'prepatch',
+  'prerelease',
+]
+
+module.exports = {
+  MAX_LENGTH,
+  MAX_SAFE_COMPONENT_LENGTH,
+  MAX_SAFE_BUILD_LENGTH,
+  MAX_SAFE_INTEGER,
+  RELEASE_TYPES,
+  SEMVER_SPEC_VERSION,
+  FLAG_INCLUDE_PRERELEASE: 0b001,
+  FLAG_LOOSE: 0b010,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/semver/internal/debug.js":
+/*!***********************************************!*\
+  !*** ./node_modules/semver/internal/debug.js ***!
+  \***********************************************/
+/***/ ((module) => {
+
+const debug = (
+  typeof process === 'object' &&
+  process.env &&
+  process.env.NODE_DEBUG &&
+  /\bsemver\b/i.test(process.env.NODE_DEBUG)
+) ? (...args) => console.error('SEMVER', ...args)
+  : () => {}
+
+module.exports = debug
+
+
+/***/ }),
+
+/***/ "./node_modules/semver/internal/identifiers.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/semver/internal/identifiers.js ***!
+  \*****************************************************/
+/***/ ((module) => {
+
+const numeric = /^[0-9]+$/
+const compareIdentifiers = (a, b) => {
+  const anum = numeric.test(a)
+  const bnum = numeric.test(b)
+
+  if (anum && bnum) {
+    a = +a
+    b = +b
+  }
+
+  return a === b ? 0
+    : (anum && !bnum) ? -1
+    : (bnum && !anum) ? 1
+    : a < b ? -1
+    : 1
+}
+
+const rcompareIdentifiers = (a, b) => compareIdentifiers(b, a)
+
+module.exports = {
+  compareIdentifiers,
+  rcompareIdentifiers,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/semver/internal/parse-options.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/semver/internal/parse-options.js ***!
+  \*******************************************************/
+/***/ ((module) => {
+
+// parse out just the options we care about
+const looseOption = Object.freeze({ loose: true })
+const emptyOpts = Object.freeze({ })
+const parseOptions = options => {
+  if (!options) {
+    return emptyOpts
+  }
+
+  if (typeof options !== 'object') {
+    return looseOption
+  }
+
+  return options
+}
+module.exports = parseOptions
+
+
+/***/ }),
+
+/***/ "./node_modules/semver/internal/re.js":
+/*!********************************************!*\
+  !*** ./node_modules/semver/internal/re.js ***!
+  \********************************************/
+/***/ ((module, exports, __webpack_require__) => {
+
+const {
+  MAX_SAFE_COMPONENT_LENGTH,
+  MAX_SAFE_BUILD_LENGTH,
+  MAX_LENGTH,
+} = __webpack_require__(/*! ./constants */ "./node_modules/semver/internal/constants.js")
+const debug = __webpack_require__(/*! ./debug */ "./node_modules/semver/internal/debug.js")
+exports = module.exports = {}
+
+// The actual regexps go on exports.re
+const re = exports.re = []
+const safeRe = exports.safeRe = []
+const src = exports.src = []
+const t = exports.t = {}
+let R = 0
+
+const LETTERDASHNUMBER = '[a-zA-Z0-9-]'
+
+// Replace some greedy regex tokens to prevent regex dos issues. These regex are
+// used internally via the safeRe object since all inputs in this library get
+// normalized first to trim and collapse all extra whitespace. The original
+// regexes are exported for userland consumption and lower level usage. A
+// future breaking change could export the safer regex only with a note that
+// all input should have extra whitespace removed.
+const safeRegexReplacements = [
+  ['\\s', 1],
+  ['\\d', MAX_LENGTH],
+  [LETTERDASHNUMBER, MAX_SAFE_BUILD_LENGTH],
+]
+
+const makeSafeRegex = (value) => {
+  for (const [token, max] of safeRegexReplacements) {
+    value = value
+      .split(`${token}*`).join(`${token}{0,${max}}`)
+      .split(`${token}+`).join(`${token}{1,${max}}`)
+  }
+  return value
+}
+
+const createToken = (name, value, isGlobal) => {
+  const safe = makeSafeRegex(value)
+  const index = R++
+  debug(name, index, value)
+  t[name] = index
+  src[index] = value
+  re[index] = new RegExp(value, isGlobal ? 'g' : undefined)
+  safeRe[index] = new RegExp(safe, isGlobal ? 'g' : undefined)
+}
+
+// The following Regular Expressions can be used for tokenizing,
+// validating, and parsing SemVer version strings.
+
+// ## Numeric Identifier
+// A single `0`, or a non-zero digit followed by zero or more digits.
+
+createToken('NUMERICIDENTIFIER', '0|[1-9]\\d*')
+createToken('NUMERICIDENTIFIERLOOSE', '\\d+')
+
+// ## Non-numeric Identifier
+// Zero or more digits, followed by a letter or hyphen, and then zero or
+// more letters, digits, or hyphens.
+
+createToken('NONNUMERICIDENTIFIER', `\\d*[a-zA-Z-]${LETTERDASHNUMBER}*`)
+
+// ## Main Version
+// Three dot-separated numeric identifiers.
+
+createToken('MAINVERSION', `(${src[t.NUMERICIDENTIFIER]})\\.` +
+                   `(${src[t.NUMERICIDENTIFIER]})\\.` +
+                   `(${src[t.NUMERICIDENTIFIER]})`)
+
+createToken('MAINVERSIONLOOSE', `(${src[t.NUMERICIDENTIFIERLOOSE]})\\.` +
+                        `(${src[t.NUMERICIDENTIFIERLOOSE]})\\.` +
+                        `(${src[t.NUMERICIDENTIFIERLOOSE]})`)
+
+// ## Pre-release Version Identifier
+// A numeric identifier, or a non-numeric identifier.
+
+createToken('PRERELEASEIDENTIFIER', `(?:${src[t.NUMERICIDENTIFIER]
+}|${src[t.NONNUMERICIDENTIFIER]})`)
+
+createToken('PRERELEASEIDENTIFIERLOOSE', `(?:${src[t.NUMERICIDENTIFIERLOOSE]
+}|${src[t.NONNUMERICIDENTIFIER]})`)
+
+// ## Pre-release Version
+// Hyphen, followed by one or more dot-separated pre-release version
+// identifiers.
+
+createToken('PRERELEASE', `(?:-(${src[t.PRERELEASEIDENTIFIER]
+}(?:\\.${src[t.PRERELEASEIDENTIFIER]})*))`)
+
+createToken('PRERELEASELOOSE', `(?:-?(${src[t.PRERELEASEIDENTIFIERLOOSE]
+}(?:\\.${src[t.PRERELEASEIDENTIFIERLOOSE]})*))`)
+
+// ## Build Metadata Identifier
+// Any combination of digits, letters, or hyphens.
+
+createToken('BUILDIDENTIFIER', `${LETTERDASHNUMBER}+`)
+
+// ## Build Metadata
+// Plus sign, followed by one or more period-separated build metadata
+// identifiers.
+
+createToken('BUILD', `(?:\\+(${src[t.BUILDIDENTIFIER]
+}(?:\\.${src[t.BUILDIDENTIFIER]})*))`)
+
+// ## Full Version String
+// A main version, followed optionally by a pre-release version and
+// build metadata.
+
+// Note that the only major, minor, patch, and pre-release sections of
+// the version string are capturing groups.  The build metadata is not a
+// capturing group, because it should not ever be used in version
+// comparison.
+
+createToken('FULLPLAIN', `v?${src[t.MAINVERSION]
+}${src[t.PRERELEASE]}?${
+  src[t.BUILD]}?`)
+
+createToken('FULL', `^${src[t.FULLPLAIN]}$`)
+
+// like full, but allows v1.2.3 and =1.2.3, which people do sometimes.
+// also, 1.0.0alpha1 (prerelease without the hyphen) which is pretty
+// common in the npm registry.
+createToken('LOOSEPLAIN', `[v=\\s]*${src[t.MAINVERSIONLOOSE]
+}${src[t.PRERELEASELOOSE]}?${
+  src[t.BUILD]}?`)
+
+createToken('LOOSE', `^${src[t.LOOSEPLAIN]}$`)
+
+createToken('GTLT', '((?:<|>)?=?)')
+
+// Something like "2.*" or "1.2.x".
+// Note that "x.x" is a valid xRange identifer, meaning "any version"
+// Only the first item is strictly required.
+createToken('XRANGEIDENTIFIERLOOSE', `${src[t.NUMERICIDENTIFIERLOOSE]}|x|X|\\*`)
+createToken('XRANGEIDENTIFIER', `${src[t.NUMERICIDENTIFIER]}|x|X|\\*`)
+
+createToken('XRANGEPLAIN', `[v=\\s]*(${src[t.XRANGEIDENTIFIER]})` +
+                   `(?:\\.(${src[t.XRANGEIDENTIFIER]})` +
+                   `(?:\\.(${src[t.XRANGEIDENTIFIER]})` +
+                   `(?:${src[t.PRERELEASE]})?${
+                     src[t.BUILD]}?` +
+                   `)?)?`)
+
+createToken('XRANGEPLAINLOOSE', `[v=\\s]*(${src[t.XRANGEIDENTIFIERLOOSE]})` +
+                        `(?:\\.(${src[t.XRANGEIDENTIFIERLOOSE]})` +
+                        `(?:\\.(${src[t.XRANGEIDENTIFIERLOOSE]})` +
+                        `(?:${src[t.PRERELEASELOOSE]})?${
+                          src[t.BUILD]}?` +
+                        `)?)?`)
+
+createToken('XRANGE', `^${src[t.GTLT]}\\s*${src[t.XRANGEPLAIN]}$`)
+createToken('XRANGELOOSE', `^${src[t.GTLT]}\\s*${src[t.XRANGEPLAINLOOSE]}$`)
+
+// Coercion.
+// Extract anything that could conceivably be a part of a valid semver
+createToken('COERCEPLAIN', `${'(^|[^\\d])' +
+              '(\\d{1,'}${MAX_SAFE_COMPONENT_LENGTH}})` +
+              `(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?` +
+              `(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?`)
+createToken('COERCE', `${src[t.COERCEPLAIN]}(?:$|[^\\d])`)
+createToken('COERCEFULL', src[t.COERCEPLAIN] +
+              `(?:${src[t.PRERELEASE]})?` +
+              `(?:${src[t.BUILD]})?` +
+              `(?:$|[^\\d])`)
+createToken('COERCERTL', src[t.COERCE], true)
+createToken('COERCERTLFULL', src[t.COERCEFULL], true)
+
+// Tilde ranges.
+// Meaning is "reasonably at or greater than"
+createToken('LONETILDE', '(?:~>?)')
+
+createToken('TILDETRIM', `(\\s*)${src[t.LONETILDE]}\\s+`, true)
+exports.tildeTrimReplace = '$1~'
+
+createToken('TILDE', `^${src[t.LONETILDE]}${src[t.XRANGEPLAIN]}$`)
+createToken('TILDELOOSE', `^${src[t.LONETILDE]}${src[t.XRANGEPLAINLOOSE]}$`)
+
+// Caret ranges.
+// Meaning is "at least and backwards compatible with"
+createToken('LONECARET', '(?:\\^)')
+
+createToken('CARETTRIM', `(\\s*)${src[t.LONECARET]}\\s+`, true)
+exports.caretTrimReplace = '$1^'
+
+createToken('CARET', `^${src[t.LONECARET]}${src[t.XRANGEPLAIN]}$`)
+createToken('CARETLOOSE', `^${src[t.LONECARET]}${src[t.XRANGEPLAINLOOSE]}$`)
+
+// A simple gt/lt/eq thing, or just "" to indicate "any version"
+createToken('COMPARATORLOOSE', `^${src[t.GTLT]}\\s*(${src[t.LOOSEPLAIN]})$|^$`)
+createToken('COMPARATOR', `^${src[t.GTLT]}\\s*(${src[t.FULLPLAIN]})$|^$`)
+
+// An expression to strip any whitespace between the gtlt and the thing
+// it modifies, so that `> 1.2.3` ==> `>1.2.3`
+createToken('COMPARATORTRIM', `(\\s*)${src[t.GTLT]
+}\\s*(${src[t.LOOSEPLAIN]}|${src[t.XRANGEPLAIN]})`, true)
+exports.comparatorTrimReplace = '$1$2$3'
+
+// Something like `1.2.3 - 1.2.4`
+// Note that these all use the loose form, because they'll be
+// checked against either the strict or loose comparator form
+// later.
+createToken('HYPHENRANGE', `^\\s*(${src[t.XRANGEPLAIN]})` +
+                   `\\s+-\\s+` +
+                   `(${src[t.XRANGEPLAIN]})` +
+                   `\\s*$`)
+
+createToken('HYPHENRANGELOOSE', `^\\s*(${src[t.XRANGEPLAINLOOSE]})` +
+                        `\\s+-\\s+` +
+                        `(${src[t.XRANGEPLAINLOOSE]})` +
+                        `\\s*$`)
+
+// Star ranges basically just allow anything at all.
+createToken('STAR', '(<|>)?=?\\s*\\*')
+// >=0.0.0 is like a star
+createToken('GTE0', '^\\s*>=\\s*0\\.0\\.0\\s*$')
+createToken('GTE0PRE', '^\\s*>=\\s*0\\.0\\.0-0\\s*$')
 
 
 /***/ }),

@@ -48,6 +48,7 @@ export default class UI {
         UI.BottomSection();
         UI.fullscreenControls();
         UI.createFormForText(frame);
+        ScratchJr.setupColKeypad();
         ScratchJr.setupKeypad();
         ScratchJr.setupEditableField();
         UI.aspectRatioAdjustment();
@@ -116,13 +117,14 @@ export default class UI {
     static createConnectionButtons(leftPanel) {
         const connectionButtonsArea = newHTML('div', 'connectionButtonsArea', leftPanel);
 
+        /* COG */
         const cogButotn = UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', (connectButton) => {
             window.applicationManager.connectGenericCog((raft) => {
                 // set subscription to raft events so we can update the UI when:
                 // - the raft is connected
                 // - the raft is disconnected
                 raftVerifiedSubscriptionHelper(raft).subscribe(() => {
-                    UI.setupConnectionButton(connectButton, raft);
+                    UI.setupCogConnectionButton(connectButton, raft);
                     // turn off the verified subscription to avoid memory leaks
                     raftVerifiedSubscriptionHelper(raft).unsubscribe();
                 })
@@ -133,14 +135,38 @@ export default class UI {
         // check if we're alredy connected to a cog, and if so, update the UI button
         const connectedCog = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Cog');
         if (connectedCog) {
-            UI.setupConnectionButton(cogButotn, connectedCog);
+            UI.setupCogConnectionButton(cogButotn, connectedCog);
         }
+        /* END COG */
+        /* MARTY */
+        UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty', (connectButton) => {
+            window.applicationManager.connectGenericMarty((raft) => {
+                // set subscription to raft events so we can update the UI when:
+                // - the raft is connected
+                // - the raft is disconnected
+                raftVerifiedSubscriptionHelper(raft).subscribe(() => {
+                    UI.setupMartyConnectionButton(connectButton, raft);
+                    // turn off the verified subscription to avoid memory leaks
+                    raftVerifiedSubscriptionHelper(raft).unsubscribe();
+                });
 
-        // UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty',);
+                // Activate Marty Mode if not already activated
+                /*MartyMode*/
+                if (!ScratchJr.isMartyModeEnabled) {
+                    UI.toggleMartyMode();
+                }
+            })
+        });
 
+        // check if we're alredy connected to a marty, and if so, update the UI button
+        const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
+        if (connectedMarty) {
+            UI.setupMartyConnectionButton(cogButotn, connectedMarty);
+        }
+        /* END MARTY */
     }
 
-    static setupConnectionButton(button, raft) {
+    static setupCogConnectionButton(button, raft) {
         // Add the connected class to the button
         button.classList.add('connectButtonConnected');
 
@@ -161,6 +187,36 @@ export default class UI {
             // When raft is disconnected, update the UI and remove the raft
             button.classList.remove('connectButtonConnected');
             window.cogManager.removeCog(raft);
+
+            // Unsubscribe from the disconnected event to avoid memory leaks
+            raftDisconnectedSubscriptionHelper(raft).unsubscribe();
+
+            // Restore the old onClick function
+            button.onclick = oldOnClick;
+        });
+    }
+
+    static setupMartyConnectionButton(button, raft) {
+        // Add the connected class to the button
+        button.classList.add('connectButtonConnected');
+
+        // Add the raft to the marty manager and wire it with blocks
+        window.martyManager.addMarty(raft);
+        window.martyManager.wireMartyWithBlocks(raft.id);
+
+        // Store the old onClick function to restore it later
+        const oldOnClick = button.onclick;
+
+        // Set the new onClick function to disconnect the raft
+        button.onclick = () => {
+            window.applicationManager.disconnectGeneric(raft);
+        }
+
+        // Set up a subscription to the raft disconnected event
+        raftDisconnectedSubscriptionHelper(raft).subscribe(() => {
+            // When raft is disconnected, update the UI and remove the raft
+            button.classList.remove('connectButtonConnected');
+            window.martyManager.removeMarty(raft);
 
             // Unsubscribe from the disconnected event to avoid memory leaks
             raftDisconnectedSubscriptionHelper(raft).unsubscribe();
@@ -794,6 +850,7 @@ export default class UI {
         if (el.className.indexOf('shakeme') < 0) {
             el.setAttribute('class', 'spritethumb on');
         }
+
         Thumbs.clickOnSprite(e, el);
     }
 
@@ -1007,6 +1064,37 @@ export default class UI {
         tb.setAttribute('id', 'pages');
         var ndiv = newHTML('div', 'pagescc', tb);
         ndiv.setAttribute('id', 'pagecc');
+
+        UI.addMartyModeButton(rp);
+    }
+
+    static addMartyModeButton(rightPanel) {
+        var mm = newHTML('div', 'martyMode', rightPanel);
+        mm.setAttribute('id', 'martyMode');
+        mm.onclick = UI.toggleMartyMode;
+
+        // Add SVG asset
+        var svgDiv = newHTML('div', 'martyModeIcon', mm);
+        svgDiv.innerHTML = '<img src="./assets/ui/martyModeDisabled.svg" alt="Marty Mode Disabled">';
+    }
+    /*MartyMode*/
+    static renderCorrectMartyModeIcon(isMartyModeEnabled) {
+        // Toggle the SVG asset
+        var martyModeIcon = gn('martyMode').querySelector('.martyModeIcon img');
+        if (ScratchJr.isMartyModeEnabled) {
+            martyModeIcon.src = './assets/ui/martyModeEnabled.svg';
+            martyModeIcon.alt = 'Marty Mode Enabled';
+        } else {
+            martyModeIcon.src = './assets/ui/martyModeDisabled.svg';
+            martyModeIcon.alt = 'Marty Mode Disabled';
+        }
+    }
+
+    /*MartyMode*/
+    static toggleMartyMode() {
+        ScratchAudio.sndFX('tap.wav');
+        ScratchJr.isMartyModeEnabled = !ScratchJr.isMartyModeEnabled;
+        UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
     }
 
     //////////////////////////////////////

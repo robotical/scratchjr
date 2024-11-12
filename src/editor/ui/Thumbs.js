@@ -11,13 +11,15 @@ import UI from './UI';
 import OS from '../../tablet/OS';
 import Events from '../../utils/Events';
 import ScratchAudio from '../../utils/ScratchAudio';
-import {frame, gn, localx, newHTML, scaleMultiplier, getIdFor,
-    isTablet, newImage, localy, setProps} from '../../utils/lib';
+import {
+    frame, gn, localx, newHTML, scaleMultiplier, getIdFor,
+    isTablet, newImage, localy, setProps
+} from '../../utils/lib';
 
 let caret = undefined;
 
 export default class Thumbs {
-    static updatePages () {
+    static updatePages() {
         var pthumbs = gn('pagecc');
         while (pthumbs.childElementCount > 0) {
             pthumbs.removeChild(pthumbs.childNodes[0]);
@@ -47,7 +49,7 @@ export default class Thumbs {
         th.next = ep;
     }
 
-    static getObjectFor (div, id) {
+    static getObjectFor(div, id) {
         for (var i = 0; i < div.childElementCount; i++) {
             if (div.childNodes[i].owner == id) {
                 return div.childNodes[i];
@@ -56,7 +58,7 @@ export default class Thumbs {
         return div.childNodes[0];
     }
 
-    static getType (div, str) {
+    static getType(div, str) {
         while (div != null) {
             if (div.type == str) {
                 return div;
@@ -66,7 +68,7 @@ export default class Thumbs {
         return null;
     }
 
-    static pageMouseDown (e) {
+    static pageMouseDown(e) {
         if (e.touches && (e.touches.length > 1)) {
             return;
         }
@@ -102,7 +104,7 @@ export default class Thumbs {
         }
     }
 
-    static prepareToDragPage (e) {
+    static prepareToDragPage(e) {
         e.preventDefault();
         e.stopPropagation();
         ScratchAudio.sndFX('grab.wav');
@@ -134,7 +136,7 @@ export default class Thumbs {
         Events.dragthumbnail.pos = Thumbs.getPagePos(Events.dragcanvas.top);
     }
 
-    static layoutPages () {
+    static layoutPages() {
         var thispage = Thumbs.findFirst();
         var p = gn('pagecc');
         while (thispage) {
@@ -143,7 +145,7 @@ export default class Thumbs {
         }
     }
 
-    static findFirst () {
+    static findFirst() {
         var kid = gn('pagecc').childNodes[0];
         while (kid.prev) {
             kid = kid.prev;
@@ -151,7 +153,7 @@ export default class Thumbs {
         return kid;
     }
 
-    static findLast () {
+    static findLast() {
         var kid = gn('pagecc').childNodes[0];
         while (kid.next) {
             kid = kid.next;
@@ -159,7 +161,7 @@ export default class Thumbs {
         return kid;
     }
 
-    static getPageOrder () {
+    static getPageOrder() {
         var page = Thumbs.findFirst();
         var res = [];
         while (page) {
@@ -172,7 +174,7 @@ export default class Thumbs {
         return res;
     }
 
-    static draggingPage (e, el) {
+    static draggingPage(e, el) {
         e.preventDefault();
         var pt = Events.getTargetPoint(e);
         var dx = pt.x - Events.dragmousex;
@@ -186,7 +188,7 @@ export default class Thumbs {
         Thumbs.layoutPages();
     }
 
-    static removeCaret () {
+    static removeCaret() {
         var myprev = caret.prev;
         var mynext = caret.next;
         if (myprev) {
@@ -203,13 +205,13 @@ export default class Thumbs {
         }
     }
 
-    static insertCaret (el) {
+    static insertCaret(el) {
         var pos = Thumbs.getPagePos(el.top);
         Thumbs.positionMe(pos, caret);
         gn('pagecc').appendChild(caret);
     }
 
-    static getPagePos (dy) {
+    static getPagePos(dy) {
         var delta = gn('pagecc').childNodes[1].offsetTop - gn('pagecc').childNodes[0].offsetTop;
         var pos = Math.floor(localy(gn('pagecc'), dy + (delta / 2)) / delta);
         pos = Math.max(0, pos);
@@ -217,7 +219,7 @@ export default class Thumbs {
         return Math.min(max, pos);
     }
 
-    static positionMe (pos, elem) {
+    static positionMe(pos, elem) {
         var beforewho = pos >= gn('pagecc').childElementCount ? undefined : gn('pagecc').childNodes[pos];
         if (!beforewho) {
             var last = Thumbs.findLast();
@@ -235,7 +237,7 @@ export default class Thumbs {
         }
     }
 
-    static repositionThumb (thumb, dy) {
+    static repositionThumb(thumb, dy) {
         var pos = Thumbs.getPagePos(dy);
         if (pos != thumb.pos) {
             ScratchAudio.sndFX('snap.wav');
@@ -251,7 +253,7 @@ export default class Thumbs {
         Thumbs.positionMe(pos, thumb);
     }
 
-    static dropPage (e) {
+    static dropPage(e) {
         ScratchJr.storyStart('Thumbs.dropPage');
         e.preventDefault();
         if (!caret) {
@@ -293,14 +295,14 @@ export default class Thumbs {
         }
     }
 
-    static clickPage (e) {
+    static clickPage(e) {
         ScratchJr.clearSelection();
         Thumbs.clickOnPage(e, Events.dragthumbnail.owner);
         Events.clearEvents();
         Events.dragthumbnail = undefined;
     }
 
-    static clickOnPage (e, pagename) {
+    static clickOnPage(e, pagename) {
         ScratchJr.unfocus(e);
         var pthumbs = gn('pagecc');
         for (var i = 0; i < pthumbs.childElementCount; i++) {
@@ -322,7 +324,7 @@ export default class Thumbs {
     }
 
 
-    static startPageShaking (tb) {
+    static startPageShaking(tb) {
         ScratchJr.shaking = tb;
         ScratchJr.stopShaking = Thumbs.stopPageShaking;
         var cc = tb.getAttribute('class');
@@ -331,7 +333,7 @@ export default class Thumbs {
     }
 
 
-    static stopPageShaking (b) {
+    static stopPageShaking(b) {
         ScratchJr.shaking = undefined;
         ScratchJr.stopShaking = undefined;
         var cc = b.getAttribute('class');
@@ -340,7 +342,7 @@ export default class Thumbs {
         b.childNodes[b.childElementCount - 1].style.visibility = 'hidden';
     }
 
-    static emptyPage (p) {
+    static emptyPage(p) {
         var tb = newHTML('div', 'pagethumb', p);
         var c = newHTML('div', 'empty', tb);
         var img;
@@ -359,7 +361,7 @@ export default class Thumbs {
         return tb;
     }
 
-    static clickOnEmptyPage (e) {
+    static clickOnEmptyPage(e) {
         if (isTablet && e.touches && (e.touches.length > 1)) {
             return;
         }
@@ -376,15 +378,15 @@ export default class Thumbs {
         new Page(getIdFor('page'));
     }
 
-    static highlighPage (page) {
+    static highlighPage(page) {
         page.setAttribute('class', 'pagethumb on');
     }
 
-    static unhighlighPage (page) {
+    static unhighlighPage(page) {
         page.setAttribute('class', 'pagethumb off');
     }
 
-    static overpage (page) {
+    static overpage(page) {
         page.setAttribute('class', 'pagethumb drop');
     }
 
@@ -392,7 +394,7 @@ export default class Thumbs {
     //   Library
     /////////////////////////////////////
 
-    static updateSprites () {
+    static updateSprites() {
         var costumes = gn('spritecc');
         costumes.style.top = '0px';
         while (costumes.childElementCount > 0) {
@@ -410,9 +412,9 @@ export default class Thumbs {
             }
             var th = spr.spriteThumbnail(costumes);
             if (spr.id == ScratchJr.stage.currentPage.currentSpriteName) {
-                Thumbs.highlighSprite(th);
+                if (th) Thumbs.highlighSprite(th);
             } else {
-                Thumbs.unhighlighSprite(th);
+                if (th) Thumbs.unhighlighSprite(th);
             }
         }
         if (!ScratchJr.getSprite()) {
@@ -421,7 +423,7 @@ export default class Thumbs {
         UI.resetSpriteLibrary();
     }
 
-    static updateSprite (spr) {
+    static updateSprite(spr) {
         if (!spr) {
             return;
         }
@@ -442,7 +444,7 @@ export default class Thumbs {
     //  Sprite Thumbnails
     ////////////////////////////////////////////
 
-    static startDragThumb (e, tb) {
+    static startDragThumb(e, tb) {
         if (ScratchJr.shaking && (e.target.id == 'deletespritethumb')) {
             ScratchJr.clearSelection();
             ScratchJr.stage.removeSprite(gn(tb.owner).owner);
@@ -458,7 +460,7 @@ export default class Thumbs {
         }
     }
 
-    static startCharShaking (tb) {
+    static startCharShaking(tb) {
         if (!tb) {
             return;
         }
@@ -470,7 +472,7 @@ export default class Thumbs {
         close.id = 'deletespritethumb';
     }
 
-    static stopCharShaking (b) {
+    static stopCharShaking(b) {
         ScratchJr.shaking = undefined;
         ScratchJr.stopShaking = undefined;
         var cc = b.getAttribute('class');
@@ -482,7 +484,7 @@ export default class Thumbs {
         }
     }
 
-    static selectThisSprite (spr) {
+    static selectThisSprite(spr) {
         var costumes = gn('spritecc');
         var el = spr.thumbnail;
         for (var i = 0; i < costumes.childElementCount; i++) {
@@ -495,7 +497,7 @@ export default class Thumbs {
         }
     }
 
-    static clickOnSprite (e, el) {
+    static clickOnSprite(e, el) {
         if (ScratchJr.shaking && (ScratchJr.shaking == el)) {
             ScratchJr.clearSelection();
             ScratchJr.stage.removeSprite(gn(el.owner).owner);
@@ -508,11 +510,16 @@ export default class Thumbs {
         ScratchJr.unfocus(e);
         var spr = gn(spritename).owner;
         var page = spr.div.parentNode.owner;
+
+        /*MartyMode*/
+        ScratchJr.isMartyModeEnabled = false;
+        UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
+
         page.setCurrentSprite(spr);
         Thumbs.selectThisSprite(spr);
     }
 
-    static prepareToDrag (e) {
+    static prepareToDrag(e) {
         e.preventDefault();
         e.stopPropagation();
         ScratchAudio.sndFX('grab.wav');
@@ -547,7 +554,7 @@ export default class Thumbs {
         frame.appendChild(Events.dragcanvas);
     }
 
-    static dragging (e, el) {
+    static dragging(e, el) {
         e.preventDefault();
         var pt = Events.getTargetPoint(e);
         var dx = pt.x - Events.dragmousex;
@@ -580,7 +587,7 @@ export default class Thumbs {
         }
     }
 
-    static removePagesCaret () {
+    static removePagesCaret() {
         for (var i = 0; i < gn('pagecc').childElementCount; i++) {
             var spr = gn('pagecc').childNodes[i];
             if (!spr.owner) {
@@ -595,17 +602,17 @@ export default class Thumbs {
         }
     }
 
-    static drop (e, el) {
+    static drop(e, el) {
         e.preventDefault();
         switch (Palette.getLandingPlace(el, e, window.devicePixelRatio)) {
-        case 'pages':
-            var thumb = Palette.getHittedThumb(el, gn('pagecc'), window.devicePixelRatio);
-            if (thumb && thumb.id != 'emptypage') {
-                ScratchJr.stage.copySprite(el, thumb);
-            }
-            break;
-        default:
-            break;
+            case 'pages':
+                var thumb = Palette.getHittedThumb(el, gn('pagecc'), window.devicePixelRatio);
+                if (thumb && thumb.id != 'emptypage') {
+                    ScratchJr.stage.copySprite(el, thumb);
+                }
+                break;
+            default:
+                break;
         }
         if (Events.dragcanvas) {
             Events.dragcanvas.parentNode.removeChild(Events.dragcanvas);
@@ -613,7 +620,7 @@ export default class Thumbs {
         Events.dragcanvas = undefined;
     }
 
-    static click (e, el) {
+    static click(e, el) {
         e.preventDefault();
         e.stopPropagation();
         if (window.event) {
@@ -625,13 +632,13 @@ export default class Thumbs {
         Thumbs.clickOnSprite(e, el);
     }
 
-    static highlighSprite (spr) {
+    static highlighSprite(spr) {
         spr.setAttribute('class', ScratchJr.isEditable() ? 'spritethumb on' : 'spritethumb noneditable');
         ScriptsPane.setActiveScript(spr.owner);
         Palette.reset();
     }
 
-    static unhighlighSprite (spr) {
+    static unhighlighSprite(spr) {
         spr.setAttribute('class', 'spritethumb off');
         var currentsc = gn(spr.owner + '_scripts');
         currentsc.owner.deactivate();
@@ -642,7 +649,7 @@ export default class Thumbs {
         }
     }
 
-    static quickHighlight (spr) {
+    static quickHighlight(spr) {
         if (spr.owner == ScratchJr.stage.currentPage.currentSpriteName) {
             spr.className = 'spritethumb on target';
         } else {
@@ -650,7 +657,7 @@ export default class Thumbs {
         }
     }
 
-    static quickRestore (spr) {
+    static quickRestore(spr) {
         if (spr.owner == ScratchJr.stage.currentPage.currentSpriteName) {
             spr.className = ScratchJr.isEditable() ? 'spritethumb on' : 'spritethumb noneditable';
         } else {

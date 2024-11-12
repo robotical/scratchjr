@@ -120,7 +120,6 @@ export default class WebappInterface {
   }
 
   static async io_cleanassets(fileType) {
-    console.log("cleanAssets - ", fileType);
     const db = await dataStoreInstance.getDatabaseManager();
     if (db) {
       db.cleanProjectFiles(fileType);
@@ -245,8 +244,6 @@ export default class WebappInterface {
   static async recordsound_recordclose(keep) {
 
     try {
-
-      console.log("saving blob");
       let audioCaptureElement = this.getAudioCaptureElement();
 
       if (keep === 'YES') {
@@ -254,13 +251,10 @@ export default class WebappInterface {
         let blob = await audioCaptureElement.captureRecordingAsBlob();
         if (blob) {
           let filename = audioCaptureElement.getId();
-          console.log("saving sound", filename);
           let fileReader = new FileReader();
           fileReader.onload = async function () {
-            console.log("filereader loaded", filename);
             // saving new sound...  will save as a webm file.
             const fn = await WebappInterface.io_setmedianame(fileReader.result, filename, 'webm');
-            console.log("fn", fn);
             soundManagerInstance.loadSoundFromDataURI(filename + '.webm', fileReader.result);
 
           };

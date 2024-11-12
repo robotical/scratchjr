@@ -860,7 +860,6 @@ export default class SVGTools {
     ///////////////////////////////
 
     static getWatermark (shape, color) {
-        console.log("sprites")
         var svg = SVGTools.getCopy(shape);
         SVGTools.removeExtras(svg);
         SVGTools.removeStylesInDefs(svg);
@@ -884,7 +883,7 @@ export default class SVGTools {
         var valid = n < svg.childElementCount;
         while (valid) {
             var elem = svg.childNodes[n];
-            if ((elem.nodeName == 'image') || (elem.nodeName == 'clipPath')) {
+            if ( (elem.nodeName == 'clipPath')) {
                 svg.removeChild(elem);
             } else {
                 if (elem.tagName == 'g') {

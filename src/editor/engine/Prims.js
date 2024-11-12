@@ -2,12 +2,15 @@ import ScratchJr from '../ScratchJr';
 import ScratchAudio from '../../utils/ScratchAudio';
 import Grid from '../ui/Grid';
 import Vector from '../../geom/Vector';
-import { gn } from '../../utils/lib';
+import { gn, rgbToHex } from '../../utils/lib';
 import UI from '../ui/UI';
+import MartyBlocks from '../../marty/MartyBlocks';
+import celebrateHelper from '../../marty/celebrate-helper';
 
 let tinterval = 1;
 let hopList = [-48, -30, -22, -14, -6, 0, 6, 14, 22, 30, 48];
 export const LINEAR_GRADIENT_COLOUR = "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)";
+const intervalToSeconds = 31.25; // runtime tick is set at 32ms by Runtime.js. 32*31.25 = 1s
 
 export default class Prims {
     static get hopList() {
@@ -74,6 +77,38 @@ export default class Prims {
         Prims.table.playsnd = Prims.playSound;
         Prims.table.playusersnd = Prims.playSound;
         Prims.table.say = Prims.Say;
+
+        /* Marty Prims */
+        Prims.table.martyDance = Prims.martyDance;
+        Prims.table.martyGetReady = Prims.martyGetReady;
+        Prims.table.martyStepForward = Prims.martyStepForward;
+        Prims.table.martyStepBackward = Prims.martyStepBackward;
+        Prims.table.martyStepLeft = Prims.martyStepLeft;
+        Prims.table.martyStepRight = Prims.martyStepRight;
+        Prims.table.martyTurnLeft = Prims.martyTurnLeft;
+        Prims.table.martyTurnRight = Prims.martyTurnRight;
+        Prims.table.martyKickLeft = Prims.martyKickLeft;
+        Prims.table.martyKickRight = Prims.martyKickRight;
+
+        Prims.table.martyEyesExcited = Prims.martyEyesExcited;
+        Prims.table.martyEyesWide = Prims.martyEyesWide;
+        Prims.table.martyEyesAngry = Prims.martyEyesAngry;
+        Prims.table.martyEyesNormal = Prims.martyEyesNormal;
+        Prims.table.martyEyesWiggle = Prims.martyEyesWiggle;
+        Prims.table.martyWaveLeft = Prims.martyWaveLeft;
+        Prims.table.martyWaveRight = Prims.martyWaveRight;
+        Prims.table.martyCelebrate = Prims.martyCelebrate;
+        Prims.table.martyLedEyesP1 = Prims.martyLedEyesP1;
+        Prims.table.martyLedEyesP2 = Prims.martyLedEyesP2;
+        Prims.table.martyLedEyesP3 = Prims.martyLedEyesP3;
+        Prims.table.martyLedEyesColour = Prims.martyLedEyesColour;
+
+        Prims.table.martyConfusion = Prims.martyConfusion;
+        Prims.table.martyDisbelief = Prims.martyDisbelief;
+        Prims.table.martyExcitement = Prims.martyExcitement;
+        Prims.table.martyNoway = Prims.martyNoway;
+        Prims.table.martyNo = Prims.martyNo;
+        Prims.table.martyWhistle = Prims.martyWhistle;
     }
 
     static Done(strip) {
@@ -514,6 +549,29 @@ export default class Prims {
         }
     }
 
+    static martyMoveAtSpeed(strip) {
+        var s = strip.spr;
+        var distance = strip.distance;
+        distance -= Math.abs(Vector.len(strip.stepVector));
+
+        if (distance < 0) {
+            s.setPos(strip.finalPosition.x, strip.finalPosition.y);
+            strip.distance = -1;
+            strip.vector = {
+                x: 0,
+                y: 0
+            };
+            strip.cmdSent = false;
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+
+        } else {
+            s.setPos(s.xcoor + strip.stepVector.x, s.ycoor + strip.stepVector.y);
+            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(strip.waitTime));
+            strip.distance = distance;
+        }
+    }
+
     static Right(strip) {
         var s = strip.spr;
         var num = Number(strip.thisblock.getArgValue()) * 30;
@@ -727,7 +785,7 @@ export default class Prims {
         if (!UI.counterExist()) {
             UI.createCounter();
         }
-        
+
         if (UI.counterExist() && UI.getCounterText() === "0") {
             UI.destroyCounter();
         }
@@ -763,6 +821,609 @@ export default class Prims {
             strip.thisblock = strip.thisblock.next;
         }
         strip.waitTimer = tinterval;
+    }
+
+    /* Marty Blcoks */
+    static martyDance(strip) {
+        let reps = Math.abs(Number(strip.thisblock.getArgValue()));
+        reps = Prims.sanitiseArgument(reps);
+        const moveTime = 3000;
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.dance(reps, moveTime);
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            Prims.playMartyServo(strip);
+            return;
+        }
+    }
+
+    static martyGetReady(strip) {
+        const moveTime = 3000;
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.getReady(moveTime);
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+            return;
+        } else {
+            Prims.playMartyServo(strip);
+            return;
+        }
+    }
+
+    static stopMartyCommandedAfterTime(strip, time) {
+        const timeout = setTimeout(() => {
+            console.log("stopping Marty after time");
+            strip.cmdSent = false;
+            clearTimeout(timeout);
+        }, time);
+    }
+
+    static martyStepForward(strip) {
+        let s = strip.spr;
+        const moveTime = MartyBlocks.stepMoveTime;
+        let steps = Math.abs(Number(strip.thisblock.getArgValue()));
+        steps = Prims.sanitiseArgument(steps);
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+            steps = Math.min(Math.max(steps, 1), 20);
+            Prims.martyBlocks.stepForward(steps);
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+            Prims.stopMartyCommandedAfterTime(strip, moveTime + MartyBlocks.moveTimeBuffer);
+        }
+
+        if (steps == 0) {
+            strip.thisblock = strip.thisblock.next;
+            strip.waitTimer = tinterval;
+            strip.distance = -1;
+            strip.cmdSent = false;
+            strip.vector = {
+                x: 0,
+                y: 0
+            };
+            return;
+
+        } else if (strip.distance < 0) {
+            strip.waitTime = (moveTime + MartyBlocks.moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+            var res = {};
+            var rad = s.angle * (Math.PI / 180);
+            res.x = steps * MartyBlocks.YStepSize * 0.5 * Math.sin(rad);
+            res.y = steps * MartyBlocks.YStepSize * 0.5 * Math.cos(rad) * -1;
+
+            strip.distance = steps * MartyBlocks.YStepSize * 0.5;
+            strip.vector = {
+                x: res.x,
+                y: res.y
+            };
+
+            let finX = res.x + s.xcoor;
+            let finY = res.y + s.ycoor;
+            strip.finalPosition = {
+                x: finX,
+                y: finY
+            }
+
+            strip.waitTime = strip.waitTime * 0.1;
+            strip.stepVector = Vector.scale(strip.vector, (0.1 / steps));
+
+            Prims.setTime(strip);
+        }
+        Prims.martyMoveAtSpeed(strip);
+    }
+
+    static martyStepBackward(strip) {
+
+        let s = strip.spr;
+        const moveTime = MartyBlocks.stepMoveTime;
+        let steps = Math.abs(Number(strip.thisblock.getArgValue()));
+        steps = Prims.sanitiseArgument(steps);
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+            steps = Math.min(Math.max(steps, 1), 20);
+            Prims.martyBlocks.stepBackward(steps);
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+            Prims.stopMartyCommandedAfterTime(strip, moveTime + MartyBlocks.moveTimeBuffer);
+        }
+
+        if (steps == 0) {
+            strip.thisblock = strip.thisblock.next;
+            strip.waitTimer = tinterval;
+            strip.distance = -1;
+            strip.cmdSent = false;
+            strip.vector = {
+                x: 0,
+                y: 0
+            };
+            return;
+        } else if (strip.distance < 0) {
+            strip.waitTime = (moveTime + MartyBlocks.moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+            var res = {};
+            var rad = s.angle * (Math.PI / 180);
+            res.x = steps * MartyBlocks.YStepSize * 0.5 * Math.sin(rad) * -1;
+            res.y = steps * MartyBlocks.YStepSize * 0.5 * Math.cos(rad);
+
+            strip.distance = steps * MartyBlocks.YStepSize * 0.5;
+            strip.vector = {
+                x: res.x,
+                y: res.y
+            };
+
+            let finX = res.x + s.xcoor;
+            let finY = res.y + s.ycoor;
+            strip.finalPosition = {
+                x: finX,
+                y: finY
+            }
+
+            strip.waitTime = strip.waitTime * 0.1;
+            strip.stepVector = Vector.scale(strip.vector, (0.1 / steps));
+
+            Prims.setTime(strip);
+        }
+        Prims.martyMoveAtSpeed(strip);
+    }
+
+    static martyStepLeft(strip) {
+
+        let s = strip.spr;
+        const moveTime = MartyBlocks.stepMoveTime;
+        let steps = Math.abs(Number(strip.thisblock.getArgValue()));
+        steps = Prims.sanitiseArgument(steps);
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+
+            steps = Math.min(Math.max(steps, 1), 20);
+            Prims.martyBlocks.stepLeft(steps);
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+            Prims.stopMartyCommandedAfterTime(strip, moveTime + MartyBlocks.moveTimeBuffer);
+        }
+
+        if (steps == 0) {
+            strip.thisblock = strip.thisblock.next;
+            strip.waitTimer = tinterval;
+            strip.distance = -1;
+            strip.vector = {
+                x: 0,
+                y: 0
+            };
+            return;
+
+        } else if (strip.distance < 0) {
+            strip.waitTime = (moveTime + MartyBlocks.moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+            var res = {};
+            var rad = (s.angle - 90) * (Math.PI / 180);
+            res.x = steps * MartyBlocks.XStepSize * 0.5 * Math.sin(rad);
+            res.y = steps * MartyBlocks.XStepSize * 0.5 * Math.cos(rad) * -1;
+
+            strip.distance = steps * MartyBlocks.XStepSize * 0.5;
+            strip.vector = {
+                x: res.x,
+                y: res.y
+            };
+
+            let finX = res.x + s.xcoor;
+            let finY = res.y + s.ycoor;
+            strip.finalPosition = {
+                x: finX,
+                y: finY
+            }
+
+            strip.waitTime = strip.waitTime * 0.1;
+            strip.stepVector = Vector.scale(strip.vector, (0.1 / steps));
+
+            Prims.setTime(strip);
+        }
+        Prims.martyMoveAtSpeed(strip);
+    }
+
+    static martyStepRight(strip) {
+
+        var s = strip.spr;
+        const moveTime = MartyBlocks.stepMoveTime;
+        var steps = Math.abs(Number(strip.thisblock.getArgValue()));
+        steps = Prims.sanitiseArgument(steps);
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+
+            steps = Math.min(Math.max(steps, 1), 20);
+            Prims.martyBlocks.stepRight(steps);
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+            Prims.stopMartyCommandedAfterTime(strip, moveTime + MartyBlocks.moveTimeBuffer);
+        }
+
+        if (steps == 0) {
+            strip.thisblock = strip.thisblock.next;
+            strip.waitTimer = tinterval;
+            strip.distance = -1;
+            strip.vector = {
+                x: 0,
+                y: 0
+            };
+            return;
+
+        } else if (strip.distance < 0) {
+            strip.waitTime = (moveTime + MartyBlocks.moveTimeBuffer) / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+
+            var res = {};
+            var rad = (s.angle + 90) * (Math.PI / 180);
+            res.x = steps * MartyBlocks.XStepSize * 0.5 * Math.sin(rad);
+            res.y = steps * MartyBlocks.XStepSize * 0.5 * Math.cos(rad) * -1;
+
+            strip.distance = steps * MartyBlocks.XStepSize * 0.5;
+            strip.vector = {
+                x: res.x,
+                y: res.y
+            };
+
+            let finX = res.x + s.xcoor;
+            let finY = res.y + s.ycoor;
+            strip.finalPosition = {
+                x: finX,
+                y: finY
+            }
+
+            strip.waitTime = strip.waitTime * 0.1;
+            strip.stepVector = Vector.scale(strip.vector, (0.1 / steps));
+
+            Prims.setTime(strip);
+        }
+        Prims.martyMoveAtSpeed(strip);
+    }
+
+    static martyTurnRight(strip) {
+        var num = Number(strip.thisblock.getArgValue()) * MartyBlocks.turnSize * 1.4;
+        var s = strip.spr;
+        const moveTime = MartyBlocks.turnMoveTime;
+        let steps = Number(strip.thisblock.getArgValue());
+        steps = Prims.sanitiseArgument(steps);
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+            steps = Math.min(Math.max(steps, 1), 20);
+            Prims.martyBlocks.turnRight(steps);
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+            Prims.stopMartyCommandedAfterTime(strip, moveTime + MartyBlocks.moveTimeBuffer);
+        }
+
+        if (strip.count < 0) {
+            strip.waitTime = (moveTime + MartyBlocks.moveTimeBuffer) * steps / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+            strip.count = Math.floor(Math.abs(steps) * MartyBlocks.turnStepCount);   //how many steps do we want to break the movement down into?
+            strip.waitTime = strip.waitTime / strip.count;
+            strip.angleStep = MartyBlocks.turnSize / MartyBlocks.turnStepCount;                  //Break the total turn size down by number of steps the sprite should take
+            strip.finalAngle = s.angle + num;                            //Final position is current angle sub rotation angle
+            strip.finalAngle = strip.finalAngle % 360;                   //Correct for rolling over 360
+            if (strip.finalAngle < 0) {
+                strip.finalAngle += 360;
+            }
+            if (strip.finalAngle > 360) {
+                strip.finalAngle -= 360;
+            }
+            Prims.setTime(strip);
+        }
+        Prims.turning(strip);
+    }
+
+    static martyTurnLeft(strip) {
+        var num = Number(strip.thisblock.getArgValue()) * MartyBlocks.turnSize * 1.4;
+        var s = strip.spr;
+        const moveTime = MartyBlocks.turnMoveTime;
+        let steps = Number(strip.thisblock.getArgValue());
+        steps = Prims.sanitiseArgument(steps);
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+            steps = Math.min(Math.max(steps, 1), 20);
+            Prims.martyBlocks.turnLeft(steps);
+            strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
+            Prims.stopMartyCommandedAfterTime(strip, moveTime + MartyBlocks.moveTimeBuffer);
+        }
+
+        if (strip.count < 0) {
+            strip.waitTime = (moveTime + MartyBlocks.moveTimeBuffer) * steps / 1000; //total time to wait for Marty's movement to end (measured in seconds)
+            strip.count = Math.floor(Math.abs(steps) * MartyBlocks.turnStepCount);   //how many steps do we want to break the movement down into?
+            strip.waitTime = strip.waitTime / strip.count;
+            strip.angleStep = - MartyBlocks.turnSize / MartyBlocks.turnStepCount;                //Break the total turn size down by number of steps the sprite should take
+            strip.finalAngle = s.angle - num;                            //Final position is current angle sub rotation angle
+            strip.finalAngle = strip.finalAngle % 360;                   //Correct for rolling over 360
+            if (strip.finalAngle < 0) {
+                strip.finalAngle += 360;
+            }
+            if (strip.finalAngle > 360) {
+                strip.finalAngle -= 360;
+            }
+            Prims.setTime(strip);
+        }
+        Prims.turning(strip);
+    }
+
+    static martyEyesExcited(strip) {
+        const moveTime = 1000;
+        Prims.setTime(strip);
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.eyesExcited();
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+
+    static martyEyesWide(strip) {
+        const moveTime = 1000;
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.eyesWide();
+            Prims.showTime(strip);
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+
+    static martyEyesAngry(strip) {
+        const moveTime = 1000;
+        Prims.setTime(strip);
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.eyesAngry();
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+
+    static martyEyesNormal(strip) {
+        const moveTime = 1000;
+        Prims.setTime(strip);
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.eyesNormal();
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+
+    static martyEyesWiggle(strip) {
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2000;
+        Prims.setTime(strip);
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.eyesWiggle(reps);
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+
+    static martyWaveLeft(strip) {
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2500;
+        Prims.setTime(strip);
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.waveLeft(reps);
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+
+    static martyWaveRight(strip) {
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2500;
+        Prims.setTime(strip);
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.waveRight(reps);
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+
+    static martyLedEyesP1(strip) {
+        const duration = 2500;
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.ledEyesP1(duration);
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (duration / 1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+    static martyLedEyesP2(strip) {
+        const duration = 2500;
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.ledEyesP2(duration);
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (duration / 1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+    static martyLedEyesP3(strip) {
+        // Not implemented yet
+        return Prims.playMartyServo(strip);
+    }
+    static martyLedEyesColour(strip) {
+        const duration = 1500;
+        let colour = rgbToHex(strip.thisblock.getArgValue()).replace("#", "");
+        if (colour === LINEAR_GRADIENT_COLOUR) {
+            colour = "000000";
+        }
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.ledEyesColour(colour);
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (duration / 1000));
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+
+    static martyCelebrate(strip) {
+        celebrateHelper(Prims.martyBlocks, Prims, strip, tinterval, intervalToSeconds);
+    }
+
+    static martyKickLeft(strip) {
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2500;
+        Prims.setTime(strip);
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.kickLeft(reps);
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+
+    static martyKickRight(strip) {
+        const reps = Number(strip.thisblock.getArgValue());
+        const moveTime = 2500;
+        Prims.setTime(strip);
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.kickRight(reps);
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000) * reps);
+            Prims.showTime(strip);
+            strip.thisblock = strip.thisblock.next;
+        } else {
+            Prims.playMartyServo(strip);
+        }
+    }
+
+    static playMartyServo(strip) {
+        const moveTime = 850;
+        ScratchAudio.sndFX('marty_eyes_servo.wav');
+        strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+        strip.thisblock = strip.thisblock.next;
+        return;
+    }
+
+    static isMartyCommanded(strip) {
+        return !!strip.cmdSent;
+    }
+
+    static martyConfusion(strip) {
+        const moveTime = 2500;
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.confusion();
+            Prims.showTime(strip);
+        } else {
+            ScratchAudio.sndFX('confused.wav');
+        }
+        strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+        strip.thisblock = strip.thisblock.next;
+    }
+
+    static martyDisbelief(strip) {
+        const moveTime = 2500;
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.disbelief();
+            Prims.showTime(strip);
+        } else {
+            ScratchAudio.sndFX('disbelief.wav');
+        }
+        strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+        strip.thisblock = strip.thisblock.next;
+    }
+
+    static martyExcitement(strip) {
+        const moveTime = 2500;
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.excitement();
+            Prims.showTime(strip);
+        } else {
+            ScratchAudio.sndFX('excited.wav');
+        }
+        strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+        strip.thisblock = strip.thisblock.next;
+    }
+
+    static martyNoway(strip) {
+        const moveTime = 2500;
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.noway();
+            Prims.showTime(strip);
+        } else {
+            ScratchAudio.sndFX('no_way.wav');
+        }
+        strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+        strip.thisblock = strip.thisblock.next;
+    }
+
+    static martyNo(strip) {
+        const moveTime = 2500;
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.no();
+            Prims.showTime(strip);
+        } else {
+            ScratchAudio.sndFX('no.wav');
+        }
+        strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+        strip.thisblock = strip.thisblock.next;
+    }
+
+    static martyWhistle(strip) {
+        const moveTime = 2500;
+        Prims.setTime(strip);
+
+        if (Prims.martyBlocks && Prims.martyBlocks.marty) {
+            Prims.martyBlocks.whistle();
+            Prims.showTime(strip);
+        } else {
+            ScratchAudio.sndFX('whistle.wav');
+        }
+        strip.waitTimer = parseInt(tinterval * intervalToSeconds * (moveTime / 1000));
+        strip.thisblock = strip.thisblock.next;
+    }
+
+    /* End Marty Blocks */
+
+    static sanitiseArgument(argValue) {
+        const maxStepArgument = 20; //the maxmum number of steps we can make in one REST command
+        if (argValue > maxStepArgument) {
+            return maxStepArgument;
+        } else {
+            return argValue;
+        }
     }
 
     static OnCogEvent(event) {
@@ -832,7 +1493,7 @@ export default class Prims {
                 if (block.getArgValue() == 'onrotatecounterclockwise' && event == 'onrotatecounterclockwise') {
                     receivers.push([s, block]);
                 }
-                if ((block.getArgValue() == 'onrotateeither' && event == 'onrotatecounterclockwise') || 
+                if ((block.getArgValue() == 'onrotateeither' && event == 'onrotatecounterclockwise') ||
                     (block.getArgValue() == 'onrotateeither' && event == 'onrotateclockwise')) {
                     receivers.push([s, block]);
                 }

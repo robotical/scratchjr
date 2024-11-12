@@ -32,8 +32,8 @@ export default class Webapp {
   }
 
   // IO functions
-  static cleanassets(ft, fcn) {
-    WebappInterface.io_cleanassets(ft);
+  static async cleanassets(ft, fcn) {
+    await WebappInterface.io_cleanassets(ft);
     fcn();
   }
 

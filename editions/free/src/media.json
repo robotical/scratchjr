@@ -70,6 +70,15 @@
       "tags": ["characters", "07 weather"]
     },
     {
+      "md5": "MartyBirdsEye.svg",
+      "width": 80,
+      "height": 101,
+      "ext": "svg",
+      "name": "Marty Bird's Eye",
+      "order": "characters,07 weather",
+      "tags": ["characters", "07 weather"]
+    },
+    {
       "md5": "Sprites_Octopus-Blue.svg",
       "width": 80,
       "height": 101,
