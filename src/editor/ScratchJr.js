@@ -408,6 +408,11 @@ export default class ScratchJr {
     }
 
     static saveProject(e, onDone) {
+        /*Tutorial*/ 
+        // don't save project if we are in tutorial mode
+        if (window.tutorialEngine) {
+            return onDone && onDone();
+        }
         if (ScratchJr.isEditable() && !Project.error && changed) {
             if (editmode != 'storyStarter') {
                 if (currentProject) {

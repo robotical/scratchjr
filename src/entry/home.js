@@ -4,8 +4,12 @@ import OS from "../tablet/OS";
 import Lobby from "../lobby/Lobby";
 import goToLink from "../utils/goToLink";
 
-
 export function homeMain() {
+  const urlParams = new URLSearchParams(window.location.search);
+  /*Tutorial*/
+  if (urlParams.get("tutorial")) {
+    goToLink("editor.html?pmd5=" + -1 + "&mode=edit&tutorial=" + urlParams.get("tutorial"));
+  }
   OS.martyCmd({cmd: "show-back-arrow"});
   gn("logotab").onclick = homeGoBack;
   homeStrings();

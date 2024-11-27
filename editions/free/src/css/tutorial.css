@@ -1,7 +1,7 @@
 /* Menu Bar */
 .tutorialMenuBar {
     position: absolute;
-    bottom: ${css_vh(1.2)};
+    bottom: ${css_vh(2.1)};
     left: 50%;
     transform: translateX(-50%);
     width: 380px;
@@ -9,27 +9,64 @@
 
     display: grid;
     grid-template-columns: min-content 1fr min-content min-content min-content;
+
+    background: #438ccb;
+
+    border-radius: 4px;
 }
 
 .tutorialButton {
-    background-color: transparent;
     border: none;
     cursor: pointer;
+
+    background: transparent;
+    color: #fff;
+
+    width: 35px;
+
+    position: relative;
 }
 
 .tutorialTitle {
-    font-size: 20px;
+    font-size: 17px;
     font-weight: bold;
-    color: #000;
+    color: #fff;
     text-align: center;
     line-height: 40px;
+}
+
+/* Progress Bar */
+#tutorialProgressBar {
+    position: absolute;
+    bottom: ${css_vh(.5)};
+    left: 50%;
+    transform: translateX(-50%);
+    width: 380px;
+    height: 10px;
+    background-color: #e0e0e0;
+    text-align: center;
+}
+
+#tutorialProgress {
+    width: 0;
+    height: 100%;
+    background-color: #76c7c0;
+    transition: width 0.3s ease-in-out;
+}
+
+#tutorialProgressText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
 }
 
 /* Instructor */
 .tutorialInstructor {
     position: absolute;
-    top: 50%;
-    right: ${css_vw(10)};
+    top: 40%;
+    right: ${css_vw(20)};
     z-index: 99999;
 
     /* pointer events only drag */
@@ -52,10 +89,9 @@
 
 .speechBubble {
     position: absolute;
-    bottom: 100%;
-    left: 0;
-    transform: translateX(-50%);
-    width: 150px;
+    bottom: 90%;
+    left: 22px;
+    width: ${css_vh(25)};
     padding: 10px;
     background: white;
     border: 2px solid black;
@@ -72,7 +108,7 @@
     content: '';
     position: absolute;
     top: 100%;
-    left: 50%;
+    left: 20%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
@@ -85,21 +121,21 @@
 #tutorial-down-pointing-arrow-svg {
     position: absolute;
     bottom: 0;
-    left: 50%;
+    left: 20%;
     transform: translate(-87%, 75%);
     z-index: 100000;
     width: 28px;
 }
 
   /* Drag Animation */ 
-  .pointingHand {
+.pointingHand {
     position: absolute;
     left: 100%;
     transform: translate(-50%, 0);
     z-index: 100000;
     width: ${css_vh(20)};
     height: ${css_vh(20)};
-  }
+}
 
 /* Modal */
 #tutorialModal {
@@ -153,24 +189,36 @@
 }
 
 /* Glow effect for highlighted blocks */
+.highlightedElement,
 .highlightedBlock {
-    box-shadow: 0 0 10px 5px rgba(255, 255, 0, 0.8);
-    transition: box-shadow 0.3s ease-in-out;
-    border-radius: 50%;
-    animation: glow 2s infinite;
+
 }
 
-/* Glow effect breathing animation */
+:root {
+    --highlightedElementColor: rgba(255, 255, 0, 0.4);
+}
+
+.highlightedBlock::before,
+.highlightedElement::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--highlightedElementColor);
+    filter: blur(2px);
+    z-index: 10000;
+    opacity: 1;
+    animation: glow 2s infinite alternate;
+  }
+  
+
 @keyframes glow {
     0% {
-        box-shadow: 0 0 10px 0px rgba(255, 255, 0, 0.8);
+      transform: scale(1);
     }
-
-    50% {
-        box-shadow: 0 0 20px 10px rgba(255, 255, 0, 0.8);
-    }
-
     100% {
-        box-shadow: 0 0 10px 0px rgba(255, 255, 0, 0.8);
+      transform: scale(2);
     }
-}
+  }

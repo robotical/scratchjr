@@ -743,6 +743,7 @@ export function findKeyframesRule(rule) {
 }
 
 export function colorToRGBA(color, opacity) {
+  if (!color) return "";
   var val = parseInt("0x" + color.substr(1, color.length));
   return (
     "rgba(" +

@@ -3,7 +3,7 @@ import OS from "../tablet/OS";
 import Camera from "../painteditor/Camera";
 import Record from "../editor/ui/Record";
 
-export function editorMain() {
+export async function editorMain() {
   OS.martyCmd({ cmd: "hide-back-arrow" });
   OS.getsettings(doNext);
   OS.analyticsEvent("editor", "project_editor_open");

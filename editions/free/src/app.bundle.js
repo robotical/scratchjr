@@ -662,6 +662,11 @@ class ScratchJr {
     window.clearInterval(autoSaveSetInterval);
   }
   static saveProject(e, onDone) {
+    /*Tutorial*/
+    // don't save project if we are in tutorial mode
+    if (window.tutorialEngine) {
+      return onDone && onDone();
+    }
     if (ScratchJr.isEditable() && !_ui_Project__WEBPACK_IMPORTED_MODULE_0__["default"].error && changed) {
       if (editmode != 'storyStarter') {
         if (currentProject) {
@@ -8604,6 +8609,7 @@ class Palette {
     var t = e.target;
     _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_10__["default"].sndFX('keydown.wav');
     var index = t.parentNode ? t.parentNode.index : 2;
+    index = !!index ? index : t.index;
     Palette.selectCategory(index);
   }
   static selectCategory(n) {
@@ -9994,6 +10000,11 @@ class Scripts {
       this.sendToBack(b.owner);
     }
     this.dragList = [];
+    /*Tutorial*/
+    if (window.tutorialEngine) {
+      // evaluate the scripts area
+      window.tutorialEngine.evaluateScriptsArea();
+    }
   }
   sendToBack(b) {
     if (!b.inside) {
@@ -10766,6 +10777,11 @@ class ScriptsPane {
         scroll.adjustCanvas();
         scroll.refresh();
         scroll.fitToScreen();
+        /*Tutorial*/
+        if (window.tutorialEngine) {
+          // evaluate the scripts area
+          window.tutorialEngine.evaluateScriptsArea();
+        }
         break;
     }
     _Undo__WEBPACK_IMPORTED_MODULE_4__["default"].record({
@@ -12031,12 +12047,63 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class TutorialUI {
+  static _highlightedElements = [];
+
   /* Sets up tutorial UI elements */
-  static setupUI(frame) {
+  static setupUI(tutorial) {
+    this.tutorial = tutorial;
+    const frame = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('frame');
     TutorialUI.frame = frame;
     TutorialUI.topSection = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('topsection');
     TutorialUI.createTutorialMenuBar();
     TutorialUI.createInstructor();
+    TutorialUI.createProgressBar();
+    TutorialUI.clearUIBeforeStep();
+  }
+
+  /* Clears up the ui and prepares it for the next step */
+  static clearUIBeforeStep() {
+    TutorialUI.clearSpeechBubble();
+    TutorialUI.unhighlightBlocks();
+    TutorialUI.unhighlightElements();
+    TutorialUI.hidePreviousButton();
+    TutorialUI.hideNextButton();
+    TutorialUI.hideHintButton();
+  }
+
+  /* Buttons */
+  static showNextButton(onClick) {
+    this.onNextClick = onClick;
+    const nextButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('nextStep');
+    nextButton.style.visibility = 'visible';
+    nextButton.addEventListener('click', this.onNextClick);
+  }
+  static hideNextButton() {
+    const nextButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('nextStep');
+    nextButton.style.visibility = 'hidden';
+    nextButton.removeEventListener('click', this.onNextClick);
+  }
+  static showPreviousButton(onClick) {
+    this.onPreviousClick = onClick;
+    const previousButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('previousStep');
+    previousButton.style.visibility = 'visible';
+    previousButton.addEventListener('click', this.onPreviousClick);
+  }
+  static hidePreviousButton() {
+    const previousButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('previousStep');
+    previousButton.style.visibility = 'hidden';
+    previousButton.removeEventListener('click', this.onPreviousClick);
+  }
+  static showHintButton(onClick) {
+    this.onHintClick = onClick;
+    const hintButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('tutorialHelp');
+    hintButton.style.visibility = 'visible';
+    hintButton.addEventListener('click', this.onHintClick);
+  }
+  static hideHintButton() {
+    const hintButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('tutorialHelp');
+    hintButton.style.visibility = 'hidden';
+    hintButton.removeEventListener('click', this.onHintClick);
   }
 
   /* Menu Bar */
@@ -12047,12 +12114,38 @@ class TutorialUI {
 
     // tutorial menu bar should have in this order a close button, the title of the tutorial, a question mark icon, previous and next buttons
     TutorialUI.tutorialMenuBar.innerHTML = `
-            <button id="closeTutorial" class="tutorialButton">X</button>
-            <div id="tutorialTitle" class="tutorialTitle">Tutorial Title</div>
+            <button id="closeTutorial" class="tutorialButton" onclick="window.applicationManager?.returnToMainApp()">X</button>
+            <div id="tutorialTitle" class="tutorialTitle">${this.tutorial.title}</div>
             <button id="tutorialHelp" class="tutorialButton">?</button>
-            <button id="previousStep" class="tutorialButton">Previous</button>
-            <button id="nextStep" class="tutorialButton">Next</button>
+            <button id="previousStep" class="tutorialButton">
+                <svg id="tutorial-left-pointing-arrow-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 6L10 12L16 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <button id="nextStep" class="tutorialButton">
+                <svg id="tutorial-right-pointing-arrow-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 6L14 12L8 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
         `;
+  }
+
+  /* Progress Bar */
+  static createProgressBar() {
+    TutorialUI.progressBar = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.newHTML)('div', 'tutorialProgressBar', TutorialUI.topSection);
+    TutorialUI.progressBar.setAttribute('id', 'tutorialProgressBar');
+    TutorialUI.progressBar.innerHTML = `
+            <div id="tutorialProgress"></div>
+            <div id="tutorialProgressText"></div>
+        `;
+  }
+  static updateProgressBar(currentStep, totalSteps) {
+    const progressBar = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('tutorialProgress');
+    const progressPercentage = currentStep / totalSteps * 100;
+    progressBar.style.width = `${progressPercentage}%`;
+    // update the number in the #tutorialProgressText div
+    const progressBarText = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('tutorialProgressText');
+    progressBarText.textContent = `${currentStep + 1} / ${totalSteps + 1}`;
   }
 
   /* Instructor */
@@ -12103,8 +12196,6 @@ class TutorialUI {
   }
   static closeModal() {
     TutorialUI.modal.style.display = 'none';
-
-    // if there is a video in the modal, stop it
     const video = TutorialUI.modal.querySelector('video');
     if (video) {
       video.pause();
@@ -12140,6 +12231,7 @@ class TutorialUI {
     speechBubble.style.display = 'block';
     const speechBubbleText = TutorialUI.instructor.querySelector('#speechBubbleText');
     speechBubbleText.textContent = text;
+    TutorialUI.momentarilyHighlightSpeechBubble(speechBubble);
   }
   static showSpeechBubbleWithImage(imageURL) {
     const speechBubble = TutorialUI.instructor.querySelector('.speechBubble');
@@ -12149,6 +12241,7 @@ class TutorialUI {
     speechBubbleImage.querySelector('img').addEventListener('click', e => {
       TutorialUI.showModal(`<img class="modalImage" src="${imageURL}" alt="expanded image" />`);
     });
+    TutorialUI.momentarilyHighlightSpeechBubble(speechBubble);
   }
   static showSpeechBubbleWithVideo(videoURL) {
     const speechBubble = TutorialUI.instructor.querySelector('.speechBubble');
@@ -12160,6 +12253,15 @@ class TutorialUI {
       e.preventDefault();
       TutorialUI.showModal(`<video class="modalVideo" src="${videoURL}" controls autoplay></video>`);
     });
+    TutorialUI.momentarilyHighlightSpeechBubble(speechBubble);
+  }
+  static momentarilyHighlightSpeechBubble(speechBubble) {
+    // Add a quick scale effect
+    speechBubble.style.transition = 'transform 0.3s ease';
+    speechBubble.style.transform = 'scale(1.3)';
+    setTimeout(() => {
+      speechBubble.style.transform = 'scale(1)';
+    }, 300);
   }
   static clearSpeechBubble() {
     const speechBubble = TutorialUI.instructor.querySelector('.speechBubble');
@@ -12175,20 +12277,19 @@ class TutorialUI {
   /* Animate Movement */
   static async blockToScriptsAnimation(blockID) {
     const blockOriginal = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)(blockID);
-    const block = TutorialUI.cloneBlock(blockOriginal);
-    TutorialUI.addPointingHandToBlock(block);
+    const block = TutorialUI._cloneBlock(blockOriginal);
+    TutorialUI._addPointingHandToBlock(block);
     const {
       dx,
       dy
-    } = TutorialUI.calculateAnimationDistance(blockOriginal, (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('scripts'));
-    TutorialUI.prepareBlockForAnimation(block, blockOriginal);
-    await new Promise(resolve => setTimeout(resolve, 400)); // just for better UX
-    TutorialUI.animateBlock(block, dx, dy, () => {
-      (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('palette').style.overflow = '';
+    } = TutorialUI._calculateAnimationDistance(blockOriginal, (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('scripts'));
+    TutorialUI._prepareBlockForAnimation(block, blockOriginal);
+    await new Promise(resolve => setTimeout(resolve, 400)); // just for better UX we wait a bit after having showed the hand but before starting the animation
+    TutorialUI._animateBlock(block, dx, dy, () => {
       document.body.removeChild(block);
     });
   }
-  static cloneBlock(blockOriginal) {
+  static _cloneBlock(blockOriginal) {
     const block = blockOriginal.cloneNode(true);
     const originalCanvases = blockOriginal.getElementsByTagName('canvas');
     const clonedCanvases = block.getElementsByTagName('canvas');
@@ -12198,7 +12299,7 @@ class TutorialUI {
     }
     return block;
   }
-  static calculateAnimationDistance(blockOriginal, scriptsDiv) {
+  static _calculateAnimationDistance(blockOriginal, scriptsDiv) {
     const blockRect = blockOriginal.getBoundingClientRect();
     const POIRect = scriptsDiv.getBoundingClientRect();
     const dx = POIRect.left + POIRect.width / 2 - (blockRect.left + blockRect.width / 2);
@@ -12208,7 +12309,7 @@ class TutorialUI {
       dy
     };
   }
-  static prepareBlockForAnimation(block, blockOriginal) {
+  static _prepareBlockForAnimation(block, blockOriginal) {
     const blockRect = blockOriginal.getBoundingClientRect();
     const palette = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('palette');
     block.style.background = blockOriginal.style.background;
@@ -12222,7 +12323,7 @@ class TutorialUI {
     palette.style.overflow = 'visible';
     document.body.appendChild(block);
   }
-  static animateBlock(block, dx, dy, onFinish) {
+  static _animateBlock(block, dx, dy, onFinish) {
     const animation = block.animate([{
       transform: `translate(0px, 0px)`
     }, {
@@ -12235,7 +12336,7 @@ class TutorialUI {
     });
     animation.onfinish = () => setTimeout(onFinish, 400);
   }
-  static addPointingHandToBlock(block) {
+  static _addPointingHandToBlock(block) {
     const pointingHand = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.newHTML)('div', 'pointingHand', block);
     pointingHand.innerHTML = `<svg stroke="black" stroke-width="2" class="svg-icon" style="vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M653.944471 468.239059c0 4.517647 2.258824-12.468706 9.306353-23.672471a32.075294 32.075294 0 0 1 60.777411 20.48v72.643765c-1.204706 18.703059-3.794824 37.345882-7.68 55.687529a193.927529 193.927529 0 0 1-21.082353 44.152471 231.303529 231.303529 0 0 0-38.098823 58.247529 118.362353 118.362353 0 0 0-3.222588 31.984942c0 9.938824 1.325176 19.847529 3.855058 29.455058a179.892706 179.892706 0 0 1-39.363764 0c-12.468706-1.927529-28.16-26.895059-31.984941-34.575058a12.137412 12.137412 0 0 0-22.106353 0c-7.017412 12.167529-22.377412 34.243765-33.581177 35.538823-21.112471 2.56-65.596235 0-100.171294 0 0 0 5.752471-32.015059-7.348706-43.52-13.131294-11.535059-26.563765-24.997647-36.803765-33.942588l-26.563764-29.424941a143.420235 143.420235 0 0 1-39.664941-64c-6.716235-30.087529-6.083765-44.815059 0-56.621177 6.716235-9.848471 16.865882-16.835765 28.461176-19.546353 9.306353-1.626353 18.853647-0.963765 27.858824 1.92753 6.264471 2.620235 11.685647 6.927059 15.661176 12.468706 7.378824 9.938824 9.607529 14.727529 7.047529 3.855058a853.805176 853.805176 0 0 0-13.131294-49.603764c-5.421176-17.618824-10.842353-27.527529-15.028706-39.363765-4.156235-11.836235-9.607529-23.04-15.99247-37.767529a370.447059 370.447059 0 0 1-14.396235-46.08 45.748706 45.748706 0 0 1 7.981176-37.436236 44.784941 44.784941 0 0 1 43.52-11.203764c12.077176 5.240471 22.256941 14.064941 29.123765 25.298823 9.577412 15.480471 17.317647 32.015059 23.04 49.272471 10.541176 27.467294 18.070588 56.018824 22.407529 85.11247-0.783059-17.167059 0.602353-34.364235 4.156235-51.2a35.870118 35.870118 0 0 1 22.076236-22.076235c9.517176-3.041882 19.606588-3.704471 29.455059-1.927529 9.788235 2.168471 18.432 7.860706 24.304941 15.99247 7.348706 18.703059 11.565176 38.490353 12.498823 58.578824 0.903529-17.167059 3.915294-34.123294 8.944941-50.56753 5.360941-7.529412 13.161412-12.950588 22.076236-15.36a89.961412 89.961412 0 0 1 32.015059 0c8.643765 2.951529 16.233412 8.402824 21.744941 15.661177 6.776471 16.986353 10.872471 34.936471 12.167529 53.127529" fill="#FFFFFF" /></svg>`;
   }
@@ -12246,14 +12347,14 @@ class TutorialUI {
     const allBlocksInPalette = palette.children;
     let found = false;
     for (let i = 0; i < allBlocksInPalette.length; i++) {
-      allBlocksInPalette[i].style.opacity = '0.5';
+      allBlocksInPalette[i].style.opacity = '0.1';
       allBlocksInPalette[i].style.pointerEvents = 'none'; // Disable interaction
-      allBlocksInPalette[i].classList.remove('highlightedBlock'); // Remove glow effect
+      // allBlocksInPalette[i].classList.remove('highlightedBlock'); // Remove glow effect
 
       if (blockIDs.includes(allBlocksInPalette[i].id)) {
         allBlocksInPalette[i].style.opacity = '1';
         allBlocksInPalette[i].style.pointerEvents = 'auto'; // Enable interaction for the highlighted block
-        allBlocksInPalette[i].classList.add('highlightedBlock'); // Add glow effect
+        // allBlocksInPalette[i].classList.add('highlightedBlock'); // Add glow effect
         found = true;
       }
     }
@@ -12263,6 +12364,7 @@ class TutorialUI {
   }
   static unhighlightBlocks() {
     const palette = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('palette');
+    if (!palette) return;
     const allBlocksInPalette = palette.children;
     for (let i = 0; i < allBlocksInPalette.length; i++) {
       allBlocksInPalette[i].style.opacity = '1';
@@ -12270,7 +12372,7 @@ class TutorialUI {
     }
   }
 
-  /* Select Category */
+  /* Category */
   static selectCategory(categoryId) {
     const selectorsLeft = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('selectors');
     const selectorsRight = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('selectorsright');
@@ -12281,6 +12383,64 @@ class TutorialUI {
     const selectorIds = [...leftSelectorIds, ...rightSelectorIds];
     const selectedCategoryIdx = selectorIds.indexOf(categoryId);
     _Palette__WEBPACK_IMPORTED_MODULE_2__["default"].selectCategory(selectedCategoryIdx);
+  }
+
+  /* Highlight Element */
+  static highlightElement(elementID, colorRGBA, onClick) {
+    const element = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)(elementID);
+    element.classList.add('highlightedElement');
+    TutorialUI._setHighlightedElementColor(colorRGBA || 'rgba(255, 0, 0, 0.5)');
+
+    // store element's initial color
+    const elementInitialColor = element.style.backgroundColor;
+
+    // set element's background color to the highlighted color
+    // element.style.backgroundColor = colorRGBA || 'rgba(255, 0, 0, 0.5)';
+
+    // store selector's overflow value
+    const selectorRight = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('selectorsright');
+    const selector = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('selectors');
+    const selectorOverflow = selector.style.overflow;
+    const selectorRightOverflow = selectorRight.style.overflow;
+
+    // set selector's overflow value to visible
+    selector.style.overflow = 'visible';
+    selectorRight.style.overflow = 'visible';
+    const onHighlightedClick = () => {
+      onClick && onClick();
+      element.classList.remove('highlightedElement');
+
+      // when the element is clicked, remove the highlight
+      element.removeEventListener('click', onHighlightedClick);
+
+      // restore selector's overflow value
+      selector.style.overflow = selectorOverflow;
+      selectorRight.style.overflow = selectorRightOverflow;
+
+      // restore element's initial color
+      element.style.backgroundColor = elementInitialColor;
+    };
+    element.addEventListener('click', onHighlightedClick);
+
+    // store the unhighlight function for this element
+    TutorialUI._highlightedElements.push({
+      element,
+      unhighlight: onHighlightedClick
+    });
+  }
+  static unhighlightElements() {
+    TutorialUI._highlightedElements.forEach(({
+      element,
+      unhighlight
+    }) => {
+      element.removeEventListener('click', unhighlight);
+      element.classList.remove('highlightedElement');
+      element.style.backgroundColor = '';
+    });
+    TutorialUI._highlightedElements = [];
+  }
+  static _setHighlightedElementColor(colorRGBA) {
+    document.documentElement.style.setProperty('--highlightedElementColor', colorRGBA);
   }
 
   /*MartyMode*/
@@ -12332,10 +12492,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _html_svgs_cog__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../../html-svgs/cog */ "./src/html-svgs/cog.js");
 /* harmony import */ var _html_svgs_marty__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../../html-svgs/marty */ "./src/html-svgs/marty.js");
 /* harmony import */ var _utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../../utils/raft-subscription-helpers */ "./src/utils/raft-subscription-helpers.js");
-/* harmony import */ var _TutorialUI__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./TutorialUI */ "./src/editor/ui/TutorialUI.js");
+/* harmony import */ var _tutorial_TutorialFetcher__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ../../tutorial/TutorialFetcher */ "./src/tutorial/TutorialFetcher.js");
+/* harmony import */ var _tutorial_TutorialEngine__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ../../tutorial/TutorialEngine */ "./src/tutorial/TutorialEngine.js");
 //////////////////////////////////////
 //  General UI Layout
 /////////////////////////////////////
+
 
 
 
@@ -12380,7 +12542,19 @@ class UI {
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].setupKeypad();
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].setupEditableField();
     UI.aspectRatioAdjustment();
-    _TutorialUI__WEBPACK_IMPORTED_MODULE_22__["default"].setupUI(_utils_lib__WEBPACK_IMPORTED_MODULE_18__.frame);
+
+    /*Tutorial*/
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("tutorial")) {
+      // Load tutorial
+      const tutorial = _tutorial_TutorialFetcher__WEBPACK_IMPORTED_MODULE_22__["default"].fetchTutorial(urlParams.get("tutorial"));
+      if (tutorial) {
+        // For better UI, give a little time for the UI to load before starting the tutorial
+        setTimeout(() => {
+          window.tutorialEngine = new _tutorial_TutorialEngine__WEBPACK_IMPORTED_MODULE_23__["default"](tutorial);
+        }, 1000);
+      }
+    }
   }
 
   // Helps debug on Android 4.2 by enabling the user to type in a
@@ -12422,9 +12596,15 @@ class UI {
   }
 
   // Function to create a connect button with an icon and title (for cog and marty buttons)
-  static createConnectButton(parent, iconName, buttonText, onClick) {
+  static createConnectButton(parent, iconName, buttonText, buttonId, onClick) {
     // Create button container
     const connectButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'connectButton', parent);
+
+    // Set button ID
+    connectButton.setAttribute('id', buttonId);
+
+    // Set position to relative
+    connectButton.style.position = 'relative';
 
     // Create icon container (icon on the left)
     const iconDiv = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'connectIcon', connectButton);
@@ -12443,52 +12623,52 @@ class UI {
   static createConnectionButtons(leftPanel) {
     const connectionButtonsArea = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'connectionButtonsArea', leftPanel);
 
-    /* COG */
-    const cogButotn = UI.createConnectButton(connectionButtonsArea, _html_svgs_cog__WEBPACK_IMPORTED_MODULE_19__.cogSvg, 'Cog', connectButton => {
-      window.applicationManager.connectGenericCog(raft => {
-        // set subscription to raft events so we can update the UI when:
-        // - the raft is connected
-        // - the raft is disconnected
-        (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__.raftVerifiedSubscriptionHelper)(raft).subscribe(() => {
-          UI.setupCogConnectionButton(connectButton, raft);
-          // turn off the verified subscription to avoid memory leaks
-          (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__.raftVerifiedSubscriptionHelper)(raft).unsubscribe();
-        });
-      });
-    });
+    // /* COG */
+    // const cogButotn = UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', 'cogConnectionButton', (connectButton) => {
+    //     window.applicationManager.connectGenericCog((raft) => {
+    //         // set subscription to raft events so we can update the UI when:
+    //         // - the raft is connected
+    //         // - the raft is disconnected
+    //         raftVerifiedSubscriptionHelper(raft).subscribe(() => {
+    //             UI.setupCogConnectionButton(connectButton, raft);
+    //             // turn off the verified subscription to avoid memory leaks
+    //             raftVerifiedSubscriptionHelper(raft).unsubscribe();
+    //         })
+    //     })
+    // });
 
-    // check if we're alredy connected to a cog, and if so, update the UI button
-    const connectedCog = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Cog');
-    if (connectedCog) {
-      UI.setupCogConnectionButton(cogButotn, connectedCog);
-    }
-    /* END COG */
-    /* MARTY */
-    UI.createConnectButton(connectionButtonsArea, _html_svgs_marty__WEBPACK_IMPORTED_MODULE_20__.martySvg, 'Marty', connectButton => {
-      window.applicationManager.connectGenericMarty(raft => {
-        // set subscription to raft events so we can update the UI when:
-        // - the raft is connected
-        // - the raft is disconnected
-        (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__.raftVerifiedSubscriptionHelper)(raft).subscribe(() => {
-          UI.setupMartyConnectionButton(connectButton, raft);
-          // turn off the verified subscription to avoid memory leaks
-          (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_21__.raftVerifiedSubscriptionHelper)(raft).unsubscribe();
-        });
+    // // check if we're alredy connected to a cog, and if so, update the UI button
+    // const connectedCog = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Cog');
+    // if (connectedCog) {
+    //     UI.setupCogConnectionButton(cogButotn, connectedCog);
+    // }
+    // /* END COG */
+    // /* MARTY */
+    // UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty', 'martyConnectionButton', (connectButton) => {
+    //     window.applicationManager.connectGenericMarty((raft) => {
+    //         // set subscription to raft events so we can update the UI when:
+    //         // - the raft is connected
+    //         // - the raft is disconnected
+    //         raftVerifiedSubscriptionHelper(raft).subscribe(() => {
+    //             UI.setupMartyConnectionButton(connectButton, raft);
+    //             // turn off the verified subscription to avoid memory leaks
+    //             raftVerifiedSubscriptionHelper(raft).unsubscribe();
+    //         });
 
-        // Activate Marty Mode if not already activated
-        /*MartyMode*/
-        if (!_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled) {
-          UI.toggleMartyMode();
-        }
-      });
-    });
+    //         // Activate Marty Mode if not already activated
+    //         /*MartyMode*/
+    //         // if (!ScratchJr.isMartyModeEnabled) {
+    //         //     UI.toggleMartyMode();
+    //         // }
+    //     })
+    // });
 
-    // check if we're alredy connected to a marty, and if so, update the UI button
-    const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
-    if (connectedMarty) {
-      UI.setupMartyConnectionButton(cogButotn, connectedMarty);
-    }
-    /* END MARTY */
+    // // check if we're alredy connected to a marty, and if so, update the UI button
+    // const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
+    // if (connectedMarty) {
+    //     UI.setupMartyConnectionButton(cogButotn, connectedMarty);
+    // }
+    // /* END MARTY */
   }
   static setupCogConnectionButton(button, raft) {
     // Add the connected class to the button
@@ -14058,7 +14238,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function editorMain() {
+async function editorMain() {
   _tablet_OS__WEBPACK_IMPORTED_MODULE_1__["default"].martyCmd({
     cmd: "hide-back-arrow"
   });
@@ -14152,6 +14332,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function homeMain() {
+  const urlParams = new URLSearchParams(window.location.search);
+  /*Tutorial*/
+  if (urlParams.get("tutorial")) {
+    (0,_utils_goToLink__WEBPACK_IMPORTED_MODULE_4__["default"])("editor.html?pmd5=" + -1 + "&mode=edit&tutorial=" + urlParams.get("tutorial"));
+  }
   _tablet_OS__WEBPACK_IMPORTED_MODULE_2__["default"].martyCmd({
     cmd: "show-back-arrow"
   });
@@ -27226,6 +27411,509 @@ window.iOS = iOS;
 
 /***/ }),
 
+/***/ "./src/tutorial/TutorialEngine.js":
+/*!****************************************!*\
+  !*** ./src/tutorial/TutorialEngine.js ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ TutorialEngine)
+/* harmony export */ });
+/* harmony import */ var _editor_ScratchJr__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../editor/ScratchJr */ "./src/editor/ScratchJr.js");
+/* harmony import */ var _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../editor/ui/TutorialUI */ "./src/editor/ui/TutorialUI.js");
+/* harmony import */ var _utils_lib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/lib */ "./src/utils/lib.js");
+
+
+
+class TutorialEngine {
+  constructor(tutorial) {
+    this.tutorial = tutorial;
+    this.currentStep = 0;
+    this._setUpUI();
+    this.updateUI(this.tutorial.tutorialSteps[this.currentStep]);
+  }
+  _setUpUI() {
+    _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].setupUI(this.tutorial);
+  }
+  progressStep() {
+    this.currentStep++;
+    console.log("Current step: ", this.currentStep);
+    this.updateUI(this.tutorial.tutorialSteps[this.currentStep]);
+  }
+  previousStep() {
+    this.currentStep--;
+    console.log("Current step: ", this.currentStep);
+    this.updateUI(this.tutorial.tutorialSteps[this.currentStep]);
+  }
+  updateUI(step) {
+    _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].clearUIBeforeStep();
+    _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].updateProgressBar(this.currentStep, this.tutorial.tutorialSteps.length - 1);
+    /* First, decide which buttons to show */
+    this._handleButtons(step.buttons, step);
+
+    /* Do the instruction actions */
+    this._handleActions(step.instructionActions);
+
+    /* Do the nextStepAction actions */
+    this._handleActions(step.nextStepActions);
+  }
+  _handleButtons(buttons, step) {
+    buttons.forEach(button => {
+      switch (button) {
+        case "next":
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].showNextButton(this.progressStep.bind(this));
+          break;
+        case "previous":
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].showPreviousButton(this.previousStep.bind(this));
+          break;
+        case "hint":
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].showHintButton(() => this._handleActions(step.hintActions));
+          break;
+        default:
+          break;
+      }
+    });
+  }
+  _handleActions(actions) {
+    actions.forEach(action => {
+      switch (action.type) {
+        case "ShowInstructorText":
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].showSpeechBubbleWithText(action.text);
+          break;
+        case "ShowCategory":
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].selectCategory(action.category);
+          break;
+        case "HighlightBlocks":
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].highlightBlocks(action.blocks);
+          break;
+        case "DragBlockToScriptArea":
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].blockToScriptsAnimation(action.block);
+          break;
+        case "HighlightElement":
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].highlightElement(action.elementId, (0,_utils_lib__WEBPACK_IMPORTED_MODULE_2__.colorToRGBA)(action.hexColor, .5), this._onHighlightedElementClickActionDecider(action.onClickAction, action.args));
+          break;
+        case "ShowMartyMode":
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].showMartyMode();
+          break;
+        default:
+          break;
+      }
+    });
+  }
+  _onHighlightedElementClickActionDecider(onClickAction, args) {
+    switch (onClickAction) {
+      case "NextStep":
+        return this.progressStep.bind(this);
+      default:
+        break;
+    }
+  }
+  evaluateScriptsArea() {
+    if (this.tutorial.tutorialSteps[this.currentStep].expectedCode && this.tutorial.tutorialSteps[this.currentStep].expectedCode.length > 0) {
+      for (const expectedCodeCondition of this.tutorial.tutorialSteps[this.currentStep].expectedCode) {
+        if (!this._evaluateExpectedCode(expectedCodeCondition)) {
+          return false;
+        }
+      }
+      // if we reach here, all expected code conditions are met
+      // highlight the next step button
+      _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].highlightElement("nextStep", (0,_utils_lib__WEBPACK_IMPORTED_MODULE_2__.colorToRGBA)("#FF0000", .5));
+    }
+  }
+  _evaluateExpectedCode(expectedCodeCondition) {
+    // expectedCodeCondition eg: ["block1=>block2"] meaning block1 should be followed by block2 (next block)
+    // actual blocks: {blocktype: "block1", next?: {blocktype: "block2", next?: {blocktype: "block3", next?: null}}}
+    const actualBlocks = _editor_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getBlocks();
+    let actualBlocksCompiledCondition = "";
+    let actualBlock = actualBlocks[0];
+    while (actualBlock) {
+      actualBlocksCompiledCondition += `${actualBlock.blocktype}`;
+      if (actualBlock.next) {
+        actualBlocksCompiledCondition += "=>";
+      }
+      actualBlock = actualBlock.next;
+    }
+    return actualBlocksCompiledCondition === expectedCodeCondition;
+  }
+}
+
+/***/ }),
+
+/***/ "./src/tutorial/TutorialFetcher.js":
+/*!*****************************************!*\
+  !*** ./src/tutorial/TutorialFetcher.js ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ TutorialFetcher)
+/* harmony export */ });
+/* harmony import */ var _tutorials_data_cog_and_marty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tutorials-data/cog-and-marty */ "./src/tutorial/tutorials-data/cog-and-marty.js");
+
+const allTutorials = [_tutorials_data_cog_and_marty__WEBPACK_IMPORTED_MODULE_0__["default"]];
+class TutorialFetcher {
+  static fetchTutorial(tutorialId) {
+    return allTutorials.find(tutorial => tutorial.id === tutorialId);
+  }
+}
+
+/***/ }),
+
+/***/ "./src/tutorial/tutorials-data/cog-and-marty.js":
+/*!******************************************************!*\
+  !*** ./src/tutorial/tutorials-data/cog-and-marty.js ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/**
+    * categories: 
+        * sprite: sprite-start sprite-motion sprite-looks sprite-sound sprite-flow sprite-stop
+        * marty: marty-start marty-motion marty-looks marty-sound marty-flow marty-stop
+        * cog: cog-start cog-looks cog-sound
+    * blocks: 
+        * onflag_block
+        * onmessage_block
+        * onclick_block
+        * ontouch_block
+        * message_block
+        * repeat_block
+        * forward_block
+        * back_block
+        * up_block
+        * down_block
+        * right_block
+        * left_block
+        * home_block
+        * hop_block
+        * wait_block
+        * setspeed_block
+        * stopmine_block
+        * startstopcounter_block
+        * increasecounter_block
+        * decreasecounter_block
+        * say_block
+        * show_block
+        * hide_block
+        * grow_block
+        * shrink_block
+        * same_block
+        * playsnd_block
+        * playusersnd_block
+        * endstack_block
+        * forever_block
+        * gotopage_block
+        * caretstart_block
+        * caretend_block
+        * caretrepeat_block
+        * caretcmd_block
+        * tiltany_block
+        * ontouchcog_block
+        * onmove_block
+        * onobjectsensed_block
+        * onlight_block
+        * onrotate_block
+        * setpattern_block
+        * clearcolours_block
+        * selectcolour_block
+        * confusion_block
+        * disbelief_block
+        * excitement_block
+        * noway_block
+        * no_block
+        * whistle_block
+        * playnote_block
+        * martyGetReady_block
+        * martyDance_block
+        * martyStepForward_block
+        * martyStepBackward_block
+        * martyStepLeft_block
+        * martyStepRight_block
+        * martyTurnRight_block
+        * martyTurnLeft_block
+        * martyKickRight_block
+        * martyKickLeft_block
+        * martyEyesExcited_block
+        * martyEyesWide_block
+        * martyEyesAngry_block
+        * martyEyesNormal_block
+        * martyEyesWiggle_block
+        * martyWaveLeft_block
+        * martyWaveRight_block
+        * martyCelebrate_block
+        * martyLedEyesP1_block
+        * martyLedEyesP2_block
+        * martyLedEyesColour_block
+        * martyConfusion_block
+        * martyDisbelief_block
+        * martyExcitement_block
+        * martyNoway_block
+        * martyNo_block
+        * martyWhistle_block
+    * actions
+        * ShowCategory
+        * HighlightBlocks
+        * HighlightElement
+        * DragBlockToScriptArea
+        * ShowMartyMode
+    * onclick actions
+        * NextStep 
+ */
+
+const cogAndMartyTutorial = {
+  id: "cog-and-marty-tutorial",
+  platform: "blocks",
+  title: "Cog and Marty Interaction",
+  description: "Learn how Cog and Marty can interact with each other",
+  tutorialSteps: [/* STEP 1 -- intro*/
+  {
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "nextStep",
+      hexColor: "#FF0000"
+    }],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "In this tutorial we will learn how Cog and Marty can interact with each other. Press 'Next' to start!"
+    }],
+    buttons: ["next"],
+    expectedCode: [],
+    presenter: "marty"
+  }, /* STEP 1.1 --connect to Cog */
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "First, let's connect to Cog. Click on the Cog button to connect to Cog"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cogConnectionButton",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  }, /* STEP 1.2 --connect to Marty */
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Then, let's connect to Marty. Click on the Marty button to connect to Marty"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "martyConnectionButton",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  }, /* STEP 2 -- go to cog event blocks */
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Great, let's do some coding! The Cog blocks are on the right side of the screen. Click on the Start block category to see the Cog blocks"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-start",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    presenter: "marty"
+  }, /* STEP 3 -- add ontouchcog block */
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Once you have selected the Start block category, drag the 'on click cog' block to the script area. Make sure to press Next when you are done"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouchcog_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouchcog_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "ontouchcog_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog"],
+    presenter: "marty"
+  }, /* STEP 4 -- go to sprite event blocks */
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Great! Now let's move to the Sprite blocks, which are on the left side of the screen."
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "sprite-start",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  }, /* STEP 5 -- add message block after the ontouchcog block */
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Now drag the 'message' block from the Sprite Start category to the script area. This block will send a message to Marty when the sprite is clicked"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["message_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["message_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "message_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>message"],
+    presenter: "marty"
+  }, /* STEP 6 -- go to marty mode */
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Now let's move to Marty. We need to enable Marty Mode to see the Marty blocks. Click on the Marty Mode button."
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "martyMode",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  }, /* STEP 7 -- add onmessage block */
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Once in Marty Mode, drag the 'on message' block from the Marty Start category to the script area. This block will listen for the message sent by Cog"
+    }],
+    nextStepActions: [{
+      type: "ShowMartyMode"
+    }, {
+      type: "ShowCategory",
+      category: "marty-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onmessage_block"]
+    }],
+    hintActions: [{
+      type: "ShowMartyMode"
+    }, {
+      type: "ShowCategory",
+      category: "marty-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onmessage_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "onmessage_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["onmessage"],
+    presenter: "marty"
+  }, /* STEP 8 -- go to marty motion blocks */
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Now, let's select Marty's motion blocks. Click on the Motion category of Marty blocks"
+    }],
+    nextStepActions: [{
+      type: "ShowMartyMode"
+    }, {
+      type: "HighlightElement",
+      elementId: "marty-motion",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  }, /* STEP 9 -- add marty dance block */
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "We're almost there! Drag the 'marty dance' block to the script area. This block will make Marty dance when the message is received"
+    }],
+    nextStepActions: [{
+      type: "ShowMartyMode"
+    }, {
+      type: "ShowCategory",
+      category: "marty-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["martyDance_block"]
+    }],
+    hintActions: [{
+      type: "ShowMartyMode"
+    }, {
+      type: "ShowCategory",
+      category: "marty-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["martyDance_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "martyDance_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["onmessage=>martyDance"],
+    presenter: "marty"
+  }, /* STEP 10 -- end */
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Great job! You have successfully coded Cog and Marty to interact with each other. No click Cog's button to see Marty dance!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous"],
+    expectedCode: [],
+    presenter: "marty"
+  }]
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (cogAndMartyTutorial);
+
+/***/ }),
+
 /***/ "./src/utils/Cookie.js":
 /*!*****************************!*\
   !*** ./src/utils/Cookie.js ***!
@@ -30010,6 +30698,7 @@ function findKeyframesRule(rule) {
   return null;
 }
 function colorToRGBA(color, opacity) {
+  if (!color) return "";
   var val = parseInt("0x" + color.substr(1, color.length));
   return "rgba(" + (val >> 16) % 256 + "," + (val >> 8) % 256 + "," + val % 256 + "," + opacity + ")";
 }

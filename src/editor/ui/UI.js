@@ -28,7 +28,8 @@ import {
 import { cogSvg } from '../../html-svgs/cog';
 import { martySvg } from '../../html-svgs/marty';
 import { raftDisconnectedSubscriptionHelper, raftVerifiedSubscriptionHelper } from '../../utils/raft-subscription-helpers';
-import TutorialUI from './TutorialUI';
+import TutorialFetcher from '../../tutorial/TutorialFetcher';
+import TutorialEngine from '../../tutorial/TutorialEngine';
 
 let projectNameTextInput = null;
 let info = null;
@@ -53,7 +54,19 @@ export default class UI {
         ScratchJr.setupKeypad();
         ScratchJr.setupEditableField();
         UI.aspectRatioAdjustment();
-        TutorialUI.setupUI(frame);
+
+        /*Tutorial*/
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("tutorial")) {
+            // Load tutorial
+            const tutorial = TutorialFetcher.fetchTutorial(urlParams.get("tutorial"));
+            if (tutorial) {
+                // For better UI, give a little time for the UI to load before starting the tutorial
+                setTimeout(() => {
+                    window.tutorialEngine = new TutorialEngine(tutorial);
+                }, 1000);
+            }
+        }
     }
 
     // Helps debug on Android 4.2 by enabling the user to type in a
@@ -96,9 +109,15 @@ export default class UI {
     }
 
     // Function to create a connect button with an icon and title (for cog and marty buttons)
-    static createConnectButton(parent, iconName, buttonText, onClick) {
+    static createConnectButton(parent, iconName, buttonText, buttonId, onClick) {
         // Create button container
         const connectButton = newHTML('div', 'connectButton', parent);
+
+        // Set button ID
+        connectButton.setAttribute('id', buttonId);
+
+        // Set position to relative
+        connectButton.style.position = 'relative';
 
         // Create icon container (icon on the left)
         const iconDiv = newHTML('div', 'connectIcon', connectButton);
@@ -120,7 +139,7 @@ export default class UI {
         const connectionButtonsArea = newHTML('div', 'connectionButtonsArea', leftPanel);
 
         /* COG */
-        const cogButotn = UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', (connectButton) => {
+        const cogButotn = UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', 'cogConnectionButton', (connectButton) => {
             window.applicationManager.connectGenericCog((raft) => {
                 // set subscription to raft events so we can update the UI when:
                 // - the raft is connected
@@ -141,7 +160,7 @@ export default class UI {
         }
         /* END COG */
         /* MARTY */
-        UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty', (connectButton) => {
+        UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty', 'martyConnectionButton', (connectButton) => {
             window.applicationManager.connectGenericMarty((raft) => {
                 // set subscription to raft events so we can update the UI when:
                 // - the raft is connected
@@ -154,9 +173,9 @@ export default class UI {
 
                 // Activate Marty Mode if not already activated
                 /*MartyMode*/
-                if (!ScratchJr.isMartyModeEnabled) {
-                    UI.toggleMartyMode();
-                }
+                // if (!ScratchJr.isMartyModeEnabled) {
+                //     UI.toggleMartyMode();
+                // }
             })
         });
 

@@ -210,6 +210,11 @@ export default class ScriptsPane {
             scroll.adjustCanvas();
             scroll.refresh();
             scroll.fitToScreen();
+            /*Tutorial*/
+            if (window.tutorialEngine) {
+                // evaluate the scripts area
+                window.tutorialEngine.evaluateScriptsArea();
+            }
             break;
         }
         Undo.record({
