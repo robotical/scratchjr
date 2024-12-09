@@ -62,37 +62,57 @@ div.frame {
 }
 
 .martyMode {
+    box-sizing: border-box;
     position: absolute;
-    bottom: ${css_vh(8)};
-    left: ${css_vh(5)};
-    width: ${css_vh(16)};
+    top: ${css_vh(1)};
+    left: ${css_vh(0)};
+    width: ${css_vh(20)};
     height: ${css_vh(10)};
     cursor: pointer;
+    background-color: #FFFFFF;
+
+    border: 4px solid #F4AD46;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    column-gap: ${css_vh(1)};
+    padding: 3px;
+}
+
+.martyModeToggle {
+    width: 30%;
+    display: flex;
+    align-items: center;
+    
 }
 
 .martyModeIcon {
-    width: 100%;
-    height: 100%;
-    background-size: contain;
-    background-repeat: no-repeat;
+    width: 40%;
+}
+
+.spriteModeIcon {
+    width: 40%;
 }
 
 /* Pages Thumbnails */
 
 .pages {
-    top: ${css_vh(0)};
+    top: ${css_vh(10)};
     position: absolute;
     display: inline-block;
     margin: ${css_vh(0)} ${css_vh(1.29)} ${css_vh(0)};
     width:  ${css_vh(21.09)};
-    height: 100%;
+    height: 60%;
 }
 
 .pagescc{
+    overflow: auto;
     position: absolute;
     top: ${css_vh(2.60)};
     width:  ${css_vh(21.09)};
-    height: ${css_vh(57.29)};
+    height: ${css_vh(37.29)};
 }
 
 .pagethumb {

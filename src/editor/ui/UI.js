@@ -26,7 +26,14 @@ import {
     setProps, globalx
 } from '../../utils/lib';
 import { cogSvg } from '../../html-svgs/cog';
+import { spriteSvg } from '../../html-svgs/sprite';
 import { martySvg } from '../../html-svgs/marty';
+import { spriteDeselectedSvg } from "../../html-svgs/sprite-deselected";
+import { martyDeselectedSvg } from "../../html-svgs/marty-deselected";
+import { martyToggleOn } from "../../html-svgs/marty_toggle_on";
+import { spriteToggleOn } from "../../html-svgs/sprite_toggle_on";
+import { batterySvg } from '../../html-svgs/battery-svg';
+import { signalSvg } from '../../html-svgs/signal-svg';
 import { raftDisconnectedSubscriptionHelper, raftVerifiedSubscriptionHelper } from '../../utils/raft-subscription-helpers';
 import TutorialFetcher from '../../tutorial/TutorialFetcher';
 import TutorialEngine from '../../tutorial/TutorialEngine';
@@ -38,6 +45,10 @@ let infoBoxOpen = false;
 
 const EMAILSHARE = 0;
 const AIRDROPSHARE = 1;
+
+
+let cogSignalAndBatteryInterval = null;
+let martySignalAndBatteryInterval = null;
 
 export default class UI {
     static get infoBoxOpen() {
@@ -123,9 +134,18 @@ export default class UI {
         const iconDiv = newHTML('div', 'connectIcon', connectButton);
         iconDiv.innerHTML = iconName; // Add the icon (could be an <i> tag or an SVG)
 
-        // Create text container (title on the right)
-        const connectText = newHTML('div', 'connectText', connectButton);
-        connectText.innerHTML = buttonText; // Add the button title
+        // Add battery and signal strength indicators
+        const batteryAndSignalContainer = newHTML('div', 'batteryAndSignalContainer', connectButton);
+
+        const signalIndicator = newHTML('div', 'signalIndicatorContainer', batteryAndSignalContainer);
+        const batteryIndicator = newHTML('div', 'batteryIndicatorContainer', batteryAndSignalContainer);
+        batteryIndicator.innerHTML = batterySvg(0);
+        signalIndicator.innerHTML = signalSvg(0);
+        batteryIndicator.style.display = 'none';
+        signalIndicator.style.display = 'none';
+
+        // Create button container 
+        const iconButtonContainer = newHTML('div', 'iconButtonContainer notConnectedButtonContainer', connectButton);
 
         // Action to perform when the button is clicked
         connectButton.onclick = () => {
@@ -138,6 +158,7 @@ export default class UI {
     static createConnectionButtons(leftPanel) {
         const connectionButtonsArea = newHTML('div', 'connectionButtonsArea', leftPanel);
 
+
         /* COG */
         const cogButotn = UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', 'cogConnectionButton', (connectButton) => {
             window.applicationManager.connectGenericCog((raft) => {
@@ -149,6 +170,24 @@ export default class UI {
                     // turn off the verified subscription to avoid memory leaks
                     raftVerifiedSubscriptionHelper(raft).unsubscribe();
                 })
+
+                // change the class of the button to disconnect
+                const connectButtonContainer = connectButton.querySelector('.iconButtonContainer');
+                connectButtonContainer.classList.remove('notConnectedButtonContainer');
+                connectButtonContainer.classList.add('connectedButtonContainer');
+
+                cogSignalAndBatteryInterval = setInterval(() => {
+                    if (!raft) {
+                        return;
+                    }
+                    // Update the battery and signal indicators
+                    const batteryIndicator = connectButton.querySelector('.batteryIndicatorContainer');
+                    const signalIndicator = connectButton.querySelector('.signalIndicatorContainer');
+                    batteryIndicator.style.display = 'block';
+                    signalIndicator.style.display = 'block';
+                    batteryIndicator.innerHTML = batterySvg(raft.getBatteryStrength());
+                    signalIndicator.innerHTML = signalSvg(raft.getRSSI());
+                }, 300);
             })
         });
 
@@ -170,6 +209,24 @@ export default class UI {
                     // turn off the verified subscription to avoid memory leaks
                     raftVerifiedSubscriptionHelper(raft).unsubscribe();
                 });
+
+                // change the class of the button to disconnect
+                const iconButtonContainer = connectButton.querySelector('.iconButtonContainer');
+                iconButtonContainer.classList.remove('notConnectedButtonContainer');
+                iconButtonContainer.classList.add('connectedButtonContainer');
+
+                martySignalAndBatteryInterval = setInterval(() => {
+                    if (!raft) {
+                        return;
+                    }
+                    // Update the battery and signal indicators
+                    const batteryIndicator = connectButton.querySelector('.batteryIndicatorContainer');
+                    const signalIndicator = connectButton.querySelector('.signalIndicatorContainer');
+                    batteryIndicator.style.display = 'block';
+                    signalIndicator.style.display = 'block';
+                    batteryIndicator.innerHTML = batterySvg(raft.getBatteryStrength());
+                    signalIndicator.innerHTML = signalSvg(raft.getRSSI());
+                }, 300);
 
                 // Activate Marty Mode if not already activated
                 /*MartyMode*/
@@ -209,6 +266,22 @@ export default class UI {
             button.classList.remove('connectButtonConnected');
             window.cogManager.removeCog(raft);
 
+            // clear the interval to avoid memory leaks
+            clearInterval(cogSignalAndBatteryInterval);
+
+            setTimeout(() => {
+                // change the button back to the default state
+                const iconButtonContainer = button.querySelector('.iconButtonContainer');
+                iconButtonContainer.classList.remove('connectedButtonContainer');
+                iconButtonContainer.classList.add('notConnectedButtonContainer');
+
+                // hide the battery and signal indicators
+                const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
+                const signalIndicator = button.querySelector('.signalIndicatorContainer');
+                batteryIndicator.style.display = 'none';
+                signalIndicator.style.display = 'none';
+            }, 500);
+
             // Unsubscribe from the disconnected event to avoid memory leaks
             raftDisconnectedSubscriptionHelper(raft).unsubscribe();
 
@@ -238,6 +311,21 @@ export default class UI {
             // When raft is disconnected, update the UI and remove the raft
             button.classList.remove('connectButtonConnected');
             window.martyManager.removeMarty(raft);
+
+            // clear the interval to avoid memory leaks
+            clearInterval(martySignalAndBatteryInterval);
+            setTimeout(() => {
+                // change the button back to the default state
+                const iconButtonContainer = button.querySelector('.iconButtonContainer');
+                iconButtonContainer.classList.remove('connectedButtonContainer');
+                iconButtonContainer.classList.add('notConnectedButtonContainer');
+
+                // hide the battery and signal indicators
+                const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
+                const signalIndicator = button.querySelector('.signalIndicatorContainer');
+                batteryIndicator.style.display = 'none';
+                signalIndicator.style.display = 'none';
+            }, 500);
 
             // Unsubscribe from the disconnected event to avoid memory leaks
             raftDisconnectedSubscriptionHelper(raft).unsubscribe();
@@ -1094,20 +1182,35 @@ export default class UI {
         mm.setAttribute('id', 'martyMode');
         mm.onclick = UI.toggleMartyMode;
 
-        // Add SVG asset
-        var svgDiv = newHTML('div', 'martyModeIcon', mm);
-        svgDiv.innerHTML = '<img src="./assets/ui/martyModeDisabled.svg" alt="Marty Mode Disabled">';
+        // Add SVG assets
+
+        // sprite icon
+        var spriteSvgDiv = newHTML('div', 'spriteModeIcon', mm);
+        spriteSvgDiv.innerHTML = spriteSvg;
+
+        // toggle icon
+        var toggleDiv = newHTML('div', 'martyModeToggle spriteToggleOn', mm);
+        toggleDiv.innerHTML = spriteToggleOn;
+
+        // Marty icon
+        var martySvgDiv = newHTML('div', 'martyModeIcon', mm);
+        martySvgDiv.innerHTML = martyDeselectedSvg;
     }
     /*MartyMode*/
-    static renderCorrectMartyModeIcon(isMartyModeEnabled) {
-        // Toggle the SVG asset
-        var martyModeIcon = gn('martyMode').querySelector('.martyModeIcon img');
+    static renderCorrectMartyModeIcon() {
+        var toggleDiv = gn('martyMode').getElementsByClassName('martyModeToggle')[0];
+        var spriteIcon = gn('martyMode').getElementsByClassName('spriteModeIcon')[0];
+        var martyIcon = gn('martyMode').getElementsByClassName('martyModeIcon')[0];
+
         if (ScratchJr.isMartyModeEnabled) {
-            martyModeIcon.src = './assets/ui/martyModeEnabled.svg';
-            martyModeIcon.alt = 'Marty Mode Enabled';
+            spriteIcon.innerHTML = spriteDeselectedSvg;
+            martyIcon.innerHTML = martySvg;
+            toggleDiv.innerHTML = martyToggleOn;
+
         } else {
-            martyModeIcon.src = './assets/ui/martyModeDisabled.svg';
-            martyModeIcon.alt = 'Marty Mode Disabled';
+            spriteIcon.innerHTML = spriteSvg;
+            martyIcon.innerHTML = martyDeselectedSvg;
+            toggleDiv.innerHTML = spriteToggleOn;
         }
     }
 
