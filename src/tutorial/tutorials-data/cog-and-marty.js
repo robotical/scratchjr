@@ -115,7 +115,7 @@ const cogAndMartyTutorial = {
                     text: "In this tutorial we will learn how Cog and Marty can interact with each other. Press 'Next' to start!"
                 }
             ],
-            buttons: ["next"],
+            buttons: ["readAloud", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -136,7 +136,7 @@ const cogAndMartyTutorial = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["previous", "readAloud", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -157,7 +157,7 @@ const cogAndMartyTutorial = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["previous", "readAloud", "readAloud", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -178,7 +178,7 @@ const cogAndMartyTutorial = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["previous", "readAloud", "next"],
             presenter: "marty"
         },
         /* STEP 3 -- add ontouchcog block */
@@ -213,7 +213,7 @@ const cogAndMartyTutorial = {
                     block: "ontouchcog_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["previous", "readAloud", "next", "hint"],
             expectedCode: ["ontouchcog"],
             presenter: "marty"
         },
@@ -234,7 +234,7 @@ const cogAndMartyTutorial = {
                 },
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["previous", "readAloud", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -270,7 +270,7 @@ const cogAndMartyTutorial = {
                     block: "message_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["previous", "readAloud", "next", "hint"],
             expectedCode: ["ontouchcog=>message"],
             presenter: "marty"
         },
@@ -292,7 +292,7 @@ const cogAndMartyTutorial = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["previous", "readAloud", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -334,7 +334,7 @@ const cogAndMartyTutorial = {
                     block: "onmessage_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["previous", "readAloud", "next", "hint"],
             expectedCode: ["onmessage"],
             presenter: "marty"
         },
@@ -360,7 +360,7 @@ const cogAndMartyTutorial = {
             hintActions: [
 
             ],
-            buttons: ["previous", "next"],
+            buttons: ["previous", "readAloud", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -402,7 +402,7 @@ const cogAndMartyTutorial = {
                     block: "martyDance_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["previous", "readAloud", "next", "hint"],
             expectedCode: ["onmessage=>martyDance"],
             presenter: "marty"
         },
@@ -416,7 +416,7 @@ const cogAndMartyTutorial = {
             ],
             nextStepActions: [],
             hintActions: [],
-            buttons: ["previous"],
+            buttons: ["previous", "readAloud",],
             expectedCode: [],
             presenter: "marty"
         }

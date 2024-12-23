@@ -37,6 +37,7 @@ import { signalSvg } from '../../html-svgs/signal-svg';
 import { raftDisconnectedSubscriptionHelper, raftVerifiedSubscriptionHelper } from '../../utils/raft-subscription-helpers';
 import TutorialFetcher from '../../tutorial/TutorialFetcher';
 import TutorialEngine from '../../tutorial/TutorialEngine';
+import { truncateString } from "../../utils/truncate-string";
 
 let projectNameTextInput = null;
 let info = null;
@@ -144,6 +145,11 @@ export default class UI {
         batteryIndicator.style.display = 'none';
         signalIndicator.style.display = 'none';
 
+        // create raft name field
+        const raftName = newHTML('div', 'raftNameConnectButton', connectButton);
+        raftName.style.display = 'none';
+
+
         // Create button container 
         const iconButtonContainer = newHTML('div', 'iconButtonContainer notConnectedButtonContainer', connectButton);
 
@@ -158,7 +164,6 @@ export default class UI {
     static createConnectionButtons(leftPanel) {
         const connectionButtonsArea = newHTML('div', 'connectionButtonsArea', leftPanel);
 
-
         /* COG */
         const cogButotn = UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', 'cogConnectionButton', (connectButton) => {
             window.applicationManager.connectGenericCog((raft) => {
@@ -170,24 +175,6 @@ export default class UI {
                     // turn off the verified subscription to avoid memory leaks
                     raftVerifiedSubscriptionHelper(raft).unsubscribe();
                 })
-
-                // change the class of the button to disconnect
-                const connectButtonContainer = connectButton.querySelector('.iconButtonContainer');
-                connectButtonContainer.classList.remove('notConnectedButtonContainer');
-                connectButtonContainer.classList.add('connectedButtonContainer');
-
-                cogSignalAndBatteryInterval = setInterval(() => {
-                    if (!raft) {
-                        return;
-                    }
-                    // Update the battery and signal indicators
-                    const batteryIndicator = connectButton.querySelector('.batteryIndicatorContainer');
-                    const signalIndicator = connectButton.querySelector('.signalIndicatorContainer');
-                    batteryIndicator.style.display = 'block';
-                    signalIndicator.style.display = 'block';
-                    batteryIndicator.innerHTML = batterySvg(raft.getBatteryStrength());
-                    signalIndicator.innerHTML = signalSvg(raft.getRSSI());
-                }, 300);
             })
         });
 
@@ -199,7 +186,7 @@ export default class UI {
         }
         /* END COG */
         /* MARTY */
-        UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty', 'martyConnectionButton', (connectButton) => {
+        const martyButton = UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty', 'martyConnectionButton', (connectButton) => {
             window.applicationManager.connectGenericMarty((raft) => {
                 // set subscription to raft events so we can update the UI when:
                 // - the raft is connected
@@ -209,37 +196,13 @@ export default class UI {
                     // turn off the verified subscription to avoid memory leaks
                     raftVerifiedSubscriptionHelper(raft).unsubscribe();
                 });
-
-                // change the class of the button to disconnect
-                const iconButtonContainer = connectButton.querySelector('.iconButtonContainer');
-                iconButtonContainer.classList.remove('notConnectedButtonContainer');
-                iconButtonContainer.classList.add('connectedButtonContainer');
-
-                martySignalAndBatteryInterval = setInterval(() => {
-                    if (!raft) {
-                        return;
-                    }
-                    // Update the battery and signal indicators
-                    const batteryIndicator = connectButton.querySelector('.batteryIndicatorContainer');
-                    const signalIndicator = connectButton.querySelector('.signalIndicatorContainer');
-                    batteryIndicator.style.display = 'block';
-                    signalIndicator.style.display = 'block';
-                    batteryIndicator.innerHTML = batterySvg(raft.getBatteryStrength());
-                    signalIndicator.innerHTML = signalSvg(raft.getRSSI());
-                }, 300);
-
-                // Activate Marty Mode if not already activated
-                /*MartyMode*/
-                // if (!ScratchJr.isMartyModeEnabled) {
-                //     UI.toggleMartyMode();
-                // }
             })
         });
 
         // check if we're alredy connected to a marty, and if so, update the UI button
         const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
         if (connectedMarty) {
-            UI.setupMartyConnectionButton(cogButotn, connectedMarty);
+            UI.setupMartyConnectionButton(martyButton, connectedMarty);
         }
         /* END MARTY */
     }
@@ -247,6 +210,27 @@ export default class UI {
     static setupCogConnectionButton(button, raft) {
         // Add the connected class to the button
         button.classList.add('connectButtonConnected');
+
+        // change the class of the button to disconnect
+        const connectButtonContainer = button.querySelector('.iconButtonContainer');
+        connectButtonContainer.classList.remove('notConnectedButtonContainer');
+        connectButtonContainer.classList.add('connectedButtonContainer');
+
+        cogSignalAndBatteryInterval = setInterval(() => {
+            if (!raft) {
+                return;
+            }
+            // Update the battery and signal indicators
+            const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
+            const signalIndicator = button.querySelector('.signalIndicatorContainer');
+            const raftName = button.querySelector('.raftNameConnectButton');
+            batteryIndicator.style.display = 'block';
+            signalIndicator.style.display = 'block';
+            raftName.style.display = 'block';
+            raftName.textContent = truncateString(raft.getFriendlyName());
+            batteryIndicator.innerHTML = batterySvg(raft.getBatteryStrength());
+            signalIndicator.innerHTML = signalSvg(raft.getRSSI());
+        }, 300);
 
         // Add the raft to the cog manager and wire it with blocks
         window.cogManager.addCog(raft);
@@ -278,9 +262,12 @@ export default class UI {
                 // hide the battery and signal indicators
                 const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
                 const signalIndicator = button.querySelector('.signalIndicatorContainer');
+                const raftName = button.querySelector('.raftNameConnectButton');
+                raftName.style.display = 'none';
+                raftName.textContent = '';
                 batteryIndicator.style.display = 'none';
                 signalIndicator.style.display = 'none';
-            }, 500);
+            }, 1000);
 
             // Unsubscribe from the disconnected event to avoid memory leaks
             raftDisconnectedSubscriptionHelper(raft).unsubscribe();
@@ -293,6 +280,27 @@ export default class UI {
     static setupMartyConnectionButton(button, raft) {
         // Add the connected class to the button
         button.classList.add('connectButtonConnected');
+
+        // change the class of the button to disconnect
+        const connectButtonContainer = button.querySelector('.iconButtonContainer');
+        connectButtonContainer.classList.remove('notConnectedButtonContainer');
+        connectButtonContainer.classList.add('connectedButtonContainer');
+
+        martySignalAndBatteryInterval = setInterval(() => {
+            if (!raft) {
+                return;
+            }
+            // Update the battery and signal indicators
+            const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
+            const signalIndicator = button.querySelector('.signalIndicatorContainer');
+            const raftName = button.querySelector('.raftNameConnectButton');
+            batteryIndicator.style.display = 'block';
+            signalIndicator.style.display = 'block';
+            raftName.style.display = 'block';
+            raftName.textContent = truncateString(raft.getFriendlyName());
+            batteryIndicator.innerHTML = batterySvg(raft.getBatteryStrength());
+            signalIndicator.innerHTML = signalSvg(raft.getRSSI());
+        }, 300);
 
         // Add the raft to the marty manager and wire it with blocks
         window.martyManager.addMarty(raft);
@@ -323,9 +331,12 @@ export default class UI {
                 // hide the battery and signal indicators
                 const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
                 const signalIndicator = button.querySelector('.signalIndicatorContainer');
+                const raftName = button.querySelector('.raftNameConnectButton');
                 batteryIndicator.style.display = 'none';
                 signalIndicator.style.display = 'none';
-            }, 500);
+                raftName.style.display = 'none';
+                raftName.textContent = '';
+            }, 1000);
 
             // Unsubscribe from the disconnected event to avoid memory leaks
             raftDisconnectedSubscriptionHelper(raft).unsubscribe();

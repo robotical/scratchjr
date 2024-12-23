@@ -281,7 +281,7 @@ ul#settings.reference {
 
 /* Localization menu */
 h1.localizationtitle {
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-size: ${css_vh(4.5)};
     color: #f5a322;
     text-align: center;

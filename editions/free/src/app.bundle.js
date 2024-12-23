@@ -2545,7 +2545,7 @@ class BlockSpecs {
     return [['tiltany', 'ontouchcog', 'onmove', 'onobjectsensed', 'onlight', 'onrotate'], ['setpattern', 'selectcolour', 'clearcolours'], ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote']];
   }
   static setupPalettesDefMarty() {
-    return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'], ['martyGetReady', 'martyStepForward', 'martyStepBackward', 'martyStepRight', 'martyStepLeft', 'martyTurnRight', 'martyTurnLeft', 'martyDance', 'martyKickLeft', 'martyKickRight'], ['martyEyesExcited', 'martyEyesWide', 'martyEyesAngry', 'martyEyesNormal', 'martyEyesWiggle', 'martyWaveLeft', 'martyWaveRight', 'martyCelebrate', 'martyLedEyesP1', 'martyLedEyesP2', 'martyLedEyesColour'], ['martyConfusion', 'martyDisbelief', 'martyExcitement', 'martyNoway', 'martyNo', 'martyWhistle'], ['wait', 'stopmine', 'repeat'], ['endstack', 'forever']];
+    return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'], ['martyGetReady', 'martyStepForward', 'martyStepBackward', 'martyStepRight', 'martyStepLeft', 'martyTurnRight', 'martyTurnLeft', 'martyDance', 'martyKickLeft', 'martyKickRight'], ['martyEyesExcited', 'martyEyesWide', 'martyEyesAngry', 'martyEyesNormal', 'martyEyesWiggle', 'martyWaveLeft', 'martyWaveRight', 'martyCelebrate', 'martyLedEyesP1', 'martyLedEyesP2', 'martyLedEyesColour'], ['martyConfusion', 'martyDisbelief', 'martyExcitement', 'martyNoway', 'martyNo', 'martyWhistle'], ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'], ['endstack', 'forever']];
   }
 
   ///////////////////////////////
@@ -8609,7 +8609,7 @@ class Palette {
     var t = e.target;
     _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_10__["default"].sndFX('keydown.wav');
     var index = t.parentNode ? t.parentNode.index : 2;
-    index = !!index ? index : t.index;
+    index = !isNaN(index) ? index : t.index;
     Palette.selectCategory(index);
   }
   static selectCategory(n) {
@@ -12069,6 +12069,7 @@ class TutorialUI {
     TutorialUI.hidePreviousButton();
     TutorialUI.hideNextButton();
     TutorialUI.hideHintButton();
+    TutorialUI.hideReadAloudButton();
   }
 
   /* Buttons */
@@ -12105,6 +12106,34 @@ class TutorialUI {
     hintButton.style.visibility = 'hidden';
     hintButton.removeEventListener('click', this.onHintClick);
   }
+  static showReadAloudButton(textToRead, voiceName = "Google US English") {
+    const readAloudButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('tutorialReadAloud');
+    this.onReadAloudClick = () => {
+      if (this.utterance) {
+        speechSynthesis.cancel();
+        this.utterance = null;
+      } else {
+        this.utterance = new SpeechSynthesisUtterance(textToRead);
+        this.utterance.lang = 'en-US';
+        const voices = speechSynthesis.getVoices();
+        const selectedVoice = voices.find(voice => voice.name === voiceName);
+        if (selectedVoice) {
+          this.utterance.voice = selectedVoice;
+        }
+        this.utterance.onend = () => {
+          this.utterance = null;
+        };
+        speechSynthesis.speak(this.utterance);
+      }
+    };
+    readAloudButton.style.visibility = 'visible';
+    readAloudButton.addEventListener('click', this.onReadAloudClick);
+  }
+  static hideReadAloudButton() {
+    const readAloudButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('tutorialReadAloud');
+    readAloudButton.style.visibility = 'hidden';
+    readAloudButton.removeEventListener('click', this.onReadAloudClick);
+  }
 
   /* Menu Bar */
   static createTutorialMenuBar() {
@@ -12116,15 +12145,16 @@ class TutorialUI {
     TutorialUI.tutorialMenuBar.innerHTML = `
             <button id="closeTutorial" class="tutorialButton" onclick="window.applicationManager?.returnToMainApp()">X</button>
             <div id="tutorialTitle" class="tutorialTitle">${this.tutorial.title}</div>
+            <button id="tutorialReadAloud" class="tutorialButton">&#128265</button>
             <button id="tutorialHelp" class="tutorialButton">?</button>
             <button id="previousStep" class="tutorialButton">
-                <svg id="tutorial-left-pointing-arrow-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16 6L10 12L16 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg id="tutorial-left-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 6L10 12L16 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </button>
             <button id="nextStep" class="tutorialButton">
-                <svg id="tutorial-right-pointing-arrow-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 6L14 12L8 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg id="tutorial-right-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 6L14 12L8 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </button>
         `;
@@ -12501,9 +12531,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ../../utils/raft-subscription-helpers */ "./src/utils/raft-subscription-helpers.js");
 /* harmony import */ var _tutorial_TutorialFetcher__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ../../tutorial/TutorialFetcher */ "./src/tutorial/TutorialFetcher.js");
 /* harmony import */ var _tutorial_TutorialEngine__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ../../tutorial/TutorialEngine */ "./src/tutorial/TutorialEngine.js");
+/* harmony import */ var _utils_truncate_string__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ../../utils/truncate-string */ "./src/utils/truncate-string.js");
 //////////////////////////////////////
 //  General UI Layout
 /////////////////////////////////////
+
 
 
 
@@ -12635,6 +12667,10 @@ class UI {
     batteryIndicator.style.display = 'none';
     signalIndicator.style.display = 'none';
 
+    // create raft name field
+    const raftName = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'raftNameConnectButton', connectButton);
+    raftName.style.display = 'none';
+
     // Create button container 
     const iconButtonContainer = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'iconButtonContainer notConnectedButtonContainer', connectButton);
 
@@ -12658,23 +12694,6 @@ class UI {
           // turn off the verified subscription to avoid memory leaks
           (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_28__.raftVerifiedSubscriptionHelper)(raft).unsubscribe();
         });
-
-        // change the class of the button to disconnect
-        const connectButtonContainer = connectButton.querySelector('.iconButtonContainer');
-        connectButtonContainer.classList.remove('notConnectedButtonContainer');
-        connectButtonContainer.classList.add('connectedButtonContainer');
-        cogSignalAndBatteryInterval = setInterval(() => {
-          if (!raft) {
-            return;
-          }
-          // Update the battery and signal indicators
-          const batteryIndicator = connectButton.querySelector('.batteryIndicatorContainer');
-          const signalIndicator = connectButton.querySelector('.signalIndicatorContainer');
-          batteryIndicator.style.display = 'block';
-          signalIndicator.style.display = 'block';
-          batteryIndicator.innerHTML = (0,_html_svgs_battery_svg__WEBPACK_IMPORTED_MODULE_26__.batterySvg)(raft.getBatteryStrength());
-          signalIndicator.innerHTML = (0,_html_svgs_signal_svg__WEBPACK_IMPORTED_MODULE_27__.signalSvg)(raft.getRSSI());
-        }, 300);
       });
     });
 
@@ -12685,7 +12704,7 @@ class UI {
     }
     /* END COG */
     /* MARTY */
-    UI.createConnectButton(connectionButtonsArea, _html_svgs_marty__WEBPACK_IMPORTED_MODULE_21__.martySvg, 'Marty', 'martyConnectionButton', connectButton => {
+    const martyButton = UI.createConnectButton(connectionButtonsArea, _html_svgs_marty__WEBPACK_IMPORTED_MODULE_21__.martySvg, 'Marty', 'martyConnectionButton', connectButton => {
       window.applicationManager.connectGenericMarty(raft => {
         // set subscription to raft events so we can update the UI when:
         // - the raft is connected
@@ -12695,42 +12714,39 @@ class UI {
           // turn off the verified subscription to avoid memory leaks
           (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_28__.raftVerifiedSubscriptionHelper)(raft).unsubscribe();
         });
-
-        // change the class of the button to disconnect
-        const iconButtonContainer = connectButton.querySelector('.iconButtonContainer');
-        iconButtonContainer.classList.remove('notConnectedButtonContainer');
-        iconButtonContainer.classList.add('connectedButtonContainer');
-        martySignalAndBatteryInterval = setInterval(() => {
-          if (!raft) {
-            return;
-          }
-          // Update the battery and signal indicators
-          const batteryIndicator = connectButton.querySelector('.batteryIndicatorContainer');
-          const signalIndicator = connectButton.querySelector('.signalIndicatorContainer');
-          batteryIndicator.style.display = 'block';
-          signalIndicator.style.display = 'block';
-          batteryIndicator.innerHTML = (0,_html_svgs_battery_svg__WEBPACK_IMPORTED_MODULE_26__.batterySvg)(raft.getBatteryStrength());
-          signalIndicator.innerHTML = (0,_html_svgs_signal_svg__WEBPACK_IMPORTED_MODULE_27__.signalSvg)(raft.getRSSI());
-        }, 300);
-
-        // Activate Marty Mode if not already activated
-        /*MartyMode*/
-        // if (!ScratchJr.isMartyModeEnabled) {
-        //     UI.toggleMartyMode();
-        // }
       });
     });
 
     // check if we're alredy connected to a marty, and if so, update the UI button
     const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
     if (connectedMarty) {
-      UI.setupMartyConnectionButton(cogButotn, connectedMarty);
+      UI.setupMartyConnectionButton(martyButton, connectedMarty);
     }
     /* END MARTY */
   }
   static setupCogConnectionButton(button, raft) {
     // Add the connected class to the button
     button.classList.add('connectButtonConnected');
+
+    // change the class of the button to disconnect
+    const connectButtonContainer = button.querySelector('.iconButtonContainer');
+    connectButtonContainer.classList.remove('notConnectedButtonContainer');
+    connectButtonContainer.classList.add('connectedButtonContainer');
+    cogSignalAndBatteryInterval = setInterval(() => {
+      if (!raft) {
+        return;
+      }
+      // Update the battery and signal indicators
+      const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
+      const signalIndicator = button.querySelector('.signalIndicatorContainer');
+      const raftName = button.querySelector('.raftNameConnectButton');
+      batteryIndicator.style.display = 'block';
+      signalIndicator.style.display = 'block';
+      raftName.style.display = 'block';
+      raftName.textContent = (0,_utils_truncate_string__WEBPACK_IMPORTED_MODULE_31__.truncateString)(raft.getFriendlyName());
+      batteryIndicator.innerHTML = (0,_html_svgs_battery_svg__WEBPACK_IMPORTED_MODULE_26__.batterySvg)(raft.getBatteryStrength());
+      signalIndicator.innerHTML = (0,_html_svgs_signal_svg__WEBPACK_IMPORTED_MODULE_27__.signalSvg)(raft.getRSSI());
+    }, 300);
 
     // Add the raft to the cog manager and wire it with blocks
     window.cogManager.addCog(raft);
@@ -12761,9 +12777,12 @@ class UI {
         // hide the battery and signal indicators
         const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
         const signalIndicator = button.querySelector('.signalIndicatorContainer');
+        const raftName = button.querySelector('.raftNameConnectButton');
+        raftName.style.display = 'none';
+        raftName.textContent = '';
         batteryIndicator.style.display = 'none';
         signalIndicator.style.display = 'none';
-      }, 500);
+      }, 1000);
 
       // Unsubscribe from the disconnected event to avoid memory leaks
       (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_28__.raftDisconnectedSubscriptionHelper)(raft).unsubscribe();
@@ -12775,6 +12794,26 @@ class UI {
   static setupMartyConnectionButton(button, raft) {
     // Add the connected class to the button
     button.classList.add('connectButtonConnected');
+
+    // change the class of the button to disconnect
+    const connectButtonContainer = button.querySelector('.iconButtonContainer');
+    connectButtonContainer.classList.remove('notConnectedButtonContainer');
+    connectButtonContainer.classList.add('connectedButtonContainer');
+    martySignalAndBatteryInterval = setInterval(() => {
+      if (!raft) {
+        return;
+      }
+      // Update the battery and signal indicators
+      const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
+      const signalIndicator = button.querySelector('.signalIndicatorContainer');
+      const raftName = button.querySelector('.raftNameConnectButton');
+      batteryIndicator.style.display = 'block';
+      signalIndicator.style.display = 'block';
+      raftName.style.display = 'block';
+      raftName.textContent = (0,_utils_truncate_string__WEBPACK_IMPORTED_MODULE_31__.truncateString)(raft.getFriendlyName());
+      batteryIndicator.innerHTML = (0,_html_svgs_battery_svg__WEBPACK_IMPORTED_MODULE_26__.batterySvg)(raft.getBatteryStrength());
+      signalIndicator.innerHTML = (0,_html_svgs_signal_svg__WEBPACK_IMPORTED_MODULE_27__.signalSvg)(raft.getRSSI());
+    }, 300);
 
     // Add the raft to the marty manager and wire it with blocks
     window.martyManager.addMarty(raft);
@@ -12805,9 +12844,12 @@ class UI {
         // hide the battery and signal indicators
         const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
         const signalIndicator = button.querySelector('.signalIndicatorContainer');
+        const raftName = button.querySelector('.raftNameConnectButton');
         batteryIndicator.style.display = 'none';
         signalIndicator.style.display = 'none';
-      }, 500);
+        raftName.style.display = 'none';
+        raftName.textContent = '';
+      }, 1000);
 
       // Unsubscribe from the disconnected event to avoid memory leaks
       (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_28__.raftDisconnectedSubscriptionHelper)(raft).unsubscribe();
@@ -13575,7 +13617,6 @@ class UI {
     // toggle icon
     var toggleDiv = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'martyModeToggle spriteToggleOn', mm);
     toggleDiv.innerHTML = _html_svgs_sprite_toggle_on__WEBPACK_IMPORTED_MODULE_25__.spriteToggleOn;
-    // toggleDiv.style.transform = 'rotate(180deg)';
 
     // Marty icon
     var martySvgDiv = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'martyModeIcon', mm);
@@ -13590,12 +13631,10 @@ class UI {
       spriteIcon.innerHTML = _html_svgs_sprite_deselected__WEBPACK_IMPORTED_MODULE_22__.spriteDeselectedSvg;
       martyIcon.innerHTML = _html_svgs_marty__WEBPACK_IMPORTED_MODULE_21__.martySvg;
       toggleDiv.innerHTML = _html_svgs_marty_toggle_on__WEBPACK_IMPORTED_MODULE_24__.martyToggleOn;
-      // toggleDiv.style.transform = 'rotate(0)';
     } else {
       spriteIcon.innerHTML = _html_svgs_sprite__WEBPACK_IMPORTED_MODULE_20__.spriteSvg;
       martyIcon.innerHTML = _html_svgs_marty_deselected__WEBPACK_IMPORTED_MODULE_23__.martyDeselectedSvg;
       toggleDiv.innerHTML = _html_svgs_sprite_toggle_on__WEBPACK_IMPORTED_MODULE_25__.spriteToggleOn;
-      // toggleDiv.style.transform = 'rotate(180deg)';
     }
   }
 
@@ -26375,6 +26414,10 @@ class TutorialEngine {
         case "hint":
           _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].showHintButton(() => this._handleActions(step.hintActions));
           break;
+        case "readAloud":
+          const textToRead = step.instructionActions.find(action => action.type === "ShowInstructorText").text;
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].showReadAloudButton(textToRead);
+          break;
         default:
           break;
       }
@@ -26588,7 +26631,7 @@ const cogAndMartyTutorial = {
       type: "ShowInstructorText",
       text: "In this tutorial we will learn how Cog and Marty can interact with each other. Press 'Next' to start!"
     }],
-    buttons: ["next"],
+    buttons: ["readAloud", "next"],
     expectedCode: [],
     presenter: "marty"
   }, /* STEP 1.1 --connect to Cog */
@@ -26604,7 +26647,7 @@ const cogAndMartyTutorial = {
       onClickAction: "NextStep"
     }],
     hintActions: [],
-    buttons: ["previous", "next"],
+    buttons: ["previous", "readAloud", "next"],
     expectedCode: [],
     presenter: "marty"
   }, /* STEP 1.2 --connect to Marty */
@@ -26620,7 +26663,7 @@ const cogAndMartyTutorial = {
       onClickAction: "NextStep"
     }],
     hintActions: [],
-    buttons: ["previous", "next"],
+    buttons: ["previous", "readAloud", "readAloud", "next"],
     expectedCode: [],
     presenter: "marty"
   }, /* STEP 2 -- go to cog event blocks */
@@ -26636,7 +26679,7 @@ const cogAndMartyTutorial = {
       onClickAction: "NextStep"
     }],
     hintActions: [],
-    buttons: ["previous", "next"],
+    buttons: ["previous", "readAloud", "next"],
     presenter: "marty"
   }, /* STEP 3 -- add ontouchcog block */
   {
@@ -26661,7 +26704,7 @@ const cogAndMartyTutorial = {
       type: "DragBlockToScriptArea",
       block: "ontouchcog_block"
     }],
-    buttons: ["previous", "next", "hint"],
+    buttons: ["previous", "readAloud", "next", "hint"],
     expectedCode: ["ontouchcog"],
     presenter: "marty"
   }, /* STEP 4 -- go to sprite event blocks */
@@ -26677,7 +26720,7 @@ const cogAndMartyTutorial = {
       onClickAction: "NextStep"
     }],
     hintActions: [],
-    buttons: ["previous", "next"],
+    buttons: ["previous", "readAloud", "next"],
     expectedCode: [],
     presenter: "marty"
   }, /* STEP 5 -- add message block after the ontouchcog block */
@@ -26703,7 +26746,7 @@ const cogAndMartyTutorial = {
       type: "DragBlockToScriptArea",
       block: "message_block"
     }],
-    buttons: ["previous", "next", "hint"],
+    buttons: ["previous", "readAloud", "next", "hint"],
     expectedCode: ["ontouchcog=>message"],
     presenter: "marty"
   }, /* STEP 6 -- go to marty mode */
@@ -26719,7 +26762,7 @@ const cogAndMartyTutorial = {
       onClickAction: "NextStep"
     }],
     hintActions: [],
-    buttons: ["previous", "next"],
+    buttons: ["previous", "readAloud", "next"],
     expectedCode: [],
     presenter: "marty"
   }, /* STEP 7 -- add onmessage block */
@@ -26749,7 +26792,7 @@ const cogAndMartyTutorial = {
       type: "DragBlockToScriptArea",
       block: "onmessage_block"
     }],
-    buttons: ["previous", "next", "hint"],
+    buttons: ["previous", "readAloud", "next", "hint"],
     expectedCode: ["onmessage"],
     presenter: "marty"
   }, /* STEP 8 -- go to marty motion blocks */
@@ -26767,7 +26810,7 @@ const cogAndMartyTutorial = {
       onClickAction: "NextStep"
     }],
     hintActions: [],
-    buttons: ["previous", "next"],
+    buttons: ["previous", "readAloud", "next"],
     expectedCode: [],
     presenter: "marty"
   }, /* STEP 9 -- add marty dance block */
@@ -26797,7 +26840,7 @@ const cogAndMartyTutorial = {
       type: "DragBlockToScriptArea",
       block: "martyDance_block"
     }],
-    buttons: ["previous", "next", "hint"],
+    buttons: ["previous", "readAloud", "next", "hint"],
     expectedCode: ["onmessage=>martyDance"],
     presenter: "marty"
   }, /* STEP 10 -- end */
@@ -26808,7 +26851,7 @@ const cogAndMartyTutorial = {
     }],
     nextStepActions: [],
     hintActions: [],
-    buttons: ["previous"],
+    buttons: ["previous", "readAloud"],
     expectedCode: [],
     presenter: "marty"
   }]
@@ -29746,6 +29789,26 @@ const raftPubSubscriptionObserver_ = callback => {
       }
     }
   };
+};
+
+/***/ }),
+
+/***/ "./src/utils/truncate-string.js":
+/*!**************************************!*\
+  !*** ./src/utils/truncate-string.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   truncateString: () => (/* binding */ truncateString)
+/* harmony export */ });
+const truncateString = (str, num = 12) => {
+  if (str.length <= num) {
+    return str;
+  }
+  return str.slice(0, num) + '...';
 };
 
 /***/ }),

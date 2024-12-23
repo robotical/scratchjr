@@ -27,6 +27,7 @@ export default class TutorialUI {
         TutorialUI.hidePreviousButton();
         TutorialUI.hideNextButton();
         TutorialUI.hideHintButton();
+        TutorialUI.hideReadAloudButton();
     }
 
 
@@ -70,6 +71,36 @@ export default class TutorialUI {
         hintButton.removeEventListener('click', this.onHintClick);
     }
 
+    static showReadAloudButton(textToRead, voiceName = "Google US English") {
+        const readAloudButton = gn('tutorialReadAloud');
+        this.onReadAloudClick = () => {
+            if (this.utterance) {
+                speechSynthesis.cancel();
+                this.utterance = null;
+            } else {
+                this.utterance = new SpeechSynthesisUtterance(textToRead);
+                this.utterance.lang = 'en-US';
+                const voices = speechSynthesis.getVoices();
+                const selectedVoice = voices.find(voice => voice.name === voiceName);
+                if (selectedVoice) {
+                    this.utterance.voice = selectedVoice;
+                }
+                this.utterance.onend = () => {
+                    this.utterance = null;
+                };
+                speechSynthesis.speak(this.utterance);
+            }
+        };
+        readAloudButton.style.visibility = 'visible';
+        readAloudButton.addEventListener('click', this.onReadAloudClick);
+    }
+
+    static hideReadAloudButton() {
+        const readAloudButton = gn('tutorialReadAloud');
+        readAloudButton.style.visibility = 'hidden';
+        readAloudButton.removeEventListener('click', this.onReadAloudClick);
+    }
+
     /* Menu Bar */
     static createTutorialMenuBar() {
         /* Menu bar contains the controls of the tutorial */
@@ -80,15 +111,16 @@ export default class TutorialUI {
         TutorialUI.tutorialMenuBar.innerHTML = `
             <button id="closeTutorial" class="tutorialButton" onclick="window.applicationManager?.returnToMainApp()">X</button>
             <div id="tutorialTitle" class="tutorialTitle">${this.tutorial.title}</div>
+            <button id="tutorialReadAloud" class="tutorialButton">&#128265</button>
             <button id="tutorialHelp" class="tutorialButton">?</button>
             <button id="previousStep" class="tutorialButton">
-                <svg id="tutorial-left-pointing-arrow-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16 6L10 12L16 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg id="tutorial-left-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 6L10 12L16 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </button>
             <button id="nextStep" class="tutorialButton">
-                <svg id="tutorial-right-pointing-arrow-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 6L14 12L8 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg id="tutorial-right-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 6L14 12L8 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </button>
         `;

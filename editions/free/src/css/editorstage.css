@@ -256,7 +256,7 @@
     text-shadow: 0 ${css_vh(0.26)} #000;
     line-height: ${css_vh(13.02)};
     font-weight: bold;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
 }
 
 .textuisize.t1{ font-size: ${css_vh(1.56)};}
@@ -441,7 +441,7 @@ p.stylelabel {
     position: relative; text-align: center;
     margin-top: 5px;
     color: #C9C9C9;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: bold;
     margin-left: auto;
     margin-right: auto;
@@ -458,7 +458,7 @@ p.stylelabel {
     text-align: center;
     margin-top: 5px;
     color: #ffffff;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: bold;
     margin-left: auto; margin-right: auto;
     width: 24;

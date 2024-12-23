@@ -102,7 +102,6 @@ div.frame {
     top: ${css_vh(10)};
     position: absolute;
     display: inline-block;
-    margin: ${css_vh(0)} ${css_vh(1.29)} ${css_vh(0)};
     width:  ${css_vh(21.09)};
     height: 60%;
 }
@@ -165,12 +164,14 @@ div.frame {
 
 .pagethumb .pagenum {
     position: relative;
+    top: ${css_vh(.8)};
+    right: ${css_vh(0)};
     margin: ${css_vh(-14.64)} ${css_vh(16.06)} ${css_vh(0)};
     padding: ${css_vh(0)};
     width: ${css_vh(3.65)};
     height: ${css_vh(3.65)};
     font-size: ${css_vh(1.82)};
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: bold;
     color: white;
     padding-left: ${css_vh(1.0)};
@@ -774,7 +775,7 @@ form.projectname {
     margin: ${css_vh(0)} ${css_vh(0.26)} ${css_vh(0)};
     padding: ${css_vh(0)};
     text-align: center;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: normal;
     font-size: ${css_vh(3.13)};
     line-height: ${css_vh(4.17)};
@@ -817,7 +818,7 @@ form.projectname {
     margin: ${css_vh(-1.30)} ${css_vh(0.00)} ${css_vh(0.00)};
     color: #28A5DA;
     vertical-align: middle;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
 
 }
 
@@ -828,7 +829,7 @@ form.projectname {
     margin: ${css_vh(0.00)};
     color: #ffffff;
     vertical-align:middle;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
 }
 
 .infoboxlogo {
@@ -1163,7 +1164,7 @@ Blocks text fields and input fields
     color: #999;
     line-height: ${css_vh(4.95)};
     font-size: ${css_vh(2.08)};
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: bold;
     margin: ${css_vh(0.39)};
     text-shadow: 0 ${css_vh(0.13)} #fff;
@@ -1215,7 +1216,7 @@ Blocks text fields and input fields
     line-height: ${css_vh(4.95)};
     vertical-align: middle;
     font-size: ${css_vh(2.08)};
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: bold;
     margin: ${css_vh(0.39)};
     text-shadow: 0 ${css_vh(0.13)} #fff;

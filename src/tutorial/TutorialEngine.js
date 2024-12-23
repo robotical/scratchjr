@@ -52,6 +52,10 @@ export default class TutorialEngine {
                 case "hint":
                     TutorialUI.showHintButton(() => this._handleActions(step.hintActions));
                     break;
+                case "readAloud":
+                    const textToRead = step.instructionActions.find(action => action.type === "ShowInstructorText").text;
+                    TutorialUI.showReadAloudButton(textToRead);
+                    break;
                 default:
                     break;
             }

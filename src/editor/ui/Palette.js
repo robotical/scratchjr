@@ -401,7 +401,7 @@ export default class Palette {
         var t = e.target;
         ScratchAudio.sndFX('keydown.wav');
         var index = t.parentNode ? t.parentNode.index : 2;
-        index = !!index ? index : t.index;
+        index = !isNaN(index) ? index : t.index;
         Palette.selectCategory(index);
     }
 

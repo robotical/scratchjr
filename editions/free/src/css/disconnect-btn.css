@@ -2,7 +2,7 @@
   font-size: 1.6rem;
   box-sizing: inherit;
   padding: 0;
-  font-family: Roboto;
+  font-family: 'Lato Regular';
   background-color: var(--colour-BLUE_LIGHT_3);
   border-radius: 5px;
   margin: 0;
@@ -12,7 +12,7 @@
     font-size: 1.6rem;
     box-sizing: inherit;
     margin: 0;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     background-color: var(--colour-PALE_BLUE);
     display: grid;
     grid-template-areas: "marty-name marty-name marty-image" "marty-battery marty-signal marty-image" "disconnect-image disconnect-image marty-image";
@@ -25,7 +25,7 @@
     box-sizing: inherit;
     margin: 0;
     padding: 0;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-size: 1rem;
     grid-area: marty-name;
     white-space: nowrap;
@@ -36,7 +36,7 @@
     box-sizing: inherit;
     margin: 0;
     padding: 0;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     align-self: end;
     grid-area: marty-battery;
     height: 100%;
@@ -51,7 +51,7 @@
     font-size: 1.6rem;
     box-sizing: inherit;
     margin: 0;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     grid-area: marty-signal;
     padding: .5rem;
 }
@@ -61,7 +61,7 @@
     box-sizing: inherit;
     margin: 0;
     padding: 0;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     cursor: pointer;
     grid-area: disconnect-image;
 }
@@ -71,7 +71,7 @@
     box-sizing: inherit;
     margin: 0;
     padding: 0;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     align-self: end;
     grid-area: marty-image;
     transform: translateY(15px) translateX(5px);
@@ -82,7 +82,7 @@
     box-sizing: inherit;
     margin: 0;
     padding: 0;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     grid-template-columns: 1fr 40%;
     align-items: flex-end;
     display: flex;
@@ -94,7 +94,7 @@
     box-sizing: inherit;
     margin: 0;
     padding: 0;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     display: block;
     font-size: .65rem;
 }
