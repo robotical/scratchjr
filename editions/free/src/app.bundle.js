@@ -306,6 +306,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _cog_CogManager__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../cog/CogManager */ "./src/cog/CogManager.js");
 /* harmony import */ var _marty_MartyManager__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../marty/MartyManager */ "./src/marty/MartyManager.js");
 /* harmony import */ var _ui_Thumbs__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./ui/Thumbs */ "./src/editor/ui/Thumbs.js");
+/* harmony import */ var _ui_Trace__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./ui/Trace */ "./src/editor/ui/Trace.js");
+
 
 
 
@@ -754,6 +756,7 @@ class ScratchJr {
       try {
         (0,_utils_lib__WEBPACK_IMPORTED_MODULE_19__.gn)('go').className = isOff ? 'go on' : 'go off';
         _ui_Grid__WEBPACK_IMPORTED_MODULE_13__["default"].updateCursor();
+        _ui_Trace__WEBPACK_IMPORTED_MODULE_23__["default"].updateTrace();
       } catch (e) {
         // ignore
       }
@@ -5259,7 +5262,7 @@ class Sprite {
     this.div = document.createElement('div');
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_17__.setProps)(this.div.style, {
       position: 'absolute',
-      zIndex: -1,
+      zIndex: 11,
       left: '0px',
       top: '0px'
     });
@@ -7438,7 +7441,7 @@ class Grid {
       position: 'absolute',
       zIndex: _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].layerTop
     });
-    Grid.setScaleAndPosition(grid, _utils_lib__WEBPACK_IMPORTED_MODULE_3__.scaleMultiplier, 47, 75, width, height);
+    // Grid.setScaleAndPosition(grid, scaleMultiplier, 47, 75, width, height);
     grid.setAttribute('id', 'livegrid');
     Grid.drawLines(grid, width, height);
     Grid.createNumbering(w, h);
@@ -7653,6 +7656,10 @@ class Grid {
   static hide(b) {
     hidden = b;
     var mystate = hidden ? 'hidden' : 'visible';
+    let div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('page 1');
+    if (div) {
+      div.appendChild((0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('livegrid'));
+    }
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('livegrid').style.visibility = mystate;
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('rownum').style.visibility = mystate;
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('colnum').style.visibility = mystate;
@@ -12027,6 +12034,128 @@ class Thumbs {
 
 /***/ }),
 
+/***/ "./src/editor/ui/Trace.js":
+/*!********************************!*\
+  !*** ./src/editor/ui/Trace.js ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Trace)
+/* harmony export */ });
+/* harmony import */ var _utils_lib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/lib */ "./src/utils/lib.js");
+/* harmony import */ var _ScratchJr__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../ScratchJr */ "./src/editor/ScratchJr.js");
+
+
+let hidden = true;
+let width = 482;
+let height = 362;
+let size = 24;
+let prevX = 0;
+let prevY = 0;
+class Trace {
+  static get hidden() {
+    return hidden;
+  }
+  static init(div) {
+    var traceStage = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.newCanvas)(div, 0, 0, width, height, {
+      position: "absolute",
+      zIndex: _ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].layerTop
+    });
+    traceStage.setAttribute("id", "trace");
+    Trace.createTrace(traceStage);
+  }
+  static createTrace(cnv) {
+    var ctx = cnv.getContext("2d");
+
+    // Clear the canvas
+    ctx.clearRect(0, 0, cnv.width, cnv.height);
+  }
+  static updateTrace() {
+    const c = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)("trace");
+    if (!c) {
+      return;
+    }
+    if (hidden) {
+      return;
+    }
+    if (_ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].inFullscreen) {
+      return;
+    }
+    if (!_ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].stage.currentPage) {
+      return;
+    }
+    if (!_ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].getSprite()) {
+      c.style.visibility = "hidden";
+      return;
+    }
+    // if the parent of the trace canvas is not the current page, move it
+    if (c.parentElement.id != _ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].stage.currentPage.id) {
+      c.parentElement.removeChild(c);
+      (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)(_ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].stage.currentPage.id).appendChild(c);
+    }
+    var spr = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)(_ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].stage.currentPage.currentSpriteName);
+    if (!spr) {
+      return;
+    }
+    var obj = spr.owner;
+    var dx = obj.xcoor + size / 2;
+    var dy = obj.ycoor - size / 2;
+    c.style.visibility = "visible";
+    Trace.setTraceValues(dx, dy);
+  }
+  static setTraceValues(dx, dy) {
+    var cnv = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)("trace");
+    let numX = +(dx / size).toFixed(2);
+    let numY = +(dy / size).toFixed(2);
+    numY *= size + 3;
+    numX *= size - 1;
+    // setProps(c.style, {
+    //   position: "absolute",
+    //   top: numY * 24 + "px",
+    //   left: (numX - 1) * 24 + "px",
+    // });
+
+    var ctx = cnv.getContext("2d");
+
+    // Store the previous position
+    prevX = numX;
+    prevY = numY;
+
+    // Update the current position
+    numX += 2;
+    numY += 2;
+
+    // Draw the trace line
+    ctx.beginPath();
+    ctx.strokeStyle = "red";
+    ctx.moveTo(prevX, prevY);
+    ctx.lineTo(numX, numY);
+    ctx.stroke();
+  }
+  static clear = () => {
+    const c = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)("trace");
+    if (!c) {
+      return;
+    }
+    const ctx = c.getContext("2d");
+    ctx.clearRect(0, 0, c.width, c.height);
+  };
+  static hide(b) {
+    hidden = b;
+    var mystate = hidden ? "hidden" : "visible";
+    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)("trace").style.visibility = mystate;
+    if (_ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].stage.currentPage) {
+      mystate = !_ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].getSprite() ? "hidden" : mystate;
+    }
+    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)("trace").style.visibility = mystate;
+  }
+}
+
+/***/ }),
+
 /***/ "./src/editor/ui/TutorialUI.js":
 /*!*************************************!*\
   !*** ./src/editor/ui/TutorialUI.js ***!
@@ -12532,9 +12661,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tutorial_TutorialFetcher__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ../../tutorial/TutorialFetcher */ "./src/tutorial/TutorialFetcher.js");
 /* harmony import */ var _tutorial_TutorialEngine__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ../../tutorial/TutorialEngine */ "./src/tutorial/TutorialEngine.js");
 /* harmony import */ var _utils_truncate_string__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ../../utils/truncate-string */ "./src/utils/truncate-string.js");
+/* harmony import */ var _Trace__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./Trace */ "./src/editor/ui/Trace.js");
 //////////////////////////////////////
 //  General UI Layout
 /////////////////////////////////////
+
 
 
 
@@ -13434,15 +13565,19 @@ class UI {
     div.setAttribute('id', 'stageframe');
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage = new _engine_Stage__WEBPACK_IMPORTED_MODULE_7__["default"](div);
     _Grid__WEBPACK_IMPORTED_MODULE_6__["default"].init(div);
+    _Trace__WEBPACK_IMPORTED_MODULE_32__["default"].init(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.div);
     if (_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isEditable()) {
       UI.createTopBarClicky(div, 'addtext', 'addText', UI.addText);
       UI.createTopBarClicky(div, 'setbkg', 'changeBkg', UI.addBackground);
     }
     UI.createTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
+    UI.createTopBarClicky(div, 'traceBtn', 'traceToggle off', UI.switchTrace);
+    UI.createTopBarClicky(div, 'traceClear', 'traceClear', _Trace__WEBPACK_IMPORTED_MODULE_32__["default"].clear);
     UI.createTopBarClicky(div, 'go', 'go on', UI.toggleRun);
     UI.createTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
     UI.createTopBarClicky(div, 'full', 'fullscreen', _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].fullScreen);
     UI.setShowGrid(false);
+    UI.setShowTrace(false);
   }
   static createCounter() {
     const stageDiv = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.gn)('stage');
@@ -13493,6 +13628,11 @@ class UI {
     }
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].resetSprites();
   }
+  static switchTrace() {
+    _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_17__["default"].sndFX('tap.wav');
+    UI.setShowTrace(_Trace__WEBPACK_IMPORTED_MODULE_32__["default"].hidden);
+    _tablet_OS__WEBPACK_IMPORTED_MODULE_11__["default"].analyticsEvent('editor', _Trace__WEBPACK_IMPORTED_MODULE_32__["default"].hidden ? 'hide_trace' : 'show_trace');
+  }
   static toggleRun(e) {
     var isOff = _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].runtime.inactive();
     if (isOff) {
@@ -13509,6 +13649,10 @@ class UI {
   static setShowGrid(b) {
     _Grid__WEBPACK_IMPORTED_MODULE_6__["default"].hide(!b);
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.gn)('grid').className = _Grid__WEBPACK_IMPORTED_MODULE_6__["default"].hidden ? 'gridToggle off' : 'gridToggle on';
+  }
+  static setShowTrace(b) {
+    _Trace__WEBPACK_IMPORTED_MODULE_32__["default"].hide(!b);
+    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.gn)('traceBtn').className = _Trace__WEBPACK_IMPORTED_MODULE_32__["default"].hidden ? 'traceToggle off' : 'traceToggle on';
   }
   static createTopBarClicky(p, str, mstyle, fcn) {
     var toggle = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', mstyle, p);
@@ -13643,6 +13787,7 @@ class UI {
     _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_17__["default"].sndFX('tap.wav');
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled = !_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled;
     UI.renderCorrectMartyModeIcon(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled);
+    _Trace__WEBPACK_IMPORTED_MODULE_32__["default"].clear();
   }
 
   //////////////////////////////////////
@@ -26625,7 +26770,7 @@ const cogAndMartyTutorial = {
     nextStepActions: [{
       type: "HighlightElement",
       elementId: "nextStep",
-      hexColor: "#FF0000"
+      hexColor: "#855cd659"
     }],
     instructionActions: [{
       type: "ShowInstructorText",
@@ -26643,7 +26788,7 @@ const cogAndMartyTutorial = {
     nextStepActions: [{
       type: "HighlightElement",
       elementId: "cogConnectionButton",
-      hexColor: "#FF0000",
+      hexColor: "#855cd659",
       onClickAction: "NextStep"
     }],
     hintActions: [],
@@ -26659,7 +26804,7 @@ const cogAndMartyTutorial = {
     nextStepActions: [{
       type: "HighlightElement",
       elementId: "martyConnectionButton",
-      hexColor: "#FF0000",
+      hexColor: "#855cd659",
       onClickAction: "NextStep"
     }],
     hintActions: [],
@@ -26675,7 +26820,7 @@ const cogAndMartyTutorial = {
     nextStepActions: [{
       type: "HighlightElement",
       elementId: "cog-start",
-      hexColor: "#FF0000",
+      hexColor: "#855cd659",
       onClickAction: "NextStep"
     }],
     hintActions: [],
@@ -26716,7 +26861,7 @@ const cogAndMartyTutorial = {
     nextStepActions: [{
       type: "HighlightElement",
       elementId: "sprite-start",
-      hexColor: "#FF0000",
+      hexColor: "#855cd659",
       onClickAction: "NextStep"
     }],
     hintActions: [],
@@ -26758,7 +26903,7 @@ const cogAndMartyTutorial = {
     nextStepActions: [{
       type: "HighlightElement",
       elementId: "martyMode",
-      hexColor: "#FF0000",
+      hexColor: "#855cd659",
       onClickAction: "NextStep"
     }],
     hintActions: [],
@@ -26806,7 +26951,7 @@ const cogAndMartyTutorial = {
     }, {
       type: "HighlightElement",
       elementId: "marty-motion",
-      hexColor: "#FF0000",
+      hexColor: "#855cd659",
       onClickAction: "NextStep"
     }],
     hintActions: [],

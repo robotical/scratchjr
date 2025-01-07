@@ -38,6 +38,7 @@ import { raftDisconnectedSubscriptionHelper, raftVerifiedSubscriptionHelper } fr
 import TutorialFetcher from '../../tutorial/TutorialFetcher';
 import TutorialEngine from '../../tutorial/TutorialEngine';
 import { truncateString } from "../../utils/truncate-string";
+import Trace from './Trace';
 
 let projectNameTextInput = null;
 let info = null;
@@ -995,15 +996,19 @@ export default class UI {
         div.setAttribute('id', 'stageframe');
         ScratchJr.stage = new Stage(div);
         Grid.init(div);
+        Trace.init(ScratchJr.stage.div);
         if (ScratchJr.isEditable()) {
             UI.createTopBarClicky(div, 'addtext', 'addText', UI.addText);
             UI.createTopBarClicky(div, 'setbkg', 'changeBkg', UI.addBackground);
         }
         UI.createTopBarClicky(div, 'grid', 'gridToggle off', UI.switchGrid);
+        UI.createTopBarClicky(div, 'traceBtn', 'traceToggle off', UI.switchTrace);
+        UI.createTopBarClicky(div, 'traceClear', 'traceClear', Trace.clear);
         UI.createTopBarClicky(div, 'go', 'go on', UI.toggleRun);
         UI.createTopBarClicky(div, 'resetall', 'resetall', UI.resetAllSprites);
         UI.createTopBarClicky(div, 'full', 'fullscreen', ScratchJr.fullScreen);
         UI.setShowGrid(false);
+        UI.setShowTrace(false);
     }
 
     static createCounter() {
@@ -1062,6 +1067,13 @@ export default class UI {
         ScratchJr.resetSprites();
     }
 
+    static switchTrace() {
+        ScratchAudio.sndFX('tap.wav');
+        UI.setShowTrace(Trace.hidden);
+
+        OS.analyticsEvent('editor', Trace.hidden ? 'hide_trace' : 'show_trace');
+    }
+
     static toggleRun(e) {
         var isOff = ScratchJr.runtime.inactive();
         if (isOff) {
@@ -1080,6 +1092,11 @@ export default class UI {
     static setShowGrid(b) {
         Grid.hide(!b);
         gn('grid').className = Grid.hidden ? 'gridToggle off' : 'gridToggle on';
+    }
+
+    static setShowTrace (b) {
+        Trace.hide(!b);
+        gn('traceBtn').className = Trace.hidden ? 'traceToggle off' : 'traceToggle on';
     }
 
     static createTopBarClicky(p, str, mstyle, fcn) {
@@ -1230,6 +1247,7 @@ export default class UI {
         ScratchAudio.sndFX('tap.wav');
         ScratchJr.isMartyModeEnabled = !ScratchJr.isMartyModeEnabled;
         UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
+        Trace.clear();
     }
 
     //////////////////////////////////////

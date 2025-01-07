@@ -25,6 +25,7 @@ import {
 import CogManager from "../cog/CogManager";
 import MartyManager from '../marty/MartyManager';
 import Thumbs from './ui/Thumbs';
+import Trace from "./ui/Trace";
 
 let workingCanvas = document.createElement('canvas');
 let workingCanvas2 = document.createElement('canvas');
@@ -507,6 +508,7 @@ export default class ScratchJr {
             try {
                 gn('go').className = isOff ? 'go on' : 'go off';
                 Grid.updateCursor();
+                Trace.updateTrace();
             } catch (e) {
                 // ignore
             }
