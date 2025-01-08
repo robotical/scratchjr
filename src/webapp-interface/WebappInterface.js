@@ -267,19 +267,18 @@ export default class WebappInterface {
     }
 
   }
-
+  
 
   static recordsound_startplay() {
     this.getAudioCaptureElement().startPlay();
-
-
-
   }
   static recordsound_stopplay() {
     this.getAudioCaptureElement().stopPlay();
-
   }
 
+  static recordsound_initrecording () {
+    this.getAudioCaptureElement().startListeningForRecordPush();
+  }
 
   static getAudioCaptureElement() {
     if (!WebappInterface.audioCaptureElement) {

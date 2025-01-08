@@ -68,6 +68,7 @@ export default class Record {
         ScratchJr.stopStrips();
         dialogOpen = true;
         ScratchJr.onBackButtonCallback.push(Record.saveSoundandClose);
+        OS.initRecording();
     }
 
     static disappear () {

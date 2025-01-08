@@ -178,6 +178,10 @@ export default class OS {
         tabletInterface.sndrecord(fcn);
     }
 
+    static initRecording (fcn) {
+        tabletInterface.initrecording(fcn);
+    }
+
     static recordstop (fcn) {
         tabletInterface.recordstop(fcn);
     }

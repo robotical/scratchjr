@@ -247,7 +247,9 @@ export default class Prims {
             }
             strip.audio = snd;
             snd.play();
-            //	console.log ("playSound", snd, strip.audio, snd.source.playbackState);
+        }
+        try {
+        } catch (e) {
         }
         if (strip.audio && strip.audio.done()) {
             strip.audio.clear();
@@ -567,7 +569,7 @@ export default class Prims {
 
         } else {
             s.setPos(s.xcoor + strip.stepVector.x, s.ycoor + strip.stepVector.y);
-            strip.waitTimer = parseInt(tinterval*intervalToSeconds*(strip.waitTime));
+            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (strip.waitTime));
             strip.distance = distance;
         }
     }
@@ -1278,7 +1280,7 @@ export default class Prims {
             colour = "000000";
         }
         if (Prims.martyBlocks && Prims.martyBlocks.marty) {
-            Prims.martyBlocks.ledEyesColour(colour);
+            Prims.martyBlocks.ledEyesColour(colour, duration);
             strip.waitTimer = parseInt(tinterval * intervalToSeconds * (duration / 1000));
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;

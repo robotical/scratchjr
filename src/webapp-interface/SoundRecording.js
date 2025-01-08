@@ -1,291 +1,224 @@
+import getUserMedia from 'get-user-media-promise';
+import { computeRMS } from '../utils/sound-utils';
+import WavEncoder from 'wav-encoder';
+
 class AudioCapture {
     constructor() {
-        this.audioCtx = new (window.AudioContext || webkitAudioContext)(); // eslint-disable-line no-undef
-        this.audioElement = new window.Audio();
-        this.audioPlaybackElement = null;
+        this.audioCtx = new (window.AudioContext || webkitAudioContext)(); // Initialize AudioContext
+        this.bufferLength = 8192;
+        this.mediaStreamSource = null;
+        this.audioBuffer = null;
+        this.recording = false;
+        this.chunks = [];
+        this.scriptProcessorNode = null;
+        this.stream = null;
         this.errorHandler = null;
+        this.sourceNode = null;
+        this.started = false;
+        this.recording = false;
+        this.disposed = false;
     }
 
     getId(isNewRecording) {
-
         if (isNewRecording || !this.id) {
-            // uuid generator
             this.id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                let r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
-
         }
         return this.id;
     }
-    startRecord(constraints) {
-        this.savedBlob = null;
 
-        constraints = constraints || { audio: true };
-        if (navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia(constraints).then(
-                this.beginStartRecord.bind(this),
-                this.onError.bind(this));
+    startRecord() {
+        this.chunks = [];
+        this.recording = true;
+        this.audioBuffer = null;
+        this.savedBlob = null;
+        return this.getId() + '.webm';
+    }
+
+    async startListeningForRecordPush(constraints = { audio: true }) {
+        try {
+            this.stream = await getUserMedia(constraints);
+            this.beginStartRecord(this.stream);
+        } catch (error) {
+            this.onError(error);
         }
-        return this.getId(/*isNewRecording*/ true) + '.webm';
+        return this.getId(true) + '.webm';
+    }
+
+    async stopListeningForRecordPush() {
+        this.dispose();
     }
 
     beginStartRecord(stream) {
-        console.log("Recording started");
-        if (!this.isRecordingPermitted) {
-            throw (new Error('Recording audio is turned off'));
-        }
-        this.chunks = null;
-        this.currentStream = stream;
-        this.mediaRecorder = new MediaRecorder(stream);
-        this.mediaRecorder.ondataavailable = this.onRecordData.bind(this);
-        this.mediaRecorder.start();
+        this.mediaStreamSource = this.audioCtx.createMediaStreamSource(stream);
+        this.sourceNode = this.audioCtx.createGain();
+        this.scriptProcessorNode = this.audioCtx.createScriptProcessor(this.bufferLength, 1, 1);
 
+        this.scriptProcessorNode.onaudioprocess = (event) => {
+            if (this.recording && !this.disposed) {
+                const inputData = event.inputBuffer.getChannelData(0);
+                this.onRecordData(new Float32Array(inputData));
+            }
+        };
+
+        this.analyserNode = this.audioCtx.createAnalyser();
+
+        this.analyserNode.fftSize = 2048;
+
+        const bufferLength = this.analyserNode.frequencyBinCount;
+        const dataArray = new Float32Array(bufferLength);
+
+        const update = () => {
+            if (this.recording && !this.disposed) {
+                this.analyserNode.getFloatTimeDomainData(dataArray);
+                this.currentVolume = computeRMS(dataArray);
+            }
+            requestAnimationFrame(update);
+        };
+
+        requestAnimationFrame(update);
+
+        // Wire everything together, ending in the destination
+        this.mediaStreamSource.connect(this.sourceNode);
+        this.sourceNode.connect(this.analyserNode);
+        this.analyserNode.connect(this.scriptProcessorNode);
+        this.scriptProcessorNode.connect(this.audioCtx.destination);
     }
 
-    onError(e) {
-        console.log("Error starting recording", e);
-        if (this.errorHandler) {
-            this.errorHandler(e);
-        }
-
-    }
-
-    onRecordData(e) {
-        console.log("Recording data", e);
+    onRecordData(data) {
         if (!this.chunks) {
             this.chunks = [];
         }
-        this.chunks.push(e.data);
+        this.chunks.push(data);
     }
 
-    stubbornlyWaitForChunkData() {
-        // wait only for 5 seconds
-        let startTime = Date.now();
-        let maxWaitTime = 5000;
-        return new Promise((resolve, reject) => {
-            let interval = setInterval(() => {
-                console.log("waiting for recording data...");
-                if (Date.now() - startTime > maxWaitTime) {
-                    clearInterval(interval);
-                    resolve(false);
-                }
-                if (this.chunks && this.chunks.length > 0) {
-                    clearInterval(interval);
-                    resolve(true);
-                }
-            }, 500);
-        })
+    getVolume() {
+        if (!this.mediaStreamSource) {
+            return 0;
+        }
+        return this.currentVolume;
     }
 
     async captureRecordingAsBlob() {
-        console.log("captureRecordingAsBlob");
         if (this.savedBlob) return this.savedBlob;
+        if (!this.recording && this.chunks.length > 0) {
+            try {
+                const combinedBuffer = this._mergeBuffers(this.chunks);
+                // Create the audio buffer manually if needed
+                const audioBuffer = this.audioCtx.createBuffer(
+                    1,
+                    combinedBuffer.length / 1,
+                    this.audioCtx.sampleRate
+                );
+                this.audioBuffer = audioBuffer;
 
-        try {
-            if (!this.chunks || this.chunks.length == 0) {
-                if (this.mediaRecorder && this.mediaRecorder.state != 'inactive') {
-                    this.mediaRecorder.requestData();
+                for (let channel = 0; channel < 1; channel++) {
+                    audioBuffer.copyToChannel(
+                        combinedBuffer.subarray(channel * audioBuffer.length, (channel + 1) * audioBuffer.length),
+                        channel
+                    );
                 }
+
+                // Encode the audio buffer into WAV format
+                const wavData = await WavEncoder.encode({
+                    sampleRate: this.audioCtx.sampleRate,
+                    channelData: Array.from({ length: audioBuffer.numberOfChannels }, (_, i) =>
+                        audioBuffer.getChannelData(i)
+                    ),
+                });
+
+
+                this.chunks = []; // Clear chunks for future recordings
+                // Convert audio buffer to Blob
+                // Convert to Blob
+                const wavBlob = new Blob([wavData], { type: 'audio/wav' });
+                this.savedBlob = wavBlob;
+                return wavBlob;
+            } catch (error) {
+                this.savedBlob = null;
+                return null;
             }
-
-            if (!this.chunks || this.chunks.length == 0) {
-                const gotChuck = await this.stubbornlyWaitForChunkData();
-                if (!gotChuck) {
-                    console.log("No recording data found");
-                    return null;
-                } else {
-                    console.log("found recording data");
-                }
-            }
-            
-            if (!this.chunks) return null;
-            console.log("Saving sound");
-            let blob = new Blob(this.chunks, { type: 'audio/ogg; codecs=opus' });
-            this.chunks = [];
-
-            this.audioElement.srcObject = this.currentStream;
-
-            this.savedBlob = blob;
-            return this.savedBlob;
-
-        } catch (e) {
-            console.log("Error saving sound", e);
-            this.savedBlob = null;
-            return null;
         }
-
-
+        return null;
     }
+
+    dispose() {
+        this.disposed = true;
+        this.recording = false;
+        this.disposed = true;
+        if (this.started) {
+            if (this.scriptProcessorNode) {
+                this.scriptProcessorNode.disconnect();
+                this.scriptProcessorNode = null;
+            }
+
+            if (this.mediaStreamSource) {
+                this.mediaStreamSource.disconnect();
+                this.mediaStreamSource = null;
+            }
+
+            if (this.stream) {
+                this.stream.getTracks().forEach((track) => track.stop());
+                this.stream = null;
+            }
+
+            if (this.sourceNode) {
+                this.sourceNode.disconnect();
+                this.sourceNode = null;
+            }
+
+            if (this.analyserNode) {
+                this.analyserNode.disconnect();
+                this.analyserNode = null;
+            }
+        }
+    }
+
     stopRecord() {
-
-        this.stopAudioMeter();
-
-        if (this.mediaRecorder) {
-            //this.mediaRecorder.stop();
-
-            // https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder/ondataavailable
-            this.mediaRecorder.requestData();
-            this.mediaRecorder.stop();
-
-        }
-        this.mediaRecorder = null;
-
+        this.recording = false;
     }
 
-    stopPlay() {
-        if (this.audioPlaybackElement) {
-            this.audioPlaybackElement.pause();
-            this.audioPlaybackElement = null;
-        }
-    }
     async startPlay() {
-        // stop the recording
-        if (this.mediaRecorder) {
-            this.stopRecord();
-        }
-
-        let blob = await this.captureRecordingAsBlob();
-
-        if (blob) {
-            console.log("Playing sound");
-            let fileReader = new FileReader();
-            fileReader.onload = function () {
-                this.audioPlaybackElement = new Audio(fileReader.result);
-                this.audioPlaybackElement.volume = 0.8; // don't oversaturate speakers;
-                this.tryPlayAudio(this.audioPlaybackElement);
-            }.bind(this);
-            fileReader.readAsDataURL(blob);
-        }
-
-
-    }
-    /** calls play on an HTML audio element, takes care of promise */
-    tryPlayAudio(audioElement) {
-        try {
-            let playPromise = audioElement.play();
-            if (playPromise !== undefined) {
-                playPromise.then(function () { }).catch(function (error) { }); // eslint-disable-line no-unused-vars
+        if (!this.audioBuffer) {
+            const blob = await this.captureRecordingAsBlob();
+            if (!blob) {
+                return;
             }
-        } catch (e) {
-            console.log("Error saving sound", e);
-        }
-    }
-    getVolume() {
 
-        // https://github.com/cwilso/volume-meter/blob/master/volume-meter.js
-
-        if (this.isDisconnected) return 0;
-
-        if (!this.audioProcessor && this.currentStream) {
-            this.startAudioMeter();
+            // const arrayBuffer = await blob.arrayBuffer();
+            // this.audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
         }
 
-        if (this.audioProcessor) {
-            return this.audioProcessor.volume;
-        }
-        return 0;
+        const source = this.audioCtx.createBufferSource();
+        source.buffer = this.audioBuffer;
+        source.connect(this.audioCtx.destination);
+        source.start();
     }
 
-
-
-
-    /** starts processing audio stream for mic volume
-    https://github.com/cwilso/volume-meter/blob/master/volume-meter.js
-    */
-    startAudioMeter(clipLevel, averaging, clipLag) {
-
-        if (!this.currentStream) {
-            return; // no stream to monitor.
+    onError(e) {
+        if (this.errorHandler) {
+            this.errorHandler(e);
         }
-        let audioContext = this.audioCtx;
-        if (!this.mediaStreamSource) {
-            this.mediaStreamSource = this.audioCtx.createMediaStreamSource(this.currentStream);
-        }
-
-        if (!this.audioProcessor) {
-
-            // "It is recommended for authors to not specify this buffer size and allow the implementation to pick a good
-            // buffer size to balance between latency and audio quality."
-            // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createScriptProcessor
-            let processor = audioContext.createScriptProcessor((typeof AudioContext != 'undefined' ? null : 512), 1, 1);
-            processor.onaudioprocess = this.processVolume.bind(this);
-            processor.clipping = false;
-            processor.lastClip = 0;
-            processor.volume = 0;
-            processor.clipLevel = clipLevel || 0.98;
-            processor.averaging = averaging || 0.95;
-            processor.clipLag = clipLag || 750;
-
-            // this will have no effect, since we don't copy the input to the output,
-            // but works around a current Chrome bug.
-            processor.connect(audioContext.destination);
-
-            processor.checkClipping = function () {
-
-                if (!processor.clipping) {
-                    return false;
-                }
-                if ((processor.lastClip + processor.clipLag) < window.performance.now()) {
-                    processor.clipping = false;
-                }
-                return processor.clipping;
-            };
-
-            processor.shutdown = function () {
-                processor.disconnect();
-                processor.onaudioprocess = null;
-            };
-
-            this.audioProcessor = processor;
-
-            this.mediaStreamSource.connect(this.audioProcessor);
-        }
-
-
     }
-    stopAudioMeter() {
-        if (this.audioProcessor) {
-            this.audioProcessor.shutdown();
-            this.mediaStreamSource.disconnect(this.audioProcessor);
-            this.audioProcessor = null;
+
+    // Helper to merge Float32Array chunks into a single buffer
+    _mergeBuffers(chunks) {
+        const buffer = new Float32Array(chunks.length * this.bufferLength);
+
+        let offset = 0;
+        for (let i = 0; i < chunks.length; i++) {
+            const bufferChunk = chunks[i];
+            buffer.set(bufferChunk, offset);
+            offset += bufferChunk.length;
         }
 
-        this.mediaStreamSource = null;
+        return buffer;
     }
 
 
-    /** Process volume using root mean square.
-        @param {object} event from audioContext.createScriptProcessor.onaudioprocess
-        @this {AudioProcessor} audioProcessor
-    */
-    processVolume(event) {
-
-        let buf = event.inputBuffer.getChannelData(0);
-        let bufLength = buf.length;
-        let sum = 0;
-        let x;
-
-
-        // Average out the absolute values
-        for (let i = 0; i < bufLength; i++) {
-            x = buf[i];
-            sum += Math.abs(x);
-        }
-
-        // ... then take the square root of the sum.
-        let avg = Math.sqrt(sum / bufLength);
-
-
-        // divide by .5 because the max value seems to be around .5...
-        // this needs to be improved as it is not accurate, but it's enough to show
-        // a bit of a microphone level.
-        this.audioProcessor.volume = avg / 0.5;
-
-
-    }
-
-
-} // AudioCapture
+}
 
 export default AudioCapture;
+

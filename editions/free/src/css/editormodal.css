@@ -109,7 +109,7 @@
 }
 
 .record.fade {
-    -webkit-transition: opacity .3s linear, top .3s ease-out;
+    -webkit-transition: opacity 2s linear, top 2s ease-out;
     top: -100%;
     opacity: 0;
 }

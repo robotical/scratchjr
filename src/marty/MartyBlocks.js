@@ -106,7 +106,7 @@ export default class MartyBlocks {
             clearTimeout(turnOffLedEyesTimer);
         }, timeoutInterval);
     }
-    ledEyesColour() {
+    ledEyesColour(colour, duration) {
         if (!isVersionGreater_errorCatching(this.marty.getRaftVersion(), MartyBlocks.LED_EYES_FW_VERSION)) {
             return window.applicationManager.toaster.warn("Marty's firmware is not up to date for this feature. Please update Marty's firmware.");
         }

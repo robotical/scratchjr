@@ -156,6 +156,13 @@ export default class Webapp {
     }
   }
 
+  static initrecording(fcn) {
+    var result = WebappInterface.recordsound_initrecording();
+    if (fcn) {
+      fcn(result);
+    }
+  }
+
   static recordstop(fcn) {
     var result = WebappInterface.recordsound_recordstop();
     if (fcn) {
