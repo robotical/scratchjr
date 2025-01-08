@@ -50,6 +50,7 @@
     align-items: center;
     flex-direction: column;
     cursor: pointer;
+    padding-top: 2px;
 }
 
 .connectButtonConnected {
@@ -92,19 +93,22 @@
     display: flex;
     /* justify-content: space-evenly; */
     align-items: flex-end;
-    justify-content: center;
+    justify-content: flex-end;
     column-gap: ${css_vh(1)};
 }
 
 .batteryIndicatorContainer {
-    width: 25%;
+    display: flex;
+    width: 50%;
 }
 .signalIndicatorContainer {
+    display: flex;
     width: 22%;
 }
 
 /* Styles for the icon part of the button */
 .connectIcon {
+    display: flex;
     width: ${css_vh(3.2)}; /* Adjust size as needed */
 }
 
