@@ -98,17 +98,17 @@
 }
 
 .batteryIndicatorContainer {
-    display: flex;
+    display: grid;
     width: 50%;
 }
 .signalIndicatorContainer {
-    display: flex;
+    display: grid;
     width: 22%;
 }
 
 /* Styles for the icon part of the button */
 .connectIcon {
-    display: flex;
+    display: grid;
     width: ${css_vh(3.2)}; /* Adjust size as needed */
 }
 
