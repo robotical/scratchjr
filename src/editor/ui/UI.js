@@ -1080,6 +1080,9 @@ export default class UI {
             ScratchJr.runStrips(e);
         } else {
             ScratchJr.stopStripsFromTop(e);
+            // Send stop commands to all connected rafts
+            window.martyManager.stopAllMartys();
+            window.cogManager.stopAllCogs();
         }
     }
 

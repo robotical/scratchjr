@@ -25,6 +25,13 @@ class MartyManager {
             console.error(`Marty with id ${martyId} not found`);
         }
     }
+
+    stopAllMartys() {
+        for (const martyId in this.martys) {
+            // motion
+            this.martys[martyId].sendRestMessage("robot/stopAfterMove");
+        }
+    }
 }
 
 export default MartyManager;

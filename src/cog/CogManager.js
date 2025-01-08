@@ -25,6 +25,13 @@ class CogManager {
             console.error(`Cog with id ${cogId} not found`);
         }
     }
+
+    stopAllCogs() {
+        for (const cogId in this.cogs) {
+            // sound
+            this.cogs[cogId].sendRestMessage("audio/stop");
+        }
+    }
 }
 
 export default CogManager;
