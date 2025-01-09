@@ -282,7 +282,7 @@ export default class BlockSpecs {
     static setupPalettesDefCog() {
         return [['tiltany', 'ontouchcog', 'onmove', 'onobjectsensed', 'onlight', 'onrotate'],
         ['setpattern', 'selectcolour', 'clearcolours'],
-        ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote']];
+        ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote', 'waitcrotchet', 'settempo']];
     }
 
     static setupPalettesDefMarty() {
@@ -426,6 +426,10 @@ export default class BlockSpecs {
                 BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
             'playnote': ['playnote', noteshapes,
                 BlockSpecs.limeCmd, 'm', 'notec', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS, 'green'],
+            'waitcrotchet': ['waitcrotchet', BlockSpecs.getImageFrom('assets/blockicons/noterest', 'svg'),
+                BlockSpecs.limeCmd, 'n', 1, BlockSpecs.limeCmdH, 1, 4, BlockSpecs.cmdS],
+            'settempo': ['settempo', BlockSpecs.getImageFrom('assets/blockicons/tempo', 'svg'),
+                BlockSpecs.limeCmd, 'n', 60, BlockSpecs.limeCmdH, 1, 240, BlockSpecs.cmdS],
 
             /* Marty Blocks */
             'martyGetReady': ['martyGetReady', BlockSpecs.getImageFrom('assets/blockicons/MartyGetReady', 'svg'),
@@ -540,6 +544,8 @@ export default class BlockSpecs {
             'no': Localization.localize('BLOCK_PLAY_NO_SOUND'),
             'whistle': Localization.localize('BLOCK_PLAY_WHISTLE_SOUND'),
             'playnote': Localization.localize('BLOCK_PLAY_NOTE'),
+            'waitcrotchet': Localization.localize('BLOCK_DESC_WAIT_CROTCHET'),
+            'settempo': Localization.localize('BLOCK_DESC_SET_TEMPO'),
             'pop': Localization.localize('BLOCK_PLAY_POP_SOUND'),
             'endstack': Localization.localize('BLOCK_DESC_END'),
             'stopall': Localization.localize('BLOCK_DESC_STOP', {

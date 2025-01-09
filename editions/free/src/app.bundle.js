@@ -13,16 +13,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ CogBlocks)
 /* harmony export */ });
 /* harmony import */ var _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../editor/engine/Prims */ "./src/editor/engine/Prims.js");
+/* harmony import */ var _CogMusicBlocks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CogMusicBlocks */ "./src/cog/CogMusicBlocks.js");
 /**
  * Each CogBlocks instance is associated with a single cog.
  * It subscribes to the published data events of the cog and
  * provides methods to interact with the cog.
  */
 
+
 class CogBlocks {
   static selectedColour = null;
   constructor(cog) {
     this.cog = cog;
+    this.musicBlocks = new _CogMusicBlocks__WEBPACK_IMPORTED_MODULE_1__["default"](cog);
 
     // Subscribe to the published data events of the cog
     this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.tilt.left, this.onTiltLeft.bind(this));
@@ -103,72 +106,6 @@ class CogBlocks {
   }
   onNoObjectSensed() {
     _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__["default"].OnCogEvent("onnoobjectsensed");
-  }
-  async playSound(sound) {
-    switch (sound) {
-      case "disbelief":
-        await this.cog.sendRestMessage('audio/rtttl/Disbelief:d=4,o=5,b=120:g,8d#,8e,8f,8f#,8g,8a,8b,8c6,8p,8c6,8b,8a,8g,8f#,8e,8f,8d#,8p,8g');
-        break;
-      case "confusion":
-        await this.cog.sendRestMessage('audio/rtttl/Confused:d=4,o=5,b=120:c,e,g,c6,e6,g6,c,e,g,c6,e6,g6,c,e,g,a,a,b,b,c6');
-        break;
-      case "excitement":
-        await this.cog.sendRestMessage('audio/rtttl/Excitement:d=4,o=5,b=180:c,e,g,8c6,16p,8c6,16p,8c6,16p,c,e,g,8c6,16p,8c6,16p,8c6,16p,c,e,g,8c6');
-        break;
-      case "noway":
-        await this.cog.sendRestMessage('audio/rtttl/NoWay:d=4,o=5,b=120:p,8g,8p,8c6,8p,8g,8p,8a,8p,8f,8p,8e,8p,8d,8p,8c,8p,8g,8p,8c6,8p,8g');
-        break;
-      case "no":
-        await this.cog.sendRestMessage('audio/rtttl/No:d=4,o=5,b=100:p,8c,8p,8c,8p,8c,8p,8c');
-        break;
-      case "whistle":
-        await this.cog.sendRestMessage('audio/rtttl/Whistle:d=4,o=6,b=140:16b5,16p,16b5,16p,16b5,16p,16g,16p,16e,16p,16g,16p,16c7,16p,16c7,16p,16c7,16p,16a,16p,16f,16p,16a,16p,16d7');
-        break;
-      default:
-        break;
-    }
-  }
-  async playNote(note) {
-    switch (note) {
-      case "notec":
-        await this.cog.sendRestMessage('audio/rtttl/NoteC:d=4,o=5,b=120:c');
-        break;
-      case "notecsharp":
-        await this.cog.sendRestMessage('audio/rtttl/NoteCSharp:d=4,o=5,b=120:c#');
-        break;
-      case "noted":
-        await this.cog.sendRestMessage('audio/rtttl/NoteD:d=4,o=5,b=120:d');
-        break;
-      case "notedsharp":
-        await this.cog.sendRestMessage('audio/rtttl/NoteDSharp:d=4,o=5,b=120:d#');
-        break;
-      case "notee":
-        await this.cog.sendRestMessage('audio/rtttl/NoteE:d=4,o=5,b=120:e');
-        break;
-      case "notef":
-        await this.cog.sendRestMessage('audio/rtttl/NoteF:d=4,o=5,b=120:f');
-        break;
-      case "notefsharp":
-        await this.cog.sendRestMessage('audio/rtttl/NoteFSharp:d=4,o=5,b=120:f#');
-        break;
-      case "noteg":
-        await this.cog.sendRestMessage('audio/rtttl/NoteG:d=4,o=5,b=120:g');
-        break;
-      case "notegsharp":
-        await this.cog.sendRestMessage('audio/rtttl/NoteGSharp:d=4,o=5,b=120:g#');
-        break;
-      case "notea":
-        await this.cog.sendRestMessage('audio/rtttl/NoteA:d=4,o=5,b=120:a');
-        break;
-      case "noteasharp":
-        await this.cog.sendRestMessage('audio/rtttl/NoteASharp:d=4,o=5,b=120:a#');
-        break;
-      case "noteb":
-        await this.cog.sendRestMessage('audio/rtttl/NoteB:d=4,o=5,b=120:b');
-        break;
-      default:
-        break;
-    }
   }
   async setPattern(pattern) {
     switch (pattern) {
@@ -275,6 +212,150 @@ class CogManager {
   }
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (CogManager);
+
+/***/ }),
+
+/***/ "./src/cog/CogMusicBlocks.js":
+/*!***********************************!*\
+  !*** ./src/cog/CogMusicBlocks.js ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ CogMusicBlocks)
+/* harmony export */ });
+class CogMusicBlocks {
+  constructor(cog) {
+    this.cog = cog;
+    this.bpm = 120;
+  }
+  setTempo(bpm) {
+    this.bpm = bpm;
+  }
+  rest(beats) {
+    const rtttl = `audio/rtttl/Rest:d=4,o=5,b=${this.bpm}:${4 + 1 - beats}p`;
+    const duration = calculateRTTTLDur(rtttl);
+    this.cog.sendRestMessage(rtttl);
+    return duration;
+  }
+  playSound(sound) {
+    switch (sound) {
+      case "disbelief":
+        const rtttlDisbelief = `audio/rtttl/Disbelief:d=4,o=5,b=${this.bpm}:g,8d#,8e,8f,8f#,8g,8a,8b,8c6,8p,8c6,8b,8a,8g,8f#,8e,8f,8d#,8p,8g`;
+        const durationDisbelief = calculateRTTTLDur(rtttlDisbelief);
+        this.cog.sendRestMessage(rtttlDisbelief);
+        return durationDisbelief;
+      case "confusion":
+        const rtttlConfusion = `audio/rtttl/Confusion:d=4,o=5,b=${this.bpm}:c,e,g,c6,e6,g6,c,e,g,c6,e6,g6,c,e,g,a,a,b,b,c6`;
+        const durationConfusion = calculateRTTTLDur(rtttlConfusion);
+        this.cog.sendRestMessage(rtttlConfusion);
+        return durationConfusion;
+      case "excitement":
+        const rtttlExcitement = `audio/rtttl/Excitement:d=4,o=5,b=${this.bpm}:c,e,g,8c6,16p,8c6,16p,8c6,16p,c,e,g,8c6,16p,8c6,16p,8c6,16p,c,e,g,8c6`;
+        const durationExcitement = calculateRTTTLDur(rtttlExcitement);
+        this.cog.sendRestMessage(rtttlExcitement);
+        return durationExcitement;
+      case "noway":
+        const rtttlNoWay = `audio/rtttl/NoWay:d=4,o=5,b=${this.bpm}:p,8g,8p,8c6,8p,8g,8p,8a,8p,8f,8p,8e,8p,8d,8p,8c,8p,8g,8p,8c6,8p,8g`;
+        const durationNoWay = calculateRTTTLDur(rtttlNoWay);
+        this.cog.sendRestMessage(rtttlNoWay);
+        return durationNoWay;
+      case "no":
+        const rtttlNo = `audio/rtttl/No:d=4,o=5,b=${this.bpm}:p,8c,8p,8c,8p,8c,8p,8c`;
+        const durationNo = calculateRTTTLDur(rtttlNo);
+        this.cog.sendRestMessage(rtttlNo);
+        return durationNo;
+      case "whistle":
+        const rtttlWhistle = `audio/rtttl/Whistle:d=4,o=6,b=${this.bpm}:16b5,16p,16b5,16p,16b5,16p,16g,16p,16e,16p,16g,16p,16c7,16p,16c7,16p,16c7,16p,16a,16p,16f,16p,16a,16p,16d7`;
+        const durationWhistle = calculateRTTTLDur(rtttlWhistle);
+        this.cog.sendRestMessage(rtttlWhistle);
+        return durationWhistle;
+      default:
+        break;
+    }
+  }
+  playNote(note) {
+    switch (note) {
+      case "notec":
+        const rtttlNoteC = `audio/rtttl/NoteC:d=4,o=5,b=${this.bpm}:c`;
+        const durationNoteC = calculateRTTTLDur(rtttlNoteC);
+        this.cog.sendRestMessage(rtttlNoteC);
+        return durationNoteC;
+      case "notecsharp":
+        const rtttlNoteCSharp = `audio/rtttl/NoteCSharp:d=4,o=5,b=${this.bpm}:c#`;
+        const durationNoteCSharp = calculateRTTTLDur(rtttlNoteCSharp);
+        this.cog.sendRestMessage(rtttlNoteCSharp);
+        return durationNoteCSharp;
+      case "noted":
+        const rtttlNoteD = `audio/rtttl/NoteD:d=4,o=5,b=${this.bpm}:d`;
+        const durationNoteD = calculateRTTTLDur(rtttlNoteD);
+        this.cog.sendRestMessage(rtttlNoteD);
+        return durationNoteD;
+      case "notedsharp":
+        const rtttlNoteDSharp = `audio/rtttl/NoteDSharp:d=4,o=5,b=${this.bpm}:d#`;
+        const durationNoteDSharp = calculateRTTTLDur(rtttlNoteDSharp);
+        this.cog.sendRestMessage(rtttlNoteDSharp);
+        return durationNoteDSharp;
+      case "notee":
+        const rtttlNoteE = `audio/rtttl/NoteE:d=4,o=5,b=${this.bpm}:e`;
+        const durationNoteE = calculateRTTTLDur(rtttlNoteE);
+        this.cog.sendRestMessage(rtttlNoteE);
+        return durationNoteE;
+      case "notef":
+        const rtttlNoteF = `audio/rtttl/NoteF:d=4,o=5,b=${this.bpm}:f`;
+        const durationNoteF = calculateRTTTLDur(rtttlNoteF);
+        this.cog.sendRestMessage(rtttlNoteF);
+        return durationNoteF;
+      case "notefsharp":
+        const rtttlNoteFSharp = `audio/rtttl/NoteFSharp:d=4,o=5,b=${this.bpm}:f#`;
+        const durationNoteFSharp = calculateRTTTLDur(rtttlNoteFSharp);
+        this.cog.sendRestMessage(rtttlNoteFSharp);
+        return durationNoteFSharp;
+      case "noteg":
+        const rtttlNoteG = `audio/rtttl/NoteG:d=4,o=5,b=${this.bpm}:g`;
+        const durationNoteG = calculateRTTTLDur(rtttlNoteG);
+        this.cog.sendRestMessage(rtttlNoteG);
+        return durationNoteG;
+      case "notegsharp":
+        const rtttlNoteGSharp = `audio/rtttl/NoteGSharp:d=4,o=5,b=${this.bpm}:g#`;
+        const durationNoteGSharp = calculateRTTTLDur(rtttlNoteGSharp);
+        this.cog.sendRestMessage(rtttlNoteGSharp);
+        return durationNoteGSharp;
+      default:
+        break;
+    }
+  }
+}
+function calculateRTTTLDur(rtttl) {
+  // Extract the parameters and notes from the RTTTL string
+  const [header, notesString] = rtttl.split(":").slice(1);
+  const params = Object.fromEntries(header.split(",").map(p => p.split("=")));
+  const notes = notesString.split(",");
+
+  // Extract tempo (BPM) and default duration
+  const bpm = parseInt(params.b, 10); // Beats per minute
+  const defaultDuration = parseInt(params.d, 10); // Default note duration (e.g., 4 = quarter note)
+
+  // Calculate the duration of a whole note in ms
+  const wholeNoteDuration = 60000 * 4 / bpm;
+  let totalDuration = 0;
+
+  // Calculate the duration for each note or rest
+  for (const note of notes) {
+    // Match note-specific duration or use default
+    const match = note.match(/^(\d+)?([a-gp#]+)/i); // Match duration and note/rest
+    if (!match) continue;
+    const noteDuration = match[1] ? parseInt(match[1], 10) : defaultDuration; // Specific or default duration
+    // Calculate the duration for the note/rest
+    const duration = wholeNoteDuration * (1 / noteDuration);
+
+    // Accumulate total duration
+    totalDuration += duration;
+  }
+  return totalDuration;
+}
 
 /***/ }),
 
@@ -1206,7 +1287,9 @@ class ScratchJr {
     } else {
       val += c;
     }
-    if (Number(val).toString() != 'NaN' && (Number(val) > 99 || Number(val) < -99)) {
+    const min = activeFocus.daddy.min || -99;
+    const max = activeFocus.daddy.max || 99;
+    if (Number(val).toString() != 'NaN' && (Number(val) > max || Number(val) < min)) {
       _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_1__["default"].sndFX('boing.wav');
     } else {
       activeFocus.setValue(val);
@@ -2551,7 +2634,7 @@ class BlockSpecs {
     return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'], ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'], ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'], [], ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'], ['endstack', 'forever']];
   }
   static setupPalettesDefCog() {
-    return [['tiltany', 'ontouchcog', 'onmove', 'onobjectsensed', 'onlight', 'onrotate'], ['setpattern', 'selectcolour', 'clearcolours'], ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote']];
+    return [['tiltany', 'ontouchcog', 'onmove', 'onobjectsensed', 'onlight', 'onrotate'], ['setpattern', 'selectcolour', 'clearcolours'], ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote', 'waitcrotchet', 'settempo']];
   }
   static setupPalettesDefMarty() {
     return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'], ['martyGetReady', 'martyStepForward', 'martyStepBackward', 'martyStepRight', 'martyStepLeft', 'martyTurnRight', 'martyTurnLeft', 'martyDance', 'martyKickLeft', 'martyKickRight'], ['martyEyesExcited', 'martyEyesWide', 'martyEyesAngry', 'martyEyesNormal', 'martyEyesWiggle', 'martyWaveLeft', 'martyWaveRight', 'martyCelebrate', 'martyLedEyesP1', 'martyLedEyesP2', 'martyLedEyesColour'], ['martyConfusion', 'martyDisbelief', 'martyExcitement', 'martyNoway', 'martyNo', 'martyWhistle'], ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'], ['endstack', 'forever']];
@@ -2629,6 +2712,8 @@ class BlockSpecs {
       'no': ['no', BlockSpecs.getImageFrom('assets/blockicons/MartyNo', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
       'whistle': ['whistle', BlockSpecs.getImageFrom('assets/blockicons/MartyWhistle', 'svg'), BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
       'playnote': ['playnote', noteshapes, BlockSpecs.limeCmd, 'm', 'notec', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS, 'green'],
+      'waitcrotchet': ['waitcrotchet', BlockSpecs.getImageFrom('assets/blockicons/noterest', 'svg'), BlockSpecs.limeCmd, 'n', 1, BlockSpecs.limeCmdH, 1, 4, BlockSpecs.cmdS],
+      'settempo': ['settempo', BlockSpecs.getImageFrom('assets/blockicons/tempo', 'svg'), BlockSpecs.limeCmd, 'n', 60, BlockSpecs.limeCmdH, 1, 240, BlockSpecs.cmdS],
       /* Marty Blocks */
       'martyGetReady': ['martyGetReady', BlockSpecs.getImageFrom('assets/blockicons/MartyGetReady', 'svg'), BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
       'martyDance': ['martyDance', BlockSpecs.getImageFrom('assets/blockicons/MartyDance', 'svg'), BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
@@ -2711,6 +2796,8 @@ class BlockSpecs {
       'no': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_PLAY_NO_SOUND'),
       'whistle': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_PLAY_WHISTLE_SOUND'),
       'playnote': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_PLAY_NOTE'),
+      'waitcrotchet': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_WAIT_CROTCHET'),
+      'settempo': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_SET_TEMPO'),
       'pop': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_PLAY_POP_SOUND'),
       'endstack': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_END'),
       'stopall': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_STOP', {
@@ -3580,12 +3667,6 @@ class Prims {
     Prims.table.done = Prims.Done;
     Prims.table.missing = Prims.Ignore;
     Prims.table.onflag = Prims.Ignore;
-    Prims.table.tiltany = Prims.Ignore; //
-    Prims.table.ontouchcog = Prims.Ignore; //
-    Prims.table.onmove = Prims.Ignore; // 
-    Prims.table.onobjectsensed = Prims.Ignore; // 
-    Prims.table.onlight = Prims.Ignore; // 
-    Prims.table.onrotate = Prims.Ignore; //
     Prims.table.onmessage = Prims.Ignore;
     Prims.table.onclick = Prims.Ignore;
     Prims.table.ontouch = Prims.OnTouch;
@@ -3619,22 +3700,32 @@ class Prims {
     Prims.table.hop = Prims.Hop;
     Prims.table.show = Prims.Show;
     Prims.table.hide = Prims.Hide;
-    Prims.table.confusion = Prims.playConfusion; //
-    Prims.table.disbelief = Prims.playDisbelief; //
-    Prims.table.excitement = Prims.playExcitement; //
-    Prims.table.noway = Prims.playNoway; //
-    Prims.table.no = Prims.playNo; //
-    Prims.table.whistle = Prims.playWhistle; //
-    Prims.table.playnote = Prims.playNote; // 
     Prims.table.grow = Prims.Grow;
     Prims.table.shrink = Prims.Shrink;
     Prims.table.same = Prims.Same;
-    Prims.table.setpattern = Prims.setPattern; //
-    Prims.table.selectcolour = Prims.selectColour; //
-    Prims.table.clearcolours = Prims.clearColours; //
     Prims.table.playsnd = Prims.playSound;
     Prims.table.playusersnd = Prims.playSound;
     Prims.table.say = Prims.Say;
+
+    /* Cog Prims */
+    Prims.table.tiltany = Prims.Ignore;
+    Prims.table.ontouchcog = Prims.Ignore;
+    Prims.table.onmove = Prims.Ignore;
+    Prims.table.onobjectsensed = Prims.Ignore;
+    Prims.table.onlight = Prims.Ignore;
+    Prims.table.onrotate = Prims.Ignore;
+    Prims.table.setpattern = Prims.setPattern;
+    Prims.table.selectcolour = Prims.selectColour;
+    Prims.table.clearcolours = Prims.clearColours;
+    Prims.table.confusion = Prims.playConfusion;
+    Prims.table.disbelief = Prims.playDisbelief;
+    Prims.table.excitement = Prims.playExcitement;
+    Prims.table.noway = Prims.playNoway;
+    Prims.table.no = Prims.playNo;
+    Prims.table.whistle = Prims.playWhistle;
+    Prims.table.playnote = Prims.playNote;
+    Prims.table.waitcrotchet = Prims.waitcrotchet;
+    Prims.table.settempo = Prims.settempo;
 
     /* Marty Prims */
     Prims.table.martyDance = Prims.martyDance;
@@ -3698,60 +3789,70 @@ class Prims {
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].runtime.yield = true;
   }
   static playConfusion(strip) {
-    const durationInSeconds = 10;
     console.log("playing confusion");
-    Prims.cogBlocks?.playSound("confusion");
+    const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("confusion") / 1000;
     Prims.setTime(strip);
     strip.waitTimer = convertNumberToSeconds(durationInSeconds);
     strip.thisblock = strip.thisblock.next;
   }
   static playDisbelief(strip) {
-    const durationInSeconds = 6;
     console.log("playing disbelief");
-    Prims.cogBlocks?.playSound("disbelief");
+    const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("disbelief") / 1000;
     Prims.setTime(strip);
     strip.waitTimer = convertNumberToSeconds(durationInSeconds);
     strip.thisblock = strip.thisblock.next;
   }
   static playExcitement(strip) {
-    const durationInSeconds = 5;
     console.log("playing excitement");
-    Prims.cogBlocks?.playSound("excitement");
+    const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("excitement") / 1000;
     Prims.setTime(strip);
     strip.waitTimer = convertNumberToSeconds(durationInSeconds);
     strip.thisblock = strip.thisblock.next;
   }
   static playNoway(strip) {
-    const durationInSeconds = 6;
     console.log("playing noway");
-    Prims.cogBlocks?.playSound("noway");
+    const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("noway") / 1000;
     Prims.setTime(strip);
     strip.waitTimer = convertNumberToSeconds(durationInSeconds);
     strip.thisblock = strip.thisblock.next;
   }
   static playNo(strip) {
-    const durationInSeconds = 3;
     console.log("playing no");
-    Prims.cogBlocks?.playSound("no");
+    const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("no") / 1000;
+    console.log("durationInSeconds: ", durationInSeconds);
     Prims.setTime(strip);
     strip.waitTimer = convertNumberToSeconds(durationInSeconds);
     strip.thisblock = strip.thisblock.next;
   }
   static playWhistle(strip) {
-    const durationInSeconds = 3;
     console.log("playing whistle");
-    Prims.cogBlocks?.playSound("whistle");
+    const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("whistle") / 1000;
+    Prims.setTime(strip);
+    strip.waitTimer = convertNumberToSeconds(durationInSeconds);
+    strip.thisblock = strip.thisblock.next;
+  }
+  static settempo(strip) {
+    const bpm = strip.thisblock.getArgValue();
+    console.log("setting tempo: ", bpm);
+    Prims.cogBlocks?.musicBlocks.setTempo(bpm);
+    Prims.setTime(strip);
+    strip.waitTimer = tinterval * 1;
+    strip.thisblock = strip.thisblock.next;
+  }
+  static waitcrotchet(strip) {
+    const beats = strip.thisblock.getArgValue();
+    console.log("waiting crotchet: ", beats);
+    const durationInSeconds = Prims.cogBlocks?.musicBlocks.rest(beats) / 1000;
     Prims.setTime(strip);
     strip.waitTimer = convertNumberToSeconds(durationInSeconds);
     strip.thisblock = strip.thisblock.next;
   }
   static playNote(strip) {
-    const durationInSeconds = .5;
     const note = strip.thisblock.getArgValue();
     console.log("playing note: ", note);
-    Prims.cogBlocks?.playNote(note);
+    const durationInSeconds = Prims.cogBlocks?.musicBlocks.playNote(note) / 1000;
     Prims.setTime(strip);
-    strip.waitTimer = convertNumberToSeconds(durationInSeconds);
+    strip.waitTimer = convertNumberToSeconds(durationInSeconds + 0.1); // add 0.1s to wait between consecutive notes
     strip.thisblock = strip.thisblock.next;
   }
   static getSoundHelper(name, extIdx = -1) {
@@ -10589,9 +10690,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Undo__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Undo */ "./src/editor/ui/Undo.js");
 /* harmony import */ var _utils_Events__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../utils/Events */ "./src/utils/Events.js");
 /* harmony import */ var _Scroll__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Scroll */ "./src/editor/ui/Scroll.js");
-/* harmony import */ var _blocks_Menu__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../blocks/Menu */ "./src/editor/blocks/Menu.js");
-/* harmony import */ var _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../utils/ScratchAudio */ "./src/utils/ScratchAudio.js");
-/* harmony import */ var _utils_lib__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../utils/lib */ "./src/utils/lib.js");
+/* harmony import */ var _Zoom__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Zoom */ "./src/editor/ui/Zoom.js");
+/* harmony import */ var _blocks_Menu__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../blocks/Menu */ "./src/editor/blocks/Menu.js");
+/* harmony import */ var _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../utils/ScratchAudio */ "./src/utils/ScratchAudio.js");
+/* harmony import */ var _utils_lib__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../utils/lib */ "./src/utils/lib.js");
+/* harmony import */ var _html_svgs_zoom_out_svg__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../html-svgs/zoom-out-svg */ "./src/html-svgs/zoom-out-svg.js");
+
+
 
 
 
@@ -10603,29 +10708,48 @@ __webpack_require__.r(__webpack_exports__);
 
 
 let scroll = undefined;
+let zoom = undefined;
 let watermark;
 class ScriptsPane {
   static get scroll() {
     return scroll;
   }
+  static get zoom() {
+    return zoom;
+  }
   static get watermark() {
     return watermark;
   }
   static createScripts(parent) {
-    var div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.newHTML)('div', 'scripts', parent);
+    var div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.newHTML)('div', 'scripts', parent);
     div.setAttribute('id', 'scripts');
-    watermark = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.newHTML)('div', 'watermark', div);
-    var h = Math.max((0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.getDocumentHeight)(), _utils_lib__WEBPACK_IMPORTED_MODULE_9__.frame.offsetHeight);
-    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.setCanvasSize)(div, div.offsetWidth, h - div.offsetTop);
+    watermark = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.newHTML)('div', 'watermark', div);
+    var h = Math.max((0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.getDocumentHeight)(), _utils_lib__WEBPACK_IMPORTED_MODULE_10__.frame.offsetHeight);
+    (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.setCanvasSize)(div, div.offsetWidth, h - div.offsetTop);
     scroll = new _Scroll__WEBPACK_IMPORTED_MODULE_6__["default"](div, 'scriptscontainer', div.offsetWidth, h - div.offsetTop, _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getActiveScript, _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getBlocks);
+    zoom = new _Zoom__WEBPACK_IMPORTED_MODULE_7__["default"](scroll.contents);
+
+    // Add zoom button
+    const zoomButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.newHTML)('div', 'zoom-button', div);
+    zoomButton.innerHTML = _html_svgs_zoom_out_svg__WEBPACK_IMPORTED_MODULE_11__.zoomOutSvg;
+    zoomButton.onmousedown = () => zoom.zoomOut();
+    zoomButton.onmouseup = () => zoom.zoomReset();
+  }
+  static zoomIn() {
+    zoom.zoomIn();
+    scroll.refresh();
+  }
+  static zoomOut() {
+    zoom.zoomOut();
+    scroll.refresh();
   }
   static setActiveScript(sprname) {
-    var currentsc = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)(sprname + '_scripts');
+    var currentsc = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)(sprname + '_scripts');
     if (!currentsc) {
       // Sprite not found
       return;
     }
-    _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.currentPage.setCurrentSprite((0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)(sprname).owner);
+    _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.currentPage.setCurrentSprite((0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)(sprname).owner);
     currentsc.owner.activate();
     currentsc.parentNode.ontouchstart = function (evt) {
       currentsc.owner.scriptsMouseDown(evt);
@@ -10666,11 +10790,11 @@ class ScriptsPane {
     _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragmousex = x;
     _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragmousey = y;
     var lpt = {
-      x: (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.localx)(_utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragthumbnail.parentNode, x),
-      y: (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.localy)(_utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragthumbnail.parentNode, y)
+      x: (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.localx)(_utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragthumbnail.parentNode, x),
+      y: (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.localy)(_utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragthumbnail.parentNode, y)
     };
-    var mx = _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragmousex - (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.globalx)(_utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragDiv) - lpt.x + _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragthumbnail.left;
-    var my = _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragmousey - (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.globaly)(_utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragDiv) - lpt.y + _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragthumbnail.top;
+    var mx = _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragmousex - (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.globalx)(_utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragDiv) - lpt.x + _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragthumbnail.left;
+    var my = _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragmousey - (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.globaly)(_utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragDiv) - lpt.y + _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragthumbnail.top;
     var mtx = new WebKitCSSMatrix(window.getComputedStyle(_utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragthumbnail).webkitTransform);
     my -= sy;
     mx -= sx;
@@ -10716,7 +10840,7 @@ class ScriptsPane {
   }
   static blockFeedback(dx, dy, e) {
     var script = _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getActiveScript().owner;
-    var limit = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)('palette').parentNode.offsetTop + (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)('palette').parentNode.offsetHeight;
+    var limit = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)('palette').parentNode.offsetTop + (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)('palette').parentNode.offsetHeight;
     var ycor = dy + _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].dragcanvas.offsetHeight;
     if (ycor < limit) {
       script.removeCaret();
@@ -10727,14 +10851,14 @@ class ScriptsPane {
     var thumb;
     switch (_Palette__WEBPACK_IMPORTED_MODULE_3__["default"].getLandingPlace(script.dragList[0].div, e)) {
       case 'library':
-        thumb = _Palette__WEBPACK_IMPORTED_MODULE_3__["default"].getHittedThumb(script.dragList[0].div, (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)('spritecc'));
-        if (thumb && (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)(thumb.owner).owner.type == _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getSprite().type) {
+        thumb = _Palette__WEBPACK_IMPORTED_MODULE_3__["default"].getHittedThumb(script.dragList[0].div, (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)('spritecc'));
+        if (thumb && (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)(thumb.owner).owner.type == _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getSprite().type) {
           _Thumbs__WEBPACK_IMPORTED_MODULE_2__["default"].quickHighlight(thumb);
         } else {
           thumb = undefined;
         }
-        for (var i = 0; i < (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)('spritecc').childElementCount; i++) {
-          var spr = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)('spritecc').childNodes[i];
+        for (var i = 0; i < (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)('spritecc').childElementCount; i++) {
+          var spr = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)('spritecc').childNodes[i];
           if (spr.nodeName == 'FORM') {
             continue;
           }
@@ -10760,23 +10884,23 @@ class ScriptsPane {
     var page = _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.currentPage;
     switch (_Palette__WEBPACK_IMPORTED_MODULE_3__["default"].getLandingPlace(el, e)) {
       case 'scripts':
-        var dx = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.localx)(sc, el.left);
-        var dy = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.localy)(sc, el.top);
+        var dx = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.localx)(sc, el.left);
+        var dy = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.localy)(sc, el.top);
         ScriptsPane.blockDropped(sc, dx, dy);
         // Start the story if scripts is changed.
         _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].storyStart('ScriptsPane.changed');
         break;
       case 'library':
-        var thumb = _Palette__WEBPACK_IMPORTED_MODULE_3__["default"].getHittedThumb(el, (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)('spritecc'));
+        var thumb = _Palette__WEBPACK_IMPORTED_MODULE_3__["default"].getHittedThumb(el, (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)('spritecc'));
         ScriptsPane.blockDropped(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].getActiveScript(), el.startx, el.starty);
-        if (thumb && (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)(thumb.owner).owner.type == (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)(page.currentSpriteName).owner.type) {
+        if (thumb && (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)(thumb.owner).owner.type == (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)(page.currentSpriteName).owner.type) {
           _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].storyStart('ScriptsPane.dropBlock:library');
-          _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_8__["default"].sndFX('copy.wav');
+          _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_9__["default"].sndFX('copy.wav');
           _Thumbs__WEBPACK_IMPORTED_MODULE_2__["default"].quickHighlight(thumb);
           setTimeout(function () {
             _Thumbs__WEBPACK_IMPORTED_MODULE_2__["default"].quickRestore(thumb);
           }, 300);
-          sc = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)(thumb.owner + '_scripts').owner;
+          sc = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)(thumb.owner + '_scripts').owner;
           var strip = _Project__WEBPACK_IMPORTED_MODULE_1__["default"].encodeStrip(el.owner);
           var firstblock = strip[0];
           var delta = sc.gettopblocks().length * 3;
@@ -10822,8 +10946,8 @@ class ScriptsPane {
     ScriptsPane.removeLibCaret();
   }
   static removeLibCaret() {
-    for (var i = 0; i < (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)('spritecc').childElementCount; i++) {
-      var spr = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)('spritecc').childNodes[i];
+    for (var i = 0; i < (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)('spritecc').childElementCount; i++) {
+      var spr = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)('spritecc').childNodes[i];
       if (spr.nodeName == 'FORM') {
         continue;
       }
@@ -10836,10 +10960,10 @@ class ScriptsPane {
   //----------------------------------
 
   static dragBackground(e) {
-    if (_blocks_Menu__WEBPACK_IMPORTED_MODULE_7__["default"].openMenu) {
+    if (_blocks_Menu__WEBPACK_IMPORTED_MODULE_8__["default"].openMenu) {
       return;
     }
-    if (_utils_lib__WEBPACK_IMPORTED_MODULE_9__.isTablet && e.touches && e.touches.length > 1) {
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_10__.isTablet && e.touches && e.touches.length > 1) {
       return;
     }
     e.preventDefault();
@@ -10854,7 +10978,7 @@ class ScriptsPane {
     ScriptsPane.setDragBackgroundEvents(ScriptsPane.dragMove, ScriptsPane.dragEnd);
   }
   static setDragBackgroundEvents(fcnmove, fcnup) {
-    if (_utils_lib__WEBPACK_IMPORTED_MODULE_9__.isTablet) {
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_10__.isTablet) {
       // setDragBackgroundEvents
       window.ontouchmove = function (evt) {
         fcnmove(evt);
@@ -10898,10 +11022,10 @@ class ScriptsPane {
 
   static updateScriptsPageBlocks(list) {
     for (var j = 0; j < list.length; j++) {
-      if (!(0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)(list[j] + '_scripts')) {
+      if (!(0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)(list[j] + '_scripts')) {
         continue;
       }
-      var sc = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_9__.gn)(list[j] + '_scripts').owner;
+      var sc = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)(list[j] + '_scripts').owner;
       if (!sc) {
         continue;
       }
@@ -10912,6 +11036,7 @@ class ScriptsPane {
     }
   }
 }
+window.ScriptsPane = ScriptsPane;
 
 /***/ }),
 
@@ -11055,6 +11180,7 @@ class Scroll {
     return 'none';
   }
   bounceBack() {
+    return; // disabling bouncing back so that the canvas can be scrolled
     var owner = this;
     var p = this.contents; // scriptscontainer
     var bc = this.getContent(); // blockcanvas
@@ -12802,13 +12928,12 @@ class UI {
     const batteryIndicator = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'batteryIndicatorContainer', batteryAndSignalContainer);
     batteryIndicator.innerHTML = (0,_html_svgs_battery_svg__WEBPACK_IMPORTED_MODULE_26__.batterySvg)(0);
     signalIndicator.innerHTML = (0,_html_svgs_signal_svg__WEBPACK_IMPORTED_MODULE_27__.signalSvg)(0);
-    // batteryIndicator.style.display = 'none';
-    // signalIndicator.style.display = 'none';
+    batteryIndicator.style.display = 'none';
+    signalIndicator.style.display = 'none';
 
     // create raft name field
     const raftName = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'raftNameConnectButton', connectButton);
-    // raftName.style.display = 'none';
-    raftName.textContent = 'dummdifid dfis';
+    raftName.style.display = 'none';
 
     // Create button container 
     const iconButtonContainer = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'iconButtonContainer notConnectedButtonContainer', connectButton);
@@ -14518,6 +14643,45 @@ class Undo {
 
 /***/ }),
 
+/***/ "./src/editor/ui/Zoom.js":
+/*!*******************************!*\
+  !*** ./src/editor/ui/Zoom.js ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Zoom)
+/* harmony export */ });
+class Zoom {
+  constructor(scriptsContainer) {
+    this.scriptsContainer = scriptsContainer;
+    this.zoomLevel = 1;
+    this.zoomInterval = null; // Add this line
+  }
+  zoomIn() {
+    this.zoomLevel = Math.min(this.zoomLevel + 0.1, 2); // Max zoom level 2x
+    this.applyZoom();
+  }
+  zoomOut() {
+    this.zoomLevel = Math.max(this.zoomLevel - 0.6, 0.1); // Min zoom level 0.1x
+    this.applyZoom();
+  }
+  zoomReset() {
+    this.zoomLevel = 1;
+    this.applyZoom();
+  }
+  applyZoom() {
+    if (this.scriptsContainer) {
+      this.scriptsContainer.style.transform = `scale(${this.zoomLevel})`;
+      // this.scriptsContainer.style.transformOrigin = '0 0';
+    }
+  }
+}
+
+/***/ }),
+
 /***/ "./src/entry/editor.js":
 /*!*****************************!*\
   !*** ./src/entry/editor.js ***!
@@ -14768,7 +14932,7 @@ function inappBlocksGuide() {
   (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('green-block-category-header').textContent = _utils_Localization__WEBPACK_IMPORTED_MODULE_1__["default"].localize('BLOCKS_SOUND_BLOCKS');
   (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('orange-block-category-header').textContent = _utils_Localization__WEBPACK_IMPORTED_MODULE_1__["default"].localize('BLOCKS_CONTROL_BLOCKS');
   (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('red-block-category-header').textContent = _utils_Localization__WEBPACK_IMPORTED_MODULE_1__["default"].localize('BLOCKS_END_BLOCKS');
-  var blockDescriptionKeys = ['BLOCKS_GREEN_FLAG', 'BLOCKS_GREEN_FLAG_DESCRIPTION', 'BLOCKS_MOVE_RIGHT', 'BLOCKS_MOVE_RIGHT_DESCRIPTION', 'BLOCKS_MOVE_LEFT', 'BLOCKS_MOVE_LEFT_DESCRIPTION', 'BLOCKS_MOVE_UP', 'BLOCKS_MOVE_UP_DESCRIPTION', 'BLOCKS_MOVE_DOWN', 'BLOCKS_MOVE_DOWN_DESCRIPTION', 'BLOCKS_TURN_RIGHT', 'BLOCKS_TURN_RIGHT_DESCRIPTION', 'BLOCKS_TURN_LEFT', 'BLOCKS_TURN_LEFT_DESCRIPTION', 'BLOCK_KICK_RIGHT', 'BLOCK_KICK_RIGHT_DESCRIPTION', 'BLOCK_KICK_LEFT', 'BLOCK_KICK_LEFT_DESCRIPTION', 'BLOCK_MOVE_GETREADY', 'BLOCK_MOVE_GETREADY_DESCRIPTION', 'BLOCK_MOVE_DANCE', 'BLOCK_MOVE_DANCE_DESCRIPTION', 'BLOCK_EYES_EXCITED', 'BLOCK_EYES_EXCITED_DESCRIPTION', 'BLOCK_EYES_WIDE', 'BLOCK_EYES_WIDE_DESCRIPTION', 'BLOCK_EYES_ANGRY', 'BLOCK_EYES_ANGRY_DESCRIPTION', 'BLOCK_EYES_NORMAL', 'BLOCK_EYES_NORMAL_DESCRIPTION', 'BLOCK_EYES_WIGGLE', 'BLOCK_EYES_WIGGLE_DESCRIPTION', 'BLOCK_WAVE_LEFT', 'BLOCK_WAVE_LEFT_DESCRIPTION', 'BLOCK_WAVE_RIGHT', 'BLOCK_WAVE_RIGHT_DESCRIPTION', 'BLOCK_LED_EYES_P1', 'BLOCK_LED_EYES_P1_DESCRIPTION', 'BLOCK_LED_EYES_P2', 'BLOCK_LED_EYES_P2_DESCRIPTION', 'BLOCK_LED_EYES_Cog', 'BLOCK_LED_EYES_Cog_DESCRIPTION', 'BLOCK_LED_EYES_COLOUR', 'BLOCK_LED_EYES_COLOUR_DESCRIPTION', 'BLOCK_CELEBRATE', 'BLOCK_CELEBRATE_DESCRIPTION', 'BLOCK_PLAY_CONFUSION_SOUND', 'BLOCK_PLAY_CONFUSION_SOUND_DESCRIPTION', 'BLOCK_PLAY_DISBELIEF_SOUND', 'BLOCK_PLAY_DISBELIEF_SOUND_DESCRIPTION', 'BLOCK_PLAY_EXCITEMENT_SOUND', 'BLOCK_PLAY_EXCITEMENT_SOUND_DESCRIPTION', 'BLOCK_PLAY_NOWAY_SOUND', 'BLOCK_PLAY_NOWAY_SOUND_DESCRIPTION', 'BLOCK_PLAY_NO_SOUND', 'BLOCK_PLAY_NO_SOUND_DESCRIPTION', 'BLOCK_PLAY_WHISTLE_SOUND', 'BLOCK_PLAY_WHISTLE_SOUND_DESCRIPTION', 'BLOCKS_WAIT', 'BLOCKS_WAIT_DESCRIPTION', 'BLOCKS_STOP', 'BLOCKS_STOP_DESCRIPTION', 'BLOCKS_REPEAT', 'BLOCKS_REPEAT_DESCRIPTION', 'BLOCKS_END', 'BLOCKS_END_DESCRIPTION', 'BLOCKS_REPEAT_FOREVER', 'BLOCKS_REPEAT_FOREVER_DESCRIPTION'];
+  var blockDescriptionKeys = ['BLOCKS_GREEN_FLAG', 'BLOCKS_GREEN_FLAG_DESCRIPTION', 'BLOCKS_MOVE_RIGHT', 'BLOCKS_MOVE_RIGHT_DESCRIPTION', 'BLOCKS_MOVE_LEFT', 'BLOCKS_MOVE_LEFT_DESCRIPTION', 'BLOCKS_MOVE_UP', 'BLOCKS_MOVE_UP_DESCRIPTION', 'BLOCKS_MOVE_DOWN', 'BLOCKS_MOVE_DOWN_DESCRIPTION', 'BLOCKS_TURN_RIGHT', 'BLOCKS_TURN_RIGHT_DESCRIPTION', 'BLOCKS_TURN_LEFT', 'BLOCKS_TURN_LEFT_DESCRIPTION', 'BLOCK_KICK_RIGHT', 'BLOCK_KICK_RIGHT_DESCRIPTION', 'BLOCK_KICK_LEFT', 'BLOCK_KICK_LEFT_DESCRIPTION', 'BLOCK_MOVE_GETREADY', 'BLOCK_MOVE_GETREADY_DESCRIPTION', 'BLOCK_MOVE_DANCE', 'BLOCK_MOVE_DANCE_DESCRIPTION', 'BLOCK_EYES_EXCITED', 'BLOCK_EYES_EXCITED_DESCRIPTION', 'BLOCK_EYES_WIDE', 'BLOCK_EYES_WIDE_DESCRIPTION', 'BLOCK_EYES_ANGRY', 'BLOCK_EYES_ANGRY_DESCRIPTION', 'BLOCK_EYES_NORMAL', 'BLOCK_EYES_NORMAL_DESCRIPTION', 'BLOCK_EYES_WIGGLE', 'BLOCK_EYES_WIGGLE_DESCRIPTION', 'BLOCK_WAVE_LEFT', 'BLOCK_WAVE_LEFT_DESCRIPTION', 'BLOCK_WAVE_RIGHT', 'BLOCK_WAVE_RIGHT_DESCRIPTION', 'BLOCK_LED_EYES_P1', 'BLOCK_LED_EYES_P1_DESCRIPTION', 'BLOCK_LED_EYES_P2', 'BLOCK_LED_EYES_P2_DESCRIPTION', 'BLOCK_LED_EYES_Cog', 'BLOCK_LED_EYES_Cog_DESCRIPTION', 'BLOCK_LED_EYES_COLOUR', 'BLOCK_LED_EYES_COLOUR_DESCRIPTION', 'BLOCK_CELEBRATE', 'BLOCK_CELEBRATE_DESCRIPTION', 'BLOCK_PLAY_CONFUSION_SOUND', 'BLOCK_PLAY_CONFUSION_SOUND_DESCRIPTION', 'BLOCK_PLAY_DISBELIEF_SOUND', 'BLOCK_PLAY_DISBELIEF_SOUND_DESCRIPTION', 'BLOCK_PLAY_EXCITEMENT_SOUND', 'BLOCK_PLAY_EXCITEMENT_SOUND_DESCRIPTION', 'BLOCK_PLAY_NOWAY_SOUND', 'BLOCK_PLAY_NOWAY_SOUND_DESCRIPTION', 'BLOCK_PLAY_NO_SOUND', 'BLOCK_PLAY_NO_SOUND_DESCRIPTION', 'BLOCK_PLAY_WHISTLE_SOUND', 'BLOCK_PLAY_WHISTLE_SOUND_DESCRIPTION', 'BLOCK_DESC_WAIT_CROTCHET', 'BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION', 'BLOCK_DESC_SET_TEMPO', 'BLOCK_DESC_SET_TEMPO_DESCRIPTION', 'BLOCKS_WAIT', 'BLOCKS_WAIT_DESCRIPTION', 'BLOCKS_STOP', 'BLOCKS_STOP_DESCRIPTION', 'BLOCKS_REPEAT', 'BLOCKS_REPEAT_DESCRIPTION', 'BLOCKS_END', 'BLOCKS_END_DESCRIPTION', 'BLOCKS_REPEAT_FOREVER', 'BLOCKS_REPEAT_FOREVER_DESCRIPTION'];
   for (let i = 0; i < blockDescriptionKeys.length; i++) {
     try {
       (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)(blockDescriptionKeys[i]).textContent = _utils_Localization__WEBPACK_IMPORTED_MODULE_1__["default"].localize(blockDescriptionKeys[i]);
@@ -15739,6 +15903,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   spriteToggleOn: () => (/* binding */ spriteToggleOn)
 /* harmony export */ });
 const spriteToggleOn = `<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 21"><g id="Switch"><path id="Track" d="M27.5,21H10.5C4.7,21,0,16.3,0,10.5H0C0,4.7,4.7,0,10.5,0h17c5.8,0,10.5,4.7,10.5,10.5h0c0,5.8-4.7,10.5-10.5,10.5Z" style="fill:#1fb78a;"/><g id="Handle"><circle cx="10.5" cy="10.5" r="10.5" style="fill:#fff;"/><path d="M10.5,0c5.79,0,10.5,4.71,10.5,10.5s-4.71,10.5-10.5,10.5S0,16.29,0,10.5,4.71,0,10.5,0ZM10.5,19c4.69,0,8.5-3.81,8.5-8.5S15.19,2,10.5,2,2,5.81,2,10.5s3.81,8.5,8.5,8.5Z" style="fill:#158b64;"/></g></g></svg>`;
+
+/***/ }),
+
+/***/ "./src/html-svgs/zoom-out-svg.js":
+/*!***************************************!*\
+  !*** ./src/html-svgs/zoom-out-svg.js ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   zoomOutSvg: () => (/* binding */ zoomOutSvg)
+/* harmony export */ });
+const zoomOutSvg = `<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><defs><style>.cls-1{fill:#231f20;opacity:0.15;}.cls-2{fill:#fff;}.cls-3{opacity:0.75;}.cls-4{fill:none;stroke:#575e75;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;}</style></defs><title>zoom-out</title><circle class="cls-1" cx="18" cy="18" r="18"/><circle class="cls-2" cx="18" cy="18" r="16"/><g class="cls-3"><circle class="cls-4" cx="18" cy="18" r="7"/><line class="cls-4" x1="23" y1="23" x2="26" y2="26"/><line class="cls-4" x1="16" y1="18" x2="20" y2="18"/></g></svg>`;
 
 /***/ }),
 

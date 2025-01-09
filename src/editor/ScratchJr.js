@@ -992,7 +992,10 @@ export default class ScratchJr {
         } else {
             val += c;
         }
-        if ((Number(val).toString() != 'NaN') && ((Number(val) > 99) || (Number(val) < -99))) {
+        const min = activeFocus.daddy.min || -99;
+        const max = activeFocus.daddy.max || 99;
+        
+        if ((Number(val).toString() != 'NaN') && ((Number(val) > max) || (Number(val) < min))) {
             ScratchAudio.sndFX('boing.wav');
         } else {
             activeFocus.setValue(val);

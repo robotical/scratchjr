@@ -486,7 +486,9 @@ z-index: 5;
     overflow: hidden;
 }
 
-#scriptscontainer {}
+#scriptscontainer {
+    transition: transform 0.3s ease;
+}
 
 #scriptscontainer .look {
     position: absolute;
@@ -1304,4 +1306,14 @@ p.textsprite {
     font-weight: bold;
     width: auto;
     -webkit-text-size-adjust: auto;
+}
+
+.zoom-button {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    z-index: 1000;
 }

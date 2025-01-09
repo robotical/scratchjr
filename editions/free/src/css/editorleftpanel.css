@@ -51,6 +51,7 @@
     flex-direction: column;
     cursor: pointer;
     padding-top: 2px;
+    padding-bottom: 1px;
 }
 
 .connectButtonConnected {
@@ -108,6 +109,7 @@
 
 /* Styles for the icon part of the button */
 .connectIcon {
+    margin-bottom: 1px;
     display: grid;
     width: ${css_vh(3.2)}; /* Adjust size as needed */
 }

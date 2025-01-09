@@ -22,12 +22,7 @@ export default class Prims {
         Prims.table.done = Prims.Done;
         Prims.table.missing = Prims.Ignore;
         Prims.table.onflag = Prims.Ignore;
-        Prims.table.tiltany = Prims.Ignore; //
-        Prims.table.ontouchcog = Prims.Ignore; //
-        Prims.table.onmove = Prims.Ignore; // 
-        Prims.table.onobjectsensed = Prims.Ignore; // 
-        Prims.table.onlight = Prims.Ignore; // 
-        Prims.table.onrotate = Prims.Ignore; //
+        
         Prims.table.onmessage = Prims.Ignore;
         Prims.table.onclick = Prims.Ignore;
         Prims.table.ontouch = Prims.OnTouch;
@@ -61,22 +56,34 @@ export default class Prims {
         Prims.table.hop = Prims.Hop;
         Prims.table.show = Prims.Show;
         Prims.table.hide = Prims.Hide;
-        Prims.table.confusion = Prims.playConfusion; //
-        Prims.table.disbelief = Prims.playDisbelief; //
-        Prims.table.excitement = Prims.playExcitement; //
-        Prims.table.noway = Prims.playNoway; //
-        Prims.table.no = Prims.playNo; //
-        Prims.table.whistle = Prims.playWhistle; //
-        Prims.table.playnote = Prims.playNote; // 
         Prims.table.grow = Prims.Grow;
         Prims.table.shrink = Prims.Shrink;
         Prims.table.same = Prims.Same;
-        Prims.table.setpattern = Prims.setPattern; //
-        Prims.table.selectcolour = Prims.selectColour; //
-        Prims.table.clearcolours = Prims.clearColours; //
         Prims.table.playsnd = Prims.playSound;
         Prims.table.playusersnd = Prims.playSound;
         Prims.table.say = Prims.Say;
+
+        /* Cog Prims */
+        Prims.table.tiltany = Prims.Ignore; 
+        Prims.table.ontouchcog = Prims.Ignore; 
+        Prims.table.onmove = Prims.Ignore;  
+        Prims.table.onobjectsensed = Prims.Ignore;  
+        Prims.table.onlight = Prims.Ignore;  
+        Prims.table.onrotate = Prims.Ignore; 
+        Prims.table.setpattern = Prims.setPattern; 
+        Prims.table.selectcolour = Prims.selectColour; 
+        Prims.table.clearcolours = Prims.clearColours; 
+        Prims.table.confusion = Prims.playConfusion; 
+        Prims.table.disbelief = Prims.playDisbelief; 
+        Prims.table.excitement = Prims.playExcitement; 
+        Prims.table.noway = Prims.playNoway; 
+        Prims.table.no = Prims.playNo; 
+        Prims.table.whistle = Prims.playWhistle; 
+        Prims.table.playnote = Prims.playNote;  
+        Prims.table.waitcrotchet = Prims.waitcrotchet;  
+        Prims.table.settempo = Prims.settempo;  
+
+
 
         /* Marty Prims */
         Prims.table.martyDance = Prims.martyDance;
@@ -151,66 +158,78 @@ export default class Prims {
 
 
     static playConfusion(strip) {
-        const durationInSeconds = 10;
         console.log("playing confusion");
-        Prims.cogBlocks?.playSound("confusion");
+        const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("confusion") / 1000;
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
     static playDisbelief(strip) {
-        const durationInSeconds = 6;
         console.log("playing disbelief")
-        Prims.cogBlocks?.playSound("disbelief");
+        const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("disbelief") / 1000;
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
     static playExcitement(strip) {
-        const durationInSeconds = 5;
         console.log("playing excitement")
-        Prims.cogBlocks?.playSound("excitement");
+        const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("excitement") / 1000;
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
     static playNoway(strip) {
-        const durationInSeconds = 6;
         console.log("playing noway")
-        Prims.cogBlocks?.playSound("noway");
+        const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("noway") / 1000;
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
     static playNo(strip) {
-        const durationInSeconds = 3;
         console.log("playing no")
-        Prims.cogBlocks?.playSound("no");
+        const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("no") / 1000;
+        console.log("durationInSeconds: ", durationInSeconds)
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
     static playWhistle(strip) {
-        const durationInSeconds = 3;
         console.log("playing whistle")
-        Prims.cogBlocks?.playSound("whistle");
+        const durationInSeconds = Prims.cogBlocks?.musicBlocks.playSound("whistle") / 1000;
+        Prims.setTime(strip);
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
+        strip.thisblock = strip.thisblock.next;
+    }
+
+    static settempo(strip) {
+        const bpm = strip.thisblock.getArgValue();
+        console.log("setting tempo: ", bpm)
+        Prims.cogBlocks?.musicBlocks.setTempo(bpm);
+        Prims.setTime(strip);
+        strip.waitTimer = tinterval * 1;
+        strip.thisblock = strip.thisblock.next;
+    }
+
+    static waitcrotchet(strip) {
+        const beats = strip.thisblock.getArgValue();
+        console.log("waiting crotchet: ", beats)
+        const durationInSeconds = Prims.cogBlocks?.musicBlocks.rest(beats) / 1000;
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds);
         strip.thisblock = strip.thisblock.next;
     }
 
     static playNote(strip) {
-        const durationInSeconds = .5;
         const note = strip.thisblock.getArgValue();
         console.log("playing note: ", note)
-        Prims.cogBlocks?.playNote(note);
+        const durationInSeconds = Prims.cogBlocks?.musicBlocks.playNote(note) / 1000;
         Prims.setTime(strip);
-        strip.waitTimer = convertNumberToSeconds(durationInSeconds);
+        strip.waitTimer = convertNumberToSeconds(durationInSeconds + 0.1); // add 0.1s to wait between consecutive notes
         strip.thisblock = strip.thisblock.next;
     }
 
