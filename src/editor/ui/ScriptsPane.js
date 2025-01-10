@@ -45,8 +45,8 @@ export default class ScriptsPane {
         // Add zoom button
         const zoomButton = newHTML('div', 'zoom-button', div);
         zoomButton.innerHTML = zoomOutSvg;
-        zoomButton.onmousedown = () => zoom.zoomOut();
-        zoomButton.onmouseup = () => zoom.zoomReset();
+        zoomButton.onpointerdown = () => zoom.zoomOut();
+        zoomButton.onpointerup = () => zoom.zoomReset();
     }
 
     static zoomIn() {

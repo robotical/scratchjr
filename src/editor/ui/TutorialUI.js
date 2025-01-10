@@ -1,3 +1,6 @@
+import { closexSvg } from "../../html-svgs/closex-svg";
+import { questionmarkSvg } from "../../html-svgs/questionmark-svg";
+import { readOutLoudSvg } from "../../html-svgs/readoutloud-svg";
 import { gn, newHTML } from "../../utils/lib";
 import ScratchJr from "../ScratchJr";
 import Palette from "./Palette";
@@ -9,6 +12,7 @@ export default class TutorialUI {
 
     /* Sets up tutorial UI elements */
     static setupUI(tutorial) {
+        speechSynthesis.getVoices(); // This is needed to get the voices in time
         this.tutorial = tutorial;
         const frame = gn('frame');
         TutorialUI.frame = frame;
@@ -109,10 +113,10 @@ export default class TutorialUI {
 
         // tutorial menu bar should have in this order a close button, the title of the tutorial, a question mark icon, previous and next buttons
         TutorialUI.tutorialMenuBar.innerHTML = `
-            <button id="closeTutorial" class="tutorialButton" onclick="window.applicationManager?.returnToMainApp()">X</button>
+            <button id="closeTutorial" class="tutorialButton" onclick="window.applicationManager?.returnToMainApp()">${closexSvg}</button>
             <div id="tutorialTitle" class="tutorialTitle">${this.tutorial.title}</div>
-            <button id="tutorialReadAloud" class="tutorialButton">&#128265</button>
-            <button id="tutorialHelp" class="tutorialButton">?</button>
+            <button id="tutorialReadAloud" class="tutorialButton">${readOutLoudSvg}</button>
+            <button id="tutorialHelp" class="tutorialButton">${questionmarkSvg}</button>
             <button id="previousStep" class="tutorialButton">
                 <svg id="tutorial-left-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg">
                     <path d="M16 6L10 12L16 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>

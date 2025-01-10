@@ -53,7 +53,7 @@ const cogAndMartyTutorial: Tutorial = {
                 {
                     type: "HighlightElement",
                     elementId: "nextStep",
-                    hexColor: "#FF0000"
+                    hexColor: "#855cd659"
                 }
             ],
             instructionActions: [
@@ -78,7 +78,7 @@ const cogAndMartyTutorial: Tutorial = {
                 {
                     type: "HighlightElement",
                     elementId: "cogConnectionButton",
-                    hexColor: "#FF0000",
+                    hexColor: "#855cd659",
                     onClickAction: "NextStep"
                 }
             ],
@@ -99,7 +99,7 @@ const cogAndMartyTutorial: Tutorial = {
                 {
                     type: "HighlightElement",
                     elementId: "martyConnectionButton",
-                    hexColor: "#FF0000",
+                    hexColor: "#855cd659",
                     onClickAction: "NextStep"
                 }
             ],
@@ -120,7 +120,7 @@ const cogAndMartyTutorial: Tutorial = {
                 {
                     type: "HighlightElement",
                     elementId: "cog-start",
-                    hexColor: "#FF0000",
+                    hexColor: "#855cd659",
                     onClickAction: "NextStep"
                 }
             ],
@@ -177,7 +177,7 @@ const cogAndMartyTutorial: Tutorial = {
                 {
                     type: "HighlightElement",
                     elementId: "sprite-start",
-                    hexColor: "#FF0000",
+                    hexColor: "#855cd659",
                     onClickAction: "NextStep"
                 },
             ],
@@ -234,7 +234,7 @@ const cogAndMartyTutorial: Tutorial = {
                 {
                     type: "HighlightElement",
                     elementId: "martyMode",
-                    hexColor: "#FF0000",
+                    hexColor: "#855cd659",
                     onClickAction: "NextStep"
                 }
             ],
@@ -301,7 +301,7 @@ const cogAndMartyTutorial: Tutorial = {
                 {
                     type: "HighlightElement",
                     elementId: "marty-motion",
-                    hexColor: "#FF0000",
+                    hexColor: "#855cd659",
                     onClickAction: "NextStep"
                 }
             ],

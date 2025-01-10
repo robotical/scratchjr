@@ -157,7 +157,7 @@ const cogAndMartyTutorial = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "readAloud", "readAloud", "next"],
+            buttons: ["previous", "readAloud", "next"],
             expectedCode: [],
             presenter: "marty"
         },

@@ -20,12 +20,8 @@
     padding: 0 3px;
 }
 
-#tutorialHelp {
-    font-size: 12px;
-}
-
 #tutorialReadAloud {
-    align-items: start;
+    /* align-items: start; */
 }
 
 #nextStep,
@@ -45,7 +41,7 @@
     border: none;
     cursor: pointer;
 
-    font-size: 10px;
+    font-size: 4px;
 
     background: #E6E6E6;
     color: #133C46;
