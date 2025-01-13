@@ -22,9 +22,6 @@ export default class CogBlocks {
         this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.movementType.shake, this.onShake.bind(this));
         this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.movementType.move, this.onMove.bind(this));
 
-        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.rotation.clockwise, this.onRotateClockwise.bind(this));
-        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.rotation.counterClockwise, this.onRotateCounterClockwise.bind(this));
-
         this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.buttonClick.click, this.onButtonClick.bind(this));
 
         this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.lightSense.high, this.onHighLight.bind(this));
@@ -45,9 +42,6 @@ export default class CogBlocks {
 
         this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.movementType.shake, this.onShake.bind(this));
         this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.movementType.move, this.onMove.bind(this));
-
-        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.rotation.clockwise, this.onRotateClockwise.bind(this));
-        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.rotation.counterClockwise, this.onRotateCounterClockwise.bind(this));
 
         this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.buttonClick.click, this.onButtonClick.bind(this));
 
@@ -82,14 +76,6 @@ export default class CogBlocks {
 
     onMove() {
         Prims.OnCogEvent("onmove");
-    }
-
-    onRotateClockwise() {
-        Prims.OnCogEvent("onrotateclockwise");
-    }
-
-    onRotateCounterClockwise() {
-        Prims.OnCogEvent("onrotatecounterclockwise");
     }
 
     onButtonClick() {

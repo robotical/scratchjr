@@ -28,7 +28,6 @@ const moveshapes = [
     'onshake'];
 const onobjectsensedshapes = ['onobjectsensedleft', 'onobjectsensedright', 'onnoobjectsensed'];
 const lightshapes = ['onhighlight', 'onmidlight', 'onlowlight'];
-// const rotateshapes = ['onrotateeither', 'onrotateclockwise', 'onrotatecounterclockwise'];
 const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];
 const colourshapes = ['selectcolourred', 'selectcolourgreen', 'selectcolourblue', 'selectcolourpurple', 'selectcolourorange', 'selectcolouryellow'];
 const noteshapes = ['notec', 'notecsharp', 'noted', 'notedsharp', 'notee', 'notef', 'notefsharp', 'noteg', 'notegsharp', 'notea', 'noteasharp', 'noteb'];
@@ -404,8 +403,6 @@ export default class BlockSpecs {
                 BlockSpecs.yellowStart, 'm', 'onobjectsensedleft', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'onlight': ['onlight', lightshapes,
                 BlockSpecs.yellowStart, 'm', 'onhighlight', BlockSpecs.yellowStartH, 0, 100, BlockSpecs.startS],
-            'onrotate': ['onrotate', rotateshapes,
-                BlockSpecs.yellowStart, 'm', 'onrotateeither', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'setpattern': ['setpattern', patternshapes,
                 BlockSpecs.pinkCmd, 'm', 'patternrainbow', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS, 'purple'],
             'clearcolours': ['clearcolours', BlockSpecs.getImageFrom('assets/blockicons/clearcolours', 'svg'),

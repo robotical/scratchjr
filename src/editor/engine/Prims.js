@@ -69,7 +69,6 @@ export default class Prims {
         Prims.table.onmove = Prims.Ignore;  
         Prims.table.onobjectsensed = Prims.Ignore;  
         Prims.table.onlight = Prims.Ignore;  
-        Prims.table.onrotate = Prims.Ignore; 
         Prims.table.setpattern = Prims.setPattern; 
         Prims.table.selectcolour = Prims.selectColour; 
         Prims.table.clearcolours = Prims.clearColours; 
@@ -1507,21 +1506,9 @@ export default class Prims {
                     receivers.push([s, block]);
                 }
             }
-            if (block.blocktype == 'onrotate') {
-                if (block.getArgValue() == 'onrotateclockwise' && event == 'onrotateclockwise') {
-                    receivers.push([s, block]);
-                }
-                if (block.getArgValue() == 'onrotatecounterclockwise' && event == 'onrotatecounterclockwise') {
-                    receivers.push([s, block]);
-                }
-                if ((block.getArgValue() == 'onrotateeither' && event == 'onrotatecounterclockwise') ||
-                    (block.getArgValue() == 'onrotateeither' && event == 'onrotateclockwise')) {
-                    receivers.push([s, block]);
-                }
-            }
         }
 
-        Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onmove', 'onrotate', 'onobjectsensed', 'onlight'], findReceivers);
+        Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onmove', 'onobjectsensed', 'onlight'], findReceivers);
         var newthreads = [];
         for (var i in receivers) {
             pair = receivers[i];
