@@ -103,6 +103,21 @@ export default class CogMusicBlocks {
                 const durationNoteGSharp = calculateRTTTLDur(rtttlNoteGSharp);
                 this.cog.sendRestMessage(rtttlNoteGSharp);
                 return durationNoteGSharp;
+            case "notea":
+                const rtttlNoteA = `audio/rtttl/NoteA:d=4,o=5,b=${this.bpm}:a`;
+                const durationNoteA = calculateRTTTLDur(rtttlNoteA);
+                this.cog.sendRestMessage(rtttlNoteA);
+                return durationNoteA;
+            case "noteasharp":
+                const rtttlNoteASharp = `audio/rtttl/NoteASharp:d=4,o=5,b=${this.bpm}:a#`;
+                const durationNoteASharp = calculateRTTTLDur(rtttlNoteASharp);
+                this.cog.sendRestMessage(rtttlNoteASharp);
+                return durationNoteASharp;
+            case "noteb":
+                const rtttlNoteB = `audio/rtttl/NoteB:d=4,o=5,b=${this.bpm}:b`;
+                const durationNoteB = calculateRTTTLDur(rtttlNoteB);
+                this.cog.sendRestMessage(rtttlNoteB);
+                return durationNoteB;
             default:
                 break;
         }

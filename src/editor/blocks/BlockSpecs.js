@@ -28,7 +28,7 @@ const moveshapes = [
     'onshake'];
 const onobjectsensedshapes = ['onobjectsensedleft', 'onobjectsensedright', 'onnoobjectsensed'];
 const lightshapes = ['onhighlight', 'onmidlight', 'onlowlight'];
-const rotateshapes = ['onrotateeither', 'onrotateclockwise', 'onrotatecounterclockwise'];
+// const rotateshapes = ['onrotateeither', 'onrotateclockwise', 'onrotatecounterclockwise'];
 const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];
 const colourshapes = ['selectcolourred', 'selectcolourgreen', 'selectcolourblue', 'selectcolourpurple', 'selectcolourorange', 'selectcolouryellow'];
 const noteshapes = ['notec', 'notecsharp', 'noted', 'notedsharp', 'notee', 'notef', 'notefsharp', 'noteg', 'notegsharp', 'notea', 'noteasharp', 'noteb'];
@@ -280,7 +280,7 @@ export default class BlockSpecs {
     }
 
     static setupPalettesDefCog() {
-        return [['tiltany', 'ontouchcog', 'onmove', 'onobjectsensed', 'onlight', 'onrotate'],
+        return [['tiltany', 'ontouchcog', 'onmove', 'onobjectsensed', 'onlight'],
         ['setpattern', 'selectcolour', 'clearcolours'],
         ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote', 'waitcrotchet', 'settempo']];
     }
@@ -501,7 +501,6 @@ export default class BlockSpecs {
             'onmove': Localization.localize('BLOCK_DESC_ON_MOVE'),
             'onobjectsensed': Localization.localize('BLOCK_DESC_ON_OBJECT_SENSED'),
             'onlight': Localization.localize('BLOCK_DESC_ON_LIGHT'),
-            'onrotate': Localization.localize('BLOCK_DESC_ON_ROTATE'),
             'onclick': Localization.localize('BLOCK_DESC_ON_TAP', {
                 CHARACTER_NAME: spr.name
             }),
