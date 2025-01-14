@@ -112,7 +112,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "In this tutorial we will learn how Cog and Marty can interact with each other. Press 'Next' to start!"
+                    text: "In this tutorial, we will learn how Cog and Marty can interact with each other. Press 'Next' to start!"
                 }
             ],
             buttons: ["readAloud", "next"],
@@ -124,7 +124,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "First, let's connect to Cog. Click on the Cog button to connect to Cog"
+                    text: "First, let's connect to Cog. Click on the Cog button to connect to Cog."
                 }
             ],
             nextStepActions: [
@@ -145,7 +145,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Then, let's connect to Marty. Click on the Marty button to connect to Marty"
+                    text: "Next, let's connect to Marty. Click on the Marty button to connect to Marty"
                 }
             ],
             nextStepActions: [
@@ -186,7 +186,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Once you have selected the Start block category, drag the 'on click cog' block to the script area. Make sure to press Next when you are done"
+                    text: "Once you have selected the Start block category, drag the 'on touch cog' block to the script area. Make sure to press 'Next' when you are done."
                 }
             ],
             nextStepActions: [
@@ -243,7 +243,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Now drag the 'message' block from the Sprite Start category to the script area. This block will send a message to Marty when the sprite is clicked"
+                    text: "Now drag the 'message' block from the Sprite Start category to the script area. This block will send a message to Marty when the sprite is clicked."
                 }
             ],
             nextStepActions: [
@@ -301,7 +301,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Once in Marty Mode, drag the 'on message' block from the Marty Start category to the script area. This block will listen for the message sent by Cog"
+                    text: "Once in Marty Mode, drag the 'on message' block from the Marty Start category to the script area. This block will listen for the message sent by Cog."
                 }
             ],
             nextStepActions: [
@@ -343,7 +343,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Now, let's select Marty's motion blocks. Click on the Motion category of Marty blocks"
+                    text: "Now, let's select Marty's motion blocks. Click on the Motion category of Marty blocks."
                 }
             ],
             nextStepActions: [
@@ -369,7 +369,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "We're almost there! Drag the 'marty dance' block to the script area. This block will make Marty dance when the message is received"
+                    text: "We're almost there! Drag the 'Marty Dance' block to the script area. This block will make Marty dance when the message is received."
                 }
             ],
             nextStepActions: [
@@ -411,7 +411,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Great job! You have successfully coded Cog and Marty to interact with each other. No click Cog's button to see Marty dance!"
+                    text: "Great job! You have successfully coded Cog and Marty to interact with each other. Now click Cog's button to see Marty dance!"
                 }
             ],
             nextStepActions: [],
