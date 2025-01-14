@@ -4963,7 +4963,10 @@ class Prims {
   }
   static OnCogEvent(event) {
     // console.log("onCogEvent")
-
+    // if executing a script, then don't do anything
+    if (this.isScriptRunning()) {
+      return;
+    }
     var pair;
     var receivers = [];
     var findReceivers = function (block, s) {
@@ -5090,6 +5093,9 @@ class Prims {
         fcn(topblocks[j], spr);
       }
     }
+  }
+  static isScriptRunning() {
+    return _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].runtime.threadsRunning.some(thread => thread.isRunning);
   }
 }
 window.cogEvent = function (event) {

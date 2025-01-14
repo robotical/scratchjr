@@ -1448,7 +1448,11 @@ export default class Prims {
 
     static OnCogEvent(event) {
         // console.log("onCogEvent")
-
+        // if executing a script, then don't do anything
+        if (this.isScriptRunning()) {
+            return;
+        }
+        
         var pair;
         var receivers = [];
 
@@ -1581,6 +1585,10 @@ export default class Prims {
                 fcn(topblocks[j], spr);
             }
         }
+    }
+
+    static isScriptRunning() {
+        return ScratchJr.runtime.threadsRunning.some(thread => thread.isRunning);
     }
 }
 
