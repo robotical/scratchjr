@@ -285,7 +285,7 @@ export default class Undo {
                     /*MartyMode*/
                     // only set visible if the sprite is not a bird's eye sprite
                     console.log("In copySprite, sprite name: " + spr.name, ". Before setting visibility to visible");
-                    if (!spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                    if (!spr.name || !spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
                         spr.div.style.visibility = 'visible';
                     }
                 }

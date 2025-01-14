@@ -105,7 +105,7 @@ export default class Page {
             this.currentSpriteName = spr.id;
             /*MartyMode*/
             // only set visible if the sprite is not a bird's eye sprite
-            if (!spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+            if (!spr.name || !spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
                 spr.div.style.visibility = 'visible';
             }
             Palette.show();
@@ -253,8 +253,8 @@ export default class Page {
             martyBirdsEyeSprite.div.style.visibility = showBirdsEye ? 'visible' : 'hidden';
         }
 
-        // Retrieve all sprites on the current page
-        const allSprites = this.getSprites();
+        // Retrieve all sprites on the current page with the texts included
+        const allSprites = this.getSprites(true);
 
         // Loop through each sprite and set visibility based on `showBirdsEye`
         allSprites.forEach(sprite => {
@@ -368,12 +368,12 @@ export default class Page {
             // only print MartyBird's eye sprite if we are in MartyMode,
             // otherwise print all the rest sprites
             if (this.currentSpriteName && this.currentSpriteName.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
-                if (spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                if (spr.name?.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
                     this.stampSpriteAt(ctx, spr, scale);
                 }
             }
             if (this.currentSpriteName && !this.currentSpriteName.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
-                if (!spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                if (!spr.name || !spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
                     this.stampSpriteAt(ctx, spr, scale);
                 }
             }
@@ -471,11 +471,15 @@ export default class Page {
         return data;
     }
 
-    getSprites() {
+    getSprites(textsIncluded = false) {
         var spritelist = JSON.parse(this.sprites);
         var res = [];
         for (var i = 0; i < spritelist.length; i++) {
-            if (gn(spritelist[i]).owner.type == 'sprite') {
+            if (!textsIncluded) {
+                if (gn(spritelist[i]).owner.type == 'sprite') {
+                    res.push(spritelist[i]);
+                }
+            } else {
                 res.push(spritelist[i]);
             }
         }
@@ -529,6 +533,7 @@ export default class Page {
         };
         textAttr.page = this;
         textAttr.id = getIdFor('Text');
+        console.log("Creating text with id", textAttr.id);
         new Sprite(textAttr);
     }
 

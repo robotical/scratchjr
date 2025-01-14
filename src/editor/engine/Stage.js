@@ -129,7 +129,7 @@ export default class Stage {
         if (spr) {
             /*MartyMode*/
             // if the sprite of the current page is a bird's eye sprite, set MartyMode
-            if (spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+            if (spr.name?.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
                 if (!ScratchJr.isMartyModeEnabled) {
                     ScratchJr.isMartyModeEnabled = true;
                     UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
@@ -195,7 +195,7 @@ export default class Stage {
                 /*MartyMode*/
                 // only set visible if the sprite is not a bird's eye sprite
                 console.log("In copySprite whenDone, sprite name: " + spr.name, ". Before setting visibility to visible");
-                if (!spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                if (!spr.name || !spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
                     spr.div.style.visibility = 'visible';
                 }
             }
