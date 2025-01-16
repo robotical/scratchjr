@@ -11,6 +11,8 @@ alias sourceMBJRProf='cdhome && source martyBlocksCliProfile'
 buildAllAndCpToWebApp () {
     local type="${1:-debug}"
     if [ $type = debug ]; then npm run build:copy; fi
+    if [ $type = prod ]; then rm -rf $MBJRHome/editions/free/src/app.bundle.js.map; fi
+    if [ $type = prod ]; then rm -rf $MBJRHome/src/build/*; fi
     if [ $type = prod ]; then npm run build-prod:copy; fi
     cpToWebapp
 }

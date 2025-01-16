@@ -15,7 +15,7 @@ export default class CogMusicBlocks {
     rest(beats) {
         const rtttl = `audio/rtttl/Rest:d=4,o=5,b=${this.bpm}:${(4 + 1) - beats}p`;
         const duration = calculateRTTTLDur(rtttl);
-        this.cog.sendRestMessage(rtttl);
+        // this.cog.sendRestMessage(rtttl); // avoid sending rest messages down to Cog, just send the duration to wait
         return duration;
     }
 
