@@ -86,7 +86,7 @@ export default class Home {
           Home.actionTarget.childNodes[
             Home.actionTarget.childElementCount - 1
           ].style.visibility = "visible";
-          
+
           Home.holding = true;
         }
       };
@@ -250,7 +250,7 @@ export default class Home {
     var shown =
       Home.actionTarget.childElementCount > 2
         ? Home.actionTarget.childNodes[Home.actionTarget.childElementCount - 1]
-            .style.visibility == "visible"
+          .style.visibility == "visible"
         : false;
     if (e && shown) {
       var t;
@@ -285,26 +285,23 @@ export default class Home {
   }
 
   static displayProjects(str) {
-    // wait for a few seconds before displaying projects to avoid race conditions
-    var start = new Date().getTime();
-    while (new Date().getTime() - start < 3000) {
-      // do nothing
-    }
-    let data = JSON.parse(str);
-    var div = gn("scrollarea");
-    while (div.childElementCount > 0) {
-      div.removeChild(div.childNodes[0]);
-    }
-    Home.emptyProjectThumbnail(div);
-    for (var i = 0; i < data.length; i++) {
-      Home.addProjectLink(div, data[i]);
-    }
     setTimeout(function () {
-      Lobby.busy = false;
-    }, 1000);
-    if (gn("wrapc")) {
-      gn("wrapc").scrollTop = scrollvalue;
-    }
+      let data = JSON.parse(str);
+      var div = gn("scrollarea");
+      while (div.childElementCount > 0) {
+        div.removeChild(div.childNodes[0]);
+      }
+      Home.emptyProjectThumbnail(div);
+      for (var i = 0; i < data.length; i++) {
+        Home.addProjectLink(div, data[i]);
+      }
+      setTimeout(function () {
+        Lobby.busy = false;
+      }, 1000);
+      if (gn("wrapc")) {
+        gn("wrapc").scrollTop = scrollvalue;
+      }
+    }, 3);
   }
 
   static addProjectLink(parent, aa) {
