@@ -1,7 +1,6 @@
+# Adjust the following 2 lines to match your local setup
 export WebappHome=/Users/ntheodoropoulos/Robotical/marty-web-app
 export MBJRHome=/Users/ntheodoropoulos/Robotical/scratchjr
-export PhoneAppHome=/Users/ntheodoropoulos/Robotical/marty-react-native # <- replace this if you want to use the buildAllAndCpToWebApp function, which builds everything and copies the build files in the phoneapp
-
 
 export gui_original=$MBJRHome/scratch-gui
 

@@ -96,7 +96,7 @@
 
 const cogAndMartyTutorial = {
     id: "cog-and-marty-tutorial",
-    platform: "blocks",
+    platform: "blocksjr",
     title: "Cog and Marty Interaction",
     description: "Learn how Cog and Marty can interact with each other",
     tutorialSteps: [
