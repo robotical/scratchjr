@@ -16260,12 +16260,7 @@ class Home {
     }
   }
   static displayProjects(str) {
-    // wait for a few seconds before displaying projects to avoid race conditions
     setTimeout(function () {
-      // var start = new Date().getTime();
-      // while (new Date().getTime() - start < 3000) {
-      //   // do nothing
-      // }
       let data = JSON.parse(str);
       var div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_7__.gn)("scrollarea");
       while (div.childElementCount > 0) {
