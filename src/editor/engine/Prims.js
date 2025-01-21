@@ -22,7 +22,7 @@ export default class Prims {
         Prims.table.done = Prims.Done;
         Prims.table.missing = Prims.Ignore;
         Prims.table.onflag = Prims.Ignore;
-        
+
         Prims.table.onmessage = Prims.Ignore;
         Prims.table.onclick = Prims.Ignore;
         Prims.table.ontouch = Prims.OnTouch;
@@ -64,23 +64,23 @@ export default class Prims {
         Prims.table.say = Prims.Say;
 
         /* Cog Prims */
-        Prims.table.tiltany = Prims.Ignore; 
-        Prims.table.ontouchcog = Prims.Ignore; 
-        Prims.table.onmove = Prims.Ignore;  
-        Prims.table.onobjectsensed = Prims.Ignore;  
-        Prims.table.onlight = Prims.Ignore;  
-        Prims.table.setpattern = Prims.setPattern; 
-        Prims.table.selectcolour = Prims.selectColour; 
-        Prims.table.clearcolours = Prims.clearColours; 
-        Prims.table.confusion = Prims.playConfusion; 
-        Prims.table.disbelief = Prims.playDisbelief; 
-        Prims.table.excitement = Prims.playExcitement; 
-        Prims.table.noway = Prims.playNoway; 
-        Prims.table.no = Prims.playNo; 
-        Prims.table.whistle = Prims.playWhistle; 
-        Prims.table.playnote = Prims.playNote;  
-        Prims.table.waitcrotchet = Prims.waitcrotchet;  
-        Prims.table.settempo = Prims.settempo;  
+        Prims.table.tiltany = Prims.Ignore;
+        Prims.table.ontouchcog = Prims.Ignore;
+        Prims.table.onshake = Prims.Ignore;
+        Prims.table.onobjectsensed = Prims.Ignore;
+        Prims.table.onlight = Prims.Ignore;
+        Prims.table.setpattern = Prims.setPattern;
+        Prims.table.selectcolour = Prims.selectColour;
+        Prims.table.clearcolours = Prims.clearColours;
+        Prims.table.confusion = Prims.playConfusion;
+        Prims.table.disbelief = Prims.playDisbelief;
+        Prims.table.excitement = Prims.playExcitement;
+        Prims.table.noway = Prims.playNoway;
+        Prims.table.no = Prims.playNo;
+        Prims.table.whistle = Prims.playWhistle;
+        Prims.table.playnote = Prims.playNote;
+        Prims.table.waitcrotchet = Prims.waitcrotchet;
+        Prims.table.settempo = Prims.settempo;
 
 
 
@@ -1452,7 +1452,7 @@ export default class Prims {
         if (this.isScriptRunning()) {
             return;
         }
-        
+
         var pair;
         var receivers = [];
 
@@ -1480,13 +1480,8 @@ export default class Prims {
                     receivers.push([s, block]);
                 }
             }
-            if (block.blocktype == 'onmove') {
-                if (block.getArgValue() == 'onmove' && event == 'onmove') {
-                    receivers.push([s, block]);
-                }
-                if (block.getArgValue() == 'onshake' && event == 'onshake') {
-                    receivers.push([s, block]);
-                }
+            if (block.blocktype == 'onshake' && event == 'onshake') {
+                receivers.push([s, block]);
             }
             if (block.blocktype == 'onobjectsensed') {
                 if (block.getArgValue() == 'onobjectsensedleft' && event == 'onobjectsensedleft') {
@@ -1512,7 +1507,7 @@ export default class Prims {
             }
         }
 
-        Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onmove', 'onobjectsensed', 'onlight'], findReceivers);
+        Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onshake', 'onobjectsensed', 'onlight'], findReceivers);
         var newthreads = [];
         for (var i in receivers) {
             pair = receivers[i];

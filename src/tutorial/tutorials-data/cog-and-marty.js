@@ -42,7 +42,7 @@
         * caretcmd_block
         * tiltany_block
         * ontouchcog_block
-        * onmove_block
+        * onshake_block
         * onobjectsensed_block
         * onlight_block
         * onrotate_block

@@ -33,7 +33,6 @@ class CogBlocks {
     this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.tilt.forward, this.onTiltForward.bind(this));
     this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.tilt.backward, this.onTiltBackward.bind(this));
     this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.movementType.shake, this.onShake.bind(this));
-    this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.movementType.move, this.onMove.bind(this));
     this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.buttonClick.click, this.onButtonClick.bind(this));
     this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.lightSense.high, this.onHighLight.bind(this));
     this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.lightSense.mid, this.onMidLight.bind(this));
@@ -49,7 +48,6 @@ class CogBlocks {
     this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.tilt.forward, this.onTiltForward.bind(this));
     this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.tilt.backward, this.onTiltBackward.bind(this));
     this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.movementType.shake, this.onShake.bind(this));
-    this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.movementType.move, this.onMove.bind(this));
     this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.buttonClick.click, this.onButtonClick.bind(this));
     this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.lightSense.high, this.onHighLight.bind(this));
     this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.lightSense.mid, this.onMidLight.bind(this));
@@ -72,9 +70,6 @@ class CogBlocks {
   }
   onShake() {
     _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__["default"].OnCogEvent("onshake");
-  }
-  onMove() {
-    _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__["default"].OnCogEvent("onmove");
   }
   onButtonClick() {
     _editor_engine_Prims__WEBPACK_IMPORTED_MODULE_0__["default"].OnCogEvent("ontouch");
@@ -2518,7 +2513,7 @@ let fontorange = '#da8540';
 let fontcolors = [fontred, fontorange, fontyellow, fontdarkgreen, fontblue, fontpink, fontpurple, fontwhite, fontdarkgray, fontblack];
 let fontsizes = [16, 24, 36, 48, 56, 72];
 const tiltshapes = ['tiltright', 'tiltleft', 'tiltbackward', 'tiltforward', 'tiltbackwardforward', 'tiltleftright'];
-const moveshapes = ['onmove', 'onshake'];
+const moveshapes = ['onshake'];
 const onobjectsensedshapes = ['onobjectsensedleft', 'onobjectsensedright', 'onnoobjectsensed'];
 const lightshapes = ['onhighlight', 'onmidlight', 'onlowlight'];
 const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];
@@ -2638,7 +2633,7 @@ class BlockSpecs {
     return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'], ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'], ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'], [], ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'], ['endstack', 'forever']];
   }
   static setupPalettesDefCog() {
-    return [['tiltany', 'ontouchcog', 'onmove', 'onobjectsensed', 'onlight'], ['setpattern', 'selectcolour', 'clearcolours'], ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote', 'waitcrotchet', 'settempo']];
+    return [['tiltany', 'ontouchcog', 'onshake', 'onobjectsensed', 'onlight'], ['setpattern', 'selectcolour', 'clearcolours'], ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote', 'waitcrotchet', 'settempo']];
   }
   static setupPalettesDefMarty() {
     return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'], ['martyGetReady', 'martyStepForward', 'martyStepBackward', 'martyStepRight', 'martyStepLeft', 'martyTurnRight', 'martyTurnLeft', 'martyDance', 'martyKickLeft', 'martyKickRight'], ['martyEyesExcited', 'martyEyesWide', 'martyEyesAngry', 'martyEyesNormal', 'martyEyesWiggle', 'martyWaveLeft', 'martyWaveRight', 'martyCelebrate', 'martyLedEyesP1', 'martyLedEyesP2', 'martyLedEyesColour'], ['martyConfusion', 'martyDisbelief', 'martyExcitement', 'martyNoway', 'martyNo', 'martyWhistle'], ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'], ['endstack', 'forever']];
@@ -2702,7 +2697,7 @@ class BlockSpecs {
       /* Cog Blocks */
       'tiltany': ['tiltany', tiltshapes, BlockSpecs.yellowStart, 'm', 'tiltright', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
       'ontouchcog': ['ontouchcog', BlockSpecs.getImageFrom('assets/blockicons/ontouchcog', 'svg'), BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
-      'onmove': ['onmove', moveshapes, BlockSpecs.yellowStart, 'm', 'onmove', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+      'onshake': ['onshake', BlockSpecs.getImageFrom('assets/blockicons/onshake', 'svg'), BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
       'onobjectsensed': ['onobjectsensed', onobjectsensedshapes, BlockSpecs.yellowStart, 'm', 'onobjectsensedleft', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
       'onlight': ['onlight', lightshapes, BlockSpecs.yellowStart, 'm', 'onhighlight', BlockSpecs.yellowStartH, 0, 100, BlockSpecs.startS],
       'setpattern': ['setpattern', patternshapes, BlockSpecs.pinkCmd, 'm', 'patternrainbow', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS, 'purple'],
@@ -2753,7 +2748,7 @@ class BlockSpecs {
       'onflag': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_GREEN_FLAG'),
       'tiltany': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_TILT'),
       'ontouchcog': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_TOUCH_Cog'),
-      'onmove': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_MOVE'),
+      'onshake': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_MOVE'),
       'onobjectsensed': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_OBJECT_SENSED'),
       'onlight': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_LIGHT'),
       'onclick': _utils_Localization__WEBPACK_IMPORTED_MODULE_0__["default"].localize('BLOCK_DESC_ON_TAP', {
@@ -3717,7 +3712,7 @@ class Prims {
     /* Cog Prims */
     Prims.table.tiltany = Prims.Ignore;
     Prims.table.ontouchcog = Prims.Ignore;
-    Prims.table.onmove = Prims.Ignore;
+    Prims.table.onshake = Prims.Ignore;
     Prims.table.onobjectsensed = Prims.Ignore;
     Prims.table.onlight = Prims.Ignore;
     Prims.table.setpattern = Prims.setPattern;
@@ -4993,13 +4988,8 @@ class Prims {
           receivers.push([s, block]);
         }
       }
-      if (block.blocktype == 'onmove') {
-        if (block.getArgValue() == 'onmove' && event == 'onmove') {
-          receivers.push([s, block]);
-        }
-        if (block.getArgValue() == 'onshake' && event == 'onshake') {
-          receivers.push([s, block]);
-        }
+      if (block.blocktype == 'onshake' && event == 'onshake') {
+        receivers.push([s, block]);
       }
       if (block.blocktype == 'onobjectsensed') {
         if (block.getArgValue() == 'onobjectsensedleft' && event == 'onobjectsensedleft') {
@@ -5024,7 +5014,7 @@ class Prims {
         }
       }
     };
-    Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onmove', 'onobjectsensed', 'onlight'], findReceivers);
+    Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onshake', 'onobjectsensed', 'onlight'], findReceivers);
     var newthreads = [];
     for (var i in receivers) {
       pair = receivers[i];
@@ -26983,7 +26973,7 @@ __webpack_require__.r(__webpack_exports__);
         * caretcmd_block
         * tiltany_block
         * ontouchcog_block
-        * onmove_block
+        * onshake_block
         * onobjectsensed_block
         * onlight_block
         * onrotate_block

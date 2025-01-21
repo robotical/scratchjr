@@ -23,9 +23,7 @@ let fontcolors = [fontred, fontorange, fontyellow,
 let fontsizes = [16, 24, 36, 48, 56, 72];
 
 const tiltshapes = ['tiltright', 'tiltleft', 'tiltbackward', 'tiltforward', 'tiltbackwardforward', 'tiltleftright']
-const moveshapes = [
-    'onmove',
-    'onshake'];
+const moveshapes = ['onshake'];
 const onobjectsensedshapes = ['onobjectsensedleft', 'onobjectsensedright', 'onnoobjectsensed'];
 const lightshapes = ['onhighlight', 'onmidlight', 'onlowlight'];
 const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];
@@ -279,7 +277,7 @@ export default class BlockSpecs {
     }
 
     static setupPalettesDefCog() {
-        return [['tiltany', 'ontouchcog', 'onmove', 'onobjectsensed', 'onlight'],
+        return [['tiltany', 'ontouchcog', 'onshake', 'onobjectsensed', 'onlight'],
         ['setpattern', 'selectcolour', 'clearcolours'],
         ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote', 'waitcrotchet', 'settempo']];
     }
@@ -397,8 +395,8 @@ export default class BlockSpecs {
                 BlockSpecs.yellowStart, 'm', 'tiltright', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'ontouchcog': ['ontouchcog', BlockSpecs.getImageFrom('assets/blockicons/ontouchcog', 'svg'),
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
-            'onmove': ['onmove', moveshapes,
-                BlockSpecs.yellowStart, 'm', 'onmove', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'onshake': ['onshake', BlockSpecs.getImageFrom('assets/blockicons/onshake', 'svg'),
+                BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'onobjectsensed': ['onobjectsensed', onobjectsensedshapes,
                 BlockSpecs.yellowStart, 'm', 'onobjectsensedleft', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'onlight': ['onlight', lightshapes,
@@ -495,7 +493,7 @@ export default class BlockSpecs {
             'onflag': Localization.localize('BLOCK_DESC_GREEN_FLAG'),
             'tiltany': Localization.localize('BLOCK_DESC_ON_TILT'),
             'ontouchcog': Localization.localize('BLOCK_DESC_ON_TOUCH_Cog'),
-            'onmove': Localization.localize('BLOCK_DESC_ON_MOVE'),
+            'onshake': Localization.localize('BLOCK_DESC_ON_MOVE'),
             'onobjectsensed': Localization.localize('BLOCK_DESC_ON_OBJECT_SENSED'),
             'onlight': Localization.localize('BLOCK_DESC_ON_LIGHT'),
             'onclick': Localization.localize('BLOCK_DESC_ON_TAP', {

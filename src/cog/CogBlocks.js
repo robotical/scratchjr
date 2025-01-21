@@ -20,7 +20,6 @@ export default class CogBlocks {
         this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.tilt.backward, this.onTiltBackward.bind(this));
 
         this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.movementType.shake, this.onShake.bind(this));
-        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.movementType.move, this.onMove.bind(this));
 
         this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.buttonClick.click, this.onButtonClick.bind(this));
 
@@ -41,7 +40,6 @@ export default class CogBlocks {
         this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.tilt.backward, this.onTiltBackward.bind(this));
 
         this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.movementType.shake, this.onShake.bind(this));
-        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.movementType.move, this.onMove.bind(this));
 
         this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.buttonClick.click, this.onButtonClick.bind(this));
 
@@ -72,10 +70,6 @@ export default class CogBlocks {
 
     onShake() {
         Prims.OnCogEvent("onshake");
-    }
-
-    onMove() {
-        Prims.OnCogEvent("onmove");
     }
 
     onButtonClick() {
