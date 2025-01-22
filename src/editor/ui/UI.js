@@ -225,9 +225,9 @@ export default class UI {
             const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
             const signalIndicator = button.querySelector('.signalIndicatorContainer');
             const raftName = button.querySelector('.raftNameConnectButton');
-            batteryIndicator.style.display = 'block';
-            signalIndicator.style.display = 'block';
-            raftName.style.display = 'block';
+            batteryIndicator.style.display = 'grid';
+            signalIndicator.style.display = 'grid';
+            raftName.style.display = 'grid';
             raftName.textContent = truncateString(raft.getFriendlyName());
             batteryIndicator.innerHTML = batterySvg(raft.getBatteryStrength());
             signalIndicator.innerHTML = signalSvg(raft.getRSSI());
@@ -295,9 +295,9 @@ export default class UI {
             const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
             const signalIndicator = button.querySelector('.signalIndicatorContainer');
             const raftName = button.querySelector('.raftNameConnectButton');
-            batteryIndicator.style.display = 'block';
-            signalIndicator.style.display = 'block';
-            raftName.style.display = 'block';
+            batteryIndicator.style.display = 'grid';
+            signalIndicator.style.display = 'grid';
+            raftName.style.display = 'grid';
             raftName.textContent = truncateString(raft.getFriendlyName());
             batteryIndicator.innerHTML = batterySvg(raft.getBatteryStrength());
             signalIndicator.innerHTML = signalSvg(raft.getRSSI());
