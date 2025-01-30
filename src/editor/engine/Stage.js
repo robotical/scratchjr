@@ -13,8 +13,7 @@ import {
     newHTML, newDiv, gn,
     getIdFor, setProps,
     scaleMultiplier, setCanvasSize,
-    globaly, globalx,
-    isTablet
+    globaly, globalx
 } from '../../utils/lib';
 
 export default class Stage {
@@ -31,15 +30,12 @@ export default class Stage {
             position: 'absolute'
         });
         var me = this;
-        if (isTablet) {
-            this.div.ontouchstart = function (evt) {
-                me.mouseDown(evt);
-            };
-        } else {
-            this.div.onpointerdown = function (evt) {
-                me.mouseDown(evt);
-            };
-        }
+        this.div.ontouchstart = function (evt) {
+            me.mouseDown(evt);
+        };
+        this.div.onmousedown = function (evt) {
+            me.mouseDown(evt);
+        };
         this.div.owner = this;
         this.currentZoom = 1;
         this.initialPoint = {
@@ -115,6 +111,7 @@ export default class Stage {
     }
 
     setPage(page, isOn) {
+        console.log("SET PAGE CALLED");
         ScratchJr.stopStrips();
         var sc = ScratchJr.getSprite() ? gn(ScratchJr.stage.currentPage.currentSpriteName + '_scripts') : undefined;
         if (sc) {
@@ -130,6 +127,19 @@ export default class Stage {
         Thumbs.updatePages();
         var spr = ScratchJr.getSprite();
         if (spr) {
+            /*MartyMode*/
+            // if the sprite of the current page is a bird's eye sprite, set MartyMode
+            if (spr.name?.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                if (!ScratchJr.isMartyModeEnabled) {
+                    ScratchJr.isMartyModeEnabled = true;
+                    UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
+                }
+            } else {
+                if (ScratchJr.isMartyModeEnabled) {
+                    ScratchJr.isMartyModeEnabled = false;
+                    UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
+                }
+            }
             spr.activate();
         }
         if (isOn) {
@@ -182,7 +192,12 @@ export default class Stage {
         var stg = this;
         var whenDone = function (spr) {
             if (spr.page.id == ScratchJr.stage.currentPage.id) {
-                spr.div.style.visibility = 'visible';
+                /*MartyMode*/
+                // only set visible if the sprite is not a bird's eye sprite
+                console.log("In copySprite whenDone, sprite name: " + spr.name, ". Before setting visibility to visible");
+                if (!spr.name || !spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                    spr.div.style.visibility = 'visible';
+                }
             }
             if (!page.currentSpriteName) {
                 page.currentSpriteName = spr.id;
@@ -264,7 +279,7 @@ export default class Stage {
 
     setViewPage(page) {
         this.currentPage = page;
-        this.currentPage.div.style.visibility = 'visible';
+        this.currentPage.div.style.visibility = 'visible';        
         this.currentPage.setPageSprites('visible');
     }
 
@@ -434,10 +449,10 @@ export default class Stage {
         window.ontouchend = function (evt) {
             me.mouseUp(evt);
         };
-        window.onpointermove = function (evt) {
+        window.onmousemove = function (evt) {
             me.mouseMove(evt);
         };
-        window.onpointerup = function (evt) {
+        window.onmouseup = function (evt) {
             me.mouseUp(evt);
         };
     }
@@ -650,7 +665,18 @@ export default class Stage {
         th.parentNode.removeChild(th);
         if (sprite && (sprite.id == spr.id)) {
             var sprites = page.getSprites();
-            page.setCurrentSprite((sprites.length > 0) ? gn(sprites[0]).owner : undefined);
+            /*MartyMode*/
+            // if there are sprites other than Marty's bird's eye sprite, set the current sprite to the first sprite
+            // otherwise, enable Marty mode
+            const allSpritesBesidesMartyBirdsEye = sprites.filter(sprite => !sprite.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME));
+            if (allSpritesBesidesMartyBirdsEye.length > 0) {
+                page.setCurrentSprite(gn(allSpritesBesidesMartyBirdsEye[0]).owner);
+            } else {
+                if (!ScratchJr.isMartyModeEnabled) {
+                    ScratchJr.isMartyModeEnabled = true;
+                    UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
+                }
+            }
         }
     }
 

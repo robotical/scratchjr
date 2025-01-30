@@ -32,8 +32,8 @@ export default class Webapp {
   }
 
   // IO functions
-  static cleanassets(ft, fcn) {
-    WebappInterface.io_cleanassets(ft);
+  static async cleanassets(ft, fcn) {
+    await WebappInterface.io_cleanassets(ft);
     fcn();
   }
 
@@ -151,6 +151,13 @@ export default class Webapp {
 
   static sndrecord(fcn) {
     var result = WebappInterface.recordsound_recordstart();
+    if (fcn) {
+      fcn(result);
+    }
+  }
+
+  static initrecording(fcn) {
+    var result = WebappInterface.recordsound_initrecording();
     if (fcn) {
       fcn(result);
     }

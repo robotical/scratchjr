@@ -56,12 +56,11 @@ div.frame {
 
 *.catface {
     position: absolute;
-    top: 10%;
+    top: 18%;
     margin: 0px;
-    height: 35%;
+    height: 22%;
     z-index: 5;
-    background: url('../assets/start/MartyFull.svg');
-    transform: rotate(13deg);
+    background: url('../assets/start/Cat.svg');
     width: 100%;
     background-position: center center;
     background-repeat: no-repeat;
@@ -70,12 +69,12 @@ div.frame {
 
 *.jrlogo {
     position: absolute;
-    top: 27%;
+    top: 39%;
     width: 100%;
     margin: 0px;
-    height: 30%;
+    height: 16%;
     z-index: 10;
-    background: url('../assets/start/MartyBlocksJr_BasedOnScratchJr.png');
+    background: url('../assets/start/ScratchJrLogo.svg');
     background-position: center center;
     background-repeat: no-repeat;
     background-size: auto 100%;
@@ -133,11 +132,9 @@ div.frame {
     top: 65%;
     left: 59%;
     margin: 0px;
-    /* width: 17%; */
-    /* height: 22%; */
-    width: 0%;
-    height: 0%;
-    /* background: url('../assets/start/helpOn.svg'); */
+    width: 17%;
+    height: 22%;
+    background: url('../assets/start/helpOn.svg');
     background-repeat: no-repeat;
     background-size: auto 100%;
     background-position-x: center;
@@ -175,8 +172,7 @@ div.frame {
 .startcode {
     position: absolute;
     top: 65%;
-    left: 42%;
-    /* left: 24%; */
+    left: 24%;
     margin: 0px;
     width: 17%;
     height: 22%;

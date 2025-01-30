@@ -29,7 +29,7 @@
 .spriteform input{
     text-align: center;
     color: #929497;
-    font-family: Roboto;
+    font-family: Verdana;
     font-size: ${css_vh(2.60)};
     cursor: default;
     padding: ${css_vh(0.26)};
@@ -93,7 +93,7 @@ spriteform.off {visibility: hidden; };
 
 .phototopbar {
     position: fixed;
-    top: ${css_vh(15.29)};
+    top: 0;
     left: 0;
     height: ${css_vh(10.29)};
     width: ${css_vw(100)};

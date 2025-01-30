@@ -861,8 +861,9 @@ export default class SVGTools {
 
     static getWatermark (shape, color) {
         var svg = SVGTools.getCopy(shape);
-        // SVGTools.removeExtras(svg);
-        // SVGTools.changeShape(svg, color);
+        SVGTools.removeExtras(svg);
+        SVGTools.removeStylesInDefs(svg);
+        SVGTools.changeShape(svg, color);
         return svg;
     }
 
@@ -882,7 +883,7 @@ export default class SVGTools {
         var valid = n < svg.childElementCount;
         while (valid) {
             var elem = svg.childNodes[n];
-            if ((elem.nodeName == 'image') || (elem.nodeName == 'clipPath')) {
+            if ( (elem.nodeName == 'clipPath')) {
                 svg.removeChild(elem);
             } else {
                 if (elem.tagName == 'g') {
@@ -892,6 +893,20 @@ export default class SVGTools {
             }
             valid = n < svg.childElementCount;
         }
+    }
+
+    static removeStylesInDefs(svg) {
+        var defs = svg.getElementsByTagName('defs');
+        if (defs.length == 0) {
+            return;
+        }
+        var def = defs[0];
+        var styles = def.getElementsByTagName('style');
+        if (styles.length == 0) {
+            return;
+        }
+        var style = styles[0];
+        def.removeChild(style);
     }
 
     static setObjectWaterMark (elem, color) {

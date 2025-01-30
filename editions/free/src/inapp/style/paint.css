@@ -23,7 +23,7 @@ body {
 }
 
 .paint-button {
-    font-family: Roboto, arial, sans-serif;
+    font-family: 'Lato Regular', arial, sans-serif;
     border-radius: 50%;
     position: absolute;
     border: 1px solid #808080;

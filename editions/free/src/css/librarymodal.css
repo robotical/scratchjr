@@ -63,7 +63,7 @@
     color:  #4682B5;
     font-weight: 500 !important;
     text-shadow: 0px -${1 * scaleMultiplier}px #0D1D28;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     line-height: ${css_vh(4.69)};
     cursor: default;
     outline: ${css_vh(0.00)};

@@ -1,4 +1,4 @@
-import {isAndroid} from './lib';
+import { isAndroid } from './lib';
 import Sound from './Sound';
 import OS from '../tablet/OS';
 
@@ -8,25 +8,27 @@ import OS from '../tablet/OS';
 
 let uiSounds = {};
 let defaultSounds = ['boing.wav', 'confused.wav', 'copy.wav', 'cut.wav', 'disbelief.wav',
-                     'entertap.wav', 'excited.wav', 'exittap.wav', 'grab.wav', 'keydown.wav',
-                     'marty_eyes_servo.wav', 'no_way.wav', 'no.wav', 'snap.wav', 'splash.wav',
-                     'tap.wav', 'whistle.wav'];
+    'entertap.wav', 'excited.wav', 'exittap.wav', 'grab.wav', 'keydown.wav',
+    'marty_eyes_servo.wav', 'no_way.wav', 'no.wav', 'snap.wav', 'splash.wav',
+    'tap.wav', 'whistle.wav'];
 let projectSounds = {};
 
 export default class ScratchAudio {
-    static get uiSounds () {
+    static get uiSounds() {
         return uiSounds;
     }
 
-    static get projectSounds () {
+    static get projectSounds() {
         return projectSounds;
     }
 
-    static sndFX (name) {
+    static sndFX(name) {
         ScratchAudio.sndFXWithVolume(name, 1.0);
     }
 
-    static sndFXWithVolume (name, volume) {
+    static sndFXWithVolume(name, volume) {
+        console.log("sndFXWithVolume: " + name + " " + volume);
+        console.log("isAndroid: " + isAndroid);
         if (!isAndroid) {
             if (!uiSounds[name]) {
                 return;
@@ -37,7 +39,7 @@ export default class ScratchAudio {
         }
     }
 
-    static init (prefix) {
+    static init(prefix) {
         if (!prefix) {
             prefix = '';
         }
@@ -52,12 +54,12 @@ export default class ScratchAudio {
         ScratchAudio.addSound(prefix, 'pop.mp3', projectSounds);
     }
 
-    static addSound (url, snd, dict, fcn) {
+    static addSound(url, snd, dict, fcn) {
         var name = snd;
         if (!isAndroid) {
-            var whenDone =  function (str) {
+            var whenDone = function (str) {
                 if (str != 'error') {
-                    var result = snd.split (',');
+                    var result = snd.split(',');
                     dict[snd] = new Sound(result[0], result[1]);
                 } else {
                     name = 'error';
@@ -66,6 +68,7 @@ export default class ScratchAudio {
                     fcn(name);
                 }
             };
+            console.log('TODO: Sounds not playing when load as object');
             OS.registerSound(url, snd, whenDone);
         } else {
             // In Android, this is handled outside of JavaScript, so just place a stub here.
@@ -76,12 +79,12 @@ export default class ScratchAudio {
         }
     }
 
-    static soundDone (name) {
+    static soundDone(name) {
         if (!projectSounds[name]) return;
         projectSounds[name].playing = false;
     }
 
-    static loadProjectSound (md5, fcn) {
+    static loadProjectSound(md5, fcn) {
         if (!md5) {
             return;
         }
@@ -93,7 +96,7 @@ export default class ScratchAudio {
         ScratchAudio.loadFromLocal(dir, md5, fcn);
     }
 
-    static loadFromLocal (dir, md5, fcn) {
+    static loadFromLocal(dir, md5, fcn) {
         if (projectSounds[md5] != undefined) {
             return;
         }

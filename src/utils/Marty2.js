@@ -11,7 +11,6 @@ const {
   default: signal_render,
 } = require("./connection-ui/disconnect-btn/signal_svg_render");
 const { default: goToLink } = require("./goToLink");
-const { default: hideLedBlocksIFNotConnected, showLedBlocks } = require("./hide-led-blocks");
 
 /**
  * @fileoverview
@@ -156,11 +155,6 @@ class Marty2 extends EventDispatcher {
   }
 
   setIsConnected(isConnected) {
-    if (isConnected) {
-      hideLedBlocksIFNotConnected(this.addons);
-    } else {
-      showLedBlocks();
-    }
     if (isConnected !== this.isConnected) {
       if (!isConnected) this.updateConnectionInfo();
       this.isConnected = isConnected;

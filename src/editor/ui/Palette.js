@@ -19,6 +19,7 @@ import {
     setProps, globalx, localy, globaly, drawScaled, newCanvas,
     setCanvasSize, hitRect, writeText, getStringSize
 } from '../../utils/lib';
+import UI from './UI';
 
 
 let blockscale = 0.75;
@@ -42,24 +43,56 @@ export default class Palette {
         helpballoon = newHelpballoon;
     }
 
+
+    static recreateCategories() {
+        Palette.recreateLeftCategory();
+        Palette.recreateRightCategory();
+
+        Palette.selectCategory(0);
+    }
+
+    static recreateLeftCategory() {
+        /* This function is called when the Marty mode is toggled to reset the palette and show the appropriate blocks */
+        // Destroy the old Right Category selectors
+        const selectorsLeft = gn('selectors');
+        if (selectorsLeft) {
+            selectorsLeft.parentElement.removeChild(selectorsLeft);
+        }
+
+        // Create the new Right Category selectors
+        Palette.createCategorySelectors(Palette.parent);
+
+        Palette.recreateRightCategory();
+    }
+
+    static recreateRightCategory() {
+        /* This function is called when the Marty mode is toggled to reset the palette and show the appropriate blocks */
+        // Destroy the old Right Category selectors
+        const selectorsRight = gn('selectorsright');
+        if (selectorsRight) {
+            selectorsRight.parentElement.removeChild(selectorsRight);
+        }
+
+        // Create the new Right Category selectors
+        Palette.createCategorySelectorsRight(Palette.parent);
+    }
+
     static setup(parent) {
+        Palette.parent = parent;
         blockscale *= scaleMultiplier;
         blockdy *= scaleMultiplier;
         Palette.blockdx *= scaleMultiplier; // XXX
         betweenblocks = 90 * blockscale;
         Palette.createCategorySelectors(parent);
+        Palette.createCategorySelectorsRight(parent);
         var div = newHTML('div', 'palette', parent);
         div.setAttribute('id', 'palette');
-        div.style["touch-action"] = "none";
-        div.onpointerdown = function (evt) {
+        div.ontouchstart = function (evt) {
             Palette.paletteMouseDown(evt);
-        }
-        // div.ontouchstart = function (evt) {
-        //     Palette.paletteMouseDown(evt);
-        // };
-        // div.onpointerdown = function (evt) {
-        //     Palette.paletteMouseDown(evt);
-        // };
+        };
+        div.onmousedown = function (evt) {
+            Palette.paletteMouseDown(evt);
+        };
         var pc = newHTML('div', 'papercut', parent);
         newHTML('div', 'withstyle', pc);
     }
@@ -71,18 +104,32 @@ export default class Palette {
         newHTML('div', 'catimage', bkg);
         var leftPx = 15 * scaleMultiplier;
         var widthPx = 54 * scaleMultiplier;
-        for (var i = 0; i < BlockSpecs.categories.length; i++) {
-            Palette.createSelector(sel, i, leftPx + i * widthPx, 0, BlockSpecs.categories[i]);
+        /*MartyMode*/
+        const categoriesLeft = ScratchJr.isMartyModeEnabled ? BlockSpecs.categoriesMarty : BlockSpecs.categories;
+        for (var i = 0; i < categoriesLeft.length; i++) {
+            Palette.createSelector(sel, i, leftPx + i * widthPx, 0, categoriesLeft[i]);
+        }
+    }
+
+    static createCategorySelectorsRight(parent) {
+        var sel = newHTML('div', 'categoryselectorright', parent);
+        sel.setAttribute('id', 'selectorsright');
+        var bkg = newHTML('div', 'catbkg', sel);
+        newHTML('div', 'catimage', bkg);
+        var leftPx = 15 * scaleMultiplier;
+        var widthPx = 54 * scaleMultiplier;
+        /*MartyMode*/
+        const leftCategoriesLength = ScratchJr.isMartyModeEnabled ? BlockSpecs.categoriesMarty.length : BlockSpecs.categories.length;
+        for (var i = 0; i < BlockSpecs.categoriesCog.length; i++) {
+            Palette.createSelector(sel, leftCategoriesLength + i, leftPx + i * widthPx, 0, BlockSpecs.categoriesCog[i]);
         }
     }
 
     static paletteMouseDown(e) {
         if (isTablet && e.touches && (e.touches.length > 1)) {
-            console.debug('Palette:paletteMouseDown: ignoring multi-touch event');
             return;
         }
         if (ScratchJr.onHold) {
-            console.debug('Palette:paletteMouseDown: ignoring event due to onHold');
             return;
         }
         e.preventDefault();
@@ -90,7 +137,7 @@ export default class Palette {
         var pal = gn('palette');
         var spt = Events.getTargetPoint(e);
         var pt = {
-            x: localx(pal, spt.x) + pal.scrollLeft,
+            x: localx(pal, spt.x),
             y: localy(pal, spt.y)
         };
         for (var i = 0; i < pal.childElementCount; i++) {
@@ -228,13 +275,13 @@ export default class Palette {
     }
 
     static hide() {
-        gn('blockspalette').childNodes[0].style.display = 'none';
-        gn('blockspalette').childNodes[1].style.display = 'none';
+        gn('blockspalette').querySelector('#selectors').style.display = 'none';
+        gn('blockspalette').querySelector('#selectorsright').style.display = 'none';
     }
 
     static show() {
-        gn('blockspalette').childNodes[0].style.display = 'inline-block';
-        gn('blockspalette').childNodes[1].style.display = 'inline-block';
+        gn('blockspalette').querySelector('#selectors').style.display = 'inline-block';
+        gn('blockspalette').querySelector('#selectorsright').style.display = 'inline-block';
     }
 
 
@@ -284,8 +331,7 @@ export default class Palette {
                 return;
             }
         }
-        var pal = gn('palette');
-        var mx = Events.dragmousex - frame.offsetLeft - localx(Events.dragthumbnail, Events.dragmousex) - pal.scrollLeft;
+        var mx = Events.dragmousex - frame.offsetLeft - localx(Events.dragthumbnail, Events.dragmousex);
         var my = Events.dragmousey - frame.offsetTop - localy(Events.dragthumbnail, Events.dragmousey);
         Events.dragcanvas = Events.dragthumbnail.owner.duplicateBlock(mx, my, sc.spr).div;
         Events.dragcanvas.style.zIndex = ScratchJr.dragginLayer;
@@ -312,8 +358,6 @@ export default class Palette {
             position: 'absolute'
         });
         div.setAttribute('id', spec[3]);
-
-
         div.index = n;
         var officon = spec[1].cloneNode(true);
         officon.width = pxWidth;
@@ -334,15 +378,12 @@ export default class Palette {
             zIndex: 8,
             visibility: 'hidden'
         });
-        if (isTablet) {
-            div.ontouchstart = function (evt) {
-                Palette.clickOnCategory(evt);
-            };
-        } else {
-            div.onpointerdown = function (evt) {
-                Palette.clickOnCategory(evt);
-            };
-        }
+        div.ontouchstart = function (evt) {
+            Palette.clickOnCategory(evt);
+        };
+        div.onmousedown = function (evt) {
+            Palette.clickOnCategory(evt);
+        };
     }
 
     static getPaletteSize() {
@@ -360,19 +401,33 @@ export default class Palette {
         var t = e.target;
         ScratchAudio.sndFX('keydown.wav');
         var index = t.parentNode ? t.parentNode.index : 2;
+        index = !isNaN(index) ? index : t.index;
         Palette.selectCategory(index);
     }
 
     static selectCategory(n) {
         var div = gn('selectors');
+        // if the number is greater than the number of categories (in the left categories div), then it is in the right categories div
+        const isRightCategories = n >= div.childNodes.length - 1;
+        n = isRightCategories ? n - (div.childNodes.length - 1) : n;
+        div = isRightCategories ? gn('selectorsright') : gn('selectors');
         // set the icons for text or sprite
         numcat = n;
         var currentSel = div.childNodes[n + 1];
         for (var i = 1; i < div.childElementCount; i++) {
             var sel = div.childNodes[i];
-            sel.childNodes[0].style.visibility = (sel.index != n) ? 'visible' : 'hidden';
-            sel.childNodes[1].style.visibility = (sel.index == n) ? 'visible' : 'hidden';
+            const selIndex = isRightCategories ? sel.index - (gn('selectors').childNodes.length - 1) : sel.index;
+            sel.childNodes[0].style.visibility = (selIndex != n) ? 'visible' : 'hidden';
+            sel.childNodes[1].style.visibility = (selIndex == n) ? 'visible' : 'hidden';
         }
+        // set to hidden the selectors for the other side categories
+        const otherSideDiv = isRightCategories ? gn('selectors') : gn('selectorsright');
+        for (var i = 1; i < otherSideDiv.childElementCount; i++) {
+            var sel = otherSideDiv.childNodes[i];
+            sel.childNodes[0].style.visibility = 'visible';
+            sel.childNodes[1].style.visibility = 'hidden';
+        }
+
         var pal = gn('palette');
         gn('blockspalette').style.background = currentSel.bkg;
         while (pal.childElementCount > 0) {
@@ -381,36 +436,56 @@ export default class Palette {
         if (!ScratchJr.getSprite()) {
             return;
         }
-        var list = (BlockSpecs.palettes[n]).concat();
+        /*MartyMode*/
+        let pallets = isRightCategories ? BlockSpecs.palettesCog : BlockSpecs.palettes;
+        if (!isRightCategories && ScratchJr.isMartyModeEnabled) {
+            pallets = BlockSpecs.palettesMarty;
+        }
+        var list = (pallets[n]).concat();
         var dx = dxblocks;
+        if (isRightCategories) {
+            dx = gn('palette').offsetWidth - 90;
+        }
         for (var k = 0; k < list.length; k++) {
+            // if is the right categories, then we need to align the blocks to the right.
+            // to do so, we need to change the dx value to be the width of the palette minus the width of the block
+            // and the betweenblocks value to be negative
             if (list[k] == 'space') {
-                dx += 30 * blockscale;
+                if (isRightCategories) {
+                    dx -= 30 * blockscale;
+                } else {
+                    dx += 30 * blockscale;
+                }
             } else {
                 var newb = Palette.newScaledBlock(pal, list[k],
                     ((list[k] == 'repeat') ? 0.65 * scaleMultiplier : blockscale), dx, blockdy);
                 newb.lift();
-                dx += betweenblocks;
+                if (isRightCategories) {
+                    dx -= betweenblocks;
+                } else {
+                    dx += betweenblocks;
+                }
             }
         }
         dx += 30;
-        if ((n == (BlockSpecs.categories.length - 1)) && (ScratchJr.stage.pages.length > 1)) {
+        let categoriesLength = isRightCategories ? BlockSpecs.categoriesCog.length : BlockSpecs.categories.length;
+        /*MartyMode*/
+        if (!isRightCategories && ScratchJr.isMartyModeEnabled) {
+            categoriesLength = BlockSpecs.categoriesMarty.length;
+        }
+        if ((n == (categoriesLength - 1)) && (ScratchJr.stage.pages.length > 1)) {
             Palette.addPagesBlocks(dx);
         }
-        //TODO: they hard coded n==3 to be sound, but we don't want the sound blocks for alpha release
-        //need to clean this up before we re-add in the sound blocks
-        // if ((n == 3) && (ScratchJr.getSprite().sounds.length > 0)) {
-        //     Palette.addSoundsBlocks(dxblocks);
-        // }
+        // TODO: they hard coded n==3 to be sound, but we don't want the sound blocks for alpha release
+        // need to clean this up before we re-add in the sound blocks
+        /*MartyMode*/
+        if (!isRightCategories && !ScratchJr.isMartyModeEnabled && (n == 3) && (ScratchJr.getSprite().sounds.length > 0)) {
+            Palette.addSoundsBlocks(dxblocks);
+        }
     }
 
     static reset() {
-        if (numcat == (BlockSpecs.categories.length - 1)) {
-            Palette.selectCategory(BlockSpecs.categories.length - 1);
-        }
-        if (numcat == 3) {
-            Palette.selectCategory(3);
-        }
+        Palette.selectCategory(0);
     }
 
     static showSelectors(b) {
@@ -450,6 +525,7 @@ export default class Palette {
             newb.lift();
             dx += betweenblocks;
         }
+        console.log("should be adding record sound");
         if ((list.length < 6) && Record.available) {
             Palette.drawRecordSound(newb.div.offsetWidth, newb.div.offsetHeight, dx);
         }
@@ -488,11 +564,8 @@ export default class Palette {
                 drawScaled(BlockSpecs.mic, cnv);
             };
         }
-        if (isTablet) {
-            div.ontouchstart = Palette.recordSound;
-        } else {
-            div.onpointerdown = Palette.recordSound;
-        }
+        div.ontouchstart = Palette.recordSound;
+        div.onmousedown = Palette.recordSound;
     }
 
     static recordSound(e) {
@@ -554,7 +627,6 @@ export default class Palette {
         return box.intersects(box2);
     }
 
-
     static getBlockfromChild(div) {
         while (div != null) {
             if (div.owner) {
@@ -594,6 +666,7 @@ export default class Palette {
 
     static newScaledBlock(parent, op, scale, dx, dy) {
         var bbx = new Block(BlockSpecs.defs[op], true, scale);
+        bbx.div.setAttribute('id', op+"_block");
         setProps(bbx.div.style, {
             position: 'absolute',
             left: dx + 'px',

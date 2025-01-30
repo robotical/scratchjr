@@ -27,9 +27,11 @@ div.frame {
     padding: ${css_vh(0)};
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0)};
     width: 100%;
-    height: ${css_vh(61.2)};
+    height: ${css_vh(63)};
     background:  url('../assets/ui/backgrounds.png');
     background-size: 100% 100%;
+
+    position: relative;
 }
 
 *.leftpanel {
@@ -51,30 +53,62 @@ div.frame {
 *.rightpanel {
     position: absolute;
     top: ${css_vh(0)};
-    right: ${css_vh_ratio_adj(5.73)};
+    right: ${css_vh(5.73)};
     margin: ${css_vh(0)};
     padding: ${css_vh(0)};
     display: inline-block;
-    height: ${css_vh_ratio_adj(61.20)};
-    width: ${css_vh_ratio_adj(21.09)};
+    height: ${css_vh(61.20)};
+    width: ${css_vh(21.09)};
+}
+
+.martyMode {
+    box-sizing: border-box;
+    position: absolute;
+    top: ${css_vh(1)};
+    left: ${css_vh(0)};
+    width: ${css_vh(20)};
+    height: ${css_vh(10)};
+    cursor: pointer;
+    background-color: #FFFFFF;
+
+    border: 4px solid #F4AD46;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    column-gap: ${css_vh(1)};
+    padding: 3px;
+}
+
+.martyModeToggle {
+    width: 30%;
+}
+
+.martyModeIcon {
+    width: 40%;
+}
+
+.spriteModeIcon {
+    width: 40%;
 }
 
 /* Pages Thumbnails */
 
 .pages {
-    top: ${css_vh(0)};
+    top: ${css_vh(10)};
     position: absolute;
     display: inline-block;
-    margin: ${css_vh(0)} ${css_vh(1.29)} ${css_vh(0)};
     width:  ${css_vh(21.09)};
-    height: 100%;
+    height: 60%;
 }
 
 .pagescc{
+    overflow: auto;
     position: absolute;
     top: ${css_vh(2.60)};
     width:  ${css_vh(21.09)};
-    height: ${css_vh(57.29)};
+    height: ${css_vh(37.29)};
 }
 
 .pagethumb {
@@ -127,12 +161,14 @@ div.frame {
 
 .pagethumb .pagenum {
     position: relative;
+    top: ${css_vh(.8)};
+    right: ${css_vh(0)};
     margin: ${css_vh(-14.64)} ${css_vh(16.06)} ${css_vh(0)};
     padding: ${css_vh(0)};
     width: ${css_vh(3.65)};
     height: ${css_vh(3.65)};
     font-size: ${css_vh(1.82)};
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: bold;
     color: white;
     padding-left: ${css_vh(1.0)};
@@ -187,10 +223,8 @@ div.frame {
 
 /*Editor UI*/
 
-#blockspalette {
-    position: relative;
-    display: grid;
-    grid-template-columns: min-content 1fr;
+#blockspalette {  
+    position: relative; 
     left: 0;
     right: 0;
     height: ${64 * scaleMultiplier}px;
@@ -228,7 +262,8 @@ div.frame {
 #blockspalette .categoryselector{
     display: inline-block;
     word-spacing: -1;
-    position: relative;
+    position: absolute;
+    top: ${css_vh(-8)};
     margin: ${css_vh(0)};
     z-index: 60;
     width: ${354 * scaleMultiplier}px;
@@ -236,7 +271,22 @@ div.frame {
     overflow: hidden;
 }
 
+#blockspalette .categoryselectorright{
+    display: inline-block;
+    word-spacing: -1;
+    position: absolute;
+    top: ${css_vh(-8)};
+    right: 0;
+    margin: ${css_vh(0)};
+    z-index: 60;
+    width: ${180 * scaleMultiplier}px;
+    height: ${64 * scaleMultiplier}px;
+    overflow: hidden;
+}
+
+#blockspalette .categoryselectorright .catbkg,
 #blockspalette .categoryselector .catbkg{
+    display: none;
     position: relative;
     width: ${708 * scaleMultiplier}px;
     height: ${128 * scaleMultiplier}px;
@@ -253,53 +303,14 @@ div.frame {
 }
 
 #blockspalette .palette{
-    display: inline-block;
+    display: block;
     position: relative;
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0)};
     height: ${64 * scaleMultiplier}px;
-    /* width: ${600 * scaleMultiplier}px; */
-    width: 89%;
+    /* width: ${659 * scaleMultiplier}px; */
+    width: 85%;
     z-index:4;
     overflow: hidden;
-    overflow-x: scroll;
-    margin-left: ${css_vh(5)};
-}
-/* hide scroll bar */
-#blockspalette .palette {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-#blockspalette .palette::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari, Opera*/
-}
-
-#blockspalette .left-scroll,
-#blockspalette .right-scroll {
-    position: absolute;
-    margin: ${css_vh(0)};
-    top: 50%;
-    transform: translateY(-50%);
-    width: ${css_vh(5)};
-    height: ${css_vh(5)};
-    z-index: 5;
-    background-color: rgb(214, 243, 246);
-    border-radius: 50%;
-    opacity: 0.5;
-}
-
-#blockspalette .left-scroll:hover,
-#blockspalette .right-scroll:hover {
-    opacity: 1;
-}
-#blockspalette .left-scroll {
-    content: "";
-    left: ${354 * scaleMultiplier}px;
-    background-image: url('../assets/ui/left-scroll.svg');
-}
-#blockspalette .right-scroll {
-    content: "";
-    right: ${css_vh(0)};
-    background-image: url('../assets/ui/right-scroll.svg');
 }
 
 #blockspalette .yellow { background: #FFE75A;}    /* #ffe100;}{ background: #FFFA5A;} */
@@ -424,7 +435,7 @@ z-index: 5;
 .controlundo {
     position: absolute;
     display: inline-block;
-    top: -${css_vh(7)};
+    top: ${css_vh(0.91)};
     right: ${css_vh(1)};
     margin: ${css_vh(0.00)};
     padding: ${css_vh(0.00)};
@@ -475,7 +486,9 @@ z-index: 5;
     overflow: hidden;
 }
 
-#scriptscontainer {}
+#scriptscontainer {
+    transition: transform 0.3s ease;
+}
 
 #scriptscontainer .look {
     position: absolute;
@@ -491,9 +504,8 @@ z-index: 5;
     position: absolute;
     top: ${css_vh(2.60)};
     left: ${css_vh(3.26)};
-    width: ${css_vh(14.44)};
-    height: ${css_vh(14.44)};
-    filter: opacity(0.25);
+    width: ${css_vh(18.88)};
+    height: ${css_vh(18.88)};
 }
 
 .watermark img{
@@ -762,7 +774,7 @@ form.projectname {
     margin: ${css_vh(0)} ${css_vh(0.26)} ${css_vh(0)};
     padding: ${css_vh(0)};
     text-align: center;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: normal;
     font-size: ${css_vh(3.13)};
     line-height: ${css_vh(4.17)};
@@ -805,7 +817,7 @@ form.projectname {
     margin: ${css_vh(-1.30)} ${css_vh(0.00)} ${css_vh(0.00)};
     color: #28A5DA;
     vertical-align: middle;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
 
 }
 
@@ -816,7 +828,7 @@ form.projectname {
     margin: ${css_vh(0.00)};
     color: #ffffff;
     vertical-align:middle;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
 }
 
 .infoboxlogo {
@@ -859,6 +871,17 @@ form.projectname {
   border-color: #FFEA00 #FFEA00 hsl(59, 79%, 60%);
 }
 
+*.menustyle.purple {
+    background-color: #CD7CD1;
+    border: 2px solid #A75CA9;
+  border-color: #CD7CD1 #CD7CD1 hsl(300, 79%, 60%);
+}
+*.menustyle.green {
+    background-color: #48CC7E;
+    border: 2px solid #2E9E5B;
+  border-color: #48CC7E #48CC7E hsl(140, 79%, 60%);
+
+}
 *.ddchoice{
   width: 42px;
   height: 42px;
@@ -877,6 +900,22 @@ form.projectname {
   border-color: #FCDD03 #FCDD03 hsl(52, 79%, 40%);
 }
 
+*.menustyle.purple > *.ddchoice{
+    -webkit-box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
+        background-color: #CD7CD1;
+        border: 2px solid #A75CA9;
+    border-color: #CD7CD1 #CD7CD1 hsl(300, 79%, 40%);
+ }
+
+ *.menustyle.green > *.ddchoice{
+    -webkit-box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
+        background-color: #48CC7E;
+        border: 2px solid #2E9E5B;
+    border-color: #48CC7E #48CC7E hsl(140, 79%, 40%);
+ }
+
 *.menustyle.orange > *.ddchoice{
   -webkit-box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
   box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
@@ -892,6 +931,22 @@ form.projectname {
 	border: 2px solid #B59B00;
   border-color: #B59B00 #B59B00 hsl(52, 79%, 55%);
 }
+
+*.menustyle.purple > *.ddchoice:active{
+    -webkit-box-shadow: inset 0 2px 0 #8A4F8A;
+    box-shadow: inset 0 2px 0 #8A4F8A;
+        background-color: #A75CA9;
+        border: 2px solid #8A4F8A;
+    border-color: #8A4F8A #8A4F8A hsl(300, 79%, 55%);
+ }
+
+ *.menustyle.green > *.ddchoice:active{
+    -webkit-box-shadow: inset 0 2px 0 #2E9E5B;
+    box-shadow: inset 0 2px 0 #2E9E5B;
+        background-color: #2E9E5B;
+        border: 2px solid #2E9E5B;
+    border-color: #2E9E5B #2E9E5B hsl(140, 79%, 55%);
+    }
 
 *.menustyle.orange > *.ddchoice{
   -webkit-box-shadow: inset 0 2px 0 rgba(255, 255, 0, 0.5), 0 -1px 0px -1px  rgba(0, 0, 0, 0.2);
@@ -949,7 +1004,7 @@ p.soundname{
     overflow: hidden;
     font-size:  13px;
     font-weight:bold;
-    font-family: Roboto;
+    font-family: Verdana;
     line-height: 16px;
     padding: 0px;
     cursor: default;
@@ -961,7 +1016,7 @@ p.balloon{
     text-align: center;
     margin: ${css_vh(0.65)};
     color: #ffffff;
-    font-family: Roboto;
+    font-family: Verdana;
     font-size:  14px;
     font-weight: bold;
     overflow: hidden;
@@ -995,7 +1050,7 @@ Blocks text fields and input fields
     float: left;
     text-align: center;
     color: #77787b;
-    font-family: Roboto;
+    font-family: Verdana;
     font-size:  ${css_vh(1.82)};
     font-weight: normal;
     font-size:  ${css_vh(1.82)};
@@ -1030,7 +1085,7 @@ Blocks text fields and input fields
     outline: 0px solid;
     text-align: center;
     color: #77787b;
-    font-family: Roboto;
+    font-family: Verdana;
     cursor: default;
     border: 2px solid  #28A5DA;
     width: ${css_vh(62.51)};
@@ -1047,6 +1102,7 @@ Blocks text fields and input fields
     height: ${css_vh(6.25)};
     font-size: ${css_vh(3.13)};
 }
+
 /* colour keyboard */
 *.colkeyboard {
     position: absolute;
@@ -1107,7 +1163,7 @@ Blocks text fields and input fields
     color: #999;
     line-height: ${css_vh(4.95)};
     font-size: ${css_vh(2.08)};
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: bold;
     margin: ${css_vh(0.39)};
     text-shadow: 0 ${css_vh(0.13)} #fff;
@@ -1159,7 +1215,7 @@ Blocks text fields and input fields
     line-height: ${css_vh(4.95)};
     vertical-align: middle;
     font-size: ${css_vh(2.08)};
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: bold;
     margin: ${css_vh(0.39)};
     text-shadow: 0 ${css_vh(0.13)} #fff;
@@ -1171,7 +1227,7 @@ Blocks text fields and input fields
 
 *.onekey.minus {
     font-size: ${css_vh(3.13)};
-    font-family: 'Roboto';
+    font-family: 'Verdana';
     line-height: ${css_vh(4.17)};
 }
 
@@ -1199,15 +1255,12 @@ Blocks text fields and input fields
 }
 
 .numfield {
-    display: grid;
-    justify-content: center;
-    align-items: center;
     position: absolute;
     margin: ${css_vh(0.00)};
     padding: ${css_vh(0.00)};
     border: 0px solid;
-    height: ${css_vh(4.13)};
-    width: ${css_vh(6.47)};
+    height: ${css_vh(3.13)};
+    width: ${css_vh(5.47)};
     top: ${css_vh(7.16)};
     left: ${css_vh(1.30)};
     color: #77787b;
@@ -1222,16 +1275,16 @@ Blocks text fields and input fields
 .numfield h3 {
     margin: ${css_vh(0.00)};
     padding: ${css_vh(0.00)};
-    /* float: left; */
+    float: left;
     text-align: center;
     color: #77787b;
-    font-family: Roboto;
+    font-family: Verdana;
     font-size:  ${css_vh(1.82)};
     font-weight: normal;
-    /* height: ${css_vh(4.13)}; */
-    /* width: ${css_vh(6.47)}; */
+    height: ${css_vh(3.13)};
+    width: ${css_vh(5.47)};
     cursor: default;
-    /* line-height: ${css_vh(4.13)}; */
+    line-height: ${css_vh(3.13)};
 }
 
 .numfield.on {
@@ -1253,4 +1306,14 @@ p.textsprite {
     font-weight: bold;
     width: auto;
     -webkit-text-size-adjust: auto;
+}
+
+.zoom-button {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    z-index: 1000;
 }

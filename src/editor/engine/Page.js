@@ -14,8 +14,7 @@ import Vector from '../../geom/Vector';
 import {
     newHTML, newDiv, gn,
     setCanvasSizeScaledToWindowDocumentHeight,
-    DEGTOR, getIdFor, setProps,
-    isTablet
+    DEGTOR, getIdFor, setProps
 } from '../../utils/lib';
 
 export default class Page {
@@ -43,8 +42,9 @@ export default class Page {
         }
     }
 
-    loadPageData(data, fcn) {
+    async loadPageData(data, fcn) {
         this.currentSpriteName = data.lastSprite;
+        const me = this;
         if (data.textstartat) {
             this.textstartat = Number(data.textstartat);
         }
@@ -65,6 +65,13 @@ export default class Page {
             }
         }
         function checkCount() {
+            /*MartyMode*/
+            // Checkout cb will run when a sprite is added to the page. 
+            // When a sprite is added, we check if the current sprite is a marty bird's eye sprite and if so, we enable Marty Mode
+            if (me.currentSpriteName && me.currentSpriteName.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                ScratchJr.isMartyModeEnabled = true;
+                UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled)
+            }
             if (!fcn) {
                 return;
             }
@@ -82,6 +89,7 @@ export default class Page {
                 fcn();
             }
         }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
     emptyPage() {
@@ -95,14 +103,20 @@ export default class Page {
         }
         if (spr) {
             this.currentSpriteName = spr.id;
-            spr.div.style.visibility = 'visible';
+            /*MartyMode*/
+            // only set visible if the sprite is not a bird's eye sprite
+            if (!spr.name || !spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                spr.div.style.visibility = 'visible';
+            }
             Palette.show();
             gn('scripts').style.display = ScratchJr.inFullscreen ? 'none' : 'block';
+            gn('palette').style.display = 'block';
             spr.activate();
         } else {
             this.currentSpriteName = undefined;
             Palette.hide();
             gn('scripts').style.display = 'none';
+            gn('palette').style.display = 'none';
         }
     }
 
@@ -133,7 +147,6 @@ export default class Page {
             MediaLib.path + name :
             (name.indexOf('/') < 0) ? OS.path + name : name;
         var md5 = (MediaLib.keys[name]) ? MediaLib.path + name : name;
-
 
         var duplicateBkg = function () {
             var fileName = IO.getFilenameWithExt(md5);
@@ -229,11 +242,51 @@ export default class Page {
         }
     }
 
-    setPageSprites(showstate) {
-        var list = JSON.parse(this.sprites);
-        for (var i = 0; i < list.length; i++) {
-            gn(list[i]).style.visibility = showstate;
+    /*MartyMode*/
+    // Method that toggles the visibility of the Marty Bird's Eye sprite and all other sprites in the stage
+    toggleMartyBirdsEyeSpriteVisibility(showBirdsEye, martyBirdsEyeSprite) {
+        console.log(`Setting visibility of Marty Bird's Eye sprite to: ${showBirdsEye}`);
+        console.log(`Setting visibility of all other sprites to: ${!showBirdsEye}`);
+
+        // Check if martyBirdsEyeSprite exists
+        if (martyBirdsEyeSprite) {
+            martyBirdsEyeSprite.div.style.visibility = showBirdsEye ? 'visible' : 'hidden';
         }
+
+        // Retrieve all sprites on the current page with the texts included
+        const allSprites = this.getSprites(true);
+
+        // Loop through each sprite and set visibility based on `showBirdsEye`
+        allSprites.forEach(sprite => {
+            const spr = this.getSprite(sprite);
+
+            // Set visibility of all other sprites
+            if (spr && !sprite.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                spr.div.style.visibility = showBirdsEye ? 'hidden' : 'visible';
+            }
+        });
+    }
+
+    setPageSprites(showstate) {
+        if (showstate == 'hidden') {
+            var list = JSON.parse(this.sprites);
+            for (var i = 0; i < list.length; i++) {
+                gn(list[i]).style.visibility = showstate;
+            }
+            return;
+        }
+        /*MartyMode*/
+        // If the showstate is 'visible', we show the Marty Bird's Eye sprite only if Marty Mode is enabled
+        // we show only the marty birds eye sprite and hide all other sprites
+        // OR, we show all sprites and hide the marty birds eye sprite
+        const martyBirdsEyeSprite = this.getMartyBirdsEyeSprite();
+        this.toggleMartyBirdsEyeSpriteVisibility(showstate === 'visible' && ScratchJr.isMartyModeEnabled, martyBirdsEyeSprite);
+
+        // var list = JSON.parse(this.sprites);
+        // for (var i = 0; i < list.length; i++) {
+        //     console.log("setting sprite", list[i], "to", showstate);
+        //     gn(list[i]).style.visibility = showstate;
+        // }
     }
 
     redoChangeBkg(data) {
@@ -267,15 +320,12 @@ export default class Page {
         var pq = newHTML('p', undefined, num);
         pq.textContent = this.num;
         newHTML('div', 'deletethumb', tb);
-        if (isTablet) {
-            tb.ontouchstart = function (evt) {
-                Thumbs.pageMouseDown(evt);
-            };
-        } else {
-            tb.onpointerdown = function (evt) {
-                Thumbs.pageMouseDown(evt);
-            };
-        }
+        tb.ontouchstart = function (evt) {
+            Thumbs.pageMouseDown(evt);
+        };
+        tb.onmousedown = function (evt) {
+            Thumbs.pageMouseDown(evt);
+        };
         this.thumbnail = tb;
         return tb;
     }
@@ -314,7 +364,19 @@ export default class Page {
             if (!spr) {
                 continue;
             }
-            this.stampSpriteAt(ctx, spr, scale);
+            /*MartyMode*/
+            // only print MartyBird's eye sprite if we are in MartyMode,
+            // otherwise print all the rest sprites
+            if (this.currentSpriteName && this.currentSpriteName.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                if (spr.name?.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                    this.stampSpriteAt(ctx, spr, scale);
+                }
+            }
+            if (this.currentSpriteName && !this.currentSpriteName.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                if (!spr.name || !spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                    this.stampSpriteAt(ctx, spr, scale);
+                }
+            }
         }
         if (window.Settings.edition != 'PBS') {
             ctx.save();
@@ -409,16 +471,38 @@ export default class Page {
         return data;
     }
 
-    getSprites() {
+    getSprites(textsIncluded = false) {
         var spritelist = JSON.parse(this.sprites);
         var res = [];
         for (var i = 0; i < spritelist.length; i++) {
-            if (gn(spritelist[i]).owner.type == 'sprite') {
+            if (!textsIncluded) {
+                if (gn(spritelist[i]).owner.type == 'sprite') {
+                    res.push(spritelist[i]);
+                }
+            } else {
                 res.push(spritelist[i]);
             }
         }
         return res;
     }
+
+    getSprite(spriteName) {
+        if (!gn(spriteName)) {
+            return undefined;
+        }
+        return gn(spriteName).owner;
+    }
+
+    getMartyBirdsEyeSprite() {
+        /*MartyMode*/
+        // get Marty Bird's Eye sprite of the current page
+        const allPageSprites = this.getSprites();
+        const martyBirdsEyeSprite = allPageSprites.find(sprite => sprite.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME));
+        if (martyBirdsEyeSprite) {
+            return this.getSprite(martyBirdsEyeSprite);
+        }
+    }
+
 
 
     /////////////////////////////
@@ -449,14 +533,28 @@ export default class Page {
         };
         textAttr.page = this;
         textAttr.id = getIdFor('Text');
+        console.log("Creating text with id", textAttr.id);
         new Sprite(textAttr);
     }
 
-    createCat() {
+    async createCat() {
         var sprAttr = UI.mascotData(ScratchJr.stage.currentPage);
         Project.mediaCount++;
         var me = this;
-        new Sprite(sprAttr, me.pageAdded);
+        /*MartyMode*/
+        // if Marty Bird's Eye sprite exists, add just the cat sprite
+        // if (this.getMartyBirdsEyeSprite()) {
+        // if Marty Bird's Eye sprite exists, add just the cat sprite
+        // new Sprite(sprAttr, me.pageAdded);
+        // } else { // if Marty Bird's Eye sprite doesn't exist, add it and when it's added, add the cat sprite
+        this.addSprite(0.5, "MartyBirdsEye.svg", ScratchJr.BIRDS_EYE_SPRITE_NAME, (spr) => {
+            // also disable Marty Mode
+            ScratchJr.isMartyModeEnabled = false;
+            UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled)
+            new Sprite(sprAttr, me.pageAdded);
+            me.martyBirdsEyeSpriteAdded(spr);
+        });
+        // }
     }
 
     update(spr) {
@@ -493,10 +591,22 @@ export default class Page {
     }
 
     spriteAdded(spr) {
+        if (spr.name !== ScratchJr.BIRDS_EYE_SPRITE_NAME) {
+            /*MartyMode*/
+            ScratchJr.isMartyModeEnabled = false;
+            UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled)
+        }
         var me = spr.div.parentNode.owner;
         me.setCurrentSprite(spr);
         me.update(spr);
         UI.spriteInView(spr);
+        ScratchJr.onHold = false;
+    }
+
+    martyBirdsEyeSpriteAdded(spr) {
+        var me = spr.div.parentNode.owner;
+        me.update(spr);
+        ScratchJr.getSprite().unselect();
         ScratchJr.onHold = false;
     }
 
@@ -516,7 +626,7 @@ export default class Page {
         Thumbs.updatePages();
     }
 
-    addSprite(scale, md5, cname) {
+    addSprite(scale, md5, cname, fcn) {
         ScratchJr.onHold = true;
         var sprAttr = {
             flip: false,
@@ -540,7 +650,7 @@ export default class Page {
         sprAttr.id = getIdFor(cname);
         sprAttr.name = cname;
         sprAttr.md5 = md5;
-        new Sprite(sprAttr, this.spriteAdded);
+        new Sprite(sprAttr, fcn || this.spriteAdded);
     }
 
     createSprite(data) {

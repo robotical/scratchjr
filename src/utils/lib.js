@@ -7,7 +7,8 @@ export const isTablet = ('ontouchstart' in document.documentElement);
 export const DEGTOR = Math.PI / 180;
 export const WINDOW_INNER_HEIGHT = window.innerHeight;
 export const WINDOW_INNER_WIDTH = window.innerWidth;
-export const scaleMultiplier = WINDOW_INNER_HEIGHT / 768.0;
+// export const scaleMultiplier = WINDOW_INNER_HEIGHT / 768.0;
+export const scaleMultiplier = WINDOW_INNER_HEIGHT / 800.0;
 export const fullscreenScaleMultiplier = 136;
 
 export const getPlatforms = () => {
@@ -39,7 +40,7 @@ export const getPlatforms = () => {
       isWebapp = true;
     }
   }
-  return {isiOS: false, isAndroid: false, isWebapp: true};
+  return { isiOS: false, isAndroid: false, isWebapp: true };
   return { isiOS, isAndroid, isWebapp };
 };
 
@@ -539,7 +540,7 @@ export function getStringSize(ctx, f, label) {
   return ctx.measureText(label);
 }
 
-function createGradient (ctx, cnvWidth) {
+function createGradient(ctx, cnvWidth) {
   // Define the start and end points of the gradient
   const gradient = ctx.createLinearGradient(0, 0, cnvWidth, 0);
 
@@ -565,7 +566,6 @@ export function addCol(ctx, c, cnvWidth, cnvHeight) {
     ctx.fillStyle = gradient;
   }
   ctx.fill();
-
 }
 
 export function writeText(ctx, f, c, label, dy, dx) {
@@ -671,7 +671,7 @@ export function rgb2hsb(str) {
 }
 
 export function rgbToHex(str) {
-  if (str.indexOf("rgb") < 0) {
+  if ((str || "").indexOf("rgb") < 0) {
     return str;
   }
   var res = str.substring(4, str.length - 1);
@@ -743,6 +743,7 @@ export function findKeyframesRule(rule) {
 }
 
 export function colorToRGBA(color, opacity) {
+  if (!color) return "";
   var val = parseInt("0x" + color.substr(1, color.length));
   return (
     "rgba(" +

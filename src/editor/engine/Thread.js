@@ -92,13 +92,11 @@ export default class Thread {
         case 'back':
         case 'forward':
         case 'up':
-            /* We don't want to move the sprite when the block is stopped */
+            if ((this.distance > -1) && !stopMine) {
+                var vector = Vector.scale(this.vector, this.distance % 24);
+                s.setPos(s.xcoor + vector.x, s.ycoor + vector.y);
+            }
             break;
-            // if ((this.distance > -1) && !stopMine) {
-            //     var vector = Vector.scale(this.vector, this.distance % 24);
-            //     s.setPos(s.xcoor + vector.x, s.ycoor + vector.y);
-            // }
-            // break;
         case 'hop':
             var count = this.count;
             var n = Number(b.getArgValue());
@@ -156,14 +154,12 @@ export default class Thread {
             break;
         case 'right':
         case 'left':
-            /* We don't want to rotate the sprite when the block is stopped */
+            var angle = s.angle;
+            if ((angle % 30) != 0) {
+                angle = (Math.floor(angle / 30) + 1) * 30;
+            }
+            s.setHeading(angle);
             break;
-            // var angle = s.angle;
-            // if ((angle % 30) != 0) {
-            //     angle = (Math.floor(angle / 30) + 1) * 30;
-            // }
-            // s.setHeading(angle);
-            // break;
         }
     }
 }

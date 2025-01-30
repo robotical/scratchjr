@@ -3,10 +3,10 @@
 ////////////////////////////////////////////////
 
 import Events from '../../utils/Events';
-import {newDiv, newHTML, CSSTransition3D, isTablet, setCanvasSize} from '../../utils/lib';
+import { newDiv, newHTML, CSSTransition3D, isTablet, setCanvasSize } from '../../utils/lib';
 
 export default class Scroll {
-    constructor (div, id, w, h, cfcn, ofcn) {
+    constructor(div, id, w, h, cfcn, ofcn) {
         this.hasHorizontal = true;
         this.hasVertical = true;
         this.arrowDistance = 6;
@@ -23,7 +23,7 @@ export default class Scroll {
         div.scroll = this; // for now;
     }
 
-    update () {
+    update() {
         this.adjustCanvas();
         this.refresh();
         this.bounceBack();
@@ -33,7 +33,7 @@ export default class Scroll {
     // Arrows
     ////////////////////////////////////////////////////////////
 
-    addArrows (sc, w, h) {
+    addArrows(sc, w, h) {
         this.aleft = newHTML('div', 'leftarrow', sc);
         this.aleft.style.height = h + 'px';
         var larrow = newHTML('span', undefined, this.aleft);
@@ -55,7 +55,7 @@ export default class Scroll {
                 me.scrolldown(e);
             };
         } else {
-            this.aup.onpointerdown = function (e) {
+            this.aup.onmousedown = function (e) {
                 me.scrolldown(e);
             };
         }
@@ -65,7 +65,7 @@ export default class Scroll {
                 me.scrollup(e);
             };
         } else {
-            this.adown.onpointerdown = function (e) {
+            this.adown.onmousedown = function (e) {
                 me.scrollup(e);
             };
         }
@@ -75,7 +75,7 @@ export default class Scroll {
                 me.scrollright(e);
             };
         } else {
-            this.aleft.onpointerdown = function (e) {
+            this.aleft.onmousedown = function (e) {
                 me.scrollright(e);
             };
         }
@@ -85,7 +85,7 @@ export default class Scroll {
                 me.scrollleft(e);
             };
         } else {
-            this.aright.onpointerdown = function (e) {
+            this.aright.onmousedown = function (e) {
                 me.scrollleft(e);
             };
         }
@@ -96,14 +96,14 @@ export default class Scroll {
     // Scrolling
     ////////////////////////////////////////////////////////////
 
-    repositionArrows (h) {
+    repositionArrows(h) {
         this.aleft.style.height = h + 'px';
         this.aleft.childNodes[0].style.top = Math.floor((h - this.aleft.childNodes[0].offsetHeight) / 2) + 'px';
         this.aright.style.height = h + 'px';
         this.aright.childNodes[0].style.top = Math.floor((h - this.aright.childNodes[0].offsetHeight) / 2) + 'px';
     }
 
-    getAdjustment (rect) { // rect of the dragg block canvas
+    getAdjustment(rect) { // rect of the dragg block canvas
         var d = this.contents.parentNode; // scripts
         var w = d.offsetWidth;
         var h = d.offsetHeight;
@@ -134,7 +134,8 @@ export default class Scroll {
         return 'none';
     }
 
-    bounceBack () {
+    bounceBack() {
+        return // disabling bouncing back so that the canvas can be scrolled
         var owner = this;
         var p = this.contents; // scriptscontainer
         var bc = this.getContent(); // blockcanvas
@@ -157,50 +158,50 @@ export default class Scroll {
             }
         };
         switch (this.getAdjustment(rect)) {
-        case 'topright':
-            transition.style.left = (this.hasHorizontal ? (w - rect.width) : 0) + 'px';
-            transition.style.top = '0px';
-            CSSTransition3D(bc, transition);
-            break;
-        case 'bottomright':
-            transition.style.left = (this.hasHorizontal ? (w - rect.width) : 0) + 'px';
-            transition.style.top = (this.hasVertical ? h - rect.height : 0) + 'px';
-            CSSTransition3D(bc, transition);
-            break;
-        case 'topleft':
-            transition.style.top = '0px';
-            transition.style.left = '0px';
-            CSSTransition3D(bc, transition);
-            break;
-        case 'bottomleft':
-            transition.style.top = (this.hasVertical ? h - rect.height : 0) + 'px';
-            transition.style.left = '0px';
-            CSSTransition3D(bc, transition);
-            break;
-        case 'right':
-            transition.style.top = valy + 'px';
-            transition.style.left = (this.hasHorizontal ? (w - rect.width) : 0) + 'px';
-            CSSTransition3D(bc, transition);
-            break;
-        case 'left':
-            if (this.hasHorizontal) {
-                transition.style.top = valy + 'px';
+            case 'topright':
+                transition.style.left = (this.hasHorizontal ? (w - rect.width) : 0) + 'px';
+                transition.style.top = '0px';
+                CSSTransition3D(bc, transition);
+                break;
+            case 'bottomright':
+                transition.style.left = (this.hasHorizontal ? (w - rect.width) : 0) + 'px';
+                transition.style.top = (this.hasVertical ? h - rect.height : 0) + 'px';
+                CSSTransition3D(bc, transition);
+                break;
+            case 'topleft':
+                transition.style.top = '0px';
                 transition.style.left = '0px';
                 CSSTransition3D(bc, transition);
-            }
-            break;
-        case 'down':
-            transition.style.top = (h - rect.height) + 'px';
-            transition.style.left = valx + 'px';
-            CSSTransition3D(bc, transition);
-            break;
-        case 'up':
-            if (this.hasVertical) {
-                transition.style.top = '0px';
+                break;
+            case 'bottomleft':
+                transition.style.top = (this.hasVertical ? h - rect.height : 0) + 'px';
+                transition.style.left = '0px';
+                CSSTransition3D(bc, transition);
+                break;
+            case 'right':
+                transition.style.top = valy + 'px';
+                transition.style.left = (this.hasHorizontal ? (w - rect.width) : 0) + 'px';
+                CSSTransition3D(bc, transition);
+                break;
+            case 'left':
+                if (this.hasHorizontal) {
+                    transition.style.top = valy + 'px';
+                    transition.style.left = '0px';
+                    CSSTransition3D(bc, transition);
+                }
+                break;
+            case 'down':
+                transition.style.top = (h - rect.height) + 'px';
                 transition.style.left = valx + 'px';
                 CSSTransition3D(bc, transition);
-            }
-            break;
+                break;
+            case 'up':
+                if (this.hasVertical) {
+                    transition.style.top = '0px';
+                    transition.style.left = valx + 'px';
+                    CSSTransition3D(bc, transition);
+                }
+                break;
         }
     }
 
@@ -208,7 +209,7 @@ export default class Scroll {
     // Refreshing
     ////////////////////////////////////////////////////////////
 
-    refresh () {
+    refresh() {
         var p = this.contents; // scriptscontainer
         var bc = this.getContent(); // blockcanvas
         var w = p.offsetWidth;
@@ -249,7 +250,7 @@ export default class Scroll {
         this.adown.style.visibility = needdown;
     }
 
-    adjustCanvas () {
+    adjustCanvas() {
         var bc = this.getContent(); // blockcanvas
         var p = this.contents; // scriptscontainer
         var w = p.offsetWidth;
@@ -316,7 +317,7 @@ export default class Scroll {
         }
     }
 
-    moveBlocks (dx, dy) {
+    moveBlocks(dx, dy) {
         var allblocks = this.getObjects();
         for (var i = 0; i < allblocks.length; i++) {
             var b = allblocks[i];
@@ -328,7 +329,7 @@ export default class Scroll {
     // Scrolling
     ////////////////////////////////////////////////////////////
 
-    scrolldown (e) {
+    scrolldown(e) {
         if (isTablet && e.touches && (e.touches.length > 1)) {
             return;
         }
@@ -356,7 +357,7 @@ export default class Scroll {
         CSSTransition3D(sc, transition);
     }
 
-    scrollup (e) {
+    scrollup(e) {
         if (isTablet && e.touches && (e.touches.length > 1)) {
             return;
         }
@@ -384,7 +385,7 @@ export default class Scroll {
         CSSTransition3D(sc, transition);
     }
 
-    scrollright (e) {
+    scrollright(e) {
         if (isTablet && e.touches && (e.touches.length > 1)) {
             return;
         }
@@ -412,7 +413,7 @@ export default class Scroll {
         CSSTransition3D(sc, transition);
     }
 
-    scrollleft (e) {
+    scrollleft(e) {
         if (isTablet && e.touches && (e.touches.length > 1)) {
             return;
         }
@@ -440,7 +441,7 @@ export default class Scroll {
         CSSTransition3D(sc, transition);
     }
 
-    fitToScreen () {
+    fitToScreen() {
         var p = this.contents;
         var sc = this.getContent();
         var valx = sc.left;
@@ -454,33 +455,33 @@ export default class Scroll {
             height: sc.offsetHeight
         };
         switch (this.getAdjustment(rect)) {
-        case 'topright':
-            valx = w - rect.width;
-            valy = 0;
-            break;
-        case 'bottomright':
-            valx = w - rect.width;
-            valy = h - rect.height;
-            break;
-        case 'topleft':
-            valx = 0; valy = 0;
-            break;
-        case 'bottomleft':
-            valy = h - rect.height;
-            valx = 0;
-            break;
-        case 'right':
-            valx = w - rect.width;
-            break;
-        case 'left':
-            valx = 0;
-            break;
-        case 'down':
-            valy = h - rect.height;
-            break;
-        case 'up':
-            valy = 0;
-            break;
+            case 'topright':
+                valx = w - rect.width;
+                valy = 0;
+                break;
+            case 'bottomright':
+                valx = w - rect.width;
+                valy = h - rect.height;
+                break;
+            case 'topleft':
+                valx = 0; valy = 0;
+                break;
+            case 'bottomleft':
+                valy = h - rect.height;
+                valx = 0;
+                break;
+            case 'right':
+                valx = w - rect.width;
+                break;
+            case 'left':
+                valx = 0;
+                break;
+            case 'down':
+                valy = h - rect.height;
+                break;
+            case 'up':
+                valy = 0;
+                break;
         }
         Events.move3D(sc, valx, valy);
     }

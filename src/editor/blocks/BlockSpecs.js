@@ -22,6 +22,14 @@ let fontcolors = [fontred, fontorange, fontyellow,
 
 let fontsizes = [16, 24, 36, 48, 56, 72];
 
+const tiltshapes = ['tiltright', 'tiltleft', 'tiltbackward', 'tiltforward', 'tiltbackwardforward', 'tiltleftright']
+const moveshapes = ['onshake'];
+const onobjectsensedshapes = ['onobjectsensedleft', 'onobjectsensedright', 'onnoobjectsensed'];
+const lightshapes = ['onhighlight', 'onmidlight', 'onlowlight'];
+const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];
+const colourshapes = ['selectcolourred', 'selectcolourgreen', 'selectcolourblue', 'selectcolourpurple', 'selectcolourorange', 'selectcolouryellow'];
+const noteshapes = ['notec', 'notecsharp', 'noted', 'notedsharp', 'notee', 'notef', 'notefsharp', 'noteg', 'notegsharp', 'notea', 'noteasharp', 'noteb'];
+
 let getshapes = ['LetterGet_Orange', 'LetterGet_Red', 'LetterGet_Yellow', 'LetterGet_Green',
     'LetterGet_Blue', 'LetterGet_Purple'];
 let sendshapes = ['LetterSend_Orange', 'LetterSend_Red', 'LetterSend_Yellow', 'LetterSend_Green',
@@ -30,32 +38,47 @@ let sendshapes = ['LetterSend_Orange', 'LetterSend_Red', 'LetterSend_Yellow', 'L
 let speeds = ['speed0', 'speed1', 'speed2'];
 
 export default class BlockSpecs {
-    static get loadCount () {
+    static get loadCount() {
         return loadCount;
     }
 
-    static set loadCount (newLoadCount) {
+    static set loadCount(newLoadCount) {
         loadCount = newLoadCount;
     }
 
-    static get fontcolors () {
+    static get fontcolors() {
         return fontcolors;
     }
 
-    static get fontsizes () {
+    static get fontsizes() {
         return fontsizes;
     }
 
-    static get speeds () {
+    static get speeds() {
         return speeds;
     }
 
-    static initBlocks () {
+    static palettes = [];
+    static palettesCog = [];
+    static palettesMarty = [];
+
+    static categories = [];
+    static categoriesCog = [];
+    static categoriesMarty = [];
+
+    static initBlocks() {
         loadassets = new Object();
         BlockSpecs.loadGraphics();
         BlockSpecs.defs = BlockSpecs.setupBlocksSpecs();
+
         BlockSpecs.palettes = BlockSpecs.setupPalettesDef();
+        BlockSpecs.palettesCog = BlockSpecs.setupPalettesDefCog();
+        BlockSpecs.palettesMarty = BlockSpecs.setupPalettesDefMarty();
+
         BlockSpecs.categories = BlockSpecs.setupCategories();
+        BlockSpecs.categoriesCog = BlockSpecs.setupCategoriesCog();
+        BlockSpecs.categoriesMarty = BlockSpecs.setupCategoriesMarty();
+
         if (window.Settings.edition == 'PBS') {
             BlockSpecs.canvasMask = BlockSpecs.getImageFrom('assets/ui/canvasmask', 'svg');
         } else {
@@ -68,13 +91,13 @@ export default class BlockSpecs {
         loadCount++;
     }
 
-    static setBalloon (str) {
+    static setBalloon(str) {
         loadCount--;
         BlockSpecs.balloon = str;
     }
 
 
-    static loadGraphics () {
+    static loadGraphics() {
         BlockSpecs.mic = BlockSpecs.getImageFrom('assets/ui/recordslot', 'svg');
         BlockSpecs.yellowStart = BlockSpecs.getImageFrom('assets/blocks/start', 'svg');
         BlockSpecs.yellowStartH = BlockSpecs.getImageFrom('assets/blocks/eh/startH');
@@ -116,7 +139,7 @@ export default class BlockSpecs {
 
     }
 
-    static getImageFrom (url, ext) {
+    static getImageFrom(url, ext) {
         var img = document.createElement('img');
         img.src = url + (ext ? '.' + ext : '.png');
         if (!img.complete) {
@@ -131,7 +154,7 @@ export default class BlockSpecs {
     }
 
 
-    static refreshLoading () {
+    static refreshLoading() {
         for (var key in loadassets) {
             if (loadassets[key].complete) {
                 loadCount--;
@@ -139,113 +162,134 @@ export default class BlockSpecs {
         }
     }
 
+    static setupCategoriesCog() {
+        return new Array(
+            [
+                BlockSpecs.getImageFrom('assets/categories/CogStartOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/CogStartOff', 'svg'),
+                window.Settings.categoryStartColor,
+                'cog-start'
+            ],
+            [
+                BlockSpecs.getImageFrom('assets/categories/CogLooksOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/CogLooksOff', 'svg'),
+                window.Settings.categoryLooksColor,
+                'cog-looks'
+            ],
+            [
+                BlockSpecs.getImageFrom('assets/categories/CogSoundOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/CogSoundOff', 'svg'),
+                window.Settings.categorySoundColor,
+                'cog-sound'
+            ],
+        );
+    }
 
-static setupCategories () {
+    static setupCategoriesMarty() {
+        return new Array(
+            [
+                BlockSpecs.getImageFrom('assets/categories/MartyStartOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/MartyStartOff', 'svg'),
+                window.Settings.categoryStartColor,
+                'marty-start'
+            ],
+            [
+                BlockSpecs.getImageFrom('assets/categories/MartyMotionOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/MartyMotionOff', 'svg'),
+                window.Settings.categoryMotionColor,
+                'marty-motion'
+            ],
+            [
+                BlockSpecs.getImageFrom('assets/categories/MartyLooksOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/MartyLooksOff', 'svg'),
+                window.Settings.categoryLooksColor,
+                'marty-looks'
+            ],
+            [
+                BlockSpecs.getImageFrom('assets/categories/MartySoundOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/MartySoundOff', 'svg'),
+                window.Settings.categorySoundColor,
+                'marty-sound'
+            ],
+            [
+                BlockSpecs.getImageFrom('assets/categories/MartyFlowOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/MartyFlowOff', 'svg'),
+                window.Settings.categoryFlowColor,
+                'marty-flow'
+            ],
+            [
+                BlockSpecs.getImageFrom('assets/categories/MartyStopOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/MartyStopOff', 'svg'),
+                window.Settings.categoryStopColor,
+                'marty-stop'
+            ]
+        );
+    }
+
+    static setupCategories() {
         return new Array(
             [
                 BlockSpecs.getImageFrom('assets/categories/StartOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/StartOff', 'svg'),
                 window.Settings.categoryStartColor,
-                'start'
+                'sprite-start'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/MotionOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/MotionOff', 'svg'),
                 window.Settings.categoryMotionColor,
-                'motion'
+                'sprite-motion'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/LooksOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/LooksOff', 'svg'),
                 window.Settings.categoryLooksColor,
-                'looks'
+                'sprite-looks'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/SoundOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/SoundOff', 'svg'),
                 window.Settings.categorySoundColor,
-                'sound'
+                'sprite-sound'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/FlowOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/FlowOff', 'svg'),
                 window.Settings.categoryFlowColor,
-                'flow'
+                'sprite-flow'
             ],
             [
                 BlockSpecs.getImageFrom('assets/categories/StopOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/StopOff', 'svg'),
                 window.Settings.categoryStopColor,
-                'stop'
+                'sprite-stop'
             ]
         );
     }
 
-
-    // static setupCategories () {
-    //     return new Array(
-    //         [
-    //             BlockSpecs.getImageFrom('assets/categories/StartOn', 'svg'),
-    //             BlockSpecs.getImageFrom('assets/categories/StartOff', 'svg'),
-    //             window.Settings.categoryStartColor,
-    //             'start'
-    //         ],
-    //         [
-    //             BlockSpecs.getImageFrom('assets/categories/MotionOn', 'svg'),
-    //             BlockSpecs.getImageFrom('assets/categories/MotionOff', 'svg'),
-    //             window.Settings.categoryMotionColor,
-    //             'motion'
-    //         ],
-    //         [
-    //             BlockSpecs.getImageFrom('assets/categories/LooksOn', 'svg'),
-    //             BlockSpecs.getImageFrom('assets/categories/LooksOff', 'svg'),
-    //             window.Settings.categoryLooksColor,
-    //             'looks'
-    //         ],
-    //         [
-    //             BlockSpecs.getImageFrom('assets/categories/SoundOn', 'svg'),
-    //             BlockSpecs.getImageFrom('assets/categories/SoundOff', 'svg'),
-    //             window.Settings.categorySoundColor,
-    //             'sound'
-    //         ],
-    //         [
-    //             BlockSpecs.getImageFrom('assets/categories/FlowOn', 'svg'),
-    //             BlockSpecs.getImageFrom('assets/categories/FlowOff', 'svg'),
-    //             window.Settings.categoryFlowColor,
-    //             'flow'
-    //         ],
-    //         [
-    //             BlockSpecs.getImageFrom('assets/categories/StopOn', 'svg'),
-    //             BlockSpecs.getImageFrom('assets/categories/StopOff', 'svg'),
-    //             window.Settings.categoryStopColor,
-    //             'stop'
-    //         ]
-    //     );
-    // }
-
-
-
-    static setupPalettesDef () {
-
-        return [['onflag'],
-            ['getReady', 'forward', 'back', 'up', 'down', 'right', 'left', 'martyDance', 'kickLeft', 'kickRight'],
-            ['eyesExcited', 'eyesWide', 'eyesAngry', 'eyesNormal', 'eyesWiggle', 'waveLeft', 'waveRight', 'celebrate', 'ledEyesP1','ledEyesP2', 'ledEyesColour'],
-            ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
-            ['wait', 'stopmine', 'repeat'],
-            ['endstack', 'forever']];
+    static setupPalettesDef() {
+        return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'],
+        ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'],
+        ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'],
+        [],
+        ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'],
+        ['endstack', 'forever']];
     }
 
+    static setupPalettesDefCog() {
+        return [['tiltany', 'ontouchcog', 'onshake', 'onobjectsensed', 'onlight'],
+        ['setpattern', 'selectcolour', 'clearcolours'],
+        ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote', 'waitcrotchet', 'settempo']];
+    }
 
-    // static setupPalettesDef () {
-
-
-    //     return [['onflag', 'onclick', 'ontouch', 'onmessage', 'message'],
-    //         ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'],
-    //         ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'],
-    //         [],
-    //         ['wait', 'stopmine', 'setspeed', 'repeat'],
-    //         ['endstack', 'forever']];
-    // }
+    static setupPalettesDefMarty() {
+        return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'],
+        ['martyGetReady', 'martyStepForward', 'martyStepBackward', 'martyStepRight', 'martyStepLeft', 'martyTurnRight', 'martyTurnLeft', 'martyDance', 'martyKickLeft', 'martyKickRight'],
+        ['martyEyesExcited', 'martyEyesWide', 'martyEyesAngry', 'martyEyesNormal', 'martyEyesWiggle', 'martyWaveLeft', 'martyWaveRight', 'martyCelebrate', 'martyLedEyesP1', 'martyLedEyesP2', 'martyLedEyesColour'],
+        ['martyConfusion', 'martyDisbelief', 'martyExcitement', 'martyNoway', 'martyNo', 'martyWhistle'],
+        ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'],
+        ['endstack', 'forever']];
+    }
 
     ///////////////////////////////
     // Data Structure
@@ -264,48 +308,40 @@ static setupCategories () {
     //
     ////////////////////////////////
 
-    static setupBlocksSpecs () {
+    static setupBlocksSpecs() {
+
         return {
+            /* ScratchJr Blocks */
             'onflag': ['onflag', BlockSpecs.getImageFrom('assets/blockicons/greenFlag', 'svg'),
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'onmessage': ['onmessage', getshapes, BlockSpecs.yellowStart, 'm', 'Orange',
-                BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
+                BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'onclick': ['onclick', BlockSpecs.getImageFrom('assets/blockicons/OnTouch', 'svg'),
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'ontouch': ['ontouch', BlockSpecs.getImageFrom('assets/blockicons/Bump', 'svg'),
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'message': ['message', sendshapes, BlockSpecs.yellowCmd, 'm', 'Orange',
-                BlockSpecs.yellowCmdH, null, null, BlockSpecs.cmdS],
+                BlockSpecs.yellowCmdH, null, null, BlockSpecs.cmdS, 'yellow'],
 
             'repeat': ['repeat', BlockSpecs.getImageFrom('assets/blockicons/Repeat', 'svg'),
                 BlockSpecs.cShape, 'n', 4, BlockSpecs.cShapeH, 0, 24, BlockSpecs.repeatS],
-            'getReady': ['getReady', BlockSpecs.getImageFrom('assets/blockicons/MartyGetReady', 'svg'),
-                BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
-            'martyDance': ['martyDance', BlockSpecs.getImageFrom('assets/blockicons/MartyDance', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
-            'forward': ['forward', BlockSpecs.getImageFrom('assets/blockicons/Foward', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
-            'back': ['back', BlockSpecs.getImageFrom('assets/blockicons/Back', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
-            'up': ['up', BlockSpecs.getImageFrom('assets/blockicons/Up', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
-            'down': ['down', BlockSpecs.getImageFrom('assets/blockicons/Down', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
-            'right': ['right', BlockSpecs.getImageFrom('assets/blockicons/Right', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
-            'left': ['left', BlockSpecs.getImageFrom('assets/blockicons/Left', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
-            
-            'kickRight': ['kickRight', BlockSpecs.getImageFrom('assets/blockicons/MartyKickRight', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 10, BlockSpecs.cmdS],
-            'kickLeft': ['kickLeft', BlockSpecs.getImageFrom('assets/blockicons/MartyKickLeft', 'svg'),
-                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 10, BlockSpecs.cmdS],
 
+            'forward': ['forward', BlockSpecs.getImageFrom('assets/blockicons/Foward', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
+            'back': ['back', BlockSpecs.getImageFrom('assets/blockicons/Back', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -20, 20, BlockSpecs.cmdS],
+            'up': ['up', BlockSpecs.getImageFrom('assets/blockicons/Up', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -15, 15, BlockSpecs.cmdS],
+            'down': ['down', BlockSpecs.getImageFrom('assets/blockicons/Down', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -15, 15, BlockSpecs.cmdS],
+            'right': ['right', BlockSpecs.getImageFrom('assets/blockicons/Right', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -12, 12, BlockSpecs.cmdS],
+            'left': ['left', BlockSpecs.getImageFrom('assets/blockicons/Left', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -12, 12, BlockSpecs.cmdS],
             'home': ['home', BlockSpecs.getImageFrom('assets/blockicons/Home', 'svg'),
                 BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, null, null, BlockSpecs.cmdS],
             'hop': ['hop', BlockSpecs.getImageFrom('assets/blockicons/Hop', 'svg'),
-                BlockSpecs.blueCmd, 'n', 2, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
-
+                BlockSpecs.blueCmd, 'n', 2, BlockSpecs.blueCmdH, -15, 15, BlockSpecs.cmdS],
 
             'wait': ['wait', BlockSpecs.getImageFrom('assets/blockicons/Wait', 'svg'),
                 BlockSpecs.orangeCmd, 'n', 10, BlockSpecs.orangeCmdH, 0, 50, BlockSpecs.cmdS],
@@ -313,32 +349,13 @@ static setupCategories () {
                 BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
             'stopmine': ['stopmine', BlockSpecs.getImageFrom('assets/blockicons/Stop', 'svg'),
                 BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
+            'startstopcounter': ['startstopcounter', BlockSpecs.getImageFrom('assets/blockicons/counter_start-reset', 'svg'),
+                BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
+            'increasecounter': ['increasecounter', BlockSpecs.getImageFrom('assets/blockicons/counter_increase', 'svg'),
+                BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
+            'decreasecounter': ['decreasecounter', BlockSpecs.getImageFrom('assets/blockicons/counter_decrease', 'svg'),
+                BlockSpecs.orangeCmd, null, null, BlockSpecs.orangeCmdH, null, null, BlockSpecs.cmdS],
 
-
-            'eyesExcited': ['eyesExcited', BlockSpecs.getImageFrom('assets/blockicons/MartyExcited', 'svg'),
-                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-            'eyesWide': ['eyesWide', BlockSpecs.getImageFrom('assets/blockicons/MartyWide', 'svg'),
-                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-            'eyesAngry': ['eyesAngry', BlockSpecs.getImageFrom('assets/blockicons/MartyAngry', 'svg'),
-                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-            'eyesNormal': ['eyesNormal', BlockSpecs.getImageFrom('assets/blockicons/MartyNormal', 'svg'),
-                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-            'eyesWiggle': ['eyesWiggle', BlockSpecs.getImageFrom('assets/blockicons/MartyWiggle', 'svg'),
-                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
-            'waveLeft': ['waveLeft', BlockSpecs.getImageFrom('assets/blockicons/MartyWaveLeft', 'svg'),
-                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
-            'waveRight': ['waveRight', BlockSpecs.getImageFrom('assets/blockicons/MartyWaveRight', 'svg'),
-                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
-            'celebrate': ['celebrate', BlockSpecs.getImageFrom('assets/blockicons/MartyCelebrate', 'svg'),
-                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-            'ledEyesP1': ['ledEyesP1', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP1', 'svg'),
-                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-            'ledEyesP2': ['ledEyesP2', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP2', 'svg'),
-                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-            // 'ledEyesP3': ['ledEyesP3', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP3', 'svg'),
-            //     BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
-            'ledEyesColour': ['ledEyesColour', BlockSpecs.getImageFrom('assets/blockicons/MartyEyesColour', 'svg'),
-                BlockSpecs.pinkCmd, 'c', LINEAR_GRADIENT_COLOUR, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'say': ['say', BlockSpecs.getImageFrom('assets/blockicons/Say', 'svg'),
                 BlockSpecs.pinkCmd, 't',
                 Localization.localize('SAY_BLOCK_DEFAULT_ARGUMENT'), BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
@@ -353,26 +370,11 @@ static setupCategories () {
             'same': ['same', BlockSpecs.getImageFrom('assets/blockicons/Reset', 'svg'),
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
 
-
-            'confusion': ['confusion', BlockSpecs.getImageFrom('assets/blockicons/MartyConfusion', 'svg'),
-                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-            'disbelief': ['disbelief', BlockSpecs.getImageFrom('assets/blockicons/MartyDisbelief', 'svg'),
-                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-            'excitement': ['excitement', BlockSpecs.getImageFrom('assets/blockicons/MartyExcitment', 'svg'),
-                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-            'noway': ['noway', BlockSpecs.getImageFrom('assets/blockicons/MartyNoWay', 'svg'),
-                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-            'no': ['no', BlockSpecs.getImageFrom('assets/blockicons/MartyNo', 'svg'),
-                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-            'whistle': ['whistle', BlockSpecs.getImageFrom('assets/blockicons/MartyWhistle', 'svg'),
-                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
-
             'playsnd': ['playsnd', BlockSpecs.getImageFrom('assets/blockicons/Speaker', 'svg'),
                 BlockSpecs.limeCmd, 's', 'pop.mp3', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
             'playusersnd': ['playusersnd', BlockSpecs.getImageFrom('assets/blockicons/Microphone', 'svg'),
                 BlockSpecs.limeCmd, 'r', '1', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
 
-            
             'endstack': ['endstack', null, BlockSpecs.redEnd, null, null,
                 BlockSpecs.redEndH, null, null, BlockSpecs.endS],
             'forever': ['forever', BlockSpecs.getImageFrom('assets/blockicons/Forever', 'svg'),
@@ -386,16 +388,114 @@ static setupCategories () {
             'caretrepeat': ['caretrepeat', null,
                 BlockSpecs.getImageFrom('assets/blocks/caretrepeat'), null, null, null, null, null],
             'caretcmd': ['caretcmd', null,
-                BlockSpecs.getImageFrom('assets/blocks/caretcmd', 'svg'), null, null, null, null, null]
+                BlockSpecs.getImageFrom('assets/blocks/caretcmd', 'svg'), null, null, null, null, null],
 
+            /* Cog Blocks */
+            'tiltany': ['tiltany', tiltshapes,
+                BlockSpecs.yellowStart, 'm', 'tiltright', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'ontouchcog': ['ontouchcog', BlockSpecs.getImageFrom('assets/blockicons/ontouchcog', 'svg'),
+                BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
+            'onshake': ['onshake', BlockSpecs.getImageFrom('assets/blockicons/onshake', 'svg'),
+                BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'onobjectsensed': ['onobjectsensed', onobjectsensedshapes,
+                BlockSpecs.yellowStart, 'm', 'onobjectsensedleft', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'onlight': ['onlight', lightshapes,
+                BlockSpecs.yellowStart, 'm', 'onhighlight', BlockSpecs.yellowStartH, 0, 100, BlockSpecs.startS],
+            'setpattern': ['setpattern', patternshapes,
+                BlockSpecs.pinkCmd, 'm', 'patternrainbow', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS, 'purple'],
+            'clearcolours': ['clearcolours', BlockSpecs.getImageFrom('assets/blockicons/clearcolours', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'selectcolour': ['selectcolour', colourshapes,
+                BlockSpecs.pinkCmd, 'm', 'selectcolourred', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS, 'purple'],
+            'confusion': ['confusion', BlockSpecs.getImageFrom('assets/blockicons/MartyConfusion', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'disbelief': ['disbelief', BlockSpecs.getImageFrom('assets/blockicons/MartyDisbelief', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'excitement': ['excitement', BlockSpecs.getImageFrom('assets/blockicons/MartyExcitment', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'noway': ['noway', BlockSpecs.getImageFrom('assets/blockicons/MartyNoWay', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'no': ['no', BlockSpecs.getImageFrom('assets/blockicons/MartyNo', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'whistle': ['whistle', BlockSpecs.getImageFrom('assets/blockicons/MartyWhistle', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'playnote': ['playnote', noteshapes,
+                BlockSpecs.limeCmd, 'm', 'notec', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS, 'green'],
+            'waitcrotchet': ['waitcrotchet', BlockSpecs.getImageFrom('assets/blockicons/noterest', 'svg'),
+                BlockSpecs.limeCmd, 'n', 1, BlockSpecs.limeCmdH, 1, 4, BlockSpecs.cmdS],
+            'settempo': ['settempo', BlockSpecs.getImageFrom('assets/blockicons/tempo', 'svg'),
+                BlockSpecs.limeCmd, 'n', 60, BlockSpecs.limeCmdH, 1, 240, BlockSpecs.cmdS],
+
+            /* Marty Blocks */
+            'martyGetReady': ['martyGetReady', BlockSpecs.getImageFrom('assets/blockicons/MartyGetReady', 'svg'),
+                BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+            'martyDance': ['martyDance', BlockSpecs.getImageFrom('assets/blockicons/MartyDance', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+            'martyStepForward': ['martyStepForward', BlockSpecs.getImageFrom('assets/blockicons/Up', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+            'martyStepBackward': ['martyStepBackward', BlockSpecs.getImageFrom('assets/blockicons/Down', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+            'martyStepLeft': ['martyStepLeft', BlockSpecs.getImageFrom('assets/blockicons/Back', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+            'martyStepRight': ['martyStepRight', BlockSpecs.getImageFrom('assets/blockicons/Foward', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+            'martyTurnRight': ['martyTurnRight', BlockSpecs.getImageFrom('assets/blockicons/Right', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+            'martyTurnLeft': ['martyTurnLeft', BlockSpecs.getImageFrom('assets/blockicons/Left', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
+            'martyKickRight': ['martyKickRight', BlockSpecs.getImageFrom('assets/blockicons/MartyKickRight', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 10, BlockSpecs.cmdS],
+            'martyKickLeft': ['martyKickLeft', BlockSpecs.getImageFrom('assets/blockicons/MartyKickLeft', 'svg'),
+                BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, 1, 10, BlockSpecs.cmdS],
+
+            'martyEyesExcited': ['martyEyesExcited', BlockSpecs.getImageFrom('assets/blockicons/MartyExcited', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'martyEyesWide': ['martyEyesWide', BlockSpecs.getImageFrom('assets/blockicons/MartyWide', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'martyEyesAngry': ['martyEyesAngry', BlockSpecs.getImageFrom('assets/blockicons/MartyAngry', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'martyEyesNormal': ['martyEyesNormal', BlockSpecs.getImageFrom('assets/blockicons/MartyNormal', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'martyEyesWiggle': ['martyEyesWiggle', BlockSpecs.getImageFrom('assets/blockicons/MartyWiggle', 'svg'),
+                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
+            'martyWaveLeft': ['martyWaveLeft', BlockSpecs.getImageFrom('assets/blockicons/MartyWaveLeft', 'svg'),
+                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
+            'martyWaveRight': ['martyWaveRight', BlockSpecs.getImageFrom('assets/blockicons/MartyWaveRight', 'svg'),
+                BlockSpecs.pinkCmd, 'n', 1, BlockSpecs.pinkCmdH, 1, 10, BlockSpecs.cmdS],
+            'martyCelebrate': ['martyCelebrate', BlockSpecs.getImageFrom('assets/blockicons/MartyCelebrate', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'martyLedEyesP1': ['martyLedEyesP1', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP1', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'martyLedEyesP2': ['martyLedEyesP2', BlockSpecs.getImageFrom('assets/blockicons/MartyLedEyesP2', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'martyLedEyesColour': ['martyLedEyesColour', BlockSpecs.getImageFrom('assets/blockicons/MartyEyesColour', 'svg'),
+                BlockSpecs.pinkCmd, 'c', LINEAR_GRADIENT_COLOUR, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+
+            'martyConfusion': ['martyConfusion', BlockSpecs.getImageFrom('assets/blockicons/MartyConfusion', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'martyDisbelief': ['martyDisbelief', BlockSpecs.getImageFrom('assets/blockicons/MartyDisbelief', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'martyExcitement': ['martyExcitement', BlockSpecs.getImageFrom('assets/blockicons/MartyExcitment', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'martyNoway': ['martyNoway', BlockSpecs.getImageFrom('assets/blockicons/MartyNoWay', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'martyNo': ['martyNo', BlockSpecs.getImageFrom('assets/blockicons/MartyNo', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
+            'martyWhistle': ['martyWhistle', BlockSpecs.getImageFrom('assets/blockicons/MartyWhistle', 'svg'),
+                BlockSpecs.limeCmd, null, null, BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS],
         };
     }
 
-    static blockDesc (b, spr) {
+    static blockDesc(b, spr) {
         var str = b.getArgValue() ? b.getArgValue().toString() : (b.blocktype == 'playsnd') ? 'SOUND' : '';
 
         return {
             'onflag': Localization.localize('BLOCK_DESC_GREEN_FLAG'),
+            'tiltany': Localization.localize('BLOCK_DESC_ON_TILT'),
+            'ontouchcog': Localization.localize('BLOCK_DESC_ON_TOUCH_Cog'),
+            'onshake': Localization.localize('BLOCK_DESC_ON_MOVE'),
+            'onobjectsensed': Localization.localize('BLOCK_DESC_ON_OBJECT_SENSED'),
+            'onlight': Localization.localize('BLOCK_DESC_ON_LIGHT'),
             'onclick': Localization.localize('BLOCK_DESC_ON_TAP', {
                 CHARACTER_NAME: spr.name
             }),
@@ -406,8 +506,6 @@ static setupCategories () {
                 COLOR: Localization.localize('BLOCK_DESC_MESSAGE_COLOR_ORANGE')
             }),
             'repeat': Localization.localize('BLOCK_DESC_REPEAT'),
-            'getReady': Localization.localize('BLOCK_DESC_MOVE_GETREADY'),
-            'martyDance': Localization.localize('BLOCK_DESC_MOVE_DANCE'),
             'forward': Localization.localize('BLOCK_DESC_MOVE_RIGHT'),
             'back': Localization.localize('BLOCK_DESC_MOVE_LEFT'),
             'up': Localization.localize('BLOCK_DESC_MOVE_UP'),
@@ -415,47 +513,34 @@ static setupCategories () {
             'home': Localization.localize('BLOCK_DESC_GO_HOME'),
             'left': Localization.localize('BLOCK_DESC_TURN_LEFT'),
             'right': Localization.localize('BLOCK_DESC_TURN_RIGHT'),
-            'kickLeft': Localization.localize('BLOCK_KICK_LEFT'),
-            'kickRight': Localization.localize('BLOCK_KICK_RIGHT'),
             'hop': Localization.localize('BLOCK_DESC_HOP'),
             'wait': Localization.localize('BLOCK_DESC_WAIT'),
             'setspeed': Localization.localize('BLOCK_DESC_SET_SPEED'),
             'stopmine': Localization.localize('BLOCK_DESC_STOP', {
                 CHARACTER_NAME: spr.name ? spr.name : spr.str
             }),
-
-            'eyesExcited': Localization.localize('BLOCK_EYES_EXCITED'),
-            'eyesWide': Localization.localize('BLOCK_EYES_WIDE'),
-            'eyesAngry': Localization.localize('BLOCK_EYES_ANGRY'),
-            'eyesNormal': Localization.localize('BLOCK_EYES_NORMAL'),
-            'eyesWiggle': Localization.localize('BLOCK_EYES_WIGGLE'),
-            'waveLeft': Localization.localize('BLOCK_WAVE_LEFT'),
-            'waveRight': Localization.localize('BLOCK_WAVE_RIGHT'),
-            'ledEyesP1': Localization.localize('BLOCK_LED_EYES_P1'),
-            'ledEyesP2': Localization.localize('BLOCK_LED_EYES_P2'),
-            // 'ledEyesP3': Localization.localize('BLOCK_LED_EYES_P3'),
-            'ledEyesColour': Localization.localize('BLOCK_LED_EYES_COLOUR'),
-            'celebrate': Localization.localize('BLOCK_CELEBRATE'),
+            'startstopcounter': Localization.localize('BLOCK_DESC_START_STOP_COUNTER'),
+            'increasecounter': Localization.localize('BLOCK_DESC_INCREASE_COUNTER'),
+            'decreasecounter': Localization.localize('BLOCK_DESC_DECREASE_COUNTER'),
+            'setpattern': Localization.localize('BLOCK_DESC_SET_PATTERN'),
+            'clearcolours': Localization.localize('BLOCK_DESC_CLEAR_COLOURS'),
+            'selectcolour': Localization.localize('BLOCK_DESC_SELECT_COLOUR'),
             'say': Localization.localize('BLOCK_DESC_SAY'),
             'show': Localization.localize('BLOCK_DESC_SHOW'),
             'hide': Localization.localize('BLOCK_DESC_HIDE'),
             'grow': Localization.localize('BLOCK_DESC_GROW'),
             'shrink': Localization.localize('BLOCK_DESC_SHRINK'),
             'same': Localization.localize('BLOCK_DESC_RESET_SIZE'),
-            'playsnd': Localization.localize('BLOCK_DESC_PLAY_SOUND', {
-                SOUND_NAME: Localization.localize('BLOCK_DESC_PLAY_SOUND_POP')
-            }),
-
-                // ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle'],
-
-            
             'confusion': Localization.localize('BLOCK_PLAY_CONFUSION_SOUND'),
             'disbelief': Localization.localize('BLOCK_PLAY_DISBELIEF_SOUND'),
             'excitement': Localization.localize('BLOCK_PLAY_EXCITEMENT_SOUND'),
             'noway': Localization.localize('BLOCK_PLAY_NOWAY_SOUND'),
             'no': Localization.localize('BLOCK_PLAY_NO_SOUND'),
             'whistle': Localization.localize('BLOCK_PLAY_WHISTLE_SOUND'),
-            'playusersnd': Localization.localize('BLOCK_DESC_PLAY_RECORDED_SOUND'),
+            'playnote': Localization.localize('BLOCK_PLAY_NOTE'),
+            'waitcrotchet': Localization.localize('BLOCK_DESC_WAIT_CROTCHET'),
+            'settempo': Localization.localize('BLOCK_DESC_SET_TEMPO'),
+            'pop': Localization.localize('BLOCK_PLAY_POP_SOUND'),
             'endstack': Localization.localize('BLOCK_DESC_END'),
             'stopall': Localization.localize('BLOCK_DESC_STOP', {
                 CHARACTER_NAME: spr.name ? spr.name : ''
@@ -466,7 +551,39 @@ static setupCategories () {
             }),
             'message': Localization.localize('BLOCK_DESC_SEND_MESSAGE', {
                 COLOR: Localization.localize('BLOCK_DESC_MESSAGE_COLOR_ORANGE')
-            })
+            }),
+
+            'martyGetReady': Localization.localize('BLOCK_DESC_MOVE_MARTY_GETREADY'),
+            'martyDance': Localization.localize('BLOCK_DESC_MOVE_MARTY_DANCE'),
+            'martyStepRight': Localization.localize('BLOCK_DESC_MOVE_MARTY_RIGHT'),
+            'martyStepLeft': Localization.localize('BLOCK_DESC_MOVE_MARTY_LEFT'),
+            'martyStepForward': Localization.localize('BLOCK_DESC_MOVE_MARTY_UP'),
+            'martyStepBackward': Localization.localize('BLOCK_DESC_MOVE_MARTY_DOWN'),
+            'martyHome': Localization.localize('BLOCK_DESC_GO_MARTY_HOME'),
+            'martyTurnLeft': Localization.localize('BLOCK_DESC_TURN_MARTY_LEFT'),
+            'martyTurnRight': Localization.localize('BLOCK_DESC_TURN_MARTY_RIGHT'),
+            'martyStepRight': Localization.localize('BLOCK_DESC_MOVE_MARTY_FORWARD'),
+            'martyStepLeft': Localization.localize('BLOCK_DESC_MOVE_MARTY_BACK'),
+            'martyKickLeft': Localization.localize('BLOCK_KICK_MARTY_LEFT'),
+            'martyKickRight': Localization.localize('BLOCK_KICK_MARTY_RIGHT'),
+            'martyEyesExcited': Localization.localize('BLOCK_EYES_MARTY_EXCITED'),
+            'martyEyesWide': Localization.localize('BLOCK_EYES_MARTY_WIDE'),
+            'martyEyesAngry': Localization.localize('BLOCK_EYES_MARTY_ANGRY'),
+            'martyEyesNormal': Localization.localize('BLOCK_EYES_MARTY_NORMAL'),
+            'martyEyesWiggle': Localization.localize('BLOCK_EYES_MARTY_WIGGLE'),
+            'martyWaveLeft': Localization.localize('BLOCK_WAVE_MARTY_LEFT'),
+            'martyWaveRight': Localization.localize('BLOCK_WAVE_MARTY_RIGHT'),
+            'martyLedEyesP1': Localization.localize('BLOCK_LED_MARTY_EYES_P1'),
+            'martyLedEyesP2': Localization.localize('BLOCK_LED_MARTY_EYES_P2'),
+            'martyLedEyesColour': Localization.localize('BLOCK_LED_MARTY_EYES_COLOUR'),
+            'martyCelebrate': Localization.localize('BLOCK_MARTY_CELEBRATE'),
+
+            'martyConfusion': Localization.localize('BLOCK_PLAY_MARTY_CONFUSION_SOUND'),
+            'martyDisbelief': Localization.localize('BLOCK_PLAY_MARTY_DISBELIEF_SOUND'),
+            'martyExcitement': Localization.localize('BLOCK_PLAY_MARTY_EXCITEMENT_SOUND'),
+            'martyNoway': Localization.localize('BLOCK_PLAY_MARTY_NOWAY_SOUND'),
+            'martyNo': Localization.localize('BLOCK_PLAY_MARTY_NO_SOUND'),
+            'martyWhistle': Localization.localize('BLOCK_PLAY_MARTY_WHISTLE_SOUND'),
         };
     }
 }

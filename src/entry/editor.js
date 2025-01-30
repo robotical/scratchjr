@@ -3,10 +3,11 @@ import OS from "../tablet/OS";
 import Camera from "../painteditor/Camera";
 import Record from "../editor/ui/Record";
 
-export function editorMain() {
+export async function editorMain() {
   OS.martyCmd({ cmd: "hide-back-arrow" });
   OS.getsettings(doNext);
   OS.analyticsEvent("editor", "project_editor_open");
+  window.applicationManager?.hideBackHomeButton();
   function doNext(str) {
     var list = str.split(",");
     OS.path = list[1] == "0" ? list[0] + "/" : undefined;
@@ -17,7 +18,5 @@ export function editorMain() {
       Camera.available = list[3] == "YES" ? true : false;
     }
     ScratchJr.appinit(window.Settings.scratchJrVersion);
-
-    setTimeout(mv2.updateConnectionInfo, 2000);
   }
 }

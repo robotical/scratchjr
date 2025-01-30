@@ -11,6 +11,7 @@ module.exports = {
       fs: require.resolve("browserify-fs"),
       stream: require.resolve("stream-browserify"),
       crypto: require.resolve("crypto-browserify"),
+      vm: require.resolve("vm-browserify")
     },
   },
   devtool: isProduction ? false : "source-map",

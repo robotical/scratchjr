@@ -14,7 +14,7 @@
 
 .fullscreen.presentationmode#full {
     left: 0px;
-    top: ${css_vh(10.65)};
+    top: 0px;
     background:  url('../assets/ui/fullOn2.svg');
     background-size: 100%;
 }
@@ -31,7 +31,6 @@
 
 .gridToggle.off {background:  url('../assets/ui/gridOn.svg'); background-size: 100%; }
 .gridToggle.on {background:  url('../assets/ui/gridOff.svg'); background-size: 100%; }
-
 
 .traceToggle {
     position: absolute;
@@ -66,14 +65,13 @@
     margin: 0px;
     padding: 0px;
     top: ${css_vh(0.65)};
-    left: ${css_vh(44.89)};
+    left: ${css_vh(44)};
 
     width: ${css_vh(8.33)};
     height: ${css_vh(8.33)};
     background:  url('../assets/ui/addText.svg');
     background-size: 100.5%; /* webview pixelates the image unless we do this */
 }
-
 
 .addText:active {
     background:  url('../assets/ui/addTextPressed.svg');
@@ -85,7 +83,7 @@
     margin: 0px;
     padding: 0px;
     top: ${css_vh(0.65)};
-    left: ${css_vh(36.30)};
+    left: ${css_vh(36)};
 
     width: ${css_vh(8.33)};
     height: ${css_vh(8.33)};
@@ -286,7 +284,7 @@
     text-shadow: 0 ${css_vh(0.26)} #000;
     line-height: ${css_vh(13.02)};
     font-weight: bold;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
 }
 
 .textuisize.t1{ font-size: ${css_vh(1.56)};}
@@ -428,6 +426,41 @@
 
 .prevpage.off {display: none;}
 
+@keyframes counterUpdate {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.counter {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin: 0px;
+    padding: 0px;
+    width: ${css_vh(7.51)};
+    height: ${css_vh(7.51)};
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: ${css_vh(4)};
+    transition: font-size 0.3s ease;
+}
+
+.counter.animate {
+    animation: counterUpdate 0.3s ease-in-out;
+}
+
 
 /* Grid */
 
@@ -436,7 +469,7 @@ p.stylelabel {
     position: relative; text-align: center;
     margin-top: 5px;
     color: #C9C9C9;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: bold;
     margin-left: auto;
     margin-right: auto;
@@ -453,7 +486,7 @@ p.stylelabel {
     text-align: center;
     margin-top: 5px;
     color: #ffffff;
-    font-family: Roboto;
+    font-family: 'Lato Regular';
     font-weight: bold;
     margin-left: auto; margin-right: auto;
     width: 24;

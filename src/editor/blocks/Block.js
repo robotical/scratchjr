@@ -61,11 +61,6 @@ export default class Block {
     }
 
     setBlockshapeFromSpecs (spec, isPalette, scale) {
-                          //0         1       
-        // 'getReady': ['getReady', BlockSpecs.getImageFrom('assets/blockicons/MartyGetReady', 'svg'),
-                //     2                3   4        5              6    7    8
-                // BlockSpecs.blueCmd, 'n', 1, BlockSpecs.blueCmdH, -10, 10, BlockSpecs.cmdS],
-
         this.spec = spec;
         this.isReporter = (spec[1] == 'reporter');
         this.blocktype = spec[0];

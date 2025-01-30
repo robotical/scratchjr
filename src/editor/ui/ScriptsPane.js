@@ -1,4 +1,3 @@
-
 import ScratchJr from '../ScratchJr';
 import Project from './Project';
 import Thumbs from './Thumbs';
@@ -6,6 +5,7 @@ import Palette from './Palette';
 import Undo from './Undo';
 import Events from '../../utils/Events';
 import Scroll from './Scroll';
+import Zoom from './Zoom';
 import Menu from '../blocks/Menu';
 import ScratchAudio from '../../utils/ScratchAudio';
 import {
@@ -13,12 +13,19 @@ import {
     globalx, globaly, setCanvasSize, getDocumentHeight, frame
 } from '../../utils/lib';
 
+import { zoomOutSvg } from '../../html-svgs/zoom-out-svg';
+
 let scroll = undefined;
+let zoom = undefined;
 let watermark;
 
 export default class ScriptsPane {
     static get scroll() {
         return scroll;
+    }
+
+    static get zoom() {
+        return zoom;
     }
 
     static get watermark() {
@@ -29,12 +36,27 @@ export default class ScriptsPane {
         var div = newHTML('div', 'scripts', parent);
         div.setAttribute('id', 'scripts');
         watermark = newHTML('div', 'watermark', div);
-        watermark.setAttribute('id', 'watermark');
-
         var h = Math.max(getDocumentHeight(), frame.offsetHeight);
         setCanvasSize(div, div.offsetWidth, h - div.offsetTop);
         scroll = new Scroll(div, 'scriptscontainer', div.offsetWidth,
             h - div.offsetTop, ScratchJr.getActiveScript, ScratchJr.getBlocks);
+        zoom = new Zoom(scroll.contents);
+
+        // Add zoom button
+        const zoomButton = newHTML('div', 'zoom-button', div);
+        zoomButton.innerHTML = zoomOutSvg;
+        zoomButton.onpointerdown = () => zoom.zoomOut();
+        zoomButton.onpointerup = () => zoom.zoomReset();
+    }
+
+    static zoomIn() {
+        zoom.zoomIn();
+        scroll.refresh();
+    }
+
+    static zoomOut() {
+        zoom.zoomOut();
+        scroll.refresh();
     }
 
     static setActiveScript(sprname) {
@@ -45,14 +67,11 @@ export default class ScriptsPane {
         }
         ScratchJr.stage.currentPage.setCurrentSprite(gn(sprname).owner);
         currentsc.owner.activate();
-        if (isTablet) {
-            currentsc.parentNode.ontouchstart = function (evt) {
-                currentsc.owner.scriptsMouseDown(evt);
-            };
-        } else {
-            currentsc.parentNode.onpointerdown = function (evt) {
-                currentsc.owner.scriptsMouseDown(evt);
-            }
+        currentsc.parentNode.ontouchstart = function (evt) {
+            currentsc.owner.scriptsMouseDown(evt);
+        };
+        currentsc.parentNode.onmousedown = function (evt) {
+            currentsc.owner.scriptsMouseDown(evt);
         };
         scroll.update();
     }
@@ -217,6 +236,11 @@ export default class ScriptsPane {
                 scroll.adjustCanvas();
                 scroll.refresh();
                 scroll.fitToScreen();
+                /*Tutorial*/
+                if (window.tutorialEngine) {
+                    // evaluate the scripts area
+                    window.tutorialEngine.evaluateScriptsArea();
+                }
                 break;
         }
         Undo.record({
@@ -287,10 +311,10 @@ export default class ScriptsPane {
                 fcnup(evt);
             };
         } else {
-            window.onpointermove = function (evt) {
+            window.onmousemove = function (evt) {
                 fcnmove(evt);
             };
-            window.onpointerup = function (evt) {
+            window.onmouseup = function (evt) {
                 fcnup(evt);
             };
         }
@@ -315,7 +339,7 @@ export default class ScriptsPane {
         Events.dragged = false;
         e.preventDefault();
         Events.clearEvents();
-        scroll.bounceBack(); // commented out because we want to be able to drag the script pane to the bottom of the screen without it bouncing back
+        scroll.bounceBack();
     }
 
     //////////////////////
@@ -338,3 +362,6 @@ export default class ScriptsPane {
         }
     }
 }
+
+
+window.ScriptsPane = ScriptsPane;

@@ -1,5 +1,3 @@
-
-
 export default class Vector {
     static sum (a, b) {
         var res = {};
@@ -7,18 +5,6 @@ export default class Vector {
         res.y = a.y + b.y;
         return res;
     }
-
-    // static toRadians (angle) {
-    //     return angle * (Math.PI / 180);
-    // }
-
-    // static forward (distance, angle) {
-    //     var res = {}
-    //     var rad = toRadians(angle);
-    //     res.x = distance * Math.sin(rad);
-    //     res.y = distance * Math.cos(rad) * -1;
-    //     return res;
-    // }
 
     static diff (a, b) {
         var res = {};

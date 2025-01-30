@@ -68,6 +68,7 @@ export default class Record {
         ScratchJr.stopStrips();
         dialogOpen = true;
         ScratchJr.onBackButtonCallback.push(Record.saveSoundandClose);
+        OS.initRecording();
     }
 
     static disappear () {
@@ -288,6 +289,7 @@ export default class Record {
 
     // Press OK (check)
     static saveSoundAndClose () {
+        console.log("saveSoundAndClose");
         if (error || !recordedSound) {
             Record.killRecorder();
         } else {

@@ -5,10 +5,16 @@ import Lobby from "../lobby/Lobby";
 import goToLink from "../utils/goToLink";
 
 export function homeMain() {
+  const urlParams = new URLSearchParams(window.location.search);
+  /*Tutorial*/
+  if (urlParams.get("tutorial")) {
+    goToLink("editor.html?pmd5=" + -1 + "&mode=edit&tutorial=" + urlParams.get("tutorial"));
+  }
   OS.martyCmd({cmd: "show-back-arrow"});
   gn("logotab").onclick = homeGoBack;
   homeStrings();
   OS.getsettings(doNext);
+  window.applicationManager?.showBackHomeButton();
   function doNext(str) {
     var list = str.split(",");
     OS.path = list[1] == "0" ? list[0] + "/" : undefined;

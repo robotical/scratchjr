@@ -1,7 +1,6 @@
+# Adjust the following 2 lines to match your local setup
 export WebappHome=/Users/ntheodoropoulos/Robotical/marty-web-app
 export MBJRHome=/Users/ntheodoropoulos/Robotical/scratchjr
-export PhoneAppHome=/Users/ntheodoropoulos/Robotical/marty-react-native # <- replace this if you want to use the buildAllAndCpToWebApp function, which builds everything and copies the build files in the phoneapp
-
 
 export gui_original=$MBJRHome/scratch-gui
 
@@ -11,11 +10,15 @@ alias sourceMBJRProf='cdhome && source martyBlocksCliProfile'
 buildAllAndCpToWebApp () {
     local type="${1:-debug}"
     if [ $type = debug ]; then npm run build:copy; fi
+    if [ $type = prod ]; then rm -rf $MBJRHome/editions/free/src/app.bundle.js.map; fi
+    if [ $type = prod ]; then rm -rf $MBJRHome/src/build/*; fi
     if [ $type = prod ]; then npm run build-prod:copy; fi
     cpToWebapp
 }
 
 cpToWebapp () {
+    setopt rm_star_silent
+    setopt rm_star_wait
     rm -rf $WebappHome/public/MartyBlocksJR/*
     cp -r $MBJRHome/editions/free/src/* $WebappHome/public/MartyBlocksJR
 }

@@ -35,15 +35,12 @@ export default class Undo {
         div.setAttribute('type', 'toggleclicky');
         div.setAttribute('id', prefix + key);
         if (fcn) {
-            if (isTablet) {
-                div.ontouchstart = function (evt) {
-                    fcn(evt);
-                };
-            } else {
-                div.onpointerdown = function (evt) {
-                    fcn(evt);
-                };
-            }
+            div.ontouchstart = function (evt) {
+                fcn(evt);
+            };
+            div.onmousedown = function (evt) {
+                fcn(evt);
+            };
         }
         return div;
     }
@@ -285,7 +282,12 @@ export default class Undo {
         var fcn = function (spr) {
             if (spr.type == 'sprite') {
                 if (page == ScratchJr.stage.currentPage.id) {
-                    spr.div.style.visibility = 'visible';
+                    /*MartyMode*/
+                    // only set visible if the sprite is not a bird's eye sprite
+                    console.log("In copySprite, sprite name: " + spr.name, ". Before setting visibility to visible");
+                    if (!spr.name || !spr.name.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                        spr.div.style.visibility = 'visible';
+                    }
                 }
                 Undo.setSprite(page, data);
             } else {

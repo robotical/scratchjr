@@ -5,7 +5,7 @@
       maximum-scale=1.0, user-scalable=no"
 />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta http-equiv="refresh" content="0;url=home.html" />
+<!-- <meta http-equiv="refresh" content="0;url=home.html" /> -->
 <meta http-equiv="cache-control" content="no-cache" />
 <meta charset="utf-8" />
 
@@ -16,6 +16,13 @@
             window.scratchJrPage = "index";
         </script>
         <script type="text/javascript" src="app.bundle.js"></script>
+        <script>
+            // Get the current URL's query parameters
+            const params = window.location.search;
+
+            // Redirect to home.html with the same query parameters
+            window.location.href = `home.html${params}`;
+        </script>
     </head>
     <body>
         If you are not redirected automatically, follow this

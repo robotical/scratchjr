@@ -126,6 +126,11 @@ export default class Scripts {
             this.sendToBack(b.owner);
         }
         this.dragList = [];
+        /*Tutorial*/
+        if (window.tutorialEngine) {
+            // evaluate the scripts area
+            window.tutorialEngine.evaluateScriptsArea();
+        }
     }
 
 
