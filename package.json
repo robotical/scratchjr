@@ -15,8 +15,7 @@
     "start": "npx serve --listen tcp://0.0.0.0:3011 ./editions/free/src",
     "build:copy": "npm run build-dev && cp -f src/build/bundles/* editions/free/src",
     "build-prod:copy": "npm run build && cp -f src/build/bundles/* editions/free/src",
-    "build:start": "npm run build:copy && npm start",
-    "postinstall": "cd node_modules/@robotical/roboticaljs && npm install && npm run build"
+    "build:start": "npm run build:copy && npm start"
   },
   "author": "Massachusetts Institute of Technology",
   "license": "BSD-3-Clause",
