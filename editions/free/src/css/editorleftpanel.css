@@ -142,8 +142,9 @@
 }
 
 .scrollbar {
+    display: none;
     position: absolute;
-    display: inline-block;
+    /* display: inline-block; */
     margin: 0px;
     padding: 0px;
     top: 0px;
@@ -154,6 +155,7 @@
 }
 
 .scrollbar .sbthumb {
+    display: none;
     position: absolute;
     margin: 0px;
     padding: 0px;
@@ -161,10 +163,10 @@
     height: 0px;
     background: #C9C9C9;
 }
-
+/* 
 .scrollbar.off { display: none;}
 
-.scrollbar.on {display: inline-block;}
+.scrollbar.on {display: inline-block;} */
 
 #library {
     position: absolute;
@@ -184,7 +186,7 @@
     overflow-y: scroll;
     overflow-x: hidden;
     width: ${css_vh(33.85)};
-    max-height: ${css_vh(40.63)};
+    max-height: ${css_vh(25.63)};
 }
 
 .spritethumbs::-webkit-scrollbar {

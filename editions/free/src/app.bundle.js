@@ -4426,7 +4426,6 @@ class Prims {
     }
   }
   static OnTouch(strip) {
-    console.log("ontouch");
     var s = strip.spr;
     if (s.touchingAny()) {
       strip.stack.push(strip.firstBlock);
@@ -4965,7 +4964,7 @@ class Prims {
     }
   }
   static OnCogEvent(event) {
-    // console.log("onCogEvent")
+    // We need to be able to move on with the event even if there is another script running
     // if executing a script, then don't do anything
     // if (this.isScriptRunning()) {
     //     return;
@@ -5615,7 +5614,6 @@ class Sprite {
   //////////////////////////////////////////////////////////////////////////////
 
   goHome() {
-    console.log("GO HOME", this.name, this.homeshown);
     this.setPos(this.homex, this.homey);
     this.scale = this.homescale;
     this.shown = this.homeshown;
@@ -6363,7 +6361,6 @@ class Sprite {
     this.setPos(this.xcoor, this.ycoor);
   }
   startShaking() {
-    console.log('IN START SHAKING');
     var p = this.div.parentNode;
     var shake = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_17__.newHTML)('div', 'shakeme', p);
     shake.id = 'shakediv';
@@ -7145,7 +7142,6 @@ class Stage {
     }
   }
   removeFromPage(spr) {
-    console.log("REMOVING SPRITE FROM PAGE");
     var id = spr.id;
     var sc = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_11__.gn)(id + '_scripts');
     var page = this.currentPage;
@@ -10786,7 +10782,6 @@ class ScriptsPane {
     scroll.update();
   }
   static runBlock(e, div) {
-    console.log('RUNBLOCK CALLED');
     e.preventDefault();
     e.stopPropagation();
     var b = div.owner.findFirst();
@@ -31235,25 +31230,62 @@ __webpack_require__.r(__webpack_exports__);
 
 class AudioCapture {
   constructor() {
-    this.audioCtx = new (window.AudioContext || webkitAudioContext)(); // Initialize AudioContext
     this.bufferLength = 8192;
     this.mediaStreamSource = null;
     this.audioBuffer = null;
     this.recording = false;
     this.chunks = [];
-    this.scriptProcessorNode = null;
     this.stream = null;
     this.errorHandler = null;
-    this.sourceNode = null;
+    this.analyserNode = null;
+    this.workletNode = null;
     this.started = false;
-    this.recording = false;
     this.disposed = false;
+  }
+  async initialise() {
+    if (this.audioCtx && typeof this.audioCtx.close === 'function') {
+      await this.audioCtx.close();
+    }
+    this.audioCtx = new (window.AudioContext || webkitAudioContext)();
+    if (this.audioCtx.state === 'suspended') {
+      await this.audioCtx.resume();
+    }
+    const processorCode = `
+      class RecorderProcessor extends AudioWorkletProcessor {
+        constructor(options) {
+          super();
+          this._bufferLength = options.processorOptions.bufferLength;
+          this._buffer = new Float32Array(this._bufferLength);
+          this._writeIndex = 0;
+        }
+        process(inputs) {
+          const inputChannels = inputs[0];
+          if (inputChannels && inputChannels[0]) {
+            const input = inputChannels[0];
+            for (let i = 0; i < input.length; i++) {
+              this._buffer[this._writeIndex++] = input[i];
+              if (this._writeIndex >= this._bufferLength) {
+                this.port.postMessage(this._buffer.slice(0));
+                this._writeIndex = 0;
+              }
+            }
+          }
+          return true;
+        }
+      }
+      registerProcessor('recorder-processor', RecorderProcessor);
+    `;
+    const blob = new Blob([processorCode], {
+      type: 'application/javascript'
+    });
+    const moduleURL = URL.createObjectURL(blob);
+    await this.audioCtx.audioWorklet.addModule(moduleURL);
   }
   getId(isNewRecording) {
     if (isNewRecording || !this.id) {
-      this.id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        let r = Math.random() * 16 | 0,
-          v = c === 'x' ? r : r & 0x3 | 0x8;
+      this.id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : r & 0x3 | 0x8;
         return v.toString(16);
       });
     }
@@ -31270,6 +31302,7 @@ class AudioCapture {
     audio: true
   }) {
     try {
+      await this.initialise();
       this.stream = await get_user_media_promise__WEBPACK_IMPORTED_MODULE_0___default()(constraints);
       this.beginStartRecord(this.stream);
     } catch (error) {
@@ -31277,145 +31310,115 @@ class AudioCapture {
     }
     return this.getId(true) + '.webm';
   }
-  async stopListeningForRecordPush() {
+  stopListeningForRecordPush() {
     this.dispose();
   }
   beginStartRecord(stream) {
+    this.started = true;
     this.mediaStreamSource = this.audioCtx.createMediaStreamSource(stream);
-    this.sourceNode = this.audioCtx.createGain();
-    this.scriptProcessorNode = this.audioCtx.createScriptProcessor(this.bufferLength, 1, 1);
-    this.scriptProcessorNode.onaudioprocess = event => {
-      if (this.recording && !this.disposed) {
-        const inputData = event.inputBuffer.getChannelData(0);
-        this.onRecordData(new Float32Array(inputData));
-      }
-    };
     this.analyserNode = this.audioCtx.createAnalyser();
     this.analyserNode.fftSize = 2048;
-    const bufferLength = this.analyserNode.frequencyBinCount;
-    const dataArray = new Float32Array(bufferLength);
-    const update = () => {
+    this.workletNode = new AudioWorkletNode(this.audioCtx, 'recorder-processor', {
+      processorOptions: {
+        bufferLength: this.bufferLength
+      }
+    });
+    this.workletNode.port.onmessage = event => {
+      if (this.recording && !this.disposed) {
+        this.onRecordData(new Float32Array(event.data));
+      }
+    };
+
+    // Volume meter loop
+    const dataArray = new Float32Array(this.analyserNode.frequencyBinCount);
+    const updateVolume = () => {
       if (this.recording && !this.disposed) {
         this.analyserNode.getFloatTimeDomainData(dataArray);
         this.currentVolume = (0,_utils_sound_utils__WEBPACK_IMPORTED_MODULE_1__.computeRMS)(dataArray);
       }
-      requestAnimationFrame(update);
+      this._rafId = requestAnimationFrame(updateVolume);
     };
-    requestAnimationFrame(update);
+    updateVolume();
 
-    // Wire everything together, ending in the destination
-    this.mediaStreamSource.connect(this.sourceNode);
-    this.sourceNode.connect(this.analyserNode);
-    this.analyserNode.connect(this.scriptProcessorNode);
-    this.scriptProcessorNode.connect(this.audioCtx.destination);
+    // Wire audio graph
+    this.mediaStreamSource.connect(this.workletNode);
+    this.workletNode.connect(this.audioCtx.destination);
+    this.mediaStreamSource.connect(this.analyserNode);
   }
   onRecordData(data) {
-    if (!this.chunks) {
-      this.chunks = [];
-    }
     this.chunks.push(data);
   }
   getVolume() {
-    if (!this.mediaStreamSource) {
-      return 0;
-    }
-    return this.currentVolume;
+    return this.currentVolume || 0;
   }
   async captureRecordingAsBlob() {
     if (this.savedBlob) return this.savedBlob;
     if (!this.recording && this.chunks.length > 0) {
-      try {
-        const combinedBuffer = this._mergeBuffers(this.chunks);
-        // Create the audio buffer manually if needed
-        const audioBuffer = this.audioCtx.createBuffer(1, combinedBuffer.length / 1, this.audioCtx.sampleRate);
-        this.audioBuffer = audioBuffer;
-        for (let channel = 0; channel < 1; channel++) {
-          audioBuffer.copyToChannel(combinedBuffer.subarray(channel * audioBuffer.length, (channel + 1) * audioBuffer.length), channel);
-        }
-
-        // Encode the audio buffer into WAV format
-        const wavData = await wav_encoder__WEBPACK_IMPORTED_MODULE_2__.encode({
-          sampleRate: this.audioCtx.sampleRate,
-          channelData: Array.from({
-            length: audioBuffer.numberOfChannels
-          }, (_, i) => audioBuffer.getChannelData(i))
-        });
-        this.chunks = []; // Clear chunks for future recordings
-        // Convert audio buffer to Blob
-        // Convert to Blob
-        const wavBlob = new Blob([wavData], {
-          type: 'audio/wav'
-        });
-        this.savedBlob = wavBlob;
-        return wavBlob;
-      } catch (error) {
-        this.savedBlob = null;
-        return null;
-      }
+      const combined = this._mergeBuffers(this.chunks);
+      // Create and store AudioBuffer for playback
+      this.audioBuffer = this.audioCtx.createBuffer(1, combined.length, this.audioCtx.sampleRate);
+      this.audioBuffer.copyToChannel(combined, 0);
+      const wavData = await wav_encoder__WEBPACK_IMPORTED_MODULE_2__.encode({
+        sampleRate: this.audioCtx.sampleRate,
+        channelData: [this.audioBuffer.getChannelData(0)]
+      });
+      this.chunks = [];
+      const blob = new Blob([wavData], {
+        type: 'audio/wav'
+      });
+      this.savedBlob = blob;
+      return blob;
     }
     return null;
+  }
+  async startPlay() {
+    console.log('playing');
+    if (this.audioCtx.state === 'suspended') {
+      await this.audioCtx.resume();
+    }
+    // If we don't yet have the decoded buffer, generate or decode it
+    if (!this.audioBuffer) {
+      const blob = await this.captureRecordingAsBlob();
+      if (!blob) return;
+      const arrayBuffer = await blob.arrayBuffer();
+      this.audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
+    }
+    const src = this.audioCtx.createBufferSource();
+    src.buffer = this.audioBuffer;
+    src.connect(this.audioCtx.destination);
+    src.start();
   }
   dispose() {
     this.disposed = true;
     this.recording = false;
-    this.disposed = true;
+    this.chunks = [];
+    this.audioBuffer = null;
+    this.savedBlob = null;
+    if (this._rafId) {
+      cancelAnimationFrame(this._rafId);
+    }
     if (this.started) {
-      if (this.scriptProcessorNode) {
-        this.scriptProcessorNode.disconnect();
-        this.scriptProcessorNode = null;
-      }
-      if (this.mediaStreamSource) {
-        this.mediaStreamSource.disconnect();
-        this.mediaStreamSource = null;
-      }
-      if (this.stream) {
-        this.stream.getTracks().forEach(track => track.stop());
-        this.stream = null;
-      }
-      if (this.sourceNode) {
-        this.sourceNode.disconnect();
-        this.sourceNode = null;
-      }
-      if (this.analyserNode) {
-        this.analyserNode.disconnect();
-        this.analyserNode = null;
-      }
+      if (this.workletNode) this.workletNode.disconnect();
+      if (this.analyserNode) this.analyserNode.disconnect();
+      if (this.mediaStreamSource) this.mediaStreamSource.disconnect();
+      if (this.stream) this.stream.getTracks().forEach(t => t.stop());
+      this.started = false;
     }
   }
   stopRecord() {
     this.recording = false;
   }
-  async startPlay() {
-    if (!this.audioBuffer) {
-      const blob = await this.captureRecordingAsBlob();
-      if (!blob) {
-        return;
-      }
-
-      // const arrayBuffer = await blob.arrayBuffer();
-      // this.audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
-    }
-    const source = this.audioCtx.createBufferSource();
-    source.buffer = this.audioBuffer;
-    source.connect(this.audioCtx.destination);
-    source.start();
-  }
   onError(e) {
-    if (this.errorHandler) {
-      this.errorHandler(e);
-    }
+    if (this.errorHandler) this.errorHandler(e);
   }
-
-  // Helper to merge Float32Array chunks into a single buffer
   _mergeBuffers(chunks) {
-    const buffer = new Float32Array(chunks.length * this.bufferLength);
+    const result = new Float32Array(chunks.length * this.bufferLength);
     let offset = 0;
-    for (let i = 0; i < chunks.length; i++) {
-      const bufferChunk = chunks[i];
-      buffer.set(bufferChunk, offset);
-      offset += bufferChunk.length;
+    for (const chunk of chunks) {
+      result.set(chunk, offset);
+      offset += chunk.length;
     }
-    return buffer;
+    return result;
   }
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AudioCapture);
