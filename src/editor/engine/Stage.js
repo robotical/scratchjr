@@ -279,7 +279,7 @@ export default class Stage {
 
     setViewPage(page) {
         this.currentPage = page;
-        this.currentPage.div.style.visibility = 'visible';        
+        this.currentPage.div.style.visibility = 'visible';
         this.currentPage.setPageSprites('visible');
     }
 
@@ -384,7 +384,10 @@ export default class Stage {
         Events.dragthumbnail = spr.div;
         Events.clearEvents();
         if (!ScratchJr.inFullscreen && ScratchJr.isEditable()) {
-            Events.holdit(spr.div, this.startShaking);
+            if (spr.type != 'sprite') { 
+                // deactivate the shaking event for sprites -- sprites can only be removed by the side sprite element
+                Events.holdit(spr.div, this.startShaking);
+            }
         }
         this.setEvents();
     }

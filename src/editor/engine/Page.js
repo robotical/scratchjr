@@ -250,6 +250,9 @@ export default class Page {
 
         // Check if martyBirdsEyeSprite exists
         if (martyBirdsEyeSprite) {
+            martyBirdsEyeSprite.shown = showBirdsEye;
+            martyBirdsEyeSprite.homeshown = showBirdsEye;
+            martyBirdsEyeSprite.div.style.opacity = showBirdsEye ? '1' : '0';
             martyBirdsEyeSprite.div.style.visibility = showBirdsEye ? 'visible' : 'hidden';
         }
 
@@ -262,6 +265,9 @@ export default class Page {
 
             // Set visibility of all other sprites
             if (spr && !sprite.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME)) {
+                spr.shown = !showBirdsEye;
+                spr.homeshown = !showBirdsEye;
+                spr.div.style.opacity = !showBirdsEye ? '1' : '0';
                 spr.div.style.visibility = showBirdsEye ? 'hidden' : 'visible';
             }
         });
@@ -608,6 +614,7 @@ export default class Page {
         me.update(spr);
         ScratchJr.getSprite().unselect();
         ScratchJr.onHold = false;
+        spr.shown = false;
     }
 
     pageAdded(spr) {
@@ -644,7 +651,7 @@ export default class Page {
             homey: 180,
             xcoor: 240,
             ycoor: 180,
-            homeshown: true
+            homeshown: true,
         };
         sprAttr.page = ScratchJr.stage.currentPage;
         sprAttr.id = getIdFor(cname);

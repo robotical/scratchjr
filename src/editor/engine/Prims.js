@@ -12,6 +12,7 @@ let hopList = [-48, -30, -22, -14, -6, 0, 6, 14, 22, 30, 48];
 export const LINEAR_GRADIENT_COLOUR = "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)";
 const intervalToSeconds = 31.25; // runtime tick is set at 32ms by Runtime.js. 32*31.25 = 1s
 
+const lastCogEventTimestamps = {};
 export default class Prims {
     static get hopList() {
         return hopList;
@@ -1436,7 +1437,6 @@ export default class Prims {
     }
 
     /* End Marty Blocks */
-
     static sanitiseArgument(argValue) {
         const maxStepArgument = 20; //the maxmum number of steps we can make in one REST command
         if (argValue > maxStepArgument) {
@@ -1447,62 +1447,88 @@ export default class Prims {
     }
 
     static OnCogEvent(event) {
-        // console.log("onCogEvent")
+        // We need to be able to move on with the event even if there is another script running
         // if executing a script, then don't do anything
-        if (this.isScriptRunning()) {
+        // if (this.isScriptRunning()) {
+        //     return;
+        // }
+
+        // only proceed if at least x ms have passed since last event of the same type
+        const now = Date.now();
+        if (
+            lastCogEventTimestamps[event] &&
+            now - lastCogEventTimestamps[event] < 0
+        ) {
             return;
         }
+
+        lastCogEventTimestamps[event] = now;
 
         var pair;
         var receivers = [];
 
         var findReceivers = function (block, s) {
+
             if (block.blocktype == 'ontouchcog' && event == 'ontouch') {
                 receivers.push([s, block]);
             }
             if (block.blocktype == 'tiltany') {
                 if (block.getArgValue() == "tiltright" && event == "tiltright") {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
                 if (block.getArgValue() == 'tiltleft' && event == 'tiltleft') {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
                 if (block.getArgValue() == 'tiltbackward' && event == 'tiltbackward') {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
                 if (block.getArgValue() == 'tiltforward' && event == 'tiltforward') {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
                 if (block.getArgValue() == 'tiltbackwardforward' && (event == 'tiltbackward' || event == 'tiltforward')) {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
                 if (block.getArgValue() == 'tiltleftright' && (event == 'tiltright' || event == 'tiltleft')) {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
             }
             if (block.blocktype == 'onshake' && event == 'onshake') {
                 receivers.push([s, block]);
+                ScratchJr.startCurrentPageStrips(['ontouch']);
             }
             if (block.blocktype == 'onobjectsensed') {
                 if (block.getArgValue() == 'onobjectsensedleft' && event == 'onobjectsensedleft') {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
                 if (block.getArgValue() == 'onobjectsensedright' && event == 'onobjectsensedright') {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
                 if (block.getArgValue() == 'onnoobjectsensed' && event == 'onnoobjectsensed') {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
             }
             if (block.blocktype == 'onlight') {
                 if (block.getArgValue() == 'onlowlight' && event == 'onlowlight') {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
                 if (block.getArgValue() == 'onhighlight' && event == 'onhighlight') {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
                 if (block.getArgValue() == 'onmidlight' && event == 'onmidlight') {
                     receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
             }
         }
