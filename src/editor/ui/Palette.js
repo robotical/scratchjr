@@ -87,6 +87,7 @@ export default class Palette {
         Palette.createCategorySelectorsRight(parent);
         var div = newHTML('div', 'palette', parent);
         div.setAttribute('id', 'palette');
+        div.style["touch-action"] = "none";
         // div.ontouchstart = function (evt) {
         //     Palette.paletteMouseDown(evt);
         // };
@@ -572,7 +573,11 @@ export default class Palette {
         }
         // div.ontouchstart = Palette.recordSound;
         // div.onmousedown = Palette.recordSound;
-        div.onpointerdown = Palette.recordSound;
+        if (isTablet) {
+            div.ontouchstart = Palette.recordSound;
+        } else {
+            div.onpointerdown = Palette.recordSound;
+        }
     }
 
     static recordSound(e) {

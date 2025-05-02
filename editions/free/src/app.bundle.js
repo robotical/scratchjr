@@ -8576,6 +8576,7 @@ class Palette {
     Palette.createCategorySelectorsRight(parent);
     var div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.newHTML)('div', 'palette', parent);
     div.setAttribute('id', 'palette');
+    div.style["touch-action"] = "none";
     // div.ontouchstart = function (evt) {
     //     Palette.paletteMouseDown(evt);
     // };
@@ -9017,7 +9018,11 @@ class Palette {
     }
     // div.ontouchstart = Palette.recordSound;
     // div.onmousedown = Palette.recordSound;
-    div.onpointerdown = Palette.recordSound;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_12__.isTablet) {
+      div.ontouchstart = Palette.recordSound;
+    } else {
+      div.onpointerdown = Palette.recordSound;
+    }
   }
   static recordSound(e) {
     e.preventDefault();
@@ -27858,16 +27863,14 @@ class Events {
   static clearEvents() {
     window.ontouchmove = undefined;
     window.ontouchend = undefined;
-    window.onmousemove = function (e) {
-      e.preventDefault();
-    };
-    window.onmouseup = undefined;
     window.onpointermove = function (e) {
       e.preventDefault();
     };
     window.onpointerup = undefined;
     window.onpointermove = undefined;
     window.onpointerup = undefined;
+    window.ontouchleave = undefined;
+    window.ontouchcancel = undefined;
   }
   static performMouseUpAction(e) {
     if (fcnend) {

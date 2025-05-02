@@ -223,17 +223,15 @@ export default class Events {
     static clearEvents () {
         window.ontouchmove = undefined;
         window.ontouchend = undefined;
-        window.onmousemove = function (e) {
-            e.preventDefault();
-        };
-        window.onmouseup = undefined;
-
         window.onpointermove = function (e) {
             e.preventDefault();
         };
         window.onpointerup = undefined;
         window.onpointermove = undefined;
         window.onpointerup = undefined;
+        window.ontouchleave = undefined;
+        window.ontouchcancel = undefined;
+
     }
 
     static performMouseUpAction (e) {
