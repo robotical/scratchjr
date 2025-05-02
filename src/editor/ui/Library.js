@@ -8,7 +8,8 @@ import Events from '../../utils/Events';
 import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
 import {gn, newHTML, scaleMultiplier,
-    getDocumentWidth, getDocumentHeight, setProps, newCanvas, frame} from '../../utils/lib';
+    getDocumentWidth, getDocumentHeight, setProps, newCanvas, frame,
+    isTablet} from '../../utils/lib';
 
 let selectedOne;
 let nativeJr = true;
@@ -55,10 +56,15 @@ export default class Library {
         Library.addThumbnails(type);
         window.ontouchstart = undefined;
         window.ontouchend = undefined;
-        window.onmousedown = undefined;
-        window.onmouseup = undefined;
+        // window.onmousedown = undefined;
+        // window.onmouseup = undefined;
+
+        window.onpointerdown = undefined;
+        window.onpointerup = undefined;
         document.ontouchmove = undefined;
-        document.onmousemove = undefined;
+        document.onpointermove = undefined;
+
+        // document.onmousemove = undefined;
         window.onresize = undefined;
 
         gn('library_paintme').style.opacity = 1;
@@ -210,12 +216,21 @@ export default class Library {
         function drawMe (dataurl) {
             img.src = dataurl;
         }
-        tb.ontouchstart = function (evt) {
-            fcn(evt, tb);
-        };
-        tb.onmousedown = function (evt) {
-            fcn(evt, tb);
-        };
+        // tb.ontouchstart = function (evt) {
+        //     fcn(evt, tb);
+        // };
+        // tb.onmousedown = function (evt) {
+        //     fcn(evt, tb);
+        // };
+        if (isTablet) {
+            tb.ontouchstart = function (evt) {
+                fcn(evt, tb);
+            };
+        } else {
+            tb.onpointerdown = function (evt) {
+                fcn(evt, tb);
+            };
+        }
         return tb;
     }
 
@@ -248,12 +263,21 @@ export default class Library {
         var pngPath = MediaLib.path.replace('svg', 'png');
         img.src = pngPath + IO.getFilename(md5) + '.png';
 
-        tb.ontouchstart = function (evt) {
-            fcn(evt, tb);
-        };
-        tb.onmousedown = function (evt) {
-            fcn(evt, tb);
-        };
+        // tb.ontouchstart = function (evt) {
+        //     fcn(evt, tb);
+        // };
+        // tb.onmousedown = function (evt) {
+        //     fcn(evt, tb);
+        // };
+        if (isTablet) {
+            tb.ontouchstart = function (evt) {
+                fcn(evt, tb);
+            };
+        } else {
+            tb.onpointerdown = function (evt) {
+                fcn(evt, tb);
+            };
+        }
         return tb;
     }
 
@@ -281,12 +305,21 @@ export default class Library {
         ctx.fillStyle = ScratchJr.stagecolor;
         ctx.fillRect(0, 0, w, h);
         parent.appendChild(tb);
-        tb.ontouchstart = function (evt) {
-            Library.selectAsset(evt, tb);
-        };
-        tb.onmousedown = function (evt) {
-            Library.selectAsset(evt, tb);
-        };
+        // tb.ontouchstart = function (evt) {
+        //     Library.selectAsset(evt, tb);
+        // };
+        // tb.onmousedown = function (evt) {
+        //     Library.selectAsset(evt, tb);
+        // };
+        if (isTablet) {
+            tb.ontouchstart = function (evt) {
+                Library.selectAsset(evt, tb);
+            };
+        } else {
+            tb.onpointerdown = function (evt) {
+                Library.selectAsset(evt, tb);
+            };
+        }
     }
 
     static addHR (div) {
@@ -313,17 +346,25 @@ export default class Library {
         tb.ontouchend = function (evt) {
             clickMe(evt, tb);
         };
-        window.onmouseup = function (evt) {
+        // window.onmouseup = function (evt) {
+        //     clickMe(evt, tb);
+        // };
+        // window.onmousemove = function (evt) {
+        //     clearEvents(evt, tb);
+        // };
+        window.onpointerup = function (evt) {
             clickMe(evt, tb);
         };
-        window.onmousemove = function (evt) {
+        window.onpointermove = function (evt) {
             clearEvents(evt, tb);
         };
         function holdit () {
             var repeat = function () {
                 tb.ontouchend = undefined;
-                window.onmouseup = undefined;
-                window.onmousemove = undefined;
+                // window.onmouseup = undefined;
+                // window.onmousemove = undefined;
+                window.onpointerup = undefined;
+                window.onpointermove = undefined;
                 timeoutEvent = undefined;
                 Library.stopShaking();
                 shaking = tb;
@@ -347,8 +388,10 @@ export default class Library {
             }
             timeoutEvent = undefined;
             tb.ontouchend = undefined;
-            window.onmousemove = undefined;
-            window.onmouseup = undefined;
+            // window.onmousemove = undefined;
+            // window.onmouseup = undefined;
+            window.onpointermove = undefined;
+            window.onpointerup = undefined;
         }
         function clickMe (e, tb) {
             if (timeoutEvent) {
@@ -357,9 +400,12 @@ export default class Library {
             Library.selectThisAsset(e, tb);
             timeoutEvent = undefined;
             tb.ontouchend = undefined;
-            tb.onmouseup = undefined;
-            window.onmousemove = undefined;
-            window.onmouseup = undefined;
+            // tb.onmouseup = undefined;
+            // window.onmousemove = undefined;
+            // window.onmouseup = undefined;
+            tb.onpointerup = undefined;
+            window.onpointermove = undefined;
+            window.onpointerup = undefined;
         }
     }
 

@@ -13,7 +13,8 @@ import {
     newHTML, newDiv, gn,
     getIdFor, setProps,
     scaleMultiplier, setCanvasSize,
-    globaly, globalx
+    globaly, globalx,
+    isTablet
 } from '../../utils/lib';
 
 export default class Stage {
@@ -30,12 +31,21 @@ export default class Stage {
             position: 'absolute'
         });
         var me = this;
-        this.div.ontouchstart = function (evt) {
-            me.mouseDown(evt);
-        };
-        this.div.onmousedown = function (evt) {
-            me.mouseDown(evt);
-        };
+        if (isTablet) {
+            this.div.ontouchstart = function (evt) {
+                me.mouseDown(evt);
+            };
+        } else {
+            this.div.onpointerdown = function (evt) {
+                me.mouseDown(evt);
+            };
+        }
+        // this.div.ontouchstart = function (evt) {
+        //     me.mouseDown(evt);
+        // };
+        // this.div.onmousedown = function (evt) {
+        //     me.mouseDown(evt);
+        // };
         this.div.owner = this;
         this.currentZoom = 1;
         this.initialPoint = {
@@ -452,12 +462,18 @@ export default class Stage {
         window.ontouchend = function (evt) {
             me.mouseUp(evt);
         };
-        window.onmousemove = function (evt) {
+        window.onpointermove = function (evt) {
             me.mouseMove(evt);
         };
-        window.onmouseup = function (evt) {
+        window.onpointerup = function (evt) {
             me.mouseUp(evt);
         };
+        // window.onmousemove = function (evt) {
+        //     me.mouseMove(evt);
+        // };
+        // window.onmouseup = function (evt) {
+        //     me.mouseUp(evt);
+        // };
     }
 
     startShaking(b) {

@@ -331,12 +331,21 @@ export default class BlockArg {
         this.button = this.addPressButton();
         if (!this.daddy.inpalette) {
             var ba = this;
-            ba.button.ontouchstart = function (evt) {
-                ba.pressDropDown(evt, fcn);
-            };
-            ba.button.onmousedown = function (evt) {
-                ba.pressDropDown(evt, fcn);
-            };
+            // ba.button.ontouchstart = function (evt) {
+            //     ba.pressDropDown(evt, fcn);
+            // };
+            // ba.button.onmousedown = function (evt) {
+            //     ba.pressDropDown(evt, fcn);
+            // };
+            if (isTablet) {
+                ba.button.ontouchstart = function (evt) {
+                    ba.pressDropDown(evt, fcn);
+                };
+            } else {
+                ba.button.onpointerdown = function (evt) {
+                    ba.pressDropDown(evt, fcn);
+                };
+            }
             // Expand the parent div to incorporate the size of the button,
             // else on Android 4.2 the bottom part of the button
             // will not be clickable.

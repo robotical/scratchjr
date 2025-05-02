@@ -745,8 +745,13 @@ export default class UI {
         var p = newHTML('div', 'spritethumbs', sprites);
         var div = newHTML('div', 'spritecc', p);
         div.setAttribute('id', 'spritecc');
-        div.ontouchstart = UI.spriteThumbsActions;
-        div.onmousedown = UI.spriteThumbsActions;
+        // div.ontouchstart = UI.spriteThumbsActions;
+        // div.onmousedown = UI.spriteThumbsActions;
+        if (isTablet) {
+            div.ontouchstart = UI.spriteThumbsActions;
+        } else {
+            div.onpointerdown = UI.spriteThumbsActions;
+        }
 
         // scrollbar
         var sb = newHTML('div', 'scrollbar', sprites);
@@ -1097,7 +1102,7 @@ export default class UI {
         gn('grid').className = Grid.hidden ? 'gridToggle off' : 'gridToggle on';
     }
 
-    static setShowTrace (b) {
+    static setShowTrace(b) {
         Trace.hide(!b);
         gn('traceBtn').className = Trace.hidden ? 'traceToggle off' : 'traceToggle on';
     }
@@ -1331,8 +1336,13 @@ export default class UI {
             e.stopPropagation();
             e.preventDefault();
         };
-        tf.ontouchstart = eatEvent;
-        tf.onmousedown = eatEvent;
+        // tf.ontouchstart = eatEvent;
+        // tf.onmousedown = eatEvent;
+        if (isTablet) {
+            tf.ontouchstart = eatEvent;
+        } else {
+            tf.onpointerdown = eatEvent;
+        }
         var activetb = newHTML('form', 'pageform', tf);
         activetb.name = 'activetextbox';
         activetb.id = 'myform';
@@ -1349,13 +1359,22 @@ export default class UI {
         var ta = newHTML('div', 'pagetextactions', tf);
         var clicky = newHTML('div', 'fontsizeText off', ta);
         clicky.setAttribute('id', 'fontsizebutton');
-        clicky.ontouchstart = UI.openFontSizeMenu;
-        clicky.onmousedown = UI.openFontSizeMenu;
+        // clicky.ontouchstart = UI.openFontSizeMenu;
+        // clicky.onmousedown = UI.openFontSizeMenu;
+        if (isTablet) {
+            clicky.ontouchstart = UI.openFontSizeMenu;
+        } else {
+            clicky.onpointerdown = UI.openFontSizeMenu;
+        }
         var col = newHTML('div', 'changecolorText off', ta);
         col.setAttribute('id', 'fontcolorbutton');
-
-        col.ontouchstart = UI.topLevelColor;
-        col.onmousedown = UI.topLevelColor;
+        if (isTablet) {
+            col.ontouchstart = UI.topLevelColor;
+        } else {
+            col.onpointerdown = UI.topLevelColor;
+        }
+        // col.ontouchstart = UI.topLevelColor;
+        // col.onmousedown = UI.topLevelColor;
         UI.createColorMenu(tf);
         UI.createTextSizeMenu(tf);
     }
@@ -1374,8 +1393,14 @@ export default class UI {
             sf = newHTML('div', 'splasharea off', colour);
             Paint.setSplashColor(sf, Paint.splash, swatchlist[i]);
             Paint.addImageUrl(sf, Paint.splashshade);
-            colour.ontouchstart = UI.setTextColor;
-            colour.onmousedown = UI.setTextColor;
+            // colour.ontouchstart = UI.setTextColor;
+            // colour.onmousedown = UI.setTextColor;
+            if (isTablet) {
+                colour.ontouchstart = UI.setTextColor;
+              } else {
+                colour.onpointerdown = UI.setTextColor;
+              }
+
         }
         UI.setMenuTextColor(gn('textcolormenu').childNodes[9]);
     }
@@ -1389,8 +1414,13 @@ export default class UI {
             textuisize.fs = sizes[i];
             var sf = newHTML('span', undefined, textuisize);
             sf.textContent = 'A';
-            textuisize.ontouchstart = UI.setTextSize;
-            textuisize.onmousedown = UI.setTextSize;
+            // textuisize.ontouchstart = UI.setTextSize;
+            // textuisize.onmousedown = UI.setTextSize;
+            if (isTablet) {
+                textuisize.ontouchstart = UI.setTextSize;
+              } else {
+                textuisize.onpointerdown = UI.setTextSize;
+              }
         }
         UI.setMenuTextSize(gn('textfontsizes').childNodes[5]);
     }

@@ -54,38 +54,26 @@ export default class Scroll {
             this.aup.ontouchstart = function (e) {
                 me.scrolldown(e);
             };
-        } else {
-            this.aup.onmousedown = function (e) {
-                me.scrolldown(e);
-            };
-        }
-
-        if (isTablet) {
             this.adown.ontouchstart = function (e) {
                 me.scrollup(e);
             };
-        } else {
-            this.adown.onmousedown = function (e) {
-                me.scrollup(e);
-            };
-        }
-
-        if (isTablet) {
             this.aleft.ontouchstart = function (e) {
                 me.scrollright(e);
             };
-        } else {
-            this.aleft.onmousedown = function (e) {
-                me.scrollright(e);
-            };
-        }
-
-        if (isTablet) {
             this.aright.ontouchstart = function (e) {
                 me.scrollleft(e);
             };
         } else {
-            this.aright.onmousedown = function (e) {
+            this.aup.onpointerdown = function (e) {
+                me.scrolldown(e);
+            };
+            this.adown.onpointerdown = function (e) {
+                me.scrollup(e);
+            };
+            this.aleft.onpointerdown = function (e) {
+                me.scrollright(e);
+            };
+            this.aright.onpointerdown = function (e) {
                 me.scrollleft(e);
             };
         }

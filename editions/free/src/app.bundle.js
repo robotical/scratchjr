@@ -645,10 +645,17 @@ class ScratchJr {
   }
   static editorEvents() {
     document.ongesturestart = undefined;
-    window.ontouchstart = ScratchJr.unfocus;
-    window.onmousedown = ScratchJr.unfocus;
-    window.ontouchend = undefined;
-    window.onmouseup = undefined;
+    // window.ontouchstart = ScratchJr.unfocus;
+    // window.onmousedown = ScratchJr.unfocus;
+    // window.ontouchend = undefined;
+    // window.onmouseup = undefined;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_19__.isTablet) {
+      window.ontouchstart = ScratchJr.unfocus;
+      window.ontouchend = undefined;
+    } else {
+      window.onpointerdown = ScratchJr.unfocus;
+      window.onpointerup = undefined;
+    }
   }
   static unfocus(evt) {
     if (_ui_Palette__WEBPACK_IMPORTED_MODULE_6__["default"].helpballoon) {
@@ -1135,8 +1142,13 @@ class ScratchJr {
 
   static setupKeypad() {
     keypad = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_19__.newHTML)('div', 'picokeyboard', _utils_lib__WEBPACK_IMPORTED_MODULE_19__.frame);
-    keypad.ontouchstart = ScratchJr.eatEvent;
-    keypad.onmousedown = ScratchJr.eatEvent;
+    // keypad.ontouchstart = ScratchJr.eatEvent;
+    // keypad.onmousedown = ScratchJr.eatEvent;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_19__.isTablet) {
+      keypad.ontouchstart = ScratchJr.eatEvent;
+    } else {
+      keypad.onpointerdown = ScratchJr.eatEvent;
+    }
     var pad = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_19__.newHTML)('div', 'insidekeyboard', keypad);
     for (var i = 1; i < 10; i++) {
       ScratchJr.keyboardAddKey(pad, i, 'onekey');
@@ -1155,8 +1167,13 @@ class ScratchJr {
     var keym = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_19__.newHTML)('div', c, p);
     var mk = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_19__.newHTML)('span', undefined, keym);
     mk.textContent = str ? str : '';
-    keym.ontouchstart = ScratchJr.numEditKey;
-    keym.onmousedown = ScratchJr.numEditKey;
+    // keym.ontouchstart = ScratchJr.numEditKey;
+    // keym.onmousedown = ScratchJr.numEditKey;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_19__.isTablet) {
+      keym.ontouchstart = ScratchJr.numEditKey;
+    } else {
+      keym.onpointerdown = ScratchJr.numEditKey;
+    }
   }
 
   /////////////////////////////////////////////////
@@ -2268,12 +2285,21 @@ class BlockArg {
     this.button = this.addPressButton();
     if (!this.daddy.inpalette) {
       var ba = this;
-      ba.button.ontouchstart = function (evt) {
-        ba.pressDropDown(evt, fcn);
-      };
-      ba.button.onmousedown = function (evt) {
-        ba.pressDropDown(evt, fcn);
-      };
+      // ba.button.ontouchstart = function (evt) {
+      //     ba.pressDropDown(evt, fcn);
+      // };
+      // ba.button.onmousedown = function (evt) {
+      //     ba.pressDropDown(evt, fcn);
+      // };
+      if (_utils_lib__WEBPACK_IMPORTED_MODULE_4__.isTablet) {
+        ba.button.ontouchstart = function (evt) {
+          ba.pressDropDown(evt, fcn);
+        };
+      } else {
+        ba.button.onpointerdown = function (evt) {
+          ba.pressDropDown(evt, fcn);
+        };
+      }
       // Expand the parent div to incorporate the size of the button,
       // else on Android 4.2 the bottom part of the button
       // will not be clickable.
@@ -2931,7 +2957,7 @@ class Menu {
     cs.onmouseout = function (evt) {
       _painteditor_Path__WEBPACK_IMPORTED_MODULE_2__["default"].unhighlightDot(evt);
     };
-    cs.onmousedown = function (evt) {
+    cs.onpointerdown = function (evt) {
       fcn(evt, mu, block, c);
     };
     function handleTouchStart(e) {
@@ -3287,12 +3313,21 @@ class Page {
     var pq = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.newHTML)('p', undefined, num);
     pq.textContent = this.num;
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_13__.newHTML)('div', 'deletethumb', tb);
-    tb.ontouchstart = function (evt) {
-      _ui_Thumbs__WEBPACK_IMPORTED_MODULE_2__["default"].pageMouseDown(evt);
-    };
-    tb.onmousedown = function (evt) {
-      _ui_Thumbs__WEBPACK_IMPORTED_MODULE_2__["default"].pageMouseDown(evt);
-    };
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_13__.isTablet) {
+      tb.ontouchstart = function (evt) {
+        _ui_Thumbs__WEBPACK_IMPORTED_MODULE_2__["default"].pageMouseDown(evt);
+      };
+    } else {
+      tb.onpointerdown = function (evt) {
+        _ui_Thumbs__WEBPACK_IMPORTED_MODULE_2__["default"].pageMouseDown(evt);
+      };
+    }
+    // tb.ontouchstart = function (evt) {
+    //     Thumbs.pageMouseDown(evt);
+    // };
+    // tb.onmousedown = function (evt) {
+    //     Thumbs.pageMouseDown(evt);
+    // };
     this.thumbnail = tb;
     return tb;
   }
@@ -6565,12 +6600,21 @@ class Stage {
       position: 'absolute'
     });
     var me = this;
-    this.div.ontouchstart = function (evt) {
-      me.mouseDown(evt);
-    };
-    this.div.onmousedown = function (evt) {
-      me.mouseDown(evt);
-    };
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_11__.isTablet) {
+      this.div.ontouchstart = function (evt) {
+        me.mouseDown(evt);
+      };
+    } else {
+      this.div.onpointerdown = function (evt) {
+        me.mouseDown(evt);
+      };
+    }
+    // this.div.ontouchstart = function (evt) {
+    //     me.mouseDown(evt);
+    // };
+    // this.div.onmousedown = function (evt) {
+    //     me.mouseDown(evt);
+    // };
     this.div.owner = this;
     this.currentZoom = 1;
     this.initialPoint = {
@@ -6965,12 +7009,18 @@ class Stage {
     window.ontouchend = function (evt) {
       me.mouseUp(evt);
     };
-    window.onmousemove = function (evt) {
+    window.onpointermove = function (evt) {
       me.mouseMove(evt);
     };
-    window.onmouseup = function (evt) {
+    window.onpointerup = function (evt) {
       me.mouseUp(evt);
     };
+    // window.onmousemove = function (evt) {
+    //     me.mouseMove(evt);
+    // };
+    // window.onmouseup = function (evt) {
+    //     me.mouseUp(evt);
+    // };
   }
   startShaking(b) {
     if (!b.owner) {
@@ -7607,12 +7657,21 @@ class Grid {
       ctx.stroke();
       dy += size;
     }
-    cnv.ontouchstart = function (evt) {
-      _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.mouseDown(evt);
-    };
-    cnv.onmousedown = function (evt) {
-      _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.mouseDown(evt);
-    };
+    // cnv.ontouchstart = function (evt) {
+    //     ScratchJr.stage.mouseDown(evt);
+    // };
+    // cnv.onmousedown = function (evt) {
+    //     ScratchJr.stage.mouseDown(evt);
+    // };
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_3__.isTablet) {
+      cnv.ontouchstart = function (evt) {
+        _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.mouseDown(evt);
+      };
+    } else {
+      cnv.onpointerdown = function (evt) {
+        _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.mouseDown(evt);
+      };
+    }
   }
   static createNumbering(w, h) {
     var row = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.newDiv)((0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('stageframe'), 0, 0, w - 46 - 30, 24, {
@@ -7684,12 +7743,21 @@ class Grid {
     var cnv = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.newCanvas)(gc, 0, 0, size + 2, size + 2, {
       position: 'absolute'
     });
-    cnv.ontouchstart = function (evt) {
-      Grid.mouseDownOnCursor(evt);
-    };
-    cnv.onmousedown = function (evt) {
-      Grid.mouseDownOnCursor(evt);
-    };
+    // cnv.ontouchstart = function (evt) {
+    //     Grid.mouseDownOnCursor(evt);
+    // };
+    // cnv.onmousedown = function (evt) {
+    //     Grid.mouseDownOnCursor(evt);
+    // };
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_3__.isTablet) {
+      cnv.ontouchstart = function (evt) {
+        Grid.mouseDownOnCursor(evt);
+      };
+    } else {
+      cnv.onpointerdown = function (evt) {
+        Grid.mouseDownOnCursor(evt);
+      };
+    }
     var ctx = cnv.getContext('2d');
     ctx.globalAlpha = 0.5;
     ctx.fillStyle = '#28A5DA';
@@ -7697,8 +7765,13 @@ class Grid {
     ctx.lineWidth = 3;
     ctx.strokeRect(3, 3, size - 6, size - 6);
     ctx.fillRect(3, 3, size - 6, size - 6);
-    gc.ontouchstart = Grid.mouseDownOnCursor;
-    gc.onmousedown = Grid.mouseDownOnCursor;
+    // gc.ontouchstart = Grid.mouseDownOnCursor;
+    // gc.onmousedown = Grid.mouseDownOnCursor;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_3__.isTablet) {
+      gc.ontouchstart = Grid.mouseDownOnCursor;
+    } else {
+      gc.onpointerdown = Grid.mouseDownOnCursor;
+    }
   }
   static mouseDownOnCursor(e) {
     e.preventDefault();
@@ -7874,10 +7947,15 @@ class Library {
     Library.addThumbnails(type);
     window.ontouchstart = undefined;
     window.ontouchend = undefined;
-    window.onmousedown = undefined;
-    window.onmouseup = undefined;
+    // window.onmousedown = undefined;
+    // window.onmouseup = undefined;
+
+    window.onpointerdown = undefined;
+    window.onpointerup = undefined;
     document.ontouchmove = undefined;
-    document.onmousemove = undefined;
+    document.onpointermove = undefined;
+
+    // document.onmousemove = undefined;
     window.onresize = undefined;
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_8__.gn)('library_paintme').style.opacity = 1;
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_8__.gn)('library_paintme').onclick = Library.editResource;
@@ -8013,12 +8091,21 @@ class Library {
     function drawMe(dataurl) {
       img.src = dataurl;
     }
-    tb.ontouchstart = function (evt) {
-      fcn(evt, tb);
-    };
-    tb.onmousedown = function (evt) {
-      fcn(evt, tb);
-    };
+    // tb.ontouchstart = function (evt) {
+    //     fcn(evt, tb);
+    // };
+    // tb.onmousedown = function (evt) {
+    //     fcn(evt, tb);
+    // };
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_8__.isTablet) {
+      tb.ontouchstart = function (evt) {
+        fcn(evt, tb);
+      };
+    } else {
+      tb.onpointerdown = function (evt) {
+        fcn(evt, tb);
+      };
+    }
     return tb;
   }
   static addLocalThumbChoose(parent, data, w, h, fcn) {
@@ -8047,12 +8134,22 @@ class Library {
     // Cached downsized-thumbnails are in pnglibrary
     var pngPath = _tablet_MediaLib__WEBPACK_IMPORTED_MODULE_3__["default"].path.replace('svg', 'png');
     img.src = pngPath + _tablet_IO__WEBPACK_IMPORTED_MODULE_2__["default"].getFilename(md5) + '.png';
-    tb.ontouchstart = function (evt) {
-      fcn(evt, tb);
-    };
-    tb.onmousedown = function (evt) {
-      fcn(evt, tb);
-    };
+
+    // tb.ontouchstart = function (evt) {
+    //     fcn(evt, tb);
+    // };
+    // tb.onmousedown = function (evt) {
+    //     fcn(evt, tb);
+    // };
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_8__.isTablet) {
+      tb.ontouchstart = function (evt) {
+        fcn(evt, tb);
+      };
+    } else {
+      tb.onpointerdown = function (evt) {
+        fcn(evt, tb);
+      };
+    }
     return tb;
   }
   static userAssetThumbnail(img, cnv, sizew, sizeh) {
@@ -8077,12 +8174,21 @@ class Library {
     ctx.fillStyle = _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stagecolor;
     ctx.fillRect(0, 0, w, h);
     parent.appendChild(tb);
-    tb.ontouchstart = function (evt) {
-      Library.selectAsset(evt, tb);
-    };
-    tb.onmousedown = function (evt) {
-      Library.selectAsset(evt, tb);
-    };
+    // tb.ontouchstart = function (evt) {
+    //     Library.selectAsset(evt, tb);
+    // };
+    // tb.onmousedown = function (evt) {
+    //     Library.selectAsset(evt, tb);
+    // };
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_8__.isTablet) {
+      tb.ontouchstart = function (evt) {
+        Library.selectAsset(evt, tb);
+      };
+    } else {
+      tb.onpointerdown = function (evt) {
+        Library.selectAsset(evt, tb);
+      };
+    }
   }
   static addHR(div) {
     var hr = document.createElement('hr');
@@ -8107,17 +8213,25 @@ class Library {
     tb.ontouchend = function (evt) {
       clickMe(evt, tb);
     };
-    window.onmouseup = function (evt) {
+    // window.onmouseup = function (evt) {
+    //     clickMe(evt, tb);
+    // };
+    // window.onmousemove = function (evt) {
+    //     clearEvents(evt, tb);
+    // };
+    window.onpointerup = function (evt) {
       clickMe(evt, tb);
     };
-    window.onmousemove = function (evt) {
+    window.onpointermove = function (evt) {
       clearEvents(evt, tb);
     };
     function holdit() {
       var repeat = function () {
         tb.ontouchend = undefined;
-        window.onmouseup = undefined;
-        window.onmousemove = undefined;
+        // window.onmouseup = undefined;
+        // window.onmousemove = undefined;
+        window.onpointerup = undefined;
+        window.onpointermove = undefined;
         timeoutEvent = undefined;
         Library.stopShaking();
         shaking = tb;
@@ -8141,8 +8255,10 @@ class Library {
       }
       timeoutEvent = undefined;
       tb.ontouchend = undefined;
-      window.onmousemove = undefined;
-      window.onmouseup = undefined;
+      // window.onmousemove = undefined;
+      // window.onmouseup = undefined;
+      window.onpointermove = undefined;
+      window.onpointerup = undefined;
     }
     function clickMe(e, tb) {
       if (timeoutEvent) {
@@ -8151,9 +8267,12 @@ class Library {
       Library.selectThisAsset(e, tb);
       timeoutEvent = undefined;
       tb.ontouchend = undefined;
-      tb.onmouseup = undefined;
-      window.onmousemove = undefined;
-      window.onmouseup = undefined;
+      // tb.onmouseup = undefined;
+      // window.onmousemove = undefined;
+      // window.onmouseup = undefined;
+      tb.onpointerup = undefined;
+      window.onpointermove = undefined;
+      window.onpointerup = undefined;
     }
   }
   static startShaking(b) {
@@ -8457,10 +8576,13 @@ class Palette {
     Palette.createCategorySelectorsRight(parent);
     var div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.newHTML)('div', 'palette', parent);
     div.setAttribute('id', 'palette');
-    div.ontouchstart = function (evt) {
-      Palette.paletteMouseDown(evt);
-    };
-    div.onmousedown = function (evt) {
+    // div.ontouchstart = function (evt) {
+    //     Palette.paletteMouseDown(evt);
+    // };
+    // div.onmousedown = function (evt) {
+    //     Palette.paletteMouseDown(evt);
+    // };
+    div.onpointerdown = function (evt) {
       Palette.paletteMouseDown(evt);
     };
     var pc = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.newHTML)('div', 'papercut', parent);
@@ -8724,12 +8846,15 @@ class Palette {
       zIndex: 8,
       visibility: 'hidden'
     });
-    div.ontouchstart = function (evt) {
+    div.onpointerdown = function (evt) {
       Palette.clickOnCategory(evt);
     };
-    div.onmousedown = function (evt) {
-      Palette.clickOnCategory(evt);
-    };
+    // div.ontouchstart = function (evt) {
+    //     Palette.clickOnCategory(evt);
+    // };
+    // div.onmousedown = function (evt) {
+    //     Palette.clickOnCategory(evt);
+    // };
   }
   static getPaletteSize() {
     var first = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('palette').childNodes[0];
@@ -8890,8 +9015,9 @@ class Palette {
         (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.drawScaled)(_blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].mic, cnv);
       };
     }
-    div.ontouchstart = Palette.recordSound;
-    div.onmousedown = Palette.recordSound;
+    // div.ontouchstart = Palette.recordSound;
+    // div.onmousedown = Palette.recordSound;
+    div.onpointerdown = Palette.recordSound;
   }
   static recordSound(e) {
     e.preventDefault();
@@ -10773,12 +10899,22 @@ class ScriptsPane {
     }
     _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.currentPage.setCurrentSprite((0,_utils_lib__WEBPACK_IMPORTED_MODULE_10__.gn)(sprname).owner);
     currentsc.owner.activate();
-    currentsc.parentNode.ontouchstart = function (evt) {
-      currentsc.owner.scriptsMouseDown(evt);
-    };
-    currentsc.parentNode.onmousedown = function (evt) {
-      currentsc.owner.scriptsMouseDown(evt);
-    };
+    // currentsc.parentNode.ontouchstart = function (evt) {
+    //     currentsc.owner.scriptsMouseDown(evt);
+    // };
+    // currentsc.parentNode.onmousedown = function (evt) {
+    //     currentsc.owner.scriptsMouseDown(evt);
+    // };
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_10__.isTablet) {
+      currentsc.parentNode.ontouchstart = function (evt) {
+        currentsc.owner.scriptsMouseDown(evt);
+      };
+    } else {
+      currentsc.parentNode.onpointerdown = function (evt) {
+        currentsc.owner.scriptsMouseDown(evt);
+      };
+    }
+    ;
     scroll.update();
   }
   static runBlock(e, div) {
@@ -11126,35 +11262,26 @@ class Scroll {
       this.aup.ontouchstart = function (e) {
         me.scrolldown(e);
       };
-    } else {
-      this.aup.onmousedown = function (e) {
-        me.scrolldown(e);
-      };
-    }
-    if (_utils_lib__WEBPACK_IMPORTED_MODULE_1__.isTablet) {
       this.adown.ontouchstart = function (e) {
         me.scrollup(e);
       };
-    } else {
-      this.adown.onmousedown = function (e) {
-        me.scrollup(e);
-      };
-    }
-    if (_utils_lib__WEBPACK_IMPORTED_MODULE_1__.isTablet) {
       this.aleft.ontouchstart = function (e) {
         me.scrollright(e);
       };
-    } else {
-      this.aleft.onmousedown = function (e) {
-        me.scrollright(e);
-      };
-    }
-    if (_utils_lib__WEBPACK_IMPORTED_MODULE_1__.isTablet) {
       this.aright.ontouchstart = function (e) {
         me.scrollleft(e);
       };
     } else {
-      this.aright.onmousedown = function (e) {
+      this.aup.onpointerdown = function (e) {
+        me.scrolldown(e);
+      };
+      this.adown.onpointerdown = function (e) {
+        me.scrollup(e);
+      };
+      this.aleft.onpointerdown = function (e) {
+        me.scrollright(e);
+      };
+      this.aright.onpointerdown = function (e) {
         me.scrollleft(e);
       };
     }
@@ -13492,8 +13619,13 @@ class UI {
     var p = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'spritethumbs', sprites);
     var div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'spritecc', p);
     div.setAttribute('id', 'spritecc');
-    div.ontouchstart = UI.spriteThumbsActions;
-    div.onmousedown = UI.spriteThumbsActions;
+    // div.ontouchstart = UI.spriteThumbsActions;
+    // div.onmousedown = UI.spriteThumbsActions;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+      div.ontouchstart = UI.spriteThumbsActions;
+    } else {
+      div.onpointerdown = UI.spriteThumbsActions;
+    }
 
     // scrollbar
     var sb = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'scrollbar', sprites);
@@ -14030,8 +14162,13 @@ class UI {
       e.stopPropagation();
       e.preventDefault();
     };
-    tf.ontouchstart = eatEvent;
-    tf.onmousedown = eatEvent;
+    // tf.ontouchstart = eatEvent;
+    // tf.onmousedown = eatEvent;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+      tf.ontouchstart = eatEvent;
+    } else {
+      tf.onpointerdown = eatEvent;
+    }
     var activetb = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('form', 'pageform', tf);
     activetb.name = 'activetextbox';
     activetb.id = 'myform';
@@ -14048,12 +14185,22 @@ class UI {
     var ta = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'pagetextactions', tf);
     var clicky = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'fontsizeText off', ta);
     clicky.setAttribute('id', 'fontsizebutton');
-    clicky.ontouchstart = UI.openFontSizeMenu;
-    clicky.onmousedown = UI.openFontSizeMenu;
+    // clicky.ontouchstart = UI.openFontSizeMenu;
+    // clicky.onmousedown = UI.openFontSizeMenu;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+      clicky.ontouchstart = UI.openFontSizeMenu;
+    } else {
+      clicky.onpointerdown = UI.openFontSizeMenu;
+    }
     var col = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'changecolorText off', ta);
     col.setAttribute('id', 'fontcolorbutton');
-    col.ontouchstart = UI.topLevelColor;
-    col.onmousedown = UI.topLevelColor;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+      col.ontouchstart = UI.topLevelColor;
+    } else {
+      col.onpointerdown = UI.topLevelColor;
+    }
+    // col.ontouchstart = UI.topLevelColor;
+    // col.onmousedown = UI.topLevelColor;
     UI.createColorMenu(tf);
     UI.createTextSizeMenu(tf);
   }
@@ -14071,8 +14218,13 @@ class UI {
       sf = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'splasharea off', colour);
       _painteditor_Paint__WEBPACK_IMPORTED_MODULE_14__["default"].setSplashColor(sf, _painteditor_Paint__WEBPACK_IMPORTED_MODULE_14__["default"].splash, swatchlist[i]);
       _painteditor_Paint__WEBPACK_IMPORTED_MODULE_14__["default"].addImageUrl(sf, _painteditor_Paint__WEBPACK_IMPORTED_MODULE_14__["default"].splashshade);
-      colour.ontouchstart = UI.setTextColor;
-      colour.onmousedown = UI.setTextColor;
+      // colour.ontouchstart = UI.setTextColor;
+      // colour.onmousedown = UI.setTextColor;
+      if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+        colour.ontouchstart = UI.setTextColor;
+      } else {
+        colour.onpointerdown = UI.setTextColor;
+      }
     }
     UI.setMenuTextColor((0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.gn)('textcolormenu').childNodes[9]);
   }
@@ -14085,8 +14237,13 @@ class UI {
       textuisize.fs = sizes[i];
       var sf = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('span', undefined, textuisize);
       sf.textContent = 'A';
-      textuisize.ontouchstart = UI.setTextSize;
-      textuisize.onmousedown = UI.setTextSize;
+      // textuisize.ontouchstart = UI.setTextSize;
+      // textuisize.onmousedown = UI.setTextSize;
+      if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+        textuisize.ontouchstart = UI.setTextSize;
+      } else {
+        textuisize.onpointerdown = UI.setTextSize;
+      }
     }
     UI.setMenuTextSize((0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.gn)('textfontsizes').childNodes[5]);
   }
@@ -14292,12 +14449,21 @@ class Undo {
     div.setAttribute('type', 'toggleclicky');
     div.setAttribute('id', prefix + key);
     if (fcn) {
-      div.ontouchstart = function (evt) {
-        fcn(evt);
-      };
-      div.onmousedown = function (evt) {
-        fcn(evt);
-      };
+      // div.ontouchstart = function (evt) {
+      //     fcn(evt);
+      // };
+      // div.onmousedown = function (evt) {
+      //     fcn(evt);
+      // };
+      if (_utils_lib__WEBPACK_IMPORTED_MODULE_6__.isTablet) {
+        div.ontouchstart = function (evt) {
+          fcn(evt);
+        };
+      } else {
+        div.onpointerdown = function (evt) {
+          fcn(evt);
+        };
+      }
     }
     return div;
   }
@@ -16523,7 +16689,8 @@ class Lobby {
   }
   static loadProjects(p) {
     document.ontouchmove = undefined;
-    document.onmousemove = undefined;
+    document.onpointermove = undefined;
+    // document.onmousemove = undefined;
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('topsection').className = 'topsection home';
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('tabheader').textContent = _utils_Localization__WEBPACK_IMPORTED_MODULE_3__["default"].localize('MY_PROJECTS');
     (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)('subtitle').textContent = '';
@@ -16546,7 +16713,7 @@ class Lobby {
     document.ontouchmove = function (e) {
       e.preventDefault();
     };
-    document.onmousemove = function (e) {
+    document.onpointermove = function (e) {
       e.preventDefault();
     };
     _Samples__WEBPACK_IMPORTED_MODULE_6__["default"].init();
@@ -16595,7 +16762,7 @@ class Lobby {
       return;
     }
     document.ontouchmove = undefined;
-    document.onmousemove = undefined;
+    document.onpointermove = undefined;
     busy = true;
     _utils_ScratchAudio__WEBPACK_IMPORTED_MODULE_1__["default"].sndFX('tap.wav');
     Lobby.selectSubButton(page);
@@ -16615,7 +16782,7 @@ class Lobby {
         document.ontouchmove = function (e) {
           e.preventDefault();
         };
-        document.onmousemove = function (e) {
+        document.onpointermove = function (e) {
           e.preventDefault();
         };
         url = host + 'interface.html';
@@ -16625,7 +16792,7 @@ class Lobby {
         document.ontouchmove = function (e) {
           e.preventDefault();
         };
-        document.onmousemove = function (e) {
+        document.onpointermove = function (e) {
           e.preventDefault();
         };
         url = host + 'paint.html';
@@ -18551,8 +18718,13 @@ class Paint {
     } else {
       Paint.initSprite(sw, sh);
     }
-    window.ontouchstart = Paint.detectGesture;
-    window.onmousedown = Paint.detectGesture;
+    // window.ontouchstart = Paint.detectGesture;
+    // window.onmousedown = Paint.detectGesture;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+      window.ontouchstart = Paint.detectGesture;
+    } else {
+      window.onpointerdown = Paint.detectGesture;
+    }
     window.ondevicemotion = undefined;
 
     // Set the back button callback
@@ -18590,8 +18762,10 @@ class Paint {
   static clearEvents(e) {
     window.ontouchmove = undefined;
     window.ontouchend = undefined;
-    window.onmousemove = undefined;
-    window.onmouseup = undefined;
+    // window.onmousemove = undefined;
+    // window.onmouseup = undefined;
+    window.onpointermove = undefined;
+    window.onpointerup = undefined;
     if (_PaintAction__WEBPACK_IMPORTED_MODULE_10__["default"].currentshape) {
       _PaintAction__WEBPACK_IMPORTED_MODULE_10__["default"].stopAction(e);
     }
@@ -18618,10 +18792,10 @@ class Paint {
       Paint.setCanvasTransform(currentZoom);
       _PaintAction__WEBPACK_IMPORTED_MODULE_10__["default"].clearEvents();
     };
-    window.onmousemove = function (evt) {
+    window.onpointermove = function (evt) {
       Paint.dragBackground(evt);
     };
-    window.onmouseup = function () {
+    window.onpointerup = function () {
       Paint.bounceBack();
       Paint.setCanvasTransform(currentZoom);
       _PaintAction__WEBPACK_IMPORTED_MODULE_10__["default"].clearEvents();
@@ -18636,13 +18810,13 @@ class Paint {
     window.ontouchmove = function () {
       Paint.gestureStart(e);
     };
-    window.onmousemove = function () {
+    window.onpointermove = function () {
       Paint.gestureStart(e);
     };
   }
   static gestureStart(e) {
     window.ontouchmove = undefined;
-    window.onmousemove = undefined;
+    window.onpointermove = undefined;
     var skipmodes = ['path', 'ellipse', 'rect'];
     if (skipmodes.indexOf(mode) > -1) {
       if (_PaintAction__WEBPACK_IMPORTED_MODULE_10__["default"].currentshape && _PaintAction__WEBPACK_IMPORTED_MODULE_10__["default"].currentshape.parentNode) {
@@ -18657,8 +18831,8 @@ class Paint {
     _utils_Events__WEBPACK_IMPORTED_MODULE_15__["default"].clearDragAndDrop();
     window.ontouchmove = Paint.gestureChange;
     window.ontouchend = Paint.gestureEnd;
-    window.onmousemove = Paint.gestureChange;
-    window.onmouseup = Paint.gestureEnd;
+    window.onpointermove = Paint.gestureChange;
+    window.onpointerup = Paint.gestureEnd;
   }
   static gestureChange(e) {
     e.preventDefault();
@@ -18680,8 +18854,8 @@ class Paint {
     e.preventDefault();
     window.ontouchmove = undefined;
     window.ontouchend = undefined;
-    window.onmousemove = undefined;
-    window.onmouseup = undefined;
+    window.onpointermove = undefined;
+    window.onpointerup = undefined;
     var scale = Math.min(maxZoom, _utils_Events__WEBPACK_IMPORTED_MODULE_15__["default"].scaleStartsAt * _utils_Events__WEBPACK_IMPORTED_MODULE_15__["default"].zoomScale(e));
     scale = Math.max(minZoom, scale);
     Paint.updateZoomScale(scale);
@@ -18720,8 +18894,8 @@ class Paint {
     _editor_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].editorEvents();
     window.ontouchmove = undefined;
     window.ontouchend = undefined;
-    window.onmousemove = undefined;
-    window.onmouseup = undefined;
+    window.onpointermove = undefined;
+    window.onpointerup = undefined;
     _editor_ui_Alert__WEBPACK_IMPORTED_MODULE_9__["default"].close();
     Paint.clearWorkspace();
     _PaintUndo__WEBPACK_IMPORTED_MODULE_13__["default"].buffer = [];
@@ -18941,8 +19115,13 @@ class Paint {
   static checkMark(pt) {
     var clicky = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'paintdone', pt);
     clicky.id = 'donecheck';
-    clicky.ontouchstart = Paint.backToProject;
-    clicky.onmousedown = Paint.backToProject;
+    // clicky.ontouchstart = Paint.backToProject;
+    // clicky.onmousedown = Paint.backToProject;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+      clicky.ontouchstart = Paint.backToProject;
+    } else {
+      clicky.onpointerdown = Paint.backToProject;
+    }
   }
   static nameOfcostume(p) {
     var sform = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('form', 'spriteform', p);
@@ -18954,7 +19133,7 @@ class Paint {
     ti.maxLength = 25;
     ti.firstTime = true;
     ti.ontouchstart = () => {};
-    ti.onmousedown = () => {};
+    ti.onpointerdown = () => {};
     ti.onfocus = Paint.nameFocus;
     ti.onblur = Paint.nameBlur;
     ti.onkeypress = Paint.handleNamePress;
@@ -19034,8 +19213,13 @@ class Paint {
       var but = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'element off', section);
       var icon = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'tool ' + list[i] + ' off', but);
       icon.setAttribute('key', list[i]);
-      icon.ontouchstart = Paint.setMode;
-      icon.onmousedown = Paint.setMode;
+      // icon.ontouchstart = Paint.setMode;
+      // icon.onmousedown = Paint.setMode;
+      if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+        icon.ontouchstart = Paint.setMode;
+      } else {
+        icon.onpointerdown = Paint.setMode;
+      }
     }
   }
   static createSizeSelector(pal) {
@@ -19051,8 +19235,13 @@ class Paint {
         strokewidth = pensizes[Number(this.key)];
         Paint.selectPenSize(n);
       };
-      ps.ontouchstart = setSize;
-      ps.onmousedown = setSize;
+      // ps.ontouchstart = setSize;
+      // ps.onmousedown = setSize;
+      if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+        ps.ontouchstart = setSize;
+      } else {
+        ps.onpointerdown = setSize;
+      }
       var c = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'line t' + i, ps);
       Paint.drawPenSizeInColor(c);
     }
@@ -19106,8 +19295,13 @@ class Paint {
       var but = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'element off', pal);
       var icon = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'tool ' + list[i] + ' off', but);
       icon.setAttribute('key', list[i]);
-      icon.ontouchstart = Paint.setMode;
-      icon.onmousedown = Paint.setMode;
+      // icon.ontouchstart = Paint.setMode;
+      // icon.onmousedown = Paint.setMode;
+      if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+        icon.ontouchstart = Paint.setMode;
+      } else {
+        icon.onpointerdown = Paint.setMode;
+      }
     }
   }
   static cameraToolsOn() {
@@ -19125,19 +19319,31 @@ class Paint {
     if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isAndroid && !AndroidInterface.scratchjr_has_multiple_cameras()) {
       fc.style.display = 'none';
     }
-    fc.ontouchstart = Paint.setMode;
-    fc.onmousedown = Paint.setMode;
+
+    // fc.ontouchstart = Paint.setMode;
+    // fc.onmousedown = Paint.setMode;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+      fc.ontouchstart = Paint.setMode;
+    } else {
+      fc.onpointerdown = Paint.setMode;
+    }
     var captureContainer = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'snapshot-container', (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.gn)('backdrop'));
     captureContainer.setAttribute('id', 'capture-container');
     var capture = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'snapshot', captureContainer);
     capture.setAttribute('id', 'capture');
     capture.setAttribute('key', 'camerasnap');
-    capture.ontouchstart = Paint.setMode;
-    capture.onmousedown = Paint.setMode;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+      capture.ontouchstart = Paint.setMode;
+    } else {
+      capture.onpointerdown = Paint.setMode;
+    }
     var cc = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'cameraclose', topbar);
     cc.setAttribute('id', 'cameraclose');
-    cc.ontouchstart = Paint.closeCameraMode;
-    cc.onmousedown = Paint.closeCameraMode;
+    if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+      cc.ontouchstart = Paint.closeCameraMode;
+    } else {
+      cc.onpointerdown = Paint.closeCameraMode;
+    }
   }
   static closeCameraMode(evt) {
     evt.preventDefault();
@@ -19207,8 +19413,13 @@ class Paint {
       sf = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'splasharea off', colour);
       Paint.setSplashColor(sf, splash, swatchlist[i]);
       Paint.addImageUrl(sf, splashshade);
-      colour.ontouchstart = Paint.selectSwatch;
-      colour.onmousedown = Paint.selectSwatch;
+      if (_utils_lib__WEBPACK_IMPORTED_MODULE_18__.isTablet) {
+        colour.ontouchstart = Paint.selectSwatch;
+      } else {
+        colour.onpointerdown = Paint.selectSwatch;
+      }
+      // colour.ontouchstart = Paint.selectSwatch;
+      // colour.onmousedown = Paint.selectSwatch;
     }
     Paint.setSwatchColor((0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.gn)('swatches').childNodes[swatchlist.indexOf('#1C1C1C')]);
   }
@@ -19311,8 +19522,10 @@ class Paint {
     div.style.background = '#F5F2F7';
     div.style.top = '0px';
     div.style.left = '0px';
-    window.onmousemove = undefined;
-    window.onmouseup = undefined;
+    // window.onmousemove = undefined;
+    // window.onmouseup = undefined;
+    window.onpointermove = undefined;
+    window.onpointerup = undefined;
     root = _SVGTools__WEBPACK_IMPORTED_MODULE_2__["default"].create(div);
     root.setAttribute('class', 'active3d');
     window.xform = _Transform__WEBPACK_IMPORTED_MODULE_16__["default"].getTranslateTransform();
@@ -19961,8 +20174,10 @@ class PaintAction {
     currentShape = undefined;
     window.ontouchmove = undefined;
     window.ontouchend = undefined;
-    window.onmousemove = undefined;
-    window.onmouseup = undefined;
+    // window.onmousemove = undefined;
+    // window.onmouseup = undefined;
+    window.onpointermove = undefined;
+    window.onpointerup = undefined;
   }
   static stopAction(e) {
     var list = ['path', 'ellipse', 'rect', 'tri'];
@@ -20001,10 +20216,16 @@ class PaintAction {
     window.ontouchend = function (evt) {
       PaintAction.mouseUp(evt);
     };
-    window.onmousemove = function (evt) {
+    // window.onmousemove = function (evt) {
+    //     PaintAction.mouseMove(evt);
+    // };
+    // window.onmouseup = function (evt) {
+    //     PaintAction.mouseUp(evt);
+    // };
+    window.onpointermove = function (evt) {
       PaintAction.mouseMove(evt);
     };
-    window.onmouseup = function (evt) {
+    window.onpointerup = function (evt) {
       PaintAction.mouseUp(evt);
     };
     window.ontouchcancel = function (evt) {
@@ -21037,12 +21258,15 @@ class PaintUndo {
     button.setAttribute('type', 'toggleclicky');
     button.setAttribute('id', prefix + key);
     if (fcn) {
-      button.ontouchstart = function (evt) {
-        fcn(evt);
-      };
-      button.onmousedown = function (evt) {
-        fcn(evt);
-      };
+      if (_utils_lib__WEBPACK_IMPORTED_MODULE_5__.isTablet) {
+        button.ontouchstart = function (evt) {
+          fcn(evt);
+        };
+      } else {
+        button.onpointerdown = function (evt) {
+          fcn(evt);
+        };
+      }
     }
     return button;
   }
@@ -27547,16 +27771,23 @@ class Events {
     } else {
       delta = 7;
     }
-    window.ontouchmove = function (evt) {
+    // window.ontouchmove = function (evt) {
+    //     Events.mouseMove(evt);
+    // };
+    // window.ontouchend = function (evt) {
+    //     Events.mouseUp(evt);
+    // };
+    // window.onmousemove = function (evt) {
+    //     Events.mouseMove(evt);
+    // };
+    // window.onmouseup = function (evt) {
+    //     Events.mouseUp(evt);
+    // };
+
+    window.onpointermove = function (evt) {
       Events.mouseMove(evt);
     };
-    window.ontouchend = function (evt) {
-      Events.mouseUp(evt);
-    };
-    window.onmousemove = function (evt) {
-      Events.mouseMove(evt);
-    };
-    window.onmouseup = function (evt) {
+    window.onpointerup = function (evt) {
       Events.mouseUp(evt);
     };
   }
@@ -27631,6 +27862,12 @@ class Events {
       e.preventDefault();
     };
     window.onmouseup = undefined;
+    window.onpointermove = function (e) {
+      e.preventDefault();
+    };
+    window.onpointerup = undefined;
+    window.onpointermove = undefined;
+    window.onpointerup = undefined;
   }
   static performMouseUpAction(e) {
     if (fcnend) {

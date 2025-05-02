@@ -293,10 +293,17 @@ export default class ScratchJr {
 
     static editorEvents() {
         document.ongesturestart = undefined;
-        window.ontouchstart = ScratchJr.unfocus;
-        window.onmousedown = ScratchJr.unfocus;
-        window.ontouchend = undefined;
-        window.onmouseup = undefined;
+        // window.ontouchstart = ScratchJr.unfocus;
+        // window.onmousedown = ScratchJr.unfocus;
+        // window.ontouchend = undefined;
+        // window.onmouseup = undefined;
+        if (isTablet) {
+            window.ontouchstart = ScratchJr.unfocus;
+            window.ontouchend = undefined;
+          } else {
+            window.onpointerdown = ScratchJr.unfocus;
+            window.onpointerup = undefined;
+          }
     }
 
     static unfocus(evt) {
@@ -829,8 +836,13 @@ export default class ScratchJr {
 
     static setupKeypad() {
         keypad = newHTML('div', 'picokeyboard', frame);
-        keypad.ontouchstart = ScratchJr.eatEvent;
-        keypad.onmousedown = ScratchJr.eatEvent;
+        // keypad.ontouchstart = ScratchJr.eatEvent;
+        // keypad.onmousedown = ScratchJr.eatEvent;
+        if (isTablet) {
+            keypad.ontouchstart = ScratchJr.eatEvent;
+          } else {
+            keypad.onpointerdown = ScratchJr.eatEvent;
+          }
         var pad = newHTML('div', 'insidekeyboard', keypad);
         for (var i = 1; i < 10; i++) {
             ScratchJr.keyboardAddKey(pad, i, 'onekey');
@@ -851,8 +863,13 @@ export default class ScratchJr {
         var keym = newHTML('div', c, p);
         var mk = newHTML('span', undefined, keym);
         mk.textContent = str ? str : '';
-        keym.ontouchstart = ScratchJr.numEditKey;
-        keym.onmousedown = ScratchJr.numEditKey;
+        // keym.ontouchstart = ScratchJr.numEditKey;
+        // keym.onmousedown = ScratchJr.numEditKey;
+        if (isTablet) {
+            keym.ontouchstart = ScratchJr.numEditKey;
+          } else {
+            keym.onpointerdown = ScratchJr.numEditKey;
+          }
     }
 
 

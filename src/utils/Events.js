@@ -129,16 +129,23 @@ export default class Events {
         } else {
             delta = 7;
         }
-        window.ontouchmove = function (evt) {
+        // window.ontouchmove = function (evt) {
+        //     Events.mouseMove(evt);
+        // };
+        // window.ontouchend = function (evt) {
+        //     Events.mouseUp(evt);
+        // };
+        // window.onmousemove = function (evt) {
+        //     Events.mouseMove(evt);
+        // };
+        // window.onmouseup = function (evt) {
+        //     Events.mouseUp(evt);
+        // };
+
+        window.onpointermove = function (evt) {
             Events.mouseMove(evt);
         };
-        window.ontouchend = function (evt) {
-            Events.mouseUp(evt);
-        };
-        window.onmousemove = function (evt) {
-            Events.mouseMove(evt);
-        };
-        window.onmouseup = function (evt) {
+        window.onpointerup = function (evt) {
             Events.mouseUp(evt);
         };
     }
@@ -220,6 +227,13 @@ export default class Events {
             e.preventDefault();
         };
         window.onmouseup = undefined;
+
+        window.onpointermove = function (e) {
+            e.preventDefault();
+        };
+        window.onpointerup = undefined;
+        window.onpointermove = undefined;
+        window.onpointerup = undefined;
     }
 
     static performMouseUpAction (e) {

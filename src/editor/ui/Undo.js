@@ -35,12 +35,21 @@ export default class Undo {
         div.setAttribute('type', 'toggleclicky');
         div.setAttribute('id', prefix + key);
         if (fcn) {
-            div.ontouchstart = function (evt) {
-                fcn(evt);
-            };
-            div.onmousedown = function (evt) {
-                fcn(evt);
-            };
+            // div.ontouchstart = function (evt) {
+            //     fcn(evt);
+            // };
+            // div.onmousedown = function (evt) {
+            //     fcn(evt);
+            // };
+            if (isTablet) {
+                div.ontouchstart = function (evt) {
+                    fcn(evt);
+                };
+            } else {
+                div.onpointerdown = function (evt) {
+                    fcn(evt);
+                };
+            }
         }
         return div;
     }

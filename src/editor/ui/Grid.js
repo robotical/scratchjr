@@ -5,7 +5,7 @@
 import ScratchJr from '../ScratchJr';
 import Events from '../../utils/Events';
 import Localization from '../../utils/Localization';
-import {gn, scaleMultiplier, newDiv, setProps, newP, newCanvas} from '../../utils/lib';
+import {gn, scaleMultiplier, newDiv, setProps, newP, newCanvas, isTablet} from '../../utils/lib';
 
 let width = 482;
 let height = 362;
@@ -69,12 +69,21 @@ export default class Grid {
             ctx.stroke();
             dy += size;
         }
-        cnv.ontouchstart = function (evt) {
-            ScratchJr.stage.mouseDown(evt);
-        };
-        cnv.onmousedown = function (evt) {
-            ScratchJr.stage.mouseDown(evt);
-        };
+        // cnv.ontouchstart = function (evt) {
+        //     ScratchJr.stage.mouseDown(evt);
+        // };
+        // cnv.onmousedown = function (evt) {
+        //     ScratchJr.stage.mouseDown(evt);
+        // };
+        if (isTablet) {
+            cnv.ontouchstart = function (evt) {
+                ScratchJr.stage.mouseDown(evt);
+            };
+        } else {
+            cnv.onpointerdown = function (evt) {
+                ScratchJr.stage.mouseDown(evt);
+            };
+        }
     }
 
     static createNumbering (w, h) {
@@ -150,12 +159,21 @@ export default class Grid {
         var cnv = newCanvas(gc, 0, 0, size + 2, size + 2, {
             position: 'absolute'
         });
-        cnv.ontouchstart = function (evt) {
-            Grid.mouseDownOnCursor(evt);
-        };
-        cnv.onmousedown = function (evt) {
-            Grid.mouseDownOnCursor(evt);
-        };
+        // cnv.ontouchstart = function (evt) {
+        //     Grid.mouseDownOnCursor(evt);
+        // };
+        // cnv.onmousedown = function (evt) {
+        //     Grid.mouseDownOnCursor(evt);
+        // };
+        if (isTablet) {
+            cnv.ontouchstart = function (evt) {
+                Grid.mouseDownOnCursor(evt);
+            };
+        } else {
+            cnv.onpointerdown = function (evt) {
+                Grid.mouseDownOnCursor(evt);
+            };
+        }
         var ctx = cnv.getContext('2d');
         ctx.globalAlpha = 0.5;
         ctx.fillStyle = '#28A5DA';
@@ -163,8 +181,13 @@ export default class Grid {
         ctx.lineWidth = 3;
         ctx.strokeRect(3, 3, size - 6, size - 6);
         ctx.fillRect(3, 3, size - 6, size - 6);
-        gc.ontouchstart = Grid.mouseDownOnCursor;
-        gc.onmousedown = Grid.mouseDownOnCursor;
+        // gc.ontouchstart = Grid.mouseDownOnCursor;
+        // gc.onmousedown = Grid.mouseDownOnCursor;
+        if (isTablet) {
+            gc.ontouchstart = Grid.mouseDownOnCursor;
+        } else {
+            gc.onpointerdown = Grid.mouseDownOnCursor;
+        }
     }
 
     static mouseDownOnCursor (e) {
