@@ -8875,7 +8875,6 @@ class Palette {
     Palette.selectCategory(index);
   }
   static selectCategory(n) {
-    console.log("selectCategory", n);
     var div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('selectors');
     // if the number is greater than the number of categories (in the left categories div), then it is in the right categories div
     const isRightCategories = n >= div.childNodes.length - 1;
@@ -13002,6 +13001,8 @@ const EMAILSHARE = 0;
 const AIRDROPSHARE = 1;
 let cogSignalAndBatteryInterval = null;
 let martySignalAndBatteryInterval = null;
+let connectionLostButton1Interval = null;
+let connectionLostButton2Interval = null;
 class UI {
   static get infoBoxOpen() {
     return infoBoxOpen;
@@ -13150,6 +13151,33 @@ class UI {
     }
     /* END MARTY */
   }
+  static showConnIssueOverlay(button) {
+    button.style.pointerEvents = 'none';
+    const overlay = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'connIssueOverlay', button);
+    overlay.textContent = 'Connection lost';
+    button.appendChild(overlay);
+
+    // in an interval countdown from 59 seconds to 0
+    let seconds = 59;
+    connectionLostButton1Interval = setInterval(() => {
+      if (seconds >= 0) {
+        overlay.textContent = `Connection lost. Reconnecting in ${seconds} seconds...`;
+        seconds--;
+      } else {
+        clearInterval(connectionLostButton1Interval);
+      }
+    }, 1000);
+  }
+  static hideConnIssueOverlay(button) {
+    button.style.pointerEvents = 'auto';
+    const overlay = button.querySelector('.connIssueOverlay');
+    if (overlay) {
+      button.removeChild(overlay);
+    }
+    if (connectionLostButton1Interval) {
+      clearInterval(connectionLostButton1Interval);
+    }
+  }
   static setupCogConnectionButton(button, raft) {
     // Add the connected class to the button
     button.classList.add('connectButtonConnected');
@@ -13186,6 +13214,14 @@ class UI {
       window.applicationManager.disconnectGeneric(raft);
     };
 
+    // Set up a subscription to the raft issue detected event
+    const connIssueSubs = (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_28__.createRaftConnectionIssueDetectedHelper)(raft);
+    connIssueSubs.subscribe(() => UI.showConnIssueOverlay(button));
+
+    // Set up a subscription to the connection issue resolved event
+    const connIssueResolvedSubs = (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_28__.createRaftConnectionIssueResolvedHelper)(raft);
+    connIssueResolvedSubs.subscribe(() => UI.hideConnIssueOverlay(button));
+
     // Set up a subscription to the raft disconnected event
     (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_28__.raftDisconnectedSubscriptionHelper)(raft).subscribe(() => {
       // When raft is disconnected, update the UI and remove the raft
@@ -13212,6 +13248,11 @@ class UI {
 
       // Unsubscribe from the disconnected event to avoid memory leaks
       (0,_utils_raft_subscription_helpers__WEBPACK_IMPORTED_MODULE_28__.raftDisconnectedSubscriptionHelper)(raft).unsubscribe();
+      UI.hideConnIssueOverlay(button);
+      // Unsubscribe from the issue detected event to avoid memory leaks
+      connIssueSubs.unsubscribe();
+      // Unsubscribe from the issue resolved event to avoid memory leaks
+      connIssueResolvedSubs.unsubscribe();
 
       // Restore the old onClick function
       button.onclick = oldOnClick;
@@ -30374,6 +30415,8 @@ Number.prototype.mod = function (n) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   createRaftConnectionIssueDetectedHelper: () => (/* binding */ createRaftConnectionIssueDetectedHelper),
+/* harmony export */   createRaftConnectionIssueResolvedHelper: () => (/* binding */ createRaftConnectionIssueResolvedHelper),
 /* harmony export */   raftDisconnectedSubscriptionHelper: () => (/* binding */ raftDisconnectedSubscriptionHelper),
 /* harmony export */   raftPubSubscriptionHelper: () => (/* binding */ raftPubSubscriptionHelper),
 /* harmony export */   raftVerifiedSubscriptionHelper: () => (/* binding */ raftVerifiedSubscriptionHelper)
@@ -30466,6 +30509,72 @@ const raftPubSubscriptionObserver_ = callback => {
             default:
               break;
           }
+          break;
+      }
+    }
+  };
+};
+const createRaftConnectionIssueDetectedHelper = raft => {
+  let observer = null;
+  return {
+    subscribe: callback => {
+      observer = raftConnectionIssueDetectedSubscriptionObserver_(callback);
+      raft.subscribe(observer, ["conn"]);
+    },
+    unsubscribe: () => {
+      if (observer) {
+        raft.unsubscribe(observer);
+      }
+    }
+  };
+};
+const raftConnectionIssueDetectedSubscriptionObserver_ = callback => {
+  return {
+    notify(eventType, eventEnum, eventName, eventData) {
+      switch (eventType) {
+        case "conn":
+          switch (eventEnum) {
+            case 5:
+              callback(eventData);
+              break;
+            default:
+              break;
+          }
+          break;
+        default:
+          break;
+      }
+    }
+  };
+};
+const createRaftConnectionIssueResolvedHelper = raft => {
+  let observer = null;
+  return {
+    subscribe: callback => {
+      observer = raftConnectionIssueResolvedSubscriptionObserver_(callback);
+      raft.subscribe(observer, ["conn"]);
+    },
+    unsubscribe: () => {
+      if (observer) {
+        raft.unsubscribe(observer);
+      }
+    }
+  };
+};
+const raftConnectionIssueResolvedSubscriptionObserver_ = callback => {
+  return {
+    notify(eventType, eventEnum, eventName, eventData) {
+      switch (eventType) {
+        case "conn":
+          switch (eventEnum) {
+            case 6:
+              callback(eventData);
+              break;
+            default:
+              break;
+          }
+          break;
+        default:
           break;
       }
     }

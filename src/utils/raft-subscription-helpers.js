@@ -111,3 +111,82 @@ const raftPubSubscriptionObserver_ = (callback) => {
         },
     };
 };
+
+export const createRaftConnectionIssueDetectedHelper = (raft) => {
+    let observer = null;
+    return {
+        subscribe: (callback) => {
+            observer = raftConnectionIssueDetectedSubscriptionObserver_(callback);
+            raft.subscribe(observer, ["conn"]);
+        },
+        unsubscribe: () => {
+            if (observer) {
+                raft.unsubscribe(observer);
+            }
+        }
+    };
+};
+
+const raftConnectionIssueDetectedSubscriptionObserver_ = (callback) => {
+    return {
+        notify(
+            eventType,
+            eventEnum,
+            eventName,
+            eventData,
+        ) {
+            switch (eventType) {
+                case "conn":
+                    switch (eventEnum) { 
+                        case 5:
+                            callback(eventData);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        },
+    };
+};
+
+export const createRaftConnectionIssueResolvedHelper = (raft) => {
+    let observer = null;
+    return {
+        subscribe: (callback) => {
+            observer = raftConnectionIssueResolvedSubscriptionObserver_(callback);
+            raft.subscribe(observer, ["conn"]);
+        },
+        unsubscribe: () => {
+            if (observer) {
+                raft.unsubscribe(observer);
+            }
+        }
+    };
+}
+const raftConnectionIssueResolvedSubscriptionObserver_ = (callback) => {
+    return {
+        notify(
+            eventType,
+            eventEnum,
+            eventName,
+            eventData,
+        ) {
+            switch (eventType) {
+                case "conn":
+                    switch (eventEnum) { 
+                        case 6:
+                            callback(eventData);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        },
+    };
+};

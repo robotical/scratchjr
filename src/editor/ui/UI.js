@@ -34,7 +34,7 @@ import { martyToggleOn } from "../../html-svgs/marty_toggle_on";
 import { spriteToggleOn } from "../../html-svgs/sprite_toggle_on";
 import { batterySvg } from '../../html-svgs/battery-svg';
 import { signalSvg } from '../../html-svgs/signal-svg';
-import { raftDisconnectedSubscriptionHelper, raftVerifiedSubscriptionHelper } from '../../utils/raft-subscription-helpers';
+import { createRaftConnectionIssueDetectedHelper, createRaftConnectionIssueResolvedHelper, raftDisconnectedSubscriptionHelper, raftVerifiedSubscriptionHelper } from '../../utils/raft-subscription-helpers';
 import TutorialFetcher from '../../tutorial/TutorialFetcher';
 import TutorialEngine from '../../tutorial/TutorialEngine';
 import { truncateString } from "../../utils/truncate-string";
@@ -51,6 +51,9 @@ const AIRDROPSHARE = 1;
 
 let cogSignalAndBatteryInterval = null;
 let martySignalAndBatteryInterval = null;
+
+let connectionLostButton1Interval = null;
+let connectionLostButton2Interval = null;
 
 export default class UI {
     static get infoBoxOpen() {
@@ -208,6 +211,35 @@ export default class UI {
         /* END MARTY */
     }
 
+    static showConnIssueOverlay(button) {
+        button.style.pointerEvents = 'none';
+        const overlay = newHTML('div', 'connIssueOverlay', button);
+        overlay.textContent = 'Connection lost';
+        button.appendChild(overlay);
+
+        // in an interval countdown from 59 seconds to 0
+        let seconds = 59;
+        connectionLostButton1Interval = setInterval(() => {
+            if (seconds >= 0) {
+                overlay.textContent = `Connection lost ${seconds}`;
+                seconds--;
+            } else {
+                clearInterval(connectionLostButton1Interval);
+
+            }
+        }, 1000);
+    }
+    static hideConnIssueOverlay(button) {
+        button.style.pointerEvents = 'auto';
+        const overlay = button.querySelector('.connIssueOverlay');
+        if (overlay) {
+            button.removeChild(overlay);
+        }
+        if (connectionLostButton1Interval) {
+            clearInterval(connectionLostButton1Interval);
+        }
+    }
+
     static setupCogConnectionButton(button, raft) {
         // Add the connected class to the button
         button.classList.add('connectButtonConnected');
@@ -245,6 +277,14 @@ export default class UI {
             window.applicationManager.disconnectGeneric(raft);
         }
 
+        // Set up a subscription to the raft issue detected event
+        const connIssueSubs = createRaftConnectionIssueDetectedHelper(raft);
+        connIssueSubs.subscribe(() => UI.showConnIssueOverlay(button));
+
+        // Set up a subscription to the connection issue resolved event
+        const connIssueResolvedSubs = createRaftConnectionIssueResolvedHelper(raft);
+        connIssueResolvedSubs.subscribe(() => UI.hideConnIssueOverlay(button));
+
         // Set up a subscription to the raft disconnected event
         raftDisconnectedSubscriptionHelper(raft).subscribe(() => {
             // When raft is disconnected, update the UI and remove the raft
@@ -272,6 +312,12 @@ export default class UI {
 
             // Unsubscribe from the disconnected event to avoid memory leaks
             raftDisconnectedSubscriptionHelper(raft).unsubscribe();
+
+            UI.hideConnIssueOverlay(button);
+            // Unsubscribe from the issue detected event to avoid memory leaks
+            connIssueSubs.unsubscribe();
+            // Unsubscribe from the issue resolved event to avoid memory leaks
+            connIssueResolvedSubs.unsubscribe();
 
             // Restore the old onClick function
             button.onclick = oldOnClick;
@@ -1397,9 +1443,9 @@ export default class UI {
             // colour.onmousedown = UI.setTextColor;
             if (isTablet) {
                 colour.ontouchstart = UI.setTextColor;
-              } else {
+            } else {
                 colour.onpointerdown = UI.setTextColor;
-              }
+            }
 
         }
         UI.setMenuTextColor(gn('textcolormenu').childNodes[9]);
@@ -1418,9 +1464,9 @@ export default class UI {
             // textuisize.onmousedown = UI.setTextSize;
             if (isTablet) {
                 textuisize.ontouchstart = UI.setTextSize;
-              } else {
+            } else {
                 textuisize.onpointerdown = UI.setTextSize;
-              }
+            }
         }
         UI.setMenuTextSize(gn('textfontsizes').childNodes[5]);
     }
