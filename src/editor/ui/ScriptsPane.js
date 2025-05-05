@@ -312,20 +312,11 @@ export default class ScriptsPane {
     }
 
     static setDragBackgroundEvents(fcnmove, fcnup) {
-        if (isTablet) { // setDragBackgroundEvents
-            window.ontouchmove = function (evt) {
-                fcnmove(evt);
-            };
-            window.ontouchend = function (evt) {
-                fcnup(evt);
-            };
-        } else {
-            window.onmousemove = function (evt) {
-                fcnmove(evt);
-            };
-            window.onmouseup = function (evt) {
-                fcnup(evt);
-            };
+        window.onpointermove = function (evt) {
+            fcnmove(evt);
+        }
+        window.onpointerup = function (evt) {
+            fcnup(evt);
         }
     }
 

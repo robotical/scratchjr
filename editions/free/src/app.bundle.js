@@ -11141,22 +11141,12 @@ class ScriptsPane {
     ScriptsPane.setDragBackgroundEvents(ScriptsPane.dragMove, ScriptsPane.dragEnd);
   }
   static setDragBackgroundEvents(fcnmove, fcnup) {
-    if (_utils_lib__WEBPACK_IMPORTED_MODULE_10__.isTablet) {
-      // setDragBackgroundEvents
-      window.ontouchmove = function (evt) {
-        fcnmove(evt);
-      };
-      window.ontouchend = function (evt) {
-        fcnup(evt);
-      };
-    } else {
-      window.onmousemove = function (evt) {
-        fcnmove(evt);
-      };
-      window.onmouseup = function (evt) {
-        fcnup(evt);
-      };
-    }
+    window.onpointermove = function (evt) {
+      fcnmove(evt);
+    };
+    window.onpointerup = function (evt) {
+      fcnup(evt);
+    };
   }
   static dragMove(e) {
     var pt = _utils_Events__WEBPACK_IMPORTED_MODULE_5__["default"].getTargetPoint(e);
