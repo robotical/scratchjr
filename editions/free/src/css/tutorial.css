@@ -110,11 +110,15 @@
     cursor: grabbing;
 }
 
-.tutorialInstructor img {
+.tutorialInstructorImage {
     height: 100%;
     width: ${css_vh(20 * .79)};
     height: ${css_vh(20)};
     transform: scaleX(-1);
+}
+
+.tutorialImage {
+    max-width: 100%;
 }
 
 .speechBubble {
