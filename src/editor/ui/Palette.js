@@ -480,7 +480,7 @@ export default class Palette {
         if (!isRightCategories && ScratchJr.isMartyModeEnabled) {
             categoriesLength = BlockSpecs.categoriesMarty.length;
         }
-        if ((n == (categoriesLength - 1)) && (ScratchJr.stage.pages.length > 1)) {
+        if (!isRightCategories && (n == (categoriesLength - 1)) && (ScratchJr.stage.pages.length > 1)) {
             Palette.addPagesBlocks(dx);
         }
         // TODO: they hard coded n==3 to be sound, but we don't want the sound blocks for alpha release

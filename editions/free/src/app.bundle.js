@@ -8875,6 +8875,7 @@ class Palette {
     Palette.selectCategory(index);
   }
   static selectCategory(n) {
+    console.log("selectCategory", n);
     var div = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('selectors');
     // if the number is greater than the number of categories (in the left categories div), then it is in the right categories div
     const isRightCategories = n >= div.childNodes.length - 1;
@@ -8940,7 +8941,7 @@ class Palette {
     if (!isRightCategories && _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isMartyModeEnabled) {
       categoriesLength = _blocks_BlockSpecs__WEBPACK_IMPORTED_MODULE_2__["default"].categoriesMarty.length;
     }
-    if (n == categoriesLength - 1 && _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.pages.length > 1) {
+    if (!isRightCategories && n == categoriesLength - 1 && _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].stage.pages.length > 1) {
       Palette.addPagesBlocks(dx);
     }
     // TODO: they hard coded n==3 to be sound, but we don't want the sound blocks for alpha release
