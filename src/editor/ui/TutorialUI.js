@@ -152,7 +152,7 @@ export default class TutorialUI {
     /* Instructor */
     static createInstructor() {
         /* Instructor is a sprite that will guide the user through the tutorial */
-        TutorialUI.instructor = newHTML('div', 'tutorialInstructor', TutorialUI.frame);
+        TutorialUI.instructor = newHTML('div', 'tutorialInstructor', document.body);
         TutorialUI.instructor.setAttribute('id', 'tutorialInstructor');
 
         // create img element for the instructor

@@ -5001,9 +5001,9 @@ class Prims {
   static OnCogEvent(event) {
     // We need to be able to move on with the event even if there is another script running
     // if executing a script, then don't do anything
-    // if (this.isScriptRunning()) {
-    //     return;
-    // }
+    if (this.isScriptRunning()) {
+      return;
+    }
 
     // only proceed if at least x ms have passed since last event of the same type
     const now = Date.now();
@@ -12594,7 +12594,7 @@ class TutorialUI {
   /* Instructor */
   static createInstructor() {
     /* Instructor is a sprite that will guide the user through the tutorial */
-    TutorialUI.instructor = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.newHTML)('div', 'tutorialInstructor', TutorialUI.frame);
+    TutorialUI.instructor = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.newHTML)('div', 'tutorialInstructor', document.body);
     TutorialUI.instructor.setAttribute('id', 'tutorialInstructor');
 
     // create img element for the instructor
