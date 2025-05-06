@@ -68,6 +68,12 @@ export default class TutorialEngine {
                 case "ShowInstructorText":
                     TutorialUI.showSpeechBubbleWithText(action.text);
                     break;
+                case "ShowInstructorImage":
+                    TutorialUI.showSpeechBubbleWithImage(action.url, action.text);
+                    break;
+                case "ShowInstructorVideo":
+                    TutorialUI.showSpeechBubbleWithVideo(action.url);
+                    break;
                 case "ShowCategory":
                     TutorialUI.selectCategory(action.category);
                     break;

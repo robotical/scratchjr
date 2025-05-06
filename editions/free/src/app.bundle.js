@@ -11141,21 +11141,6 @@ class ScriptsPane {
     ScriptsPane.setDragBackgroundEvents(ScriptsPane.dragMove, ScriptsPane.dragEnd);
   }
   static setDragBackgroundEvents(fcnmove, fcnup) {
-    // if (isTablet) { // setDragBackgroundEvents
-    //     window.ontouchmove = function (evt) {
-    //         fcnmove(evt);
-    //     };
-    //     window.ontouchend = function (evt) {
-    //         fcnup(evt);
-    //     };
-    // } else {
-    //     window.onmousemove = function (evt) {
-    //         fcnmove(evt);
-    //     };
-    //     window.onmouseup = function (evt) {
-    //         fcnup(evt);
-    //     };
-    // }
     window.onpointermove = function (evt) {
       fcnmove(evt);
     };
@@ -12614,7 +12599,7 @@ class TutorialUI {
 
     // create img element for the instructor
     TutorialUI.instructor.innerHTML = `
-            <img src="./assets/ui/Marty_Instructor.svg" alt="instructor" />
+            <img src="./assets/ui/Marty_Instructor.svg" alt="instructor" class="tutorialInstructorImage" />
             <div class="speechBubble">
             <div id="speechBubbleText"></div>
             <div id="speechBubbleImage"></div>
@@ -12691,11 +12676,11 @@ class TutorialUI {
     speechBubbleText.textContent = text;
     TutorialUI.momentarilyHighlightSpeechBubble(speechBubble);
   }
-  static showSpeechBubbleWithImage(imageURL) {
+  static showSpeechBubbleWithImage(imageURL, text = "") {
     const speechBubble = TutorialUI.instructor.querySelector('.speechBubble');
     speechBubble.style.display = 'block';
     const speechBubbleImage = TutorialUI.instructor.querySelector('#speechBubbleImage');
-    speechBubbleImage.innerHTML = `<img src="${imageURL}" alt="speech bubble image" style="max-width: 100%; max-height: 200px;" />`;
+    speechBubbleImage.innerHTML = `<img src="${imageURL}" alt="${text}" class="tutorialImage" /><br />${text}`;
     speechBubbleImage.querySelector('img').addEventListener('click', e => {
       TutorialUI.showModal(`<img class="modalImage" src="${imageURL}" alt="expanded image" />`);
     });
@@ -27145,6 +27130,12 @@ class TutorialEngine {
         case "ShowInstructorText":
           _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].showSpeechBubbleWithText(action.text);
           break;
+        case "ShowInstructorImage":
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].showSpeechBubbleWithImage(action.url, action.text);
+          break;
+        case "ShowInstructorVideo":
+          _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].showSpeechBubbleWithVideo(action.url);
+          break;
         case "ShowCategory":
           _editor_ui_TutorialUI__WEBPACK_IMPORTED_MODULE_1__["default"].selectCategory(action.category);
           break;
@@ -27216,8 +27207,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ TutorialFetcher)
 /* harmony export */ });
 /* harmony import */ var _tutorials_data_cog_and_marty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tutorials-data/cog-and-marty */ "./src/tutorial/tutorials-data/cog-and-marty.js");
+/* harmony import */ var _tutorials_data_cog_jrblocks_1__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./tutorials-data/cog-jrblocks-1 */ "./src/tutorial/tutorials-data/cog-jrblocks-1.js");
+/* harmony import */ var _tutorials_data_cog_jrblocks_2__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tutorials-data/cog-jrblocks-2 */ "./src/tutorial/tutorials-data/cog-jrblocks-2.js");
+/* harmony import */ var _tutorials_data_cog_jrblocks_3__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tutorials-data/cog-jrblocks-3 */ "./src/tutorial/tutorials-data/cog-jrblocks-3.js");
+/* harmony import */ var _tutorials_data_cog_jrblocks_4__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tutorials-data/cog-jrblocks-4 */ "./src/tutorial/tutorials-data/cog-jrblocks-4.js");
 
-const allTutorials = [_tutorials_data_cog_and_marty__WEBPACK_IMPORTED_MODULE_0__["default"]];
+
+
+
+
+const allTutorials = [_tutorials_data_cog_and_marty__WEBPACK_IMPORTED_MODULE_0__["default"], _tutorials_data_cog_jrblocks_1__WEBPACK_IMPORTED_MODULE_1__["default"], _tutorials_data_cog_jrblocks_2__WEBPACK_IMPORTED_MODULE_2__["default"], _tutorials_data_cog_jrblocks_3__WEBPACK_IMPORTED_MODULE_3__["default"], _tutorials_data_cog_jrblocks_4__WEBPACK_IMPORTED_MODULE_4__["default"]];
 class TutorialFetcher {
   static fetchTutorial(tutorialId) {
     return allTutorials.find(tutorial => tutorial.id === tutorialId);
@@ -27573,6 +27572,2141 @@ const cogAndMartyTutorial = {
   }]
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (cogAndMartyTutorial);
+
+/***/ }),
+
+/***/ "./src/tutorial/tutorials-data/cog-jrblocks-1.js":
+/*!*******************************************************!*\
+  !*** ./src/tutorial/tutorials-data/cog-jrblocks-1.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const cogJrBlocksTutorial1 = {
+  id: "cog-jrblocks-1",
+  platform: "blocksjr",
+  // should this be jrblocks?
+  title: "Make a tune",
+  description: "We'll use sequencing to program cog to play a tune when the button is pressed",
+  tutorialSteps: [/* STEP 1 -- intro*/
+  {
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "nextStep",
+      hexColor: "#FF0000"
+    }],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Let's make cog play a tune!"
+    }],
+    buttons: ["next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // Can we add automatic guidance to connect to cog, that only appears if they're not already connected?
+
+  // step 2 - select the events category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/2-events.png",
+      text: "Select the Cog Events category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-start",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 3 - pick the on touch event
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/3-buttonPress.png",
+      text: "Add the on button press block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouchcog_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouchcog_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "ontouchcog_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog"],
+    presenter: "marty"
+  },
+  // step 4 - go to the sounds category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/4-sounds.png",
+      text: "Select the cog sound blocks"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-sound",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog_block"],
+    presenter: "marty"
+  },
+  // step 5 - play an existing tune
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/5-playTune.png",
+      text: "Play an existing tune"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["whistle_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["whistle_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "whistle_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>whistle"],
+    presenter: "marty"
+  },
+  // step 6 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/6-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>whistle"],
+    presenter: "marty"
+  },
+  // step 7 - remove the tune block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/7-removeTune.png",
+      text: "Remove the tune"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog"],
+    presenter: "marty"
+  },
+  // step 8 - try a different tune
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/8-playTune.png",
+      text: "Try a different tune"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["confusion_block", "disbelief_block", "excitement_block", "noway_block", "no_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["confusion_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "confusion_block"
+    }],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>confusion", "ontouchcog=>disbelief"],
+    presenter: "marty"
+  },
+  // step 9 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/6-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>confusion"],
+    presenter: "marty"
+  },
+  // step 10 - Remove the tune block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/7-removeTune.png",
+      text: "Remove the tune"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog"],
+    presenter: "marty"
+  },
+  // step 11 - add a musical note
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/11-noteBlock.png",
+      text: "Add a musical note"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote"],
+    presenter: "marty"
+  },
+  // step 12 - select which note
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/12-selectNote-E.png",
+      text: "Change the note to an E"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote"],
+    presenter: "marty"
+  },
+  // step 13 - try it out!
+
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/6-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote"],
+    presenter: "marty"
+  },
+  // step 14 - add a second note and make it an E
+  // should we split this into two steps?
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/14-secondNote.png",
+      text: "Add the second note and make it an E"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote"],
+    presenter: "marty"
+  },
+  // step 15 - add the first bar
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/15-firstBar.png",
+      text: "Add the next two notes"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote"],
+    presenter: "marty"
+  },
+  // step 16 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/6-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote"],
+    presenter: "marty"
+  },
+  // step 17 - add the second bar
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/17-secondBar.png",
+      text: "Add the next four notes"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
+    presenter: "marty"
+  },
+  // step 18 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/6-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
+    presenter: "marty"
+  },
+  // step 19 - add the third bar
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/19-thirdBar.png",
+      text: "Add the next four notes"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
+    presenter: "marty"
+  },
+  // step 20 - add the fourth bar
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/20-fourthBar.png",
+      text: "Add the next four notes"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block", "waitcrotchet_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
+    presenter: "marty"
+  },
+  // step 21 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/6-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
+    presenter: "marty"
+  },
+  // step 22 - well done!
+  {
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "nextStep",
+      hexColor: "#FF0000"
+    }],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "<b>Well done!</b><br />Now let's make it faster"
+    }],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 23 - add a tempo block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/23-metronome.png",
+      text: "Add a <b>set tempo</b> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["settempo_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["settempo_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "settempo_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>settempo=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
+    presenter: "marty"
+  },
+  // step 24 - set the tempo
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/24-tempo.png",
+      text: "Set the tempo to 180 bpm"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>settempo=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
+    presenter: "marty"
+  },
+  // step 25 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/1/6-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>settempo=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
+    presenter: "marty"
+  },
+  // step 26 - next steps
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Nice work!<br />Now see if you can make a tune of your own"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  }]
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (cogJrBlocksTutorial1);
+
+/***/ }),
+
+/***/ "./src/tutorial/tutorials-data/cog-jrblocks-2.js":
+/*!*******************************************************!*\
+  !*** ./src/tutorial/tutorials-data/cog-jrblocks-2.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const cogJrBlocksTutorial2 = {
+  id: "cog-jrblocks-2",
+  platform: "blocksjr",
+  title: "Make a light show",
+  description: "We'll use loops to make cog light up in fun patterns",
+  tutorialSteps: [/* STEP 1 -- intro*/
+  {
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "nextStep",
+      hexColor: "#FF0000"
+    }],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Let's make a light show!"
+    }],
+    buttons: ["next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // Can we add automatic guidance to connect to cog, that only appears if they're not already connected?
+
+  // step 2 - select the events category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/2-events.png",
+      text: "Select the Cog Events category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-start",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 3 - pick the on touch event
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/3-buttonPress.png",
+      text: "Add the on button press block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouchcog_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouchcog_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "ontouchcog_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog"],
+    presenter: "marty"
+  },
+  // step 4 - go to the lights category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/4-lights.png",
+      text: "Select the cog light blocks"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-looks",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog"],
+    presenter: "marty"
+  },
+  // step 5 - set the LED color
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/5-setColor.png",
+      text: "Add a set color block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "selectcolour_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 6 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 7 - Change the LED color
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/7-chooseColor.png",
+      text: "Change the color"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 8 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 9 - add another color
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/9-secondColor.png",
+      text: "Add a second color"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "selectcolour_block"
+    }],
+    buttons: ["hint", "previous", "next"],
+    expectedCode: ["ontouchcog=>selectcolour=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 10 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/pushCogButton.jpg",
+      text: "Push the button! Does it do what you want?"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>selectcolour=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 11 - Select the control category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/11-control.png",
+      text: "Select the control category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "sprite-flow",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>selectcolour=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 12 - add a pause
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/12-addPause.png",
+      text: "Add a wait block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["wait_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["wait_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "wait_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>selectcolour=>wait=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 13 - Change the length of the pause
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/13-setPauseTime.png",
+      text: "Set the wait to 1 second"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>selectcolour=>wait=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 14 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>selectcolour=>wait=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 15 - add a second pause
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/15-secondPause.png",
+      text: "Add a second wait block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["wait_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["wait_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "wait_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>selectcolour=>wait=>selectcolour=>wait"],
+    presenter: "marty"
+  },
+  // step 16 - set the second pause to 1s
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/16-setPauseTime.png",
+      text: "Set the wait to 1 second"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>selectcolour=>wait=>selectcolour=>wait"],
+    presenter: "marty"
+  },
+  // step 17 - add a loop
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/17-loop.png",
+      text: "Add a loop with a repeat block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["repeat_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["repeat_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "repeat_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>repeat=>selectcolour=>wait=>selectcolour=>wait"],
+    presenter: "marty"
+  },
+  // step 18 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>repeat=>selectcolour=>wait=>selectcolour=>wait"],
+    presenter: "marty"
+  },
+  // step 19 - change the number of repeats
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/19-setLoopRepeats.png",
+      text: "Change the number of repeats"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>selectcolour=>wait=>selectcolour=>wait"],
+    presenter: "marty"
+  },
+  // step 20 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>selectcolour=>wait=>selectcolour=>wait"],
+    presenter: "marty"
+  },
+  // step 21 - Select the lights category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/4-lights.png",
+      text: "Select the cog light blocks"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-looks",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>repeat=>selectcolour=>wait=>selectcolour=>wait"],
+    presenter: "marty"
+  },
+  // step 22 - add a light pattern block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/22-addPattern.png",
+      text: "Add a light pattern"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["setpattern_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["setpattern_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "setpattern_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>repeat=>selectcolour=>wait=>selectcolour=>wait=>setpattern"],
+    presenter: "marty"
+  },
+  // step 23 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>repeat=>selectcolour=>wait=>selectcolour=>wait=>setpattern"],
+    presenter: "marty"
+  },
+  // step 24 - change the pattern
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/24-changePattern.png",
+      text: "Change the pattern to spin"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>repeat=>selectcolour=>wait=>selectcolour=>wait=>setpattern"],
+    presenter: "marty"
+  },
+  // step 25 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>repeat=>selectcolour=>wait=>selectcolour=>wait=>setpattern"],
+    presenter: "marty"
+  },
+  // step 26 - change the pattern
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/26-changePattern.png",
+      text: "Change the pattern to flash"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>repeat=>selectcolour=>wait=>selectcolour=>wait=>setpattern"],
+    presenter: "marty"
+  },
+  // step 27 - add a delay and change the time
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/27-addDelay.png",
+      text: "Add a second wait block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["wait_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["wait_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "wait_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>repeat=>selectcolour=>wait=>selectcolour=>wait=>setpattern=>wait"],
+    presenter: "marty"
+  },
+  // step 28 - turn the lights off
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/28-lightsOff.png",
+      text: "Add a lights off block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["clearcolours_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["clearcolours_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "clearcolours_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>repeat=>selectcolour=>wait=>selectcolour=>wait=>setpattern=>clearcolours"],
+    presenter: "marty"
+  },
+  // step 29 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/2/pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>repeat=>selectcolour=>wait=>selectcolour=>wait=>setpattern=>clearcolours"],
+    presenter: "marty"
+  },
+  // step 30 - next steps
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Nice work! Now make your own colors and patterns!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  }]
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (cogJrBlocksTutorial2);
+
+/***/ }),
+
+/***/ "./src/tutorial/tutorials-data/cog-jrblocks-3.js":
+/*!*******************************************************!*\
+  !*** ./src/tutorial/tutorials-data/cog-jrblocks-3.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const cogJrBlocksTutorial3 = {
+  id: "cog-jrblocks-3",
+  platform: "blocksjr",
+  // should this be jrblocks?
+  title: "Make a sound and light show",
+  description: "Combining what they've learned in the last two activities, students can construct a combined sound and light show on their cog! They can connect the sound sequence and the light sequence up to the same starting event, to see that they can make two sequences run simultaneously",
+  tutorialSteps: [/* STEP 1 -- intro*/
+  {
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "nextStep",
+      hexColor: "#FF0000"
+    }],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Let's make a sound and light show!"
+    }],
+    buttons: ["next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // this will be tutorial 3, so we assume that we're already connected to cog? We should probably make tutorial 1 as well to cover this
+  // or can we make smart guidance that will guide the student to connect to cog when they try to run code without one connected?
+
+  // step 2 - pick an event to start things
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Select the cog event blocks"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-start",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  }, {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Add the on button press block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouchcog_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouchcog_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "ontouchcog_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog"],
+    presenter: "marty"
+  },
+  // step 3 - add a musical note
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Select the cog sound blocks"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-sound",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog_block"],
+    presenter: "marty"
+  }, {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Add a musical note"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote"],
+    presenter: "marty"
+  },
+  // step 4 - change the note to an E
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/4-selectNote.png",
+      text: "Change the note to an E"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote"],
+    presenter: "marty"
+  },
+  // step 5 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/5-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote"],
+    presenter: "marty"
+  },
+  // step 6 - Add another button push event
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/6-twoButtonPushEvents.png",
+      text: "Add another button push event"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouchcog_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouchcog_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "ontouchcog_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote", "ontouchcog"],
+    presenter: "marty"
+  },
+  // step 7 - add a light command
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Select the cog light blocks"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-looks",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote", "ontouchcog"],
+    presenter: "marty"
+  }, {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/7-ledCommand.png",
+      text: "Add a set color block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "selectcolour_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote", "ontouchcog=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 8 - change the color of the LED command
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/8-selectColor.png",
+      text: "Change the color"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote", "ontouchcog=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 9 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/5-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote", "ontouchcog=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 10 - Add the first bar of music - EDCD
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/10-firstBar.png",
+      text: "Add more notes - EDCD"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote", "ontouchcog=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 11 - add a pause after the LED command
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/11-rest.png",
+      text: "Add a pause after the LED command"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["waitcrotchet_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["waitcrotchet_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "waitcrotchet_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote", "ontouchcog=>selectcolour=>rest"],
+    presenter: "marty"
+  },
+  // step 12 - change the rest to be for 4 beats
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/12-setRestLength.png",
+      text: "Set the color for 4 beats"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote", "ontouchcog=>selectcolour=>rest"],
+    presenter: "marty"
+  },
+  // step 13 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/5-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote", "ontouchcog=>selectcolour=>rest"],
+    presenter: "marty"
+  },
+  // step 14 - add the second bar of music
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/14-secondBar.png",
+      text: "Add more notes - EEE_"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block", "waitcrotchet_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest"],
+    presenter: "marty"
+  },
+  // step 15 - add a color for the second bar of music
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/15-secondBarLEDs.png",
+      text: "Add a color for the second bar"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "selectcolour_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest"],
+    presenter: "marty"
+  },
+  // step 16 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/5-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest"],
+    presenter: "marty"
+  },
+  // step 17 - add the third bar of music and a color
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/17-thirdBar.png",
+      text: "Add more notes - DDD_"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block", "waitcrotchet_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest=>playnote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest"]
+  },
+  // step 18 - add the fourth bar of music and a color
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/18-fourthBar.png",
+      text: "Add more notes - DDD_"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block", "waitcrotchet_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest=>playnote=>playnote=>playnote=>restplaynote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest"]
+  },
+  // step 19 - add a pattern block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/19-ledPattern.png",
+      text: "Lets add a pattern"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["setpattern_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["setpattern_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "setpattern_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest=>playnote=>playnote=>playnote=>restplaynote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>setpattern=>rest"],
+    presenter: "marty"
+  },
+  // step 20 - change it to be flashing
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/20-flashPattern.png",
+      text: "Set it to a flashing pattern"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest=>playnote=>playnote=>playnote=>restplaynote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>setpattern=>rest"],
+    presenter: "marty"
+  },
+  // step 21 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/5-pushCogButton.jpg",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest=>playnote=>playnote=>playnote=>restplaynote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>setpattern=>rest"],
+    presenter: "marty"
+  },
+  // step 22 - finish the song
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/22-wholeSong.png",
+      text: "Push the button!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 23 - next steps!
+  {
+    nextStepActions: [],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Well done! Next Steps :- Try changing the colors and patterns. Try making another song. See if you can make the colors change with every note. See if you can use loops to reduce the length of your code. Group activity :- Demonstrate your sound and light show to the class"
+    }],
+    buttons: ["previous"],
+    expectedCode: [],
+    presenter: "marty"
+  }]
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (cogJrBlocksTutorial3);
+
+/***/ }),
+
+/***/ "./src/tutorial/tutorials-data/cog-jrblocks-4.js":
+/*!*******************************************************!*\
+  !*** ./src/tutorial/tutorials-data/cog-jrblocks-4.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const cogJrBlocksTutorial4 = {
+  id: "cog-jrblocks-4",
+  platform: "blocksjr",
+  title: "Make an etch-a-sketch",
+  description: "We'll introduce the tilt sensing on cog, and show how to interact with sprites in Jr Blocks",
+  tutorialSteps: [/* STEP 1 -- intro*/
+  {
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "nextStep",
+      hexColor: "#FF0000"
+    }],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Let's make an etch-a-sketch!"
+    }],
+    buttons: ["next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 2 - select the events category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/2-events.png",
+      text: "Select the Cog Events category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-start",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 3 - add a tilt block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/3-tiltBlock.png",
+      text: "Add the on tilt block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["tiltany_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["tiltany_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "tiltany_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["tiltany"],
+    presenter: "marty"
+  },
+  // step 4 - select the sprite motion category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/4-motion.png",
+      text: "Select the sprite motion category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "sprite-motion",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany"],
+    presenter: "marty"
+  },
+  // step 5 - add a move right block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/5-moveRight.png",
+      text: "Add a move forward block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["forward_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["forward_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "forward_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward"],
+    presenter: "marty"
+  },
+  // step 6 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/cogTiltRight.gif",
+      text: "Tilt Cog Right"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>forward"],
+    presenter: "marty"
+  },
+  // step 7 - Add another on-tilt block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/7-secondTilt.png",
+      text: "Add a second on tilt block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["tiltany_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["tiltany_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "tiltany_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany"],
+    presenter: "marty"
+  },
+  // step 8 - Change the tilt direction to left
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/8-tiltLeft.png",
+      text: "Change the tilt direction to left"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>right", "tiltany"],
+    presenter: "marty"
+  },
+  // step 9 - add a move left block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/9-moveLeft.png",
+      text: "Add a move backward block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["back_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["back_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "back_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back"],
+    presenter: "marty"
+  },
+  // step 10 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/cogTiltLeft.gif",
+      text: "Tilt Cog left"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back"],
+    presenter: "marty"
+  },
+  // step 11 - Add a third tilt block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/11-thirdTilt.png",
+      text: "Add a third on tilt block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["tiltany_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["tiltany_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "tiltany_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany"],
+    presenter: "marty"
+  },
+  // step 12 - change the tilt direction to down
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/12-tiltDown.png",
+      text: "Change the tilt direction to down"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany"],
+    presenter: "marty"
+  },
+  // step 13 - Add a move down block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/13-moveDown.png",
+      text: "Add a move down block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["down_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["down_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "down_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down"],
+    presenter: "marty"
+  },
+  // step 14 - add a fourth tilt block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/14-fourthTilt.png",
+      text: "Add a fourth on tilt block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["tiltany_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["tiltany_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "tiltany_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany"],
+    presenter: "marty"
+  },
+  // step 15 - change the tilt direction to up
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/15-tiltUp.png",
+      text: "Change the tilt direction to up"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany"],
+    presenter: "marty"
+  },
+  // step 16 - Add a move up block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/16-moveUp.png",
+      text: "Add a move up block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["up_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["up_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "up_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
+    presenter: "marty"
+  },
+  // step 17 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/cogTiltFwdBwd.gif",
+      text: "Tilt Cog forward and backward"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
+    presenter: "marty"
+  },
+  // step 18 - Turn on the sprite trail
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/18-spriteTrail.png",
+      text: "Turn on the sprite trail"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
+    presenter: "marty"
+  },
+  // step 19 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/cogTiltFwdBwd.gif",
+      text: "Try it out!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
+    presenter: "marty"
+  },
+  // step 20 - Clear the trail
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/20-clearTrail.png",
+      text: "Push the button to clear the trail"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
+    presenter: "marty"
+  },
+  // step 21 - select the control category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/21-control.png",
+      text: "Select the control category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "sprite-flow",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany"],
+    presenter: "marty"
+  },
+  // step 22 - add a set speed block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/22-setSpeed.png",
+      text: "Add a set speed block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["setspeed_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["setspeed_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "setspeed_block"
+    }],
+    buttons: ["previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "setspeed"],
+    presenter: "marty"
+  },
+  // step 23 - set the speed to slow
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/23-selectSpeed.png",
+      text: "Change the speed to slow"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "setspeed"],
+    presenter: "marty"
+  },
+  // step 24 - click the set speed block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/24-clickSetSpeed.png",
+      text: "Run the set speed block"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "setspeed"],
+    presenter: "marty"
+  },
+  // step 25 - draw something!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/25-drawSomething.png",
+      text: "Draw something!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "setspeed"],
+    presenter: "marty"
+  },
+  // step 26 - next steps!
+  {
+    nextStepActions: [],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Well done! Now see what else you can draw!"
+    }],
+    buttons: ["previous"],
+    expectedCode: [],
+    presenter: "marty"
+  }]
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (cogJrBlocksTutorial4);
 
 /***/ }),
 

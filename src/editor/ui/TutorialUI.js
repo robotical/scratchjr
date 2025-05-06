@@ -157,7 +157,7 @@ export default class TutorialUI {
 
         // create img element for the instructor
         TutorialUI.instructor.innerHTML = `
-            <img src="./assets/ui/Marty_Instructor.svg" alt="instructor" />
+            <img src="./assets/ui/Marty_Instructor.svg" alt="instructor" class="tutorialInstructorImage" />
             <div class="speechBubble">
             <div id="speechBubbleText"></div>
             <div id="speechBubbleImage"></div>
@@ -243,11 +243,11 @@ export default class TutorialUI {
         TutorialUI.momentarilyHighlightSpeechBubble(speechBubble);
     }
 
-    static showSpeechBubbleWithImage(imageURL) {
+    static showSpeechBubbleWithImage(imageURL, text="") {
         const speechBubble = TutorialUI.instructor.querySelector('.speechBubble');
         speechBubble.style.display = 'block';
         const speechBubbleImage = TutorialUI.instructor.querySelector('#speechBubbleImage');
-        speechBubbleImage.innerHTML = `<img src="${imageURL}" alt="speech bubble image" style="max-width: 100%; max-height: 200px;" />`;
+        speechBubbleImage.innerHTML = `<img src="${imageURL}" alt="${text}" class="tutorialImage" /><br />${text}`;
         speechBubbleImage.querySelector('img').addEventListener('click', (e) => {
             TutorialUI.showModal(`<img class="modalImage" src="${imageURL}" alt="expanded image" />`);
         });
