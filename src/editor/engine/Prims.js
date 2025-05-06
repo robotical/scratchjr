@@ -1537,6 +1537,12 @@ export default class Prims {
         var newthreads = [];
         for (var i in receivers) {
             pair = receivers[i];
+            // console.log("found receiver", pair[0], pair[1]);
+            const isScriptRunningForThatBlock = ScratchJr.runtime.isScriptRunningForThatBlock(pair[1]);
+            if (isScriptRunningForThatBlock) {
+                // don't start a new thread if the script this block belongs to is already running
+                continue;
+            }
             newthreads.push(ScratchJr.runtime.restartThread(pair[0], pair[1], true));
         }
     }

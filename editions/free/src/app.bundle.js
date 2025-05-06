@@ -5001,9 +5001,9 @@ class Prims {
   static OnCogEvent(event) {
     // We need to be able to move on with the event even if there is another script running
     // if executing a script, then don't do anything
-    if (this.isScriptRunning()) {
-      return;
-    }
+    // if (this.isScriptRunning()) {
+    //     return;
+    // }
 
     // only proceed if at least x ms have passed since last event of the same type
     const now = Date.now();
@@ -5081,6 +5081,12 @@ class Prims {
     var newthreads = [];
     for (var i in receivers) {
       pair = receivers[i];
+      // console.log("found receiver", pair[0], pair[1]);
+      const isScriptRunningForThatBlock = _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].runtime.isScriptRunningForThatBlock(pair[1]);
+      if (isScriptRunningForThatBlock) {
+        // don't start a new thread if the script this block belongs to is already running
+        continue;
+      }
       newthreads.push(_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].runtime.restartThread(pair[0], pair[1], true));
     }
   }
@@ -5348,6 +5354,21 @@ class Runtime {
       this.threadsRunning.push(newThread);
     }
     return newThread;
+  }
+
+  // 1) Walk up the chain of “previous” blocks to the very first block
+  getScriptStart(block) {
+    let b = block;
+    while (b.previousBlock) {
+      b = b.previousBlock;
+    }
+    return b;
+  }
+
+  // 2) Given *any* block in a script, tell me if its thread is alive
+  isScriptRunningForThatBlock(block) {
+    const head = this.getScriptStart(block);
+    return this.threadsRunning.some(t => t.firstBlock === head && t.isRunning);
   }
 }
 

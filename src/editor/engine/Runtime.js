@@ -4,14 +4,14 @@ import Prims from './Prims';
 import Thread from './Thread';
 
 export default class Runtime {
-    constructor () {
+    constructor() {
         this.threadsRunning = [];
         this.thread = undefined;
         this.intervalId = undefined;
         this.yield = false;
     }
 
-    beginTimer () {
+    beginTimer() {
         if (this.intervalId != null) {
             window.clearInterval(this.intervalId);
         }
@@ -24,7 +24,7 @@ export default class Runtime {
         this.threadsRunning = [];
     }
 
-    tickTask () {
+    tickTask() {
         ScratchJr.updateRunStopButtons();
         if (this.threadsRunning.length < 1) {
             return;
@@ -41,7 +41,7 @@ export default class Runtime {
         }
     }
 
-    inactive () {
+    inactive() {
         if (this.threadsRunning.length < 1) {
             return true;
         }
@@ -62,7 +62,7 @@ export default class Runtime {
         return inactive;
     }
 
-    step (n) {
+    step(n) {
         this.yield = false;
         this.thread = this.threadsRunning[n];
         while (true) { // eslint-disable-line no-constant-condition
@@ -86,18 +86,18 @@ export default class Runtime {
         }
     }
 
-    addRunScript (spr, b) {
+    addRunScript(spr, b) {
         this.restartThread(spr, b);
     }
 
-    stopThreads () {
+    stopThreads() {
         for (var i in this.threadsRunning) {
             this.threadsRunning[i].stop();
         }
         this.threadsRunning = [];
     }
 
-    stopThreadBlock (b) {
+    stopThreadBlock(b) {
         for (var i in this.threadsRunning) {
             if (this.threadsRunning[i].firstBlock == b) {
                 this.threadsRunning[i].stop();
@@ -105,7 +105,7 @@ export default class Runtime {
         }
     }
 
-    stopThreadSprite (spr) {
+    stopThreadSprite(spr) {
         for (var i in this.threadsRunning) {
             if (this.threadsRunning[i].spr == spr) {
                 this.threadsRunning[i].stop();
@@ -113,7 +113,7 @@ export default class Runtime {
         }
     }
 
-    removeRunScript (spr) {
+    removeRunScript(spr) {
         var res = [];
         for (var i in this.threadsRunning) {
             if (this.threadsRunning[i].spr == spr) {
@@ -132,7 +132,7 @@ export default class Runtime {
         return res;
     }
 
-    runPrim () {
+    runPrim() {
         if (this.thread.oldblock != null) {
             this.thread.oldblock.unhighlight();
         }
@@ -151,7 +151,7 @@ export default class Runtime {
         }
     }
 
-    endCase () {
+    endCase() {
         if (this.thread.oldblock != null) {
             this.thread.oldblock.unhighlight();
         }
@@ -164,7 +164,7 @@ export default class Runtime {
         }
     }
 
-    restartThread (spr, b, active) {
+    restartThread(spr, b, active) {
         var newThread = new Thread(spr, b);
         var wasRunning = false;
         for (var i = 0; i < this.threadsRunning.length; i++) {
@@ -183,5 +183,22 @@ export default class Runtime {
             this.threadsRunning.push(newThread);
         }
         return newThread;
+    }
+
+    // 1) Walk up the chain of “previous” blocks to the very first block
+    getScriptStart(block) {
+        let b = block;
+        while (b.previousBlock) {
+            b = b.previousBlock;
+        }
+        return b;
+    }
+
+    // 2) Given *any* block in a script, tell me if its thread is alive
+    isScriptRunningForThatBlock(block) {
+        const head = this.getScriptStart(block);
+        return this.threadsRunning.some(t =>
+            t.firstBlock === head && t.isRunning
+        );
     }
 }
