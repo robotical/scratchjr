@@ -29,7 +29,7 @@ export default class TutorialEngine {
 
     updateUI(step) {
         TutorialUI.clearUIBeforeStep();
-        TutorialUI.updateProgressBar(this.currentStep, this.tutorial.tutorialSteps.length-1);
+        TutorialUI.updateProgressBar(this.currentStep, this.tutorial.tutorialSteps.length - 1);
         /* First, decide which buttons to show */
         this._handleButtons(step.buttons, step);
 
@@ -53,7 +53,7 @@ export default class TutorialEngine {
                     TutorialUI.showHintButton(() => this._handleActions(step.hintActions));
                     break;
                 case "readAloud":
-                    const textToRead = step.instructionActions.find(action => action.type === "ShowInstructorText").text;
+                    const textToRead = step.instructionActions.find(action => action.type === "ShowInstructorText" || action.type === "ShowInstructorImage").text;
                     TutorialUI.showReadAloudButton(textToRead);
                     break;
                 default:
@@ -122,20 +122,34 @@ export default class TutorialEngine {
     }
 
     _evaluateExpectedCode(expectedCodeCondition) {
-        // expectedCodeCondition eg: ["block1=>block2"] meaning block1 should be followed by block2 (next block)
-        // actual blocks: {blocktype: "block1", next?: {blocktype: "block2", next?: {blocktype: "block3", next?: null}}}
+        // expectedCodeCondition e.g. "block1=>block2=>block3"
         const actualBlocks = ScratchJr.getBlocks();
-        let actualBlocksCompiledCondition = "";
-        let actualBlock = actualBlocks[0];
-        while (actualBlock) {
-            actualBlocksCompiledCondition += `${actualBlock.blocktype}`;
-            if (actualBlock.next) {
-                actualBlocksCompiledCondition += "=>";
+        if (!actualBlocks || actualBlocks.length === 0) return false;
+        // Start DFS from the first script block only
+        
+        for (const block of actualBlocks) {
+            let compiled = [];
+            const stack = [block];
+            while (stack.length) {
+                const block = stack.pop();
+                if (!block) continue;
+                compiled.push(block.blocktype);
+                // Push "next" first so that "inside" gets processed before it
+                if (block.next) {
+                    stack.push(block.next);
+                }
+                if (block.inside) {
+                    stack.push(block.inside);
+                }
             }
-            actualBlock = actualBlock.next;
-        }
-        return actualBlocksCompiledCondition === expectedCodeCondition;
-    }
 
+            const actualBlocksCompiledCondition = compiled.join('=>');
+            console.log('actualBlocksCompiledCondition:', actualBlocksCompiledCondition);
+            if (actualBlocksCompiledCondition === expectedCodeCondition) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 

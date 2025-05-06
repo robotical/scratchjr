@@ -1,7 +1,7 @@
 import { closexSvg } from "../../html-svgs/closex-svg";
 import { questionmarkSvg } from "../../html-svgs/questionmark-svg";
 import { readOutLoudSvg } from "../../html-svgs/readoutloud-svg";
-import { gn, newHTML } from "../../utils/lib";
+import { gn, newHTML, stripHtml } from "../../utils/lib";
 import ScratchJr from "../ScratchJr";
 import Palette from "./Palette";
 import UI from "./UI";
@@ -82,7 +82,7 @@ export default class TutorialUI {
                 speechSynthesis.cancel();
                 this.utterance = null;
             } else {
-                this.utterance = new SpeechSynthesisUtterance(textToRead);
+                this.utterance = new SpeechSynthesisUtterance(stripHtml(textToRead));
                 this.utterance.lang = 'en-US';
                 const voices = speechSynthesis.getVoices();
                 const selectedVoice = voices.find(voice => voice.name === voiceName);
@@ -239,7 +239,7 @@ export default class TutorialUI {
         const speechBubble = TutorialUI.instructor.querySelector('.speechBubble');
         speechBubble.style.display = 'block';
         const speechBubbleText = TutorialUI.instructor.querySelector('#speechBubbleText');
-        speechBubbleText.textContent = text;
+        speechBubbleText.innerHTML = text;
         TutorialUI.momentarilyHighlightSpeechBubble(speechBubble);
     }
 

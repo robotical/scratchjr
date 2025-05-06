@@ -19,7 +19,7 @@ const cogJrBlocksTutorial4 = {
                     text: "Let's make an etch-a-sketch!"
                 }
             ],
-            buttons: ["next"],
+            buttons: ["readAloud", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -30,7 +30,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/2-events.png",
-                    text: "Select the Cog Events category"
+                    text: "Select the <i><u>Cog Events</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -42,7 +42,7 @@ const cogJrBlocksTutorial4 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -53,7 +53,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/3-tiltBlock.png",
-                    text: "Add the on tilt block"
+                    text: "Add the <i><u>on tilt</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -80,7 +80,7 @@ const cogJrBlocksTutorial4 = {
                     block: "tiltany_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany"],
             presenter: "marty"
         },
@@ -91,7 +91,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/4-motion.png",
-                    text: "Select the sprite motion category"
+                    text: "Select the <i><u>sprite motion</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -103,7 +103,7 @@ const cogJrBlocksTutorial4 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany"],
             presenter: "marty"
         },
@@ -114,7 +114,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/5-moveRight.png",
-                    text: "Add a move forward block"
+                    text: "Add a <i><u>move forward</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -141,7 +141,7 @@ const cogJrBlocksTutorial4 = {
                     block: "forward_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward"],
             presenter: "marty"
         },
@@ -159,7 +159,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward"],
             presenter: "marty"
         },
@@ -197,7 +197,7 @@ const cogJrBlocksTutorial4 = {
                     block: "tiltany_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany"],
             presenter: "marty"
         },
@@ -215,7 +215,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>right", "tiltany"],
             presenter: "marty"
         },
@@ -226,7 +226,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/9-moveLeft.png",
-                    text: "Add a move backward block"
+                    text: "Add a <i><u>move backward</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -253,7 +253,7 @@ const cogJrBlocksTutorial4 = {
                     block: "back_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany=>back"],
             presenter: "marty"
         },
@@ -271,7 +271,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back"],
             presenter: "marty"
         },
@@ -309,7 +309,7 @@ const cogJrBlocksTutorial4 = {
                     block: "tiltany_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany"],
             presenter: "marty"
         },
@@ -327,7 +327,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany"],
             presenter: "marty"
         },
@@ -338,7 +338,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/13-moveDown.png",
-                    text: "Add a move down block"
+                    text: "Add a <i><u>move down</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -365,7 +365,7 @@ const cogJrBlocksTutorial4 = {
                     block: "down_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down"],
             presenter: "marty"
         },
@@ -403,7 +403,7 @@ const cogJrBlocksTutorial4 = {
                     block: "tiltany_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany"],
             presenter: "marty"
         },
@@ -421,7 +421,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany"],
             presenter: "marty"
         },
@@ -432,7 +432,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/16-moveUp.png",
-                    text: "Add a move up block"
+                    text: "Add a <i><u>move up</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -459,7 +459,7 @@ const cogJrBlocksTutorial4 = {
                     block: "up_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
             presenter: "marty"
         },
@@ -477,7 +477,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
             presenter: "marty"
         },
@@ -495,7 +495,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
             presenter: "marty"
         },
@@ -513,7 +513,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
             presenter: "marty"
         },
@@ -531,7 +531,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
             presenter: "marty"
         },
@@ -542,7 +542,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/21-control.png",
-                    text: "Select the control category"
+                    text: "Select the <i><u>control</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -554,7 +554,7 @@ const cogJrBlocksTutorial4 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany"],
             presenter: "marty"
         },
@@ -565,7 +565,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/22-setSpeed.png",
-                    text: "Add a set speed block"
+                    text: "Add a <i><u>set speed</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -592,7 +592,7 @@ const cogJrBlocksTutorial4 = {
                     block: "setspeed_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "setspeed"],
             presenter: "marty"
         },   
@@ -610,7 +610,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "setspeed"],
             presenter: "marty"
         },
@@ -628,7 +628,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "setspeed"],
             presenter: "marty"
         },
@@ -646,7 +646,7 @@ const cogJrBlocksTutorial4 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "setspeed"],
             presenter: "marty"
         },
@@ -658,10 +658,10 @@ const cogJrBlocksTutorial4 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Well done! Now see what else you can draw!"
+                    text: "Well done! </br> Now see what else you can draw!"
                 }
             ],
-            buttons: ["previous"],
+            buttons: ["readAloud", "previous"],
             expectedCode: [],
             presenter: "marty"
         },

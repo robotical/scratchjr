@@ -800,3 +800,14 @@ export function css_vw_ratio_adj(x) {
 Number.prototype.mod = function (n) {
   return ((this % n) + n) % n;
 };
+
+/**
+ * Strip any HTML tags/entities from a string.
+ * @param {string} html
+ * @returns {string} plain text
+ */
+export function stripHtml(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}

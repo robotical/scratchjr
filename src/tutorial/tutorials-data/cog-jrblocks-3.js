@@ -16,10 +16,10 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Let's make a sound and light show!"
+                    text: "Let's make a sound and light show! 🎵✨"
                 }
             ],
-            buttons: ["next"],
+            buttons: ["readAloud", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -31,7 +31,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Select the cog event blocks"
+                    text: "Select the <i><u>cog event</u></i> blocks"
                 }
             ],
             nextStepActions: [
@@ -43,7 +43,7 @@ const cogJrBlocksTutorial3 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -51,7 +51,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Add the on button press block"
+                    text: "Add the  <i><u>on button press</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -78,7 +78,7 @@ const cogJrBlocksTutorial3 = {
                     block: "ontouchcog_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["ontouchcog"],
             presenter: "marty"
         },
@@ -87,7 +87,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Select the cog sound blocks"
+                    text: "Select the  <i><u>cog sound</u></i> blocks"
                 }
             ],
             nextStepActions: [
@@ -99,7 +99,7 @@ const cogJrBlocksTutorial3 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["ontouchcog_block"],
             presenter: "marty"
         },
@@ -107,7 +107,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Add a musical note"
+                    text: "Add a  <i><u>musical note</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -134,7 +134,7 @@ const cogJrBlocksTutorial3 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["ontouchcog=>playnote"],
             presenter: "marty"
         },
@@ -152,7 +152,7 @@ const cogJrBlocksTutorial3 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["ontouchcog=>playnote"],
             presenter: "marty"
         },
@@ -170,7 +170,7 @@ const cogJrBlocksTutorial3 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["ontouchcog=>playnote"],
             presenter: "marty"
         },
@@ -208,7 +208,7 @@ const cogJrBlocksTutorial3 = {
                     block: "ontouchcog_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["ontouchcog=>playnote", "ontouchcog"],
             presenter: "marty"
         },
@@ -218,7 +218,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Select the cog light blocks"
+                    text: "Select the  <i><u>cog lights</u></i> blocks"
                 }
             ],
             nextStepActions: [
@@ -230,7 +230,7 @@ const cogJrBlocksTutorial3 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["ontouchcog=>playnote", "ontouchcog"],
             presenter: "marty"
         },
@@ -239,7 +239,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/7-ledCommand.png",
-                    text: "Add a set color block"
+                    text: "Add a  <i><u>set color </u></i> block"
                 }
             ],
             nextStepActions: [
@@ -266,7 +266,7 @@ const cogJrBlocksTutorial3 = {
                     block: "selectcolour_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["ontouchcog=>playnote", "ontouchcog=>selectcolour"],
             presenter: "marty"
         },
@@ -284,7 +284,7 @@ const cogJrBlocksTutorial3 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["ontouchcog=>playnote", "ontouchcog=>selectcolour"],
             presenter: "marty"
         },
@@ -302,7 +302,7 @@ const cogJrBlocksTutorial3 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["ontouchcog=>playnote", "ontouchcog=>selectcolour"],
             presenter: "marty"
         },
@@ -313,7 +313,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/10-firstBar.png",
-                    text: "Add more notes - EDCD"
+                    text: "Add more notes -  <b>EDCD</b>"
                 }
             ],
             nextStepActions: [
@@ -340,7 +340,7 @@ const cogJrBlocksTutorial3 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote", "ontouchcog=>selectcolour"],
             presenter: "marty"
         },
@@ -378,8 +378,8 @@ const cogJrBlocksTutorial3 = {
                     block: "waitcrotchet_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
-            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote", "ontouchcog=>selectcolour=>rest"],
+            buttons: ["readAloud", "previous", "next", "hint"],
+            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote", "ontouchcog=>selectcolour=>waitcrotchet"],
             presenter: "marty"
         },
 
@@ -396,8 +396,8 @@ const cogJrBlocksTutorial3 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
-            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote", "ontouchcog=>selectcolour=>rest"],
+            buttons: ["readAloud", "previous", "next"],
+            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote", "ontouchcog=>selectcolour=>waitcrotchet"],
             presenter: "marty"
         },
 
@@ -414,8 +414,8 @@ const cogJrBlocksTutorial3 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
-            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote", "ontouchcog=>selectcolour=>rest"],
+            buttons: ["readAloud", "previous", "next"],
+            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote", "ontouchcog=>selectcolour=>waitcrotchet"],
             presenter: "marty"
         },
 
@@ -425,7 +425,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/14-secondBar.png",
-                    text: "Add more notes - EEE_"
+                    text: "Add more notes - <b>EEE_</b>"
                 }
             ],
             nextStepActions: [
@@ -452,8 +452,8 @@ const cogJrBlocksTutorial3 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
-            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest"],
+            buttons: ["readAloud", "previous", "next", "hint"],
+            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>waitcrotchet", "ontouchcog=>selectcolour=>waitcrotchet"],
             presenter: "marty"
         },
 
@@ -490,8 +490,8 @@ const cogJrBlocksTutorial3 = {
                     block: "selectcolour_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
-            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest"],
+            buttons: ["readAloud", "previous", "next", "hint"],
+            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>waitcrotchet", "ontouchcog=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet"],
             presenter: "marty"
         },
 
@@ -508,8 +508,8 @@ const cogJrBlocksTutorial3 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
-            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest"],
+            buttons: ["readAloud", "previous", "next"],
+            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>waitcrotchet", "ontouchcog=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet"],
             presenter: "marty"
         },
 
@@ -519,7 +519,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/17-thirdBar.png",
-                    text: "Add more notes - DDD_"
+                    text: "Add more notes - <b>DDD_</b>"
                 }
             ],
             nextStepActions: [
@@ -546,8 +546,8 @@ const cogJrBlocksTutorial3 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
-            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest=>playnote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest"],
+            buttons: ["readAloud", "previous", "next", "hint"],
+            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>waitcrotchet=>playnote=>playnote=>playnote=>waitcrotchet", "ontouchcog=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet"],
         },
 
         // step 18 - add the fourth bar of music and a color
@@ -556,7 +556,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/18-fourthBar.png",
-                    text: "Add more notes - DDD_"
+                    text: "Add more notes - <b>DDD_</b>"
                 }
             ],
             nextStepActions: [
@@ -583,8 +583,8 @@ const cogJrBlocksTutorial3 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
-            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest=>playnote=>playnote=>playnote=>restplaynote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest"],
+            buttons: ["readAloud", "previous", "next", "hint"],
+            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>waitcrotchet=>playnote=>playnote=>playnote=>waitcrotchetplaynote=>playnote=>playnote=>waitcrotchet", "ontouchcog=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet"],
         },
 
         // step 19 - add a pattern block
@@ -620,8 +620,8 @@ const cogJrBlocksTutorial3 = {
                     block: "setpattern_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
-            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest=>playnote=>playnote=>playnote=>restplaynote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>setpattern=>rest"],
+            buttons: ["readAloud", "previous", "next", "hint"],
+            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>waitcrotchet=>playnote=>playnote=>playnote=>waitcrotchet=>playnote=>playnote=>playnote=>waitcrotchet", "ontouchcog=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet=>selectcolour=>setpattern=>waitcrotchet"],
             presenter: "marty"
         },
 
@@ -638,8 +638,8 @@ const cogJrBlocksTutorial3 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
-            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest=>playnote=>playnote=>playnote=>restplaynote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>setpattern=>rest"],
+            buttons: ["readAloud", "previous", "next"],
+            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>waitcrotchet=>playnote=>playnote=>playnote=>waitcrotchetplaynote=>playnote=>playnote=>waitcrotchet", "ontouchcog=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet=>selectcolour=>setpattern=>waitcrotchet"],
             presenter: "marty"
         },
 
@@ -656,8 +656,8 @@ const cogJrBlocksTutorial3 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
-            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>rest=>playnote=>playnote=>playnote=>restplaynote=>playnote=>playnote=>rest", "ontouchcog=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>rest=>selectcolour=>setpattern=>rest"],
+            buttons: ["readAloud", "previous", "next"],
+            expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>waitcrotchet=>playnote=>playnote=>playnote=>waitcrotchetplaynote=>playnote=>playnote=>waitcrotchet", "ontouchcog=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet=>selectcolour=>waitcrotchet=>selectcolour=>setpattern=>waitcrotchet"],
             presenter: "marty"
         },
 
@@ -674,7 +674,7 @@ const cogJrBlocksTutorial3 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },    
@@ -686,10 +686,10 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Well done! Next Steps :- Try changing the colors and patterns. Try making another song. See if you can make the colors change with every note. See if you can use loops to reduce the length of your code. Group activity :- Demonstrate your sound and light show to the class"
+                    text: "Well done!</br>Next Steps :- Try changing the colors and patterns. Try making another song. See if you can make the colors change with every note. See if you can use loops to reduce the length of your code. Group activity :- Demonstrate your sound and light show to the class"
                 }
             ],
-            buttons: ["previous"],
+            buttons: ["readAloud", "previous"],
             expectedCode: [],
             presenter: "marty"
         },

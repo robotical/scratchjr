@@ -16,10 +16,10 @@ const cogJrBlocksTutorial1 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Let's make cog play a tune!"
+                    text: "Let's make Cog play a tune!"
                 }
             ],
-            buttons: ["next"],
+            buttons: ["readAloud","next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -43,7 +43,7 @@ const cogJrBlocksTutorial1 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -81,7 +81,7 @@ const cogJrBlocksTutorial1 = {
                     block: "ontouchcog_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud","previous", "next", "hint"],
             expectedCode: ["ontouchcog"],
             presenter: "marty"
         },
@@ -104,7 +104,7 @@ const cogJrBlocksTutorial1 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog_block"],
             presenter: "marty"
         },
@@ -142,7 +142,7 @@ const cogJrBlocksTutorial1 = {
                     block: "whistle_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud","previous", "next", "hint"],
             expectedCode: ["ontouchcog=>whistle"],
             presenter: "marty"
         },
@@ -160,7 +160,7 @@ const cogJrBlocksTutorial1 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog=>whistle"],
             presenter: "marty"
         },
@@ -179,7 +179,7 @@ const cogJrBlocksTutorial1 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog"],
             presenter: "marty"
         },
@@ -217,8 +217,8 @@ const cogJrBlocksTutorial1 = {
                     block: "confusion_block",
                 }
             ],
-            buttons: ["previous", "next"],
-            expectedCode: ["ontouchcog=>confusion", "ontouchcog=>disbelief"],
+            buttons: ["readAloud","previous", "next"],
+            expectedCode: ["ontouchcog=>confusion"],
             presenter: "marty"
         },
 
@@ -235,7 +235,7 @@ const cogJrBlocksTutorial1 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog=>confusion"],
             presenter: "marty"
         },
@@ -253,7 +253,7 @@ const cogJrBlocksTutorial1 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog"],
             presenter: "marty"
         },
@@ -291,7 +291,7 @@ const cogJrBlocksTutorial1 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud","previous", "next", "hint"],
             expectedCode: ["ontouchcog=>playnote"],
             presenter: "marty"
         },
@@ -309,7 +309,7 @@ const cogJrBlocksTutorial1 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog=>playnote"],
             presenter: "marty"
         },
@@ -328,7 +328,7 @@ const cogJrBlocksTutorial1 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog=>playnote"],
             presenter: "marty"
         },
@@ -367,7 +367,7 @@ const cogJrBlocksTutorial1 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud","previous", "next", "hint"],
             expectedCode: ["ontouchcog=>playnote=>playnote"],
             presenter: "marty"
         },
@@ -405,7 +405,7 @@ const cogJrBlocksTutorial1 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud","previous", "next", "hint"],
             expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote"],
             presenter: "marty"
         },
@@ -423,7 +423,7 @@ const cogJrBlocksTutorial1 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote"],
             presenter: "marty"
         },
@@ -461,7 +461,7 @@ const cogJrBlocksTutorial1 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud","previous", "next", "hint"],
             expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
             presenter: "marty"
         },
@@ -479,7 +479,7 @@ const cogJrBlocksTutorial1 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
             presenter: "marty"
         },
@@ -517,7 +517,7 @@ const cogJrBlocksTutorial1 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud","previous", "next", "hint"],
             expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
             presenter: "marty"
         },
@@ -555,7 +555,7 @@ const cogJrBlocksTutorial1 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud","previous", "next", "hint"],
             expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
             presenter: "marty"
         },
@@ -573,7 +573,7 @@ const cogJrBlocksTutorial1 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
             presenter: "marty"
         },
@@ -593,7 +593,7 @@ const cogJrBlocksTutorial1 = {
                     text: "<b>Well done!</b><br />Now let's make it faster"
                 }
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -631,7 +631,7 @@ const cogJrBlocksTutorial1 = {
                     block: "settempo_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud","previous", "next", "hint"],
             expectedCode: ["ontouchcog=>settempo=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
             presenter: "marty"
         },
@@ -649,7 +649,7 @@ const cogJrBlocksTutorial1 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog=>settempo=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
             presenter: "marty"
         },
@@ -667,7 +667,7 @@ const cogJrBlocksTutorial1 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud","previous", "next"],
             expectedCode: ["ontouchcog=>settempo=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote=>playnote"],
             presenter: "marty"
         },
@@ -677,12 +677,12 @@ const cogJrBlocksTutorial1 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Nice work!<br />Now see if you can make a tune of your own"
+                    text: "<b>Nice work!</b><br />Now see if you can make a tune of your own 🎵"
                 }
             ],
             nextStepActions: [],
             hintActions: [],
-            buttons: ["previous", "readAloud",],
+            buttons: ["readAloud","previous", "readAloud",],
             expectedCode: [],
             presenter: "marty"
         }
