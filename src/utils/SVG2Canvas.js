@@ -803,6 +803,15 @@ export default class SVG2Canvas {
     }
 
     static arrayToString(res) {
+        // NT: This seems to be working better than the previous version
+        return res
+            .map(cmd => {
+                const [op, ...coords] = cmd;
+                // join the coords with commas (or spaces, if you prefer)
+                return op + coords.join(',');
+            })
+            .join(' ');
+        console.log("res", res);
         var str = '';
         for (var i = 0; i < res.length; i++) {
             var cmd = res[i];
