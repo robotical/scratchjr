@@ -17721,8 +17721,10 @@ class Ghost {
     }
     var pt = _PaintAction__WEBPACK_IMPORTED_MODULE_4__["default"].getScreenPt(evt);
     if (Ghost.outsideArea(_geom_Vector__WEBPACK_IMPORTED_MODULE_6__["default"].floor(_geom_Vector__WEBPACK_IMPORTED_MODULE_6__["default"].scale(pt, _Paint__WEBPACK_IMPORTED_MODULE_3__["default"].currentZoom)), maskCanvas)) {
+      console.log("Ghost: outside area");
       return null;
     } else {
+      console.log("Ghost: inside area");
       return Ghost.allTools(pt);
     }
   }
@@ -21707,7 +21709,7 @@ class Path {
     var shape = _SVGTools__WEBPACK_IMPORTED_MODULE_3__["default"].addPath(p, first.x, first.y);
     var d = Path.getRectangularD(pointslist);
     shape.setAttributeNS(null, 'd', d);
-    shape.setAttribute('fill', 'none');
+    shape.setAttribute('fill', 'transparent');
     return shape;
   }
   static getRectangularD(plist) {
@@ -21776,6 +21778,7 @@ class Path {
     attr.d = _utils_SVG2Canvas__WEBPACK_IMPORTED_MODULE_1__["default"].arrayToString(d);
     attr.id = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.getIdFor)('path');
     attr['stroke-miterlimit'] = shape.getAttribute('stroke-miterlimit');
+    shape.setAttribute('fill', 'transparent');
     var elem = _SVGTools__WEBPACK_IMPORTED_MODULE_3__["default"].addChild((0,_utils_lib__WEBPACK_IMPORTED_MODULE_12__.gn)('layer1'), 'path', attr);
     return elem;
   }
@@ -23984,7 +23987,7 @@ class SVGTools {
   }
   static getPolyAttr() {
     return {
-      'fill': 'none',
+      'fill': 'transparent',
       'stroke': _Paint__WEBPACK_IMPORTED_MODULE_0__["default"].fillcolor,
       'stroke-width': _Paint__WEBPACK_IMPORTED_MODULE_0__["default"].strokewidth,
       'stroke-linecap': 'round',
@@ -23994,7 +23997,7 @@ class SVGTools {
   }
   static getPenAttr() {
     return {
-      'fill': 'none',
+      'fill': 'transparent',
       'stroke': _Paint__WEBPACK_IMPORTED_MODULE_0__["default"].fillcolor,
       'stroke-width': _Paint__WEBPACK_IMPORTED_MODULE_0__["default"].strokewidth,
       'opacity': 1,
@@ -31237,6 +31240,12 @@ class SVG2Canvas {
     return res;
   }
   static arrayToString(res) {
+    return res.map(cmd => {
+      const [op, ...coords] = cmd;
+      // join the coords with commas (or spaces, if you prefer)
+      return op + coords.join(',');
+    }).join(' ');
+    console.log("res", res);
     var str = '';
     for (var i = 0; i < res.length; i++) {
       var cmd = res[i];

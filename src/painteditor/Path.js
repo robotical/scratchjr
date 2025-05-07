@@ -260,7 +260,7 @@ export default class Path {
         var shape = SVGTools.addPath(p, first.x, first.y);
         var d = Path.getRectangularD(pointslist);
         shape.setAttributeNS(null, 'd', d);
-        shape.setAttribute('fill', 'none');
+        shape.setAttribute('fill', 'transparent');
         return shape;
     }
 
@@ -338,6 +338,7 @@ export default class Path {
         attr.d = SVG2Canvas.arrayToString(d);
         attr.id = getIdFor('path');
         attr['stroke-miterlimit'] = shape.getAttribute('stroke-miterlimit');
+        shape.setAttribute('fill', 'transparent');
         var elem = SVGTools.addChild(gn('layer1'), 'path', attr);
         return elem;
     }
