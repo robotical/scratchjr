@@ -152,6 +152,37 @@
     margin-left: -10px;
 }
 
+.speechBubbleControls {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100000;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.speechBubblePreviousStep {
+    background: #E6E6E6;
+    color: white;
+    border-radius: 5px;
+    /* padding: 2.5px 5px; */
+    margin-left: -12px;
+    cursor: pointer;
+}
+.speechBubbleNextStep {
+    background: #E6E6E6;
+    color: white;
+    border-radius: 5px;
+    /* padding: 2.5px 5px; */
+    margin-right: -12px;
+    cursor: pointer;
+
+}
+
 #tutorial-down-pointing-arrow-svg {
     position: absolute;
     bottom: 0;

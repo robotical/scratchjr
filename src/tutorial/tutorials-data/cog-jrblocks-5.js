@@ -19,7 +19,7 @@ const cogJrBlocksTutorial5 = {
                     text: "Let's make a maze game!"
                 }
             ],
-            buttons: ["next"],
+            buttons: ["readAloud", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -30,7 +30,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/2-events.png",
-                    text: "Select the Cog Events category"
+                    text: "Select the <i><u>Cog Events</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -42,7 +42,7 @@ const cogJrBlocksTutorial5 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -53,7 +53,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/3-tiltBlocks.png",
-                    text: "Add four on tilt blocks"
+                    text: "Add four <i><u>on tilt</u></i> blocks"
                 }
             ],
             nextStepActions: [
@@ -80,7 +80,7 @@ const cogJrBlocksTutorial5 = {
                     block: "tiltany_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany", "tiltany", "tiltany", "tiltany"],
             presenter: "marty"
         },
@@ -91,7 +91,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/4-motion.png",
-                    text: "Select the sprite motion category"
+                    text: "Select the <i><u>sprite motion</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -103,7 +103,7 @@ const cogJrBlocksTutorial5 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany", "tiltany", "tiltany", "tiltany"],
             presenter: "marty"
         },
@@ -114,7 +114,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/5-motionBlocks.png",
-                    text: "Add four motion blocks"
+                    text: "Add four <i><u>motion</u></i> blocks"
                 }
             ],
             nextStepActions: [
@@ -141,7 +141,7 @@ const cogJrBlocksTutorial5 = {
                     block: "forward_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
             presenter: "marty"
         },
@@ -152,7 +152,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/6-addSprite.png",
-                    text: "Press the Add Sprite button"
+                    text: "Press the <i><u>Add Sprite</u></i> button"
                 }
             ],
             nextStepActions: [
@@ -164,7 +164,7 @@ const cogJrBlocksTutorial5 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -175,13 +175,13 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/7-drawSprite.png",
-                    text: "Press the Draw button"
+                    text: "Press the <i><u>Draw</u></i> button"
                 }
             ],
             nextStepActions: [
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -192,14 +192,14 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/8-thickLine.png",
-                    text: "Select the thick line"
+                    text: "Select the <i><u>thick line</u></i> option"
                 }
             ],
             nextStepActions: [
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -217,7 +217,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -235,7 +235,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -246,7 +246,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/11-looks.png",
-                    text: "Select the sprite loooks category"
+                    text: "Select the <i><u>sprite loooks</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -258,7 +258,7 @@ const cogJrBlocksTutorial5 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -269,7 +269,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/12-grow.png",
-                    text: "Add a grow block"
+                    text: "Add a <i><u>grow block</u></i>"
                 }
             ],
             nextStepActions: [
@@ -296,7 +296,7 @@ const cogJrBlocksTutorial5 = {
                     block: "grow_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["grow"],
             presenter: "marty"
         },
@@ -314,7 +314,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["grow"],
             presenter: "marty"
         },
@@ -332,7 +332,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["grow"],
             presenter: "marty"
         },
@@ -350,7 +350,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["grow"],
             presenter: "marty"
         },
@@ -368,7 +368,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -379,7 +379,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/17-shrink.png",
-                    text: "Add a shrink block"
+                    text: "Add a <i><u>shrink</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -406,7 +406,7 @@ const cogJrBlocksTutorial5 = {
                     block: "shrink_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "shrink"],
             presenter: "marty"
         },
@@ -424,7 +424,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "shrink"],
             presenter: "marty"
         },
@@ -442,7 +442,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -453,7 +453,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/20-spriteEvents.png",
-                    text: "Select the sprite events category"
+                    text: "Select the <i><u>sprite events</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -466,7 +466,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["grow"],
             presenter: "marty"
         },
@@ -477,7 +477,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/21-onBump.png",
-                    text: "Add an on bump block"
+                    text: "Add an <i><u>on bump</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -504,7 +504,7 @@ const cogJrBlocksTutorial5 = {
                     block: "ontouch_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["ontouch"],
             presenter: "marty"
         },   
@@ -515,7 +515,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/22-sendMessage.png",
-                    text: "Add a send message block"
+                    text: "Add a <i><u>send message</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -542,7 +542,7 @@ const cogJrBlocksTutorial5 = {
                     block: "message_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["ontouch=>message"],
             presenter: "marty"
         },   
@@ -560,7 +560,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -571,7 +571,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/24-onMessage.png",
-                    text: "Add an on message block"
+                    text: "Add an <i><u>on message</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -598,7 +598,7 @@ const cogJrBlocksTutorial5 = {
                     block: "onmessage_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "onmessage"],
             presenter: "marty"
         },  
@@ -609,7 +609,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/25-spriteMotion.png",
-                    text: "Select the sprite motion category"
+                    text: "Select the <i><u>sprite motion</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -622,7 +622,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "onmessage"],
             presenter: "marty"
         },
@@ -633,7 +633,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/26-rotate12.png",
-                    text: "Add a rotate block and set the number to 12"
+                    text: "Add a <i><u>rotate</u></i> block and set the number to 12"
                 }
             ],
             nextStepActions: [
@@ -660,7 +660,7 @@ const cogJrBlocksTutorial5 = {
                     block: "right_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "onmessage=>right"],
             presenter: "marty"
         },
@@ -671,7 +671,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/27-goHome.png",
-                    text: "Add a go home block"
+                    text: "Add a <i><u>go home</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -698,7 +698,7 @@ const cogJrBlocksTutorial5 = {
                     block: "home_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "onmessage=>right=>home"],
             presenter: "marty"
         },  
@@ -716,7 +716,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "onmessage=>right=>home"],
             presenter: "marty"
         },
@@ -727,14 +727,14 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/29-addScene.png",
-                    text: "Click the add scene button"
+                    text: "Click the <i><u>add scene</u></i> button"
                 }
             ],
             nextStepActions: [
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -745,14 +745,14 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/30-editBackground.png",
-                    text: "Click the background button"
+                    text: "Click the <i><u>background</u></i> button"
                 }
             ],
             nextStepActions: [
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -770,7 +770,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -788,7 +788,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -799,7 +799,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/33-onGreenFlag.png",
-                    text: "Add an On Green Flag block"
+                    text: "Add an <i><u>on green flag</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -826,7 +826,7 @@ const cogJrBlocksTutorial5 = {
                     block: "onflag_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onflag"],
             presenter: "marty"
         },  
@@ -837,7 +837,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/34-loop.png",
-                    text: "Add a repeat block"
+                    text: "Add a <i><u>repeat</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -864,7 +864,7 @@ const cogJrBlocksTutorial5 = {
                     block: "repeat_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onflag=>repeat"],
             presenter: "marty"
         },
@@ -875,7 +875,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/35-jump.png",
-                    text: "Add a hop block"
+                    text: "Add a <i><u>hop</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -902,7 +902,7 @@ const cogJrBlocksTutorial5 = {
                     block: "hop_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onflag=>repeat=>hop"],
             presenter: "marty"
         },  
@@ -913,7 +913,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/36-onTouch.png",
-                    text: "Add an on tap block"
+                    text: "Add an <i><u>on tap</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -940,7 +940,7 @@ const cogJrBlocksTutorial5 = {
                     block: "onclick_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onflag=>repeat=>hop", "ontap"],
             presenter: "marty"
         },  
@@ -951,7 +951,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/37-stop.png",
-                    text: "Select the sprite stop category"
+                    text: "Select the <i><u>sprite stop</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -964,7 +964,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["onflag=>repeat=>hop", "ontap"],
             presenter: "marty"
         },
@@ -975,7 +975,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/38-goToPage1.png",
-                    text: "Add a Go To Page 1 block"
+                    text: "Add a <i><u>Go To Page 1</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -1002,7 +1002,7 @@ const cogJrBlocksTutorial5 = {
                     block: "gotopage_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onflag=>repeat=>hop", "ontap=>gotopage"],
             presenter: "marty"
         },  
@@ -1020,7 +1020,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -1038,7 +1038,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -1056,7 +1056,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -1074,7 +1074,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -1085,7 +1085,7 @@ const cogJrBlocksTutorial5 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/21-onBump.png",
-                    text: "Add an on bump"
+                    text: "Add an <i><u>on bump</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -1112,7 +1112,7 @@ const cogJrBlocksTutorial5 = {
                     block: "ontouch_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onbump"],
             presenter: "marty"
         },
@@ -1150,7 +1150,7 @@ const cogJrBlocksTutorial5 = {
                     block: "gotopage_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["ontouch=>gotopage"],
             presenter: "marty"
         }, 
@@ -1168,7 +1168,7 @@ const cogJrBlocksTutorial5 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -1180,10 +1180,10 @@ const cogJrBlocksTutorial5 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Well done! Now see if you can add more levels to the maze!"
+                    text: "Well done!</br>Now see if you can add more levels to the maze!"
                 }
             ],
-            buttons: ["previous"],
+            buttons: ["readAloud", "previous"],
             expectedCode: [],
             presenter: "marty"
         },

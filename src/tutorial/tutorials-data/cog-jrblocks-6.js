@@ -19,7 +19,7 @@ const cogJrBlocksTutorial6 = {
                     text: "Let's make a parking sensor!"
                 }
             ],
-            buttons: ["next"],
+            buttons: ["readAloud", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -30,7 +30,7 @@ const cogJrBlocksTutorial6 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/2-cogEvents.png",
-                    text: "Select the Cog Events category"
+                    text: "Select the <i><u>Cog Events</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -42,7 +42,7 @@ const cogJrBlocksTutorial6 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -53,7 +53,7 @@ const cogJrBlocksTutorial6 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/3-objectSensed.png",
-                    text: "Add an On Object Sensed block"
+                    text: "Add an <i><u>On Object Sensed</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -80,7 +80,7 @@ const cogJrBlocksTutorial6 = {
                     block: "onobjectsensed_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onobjectsensed"],
             presenter: "marty"
         },
@@ -91,7 +91,7 @@ const cogJrBlocksTutorial6 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/4-lights.png",
-                    text: "Select the Cog lights category"
+                    text: "Select the <i><u>Cog lights</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -103,7 +103,7 @@ const cogJrBlocksTutorial6 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["onobjectsensed"],
             presenter: "marty"
         },
@@ -114,7 +114,7 @@ const cogJrBlocksTutorial6 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/5-setColor.png",
-                    text: "Add a Set Color block"
+                    text: "Add a <i><u>Set Color</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -141,7 +141,7 @@ const cogJrBlocksTutorial6 = {
                     block: "selectcolour_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onobjectsensed=>selectcolour"],
             presenter: "marty"
         },
@@ -158,7 +158,7 @@ const cogJrBlocksTutorial6 = {
             nextStepActions: [
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -196,7 +196,7 @@ const cogJrBlocksTutorial6 = {
                     block: "onobjectsensed_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onobjectsensed=>selectcolour", "onobjectsensed"],
             presenter: "marty"
         },
@@ -214,7 +214,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -252,7 +252,7 @@ const cogJrBlocksTutorial6 = {
                     block: "selectcolour_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onobjectsensed=>selectcolour", "onobjectsensed=>selectcolour"],
             presenter: "marty"
         },
@@ -270,7 +270,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["onobjectsensed=>selectcolour", "onobjectsensed=>selectcolour"],
             presenter: "marty"
         },
@@ -287,7 +287,7 @@ const cogJrBlocksTutorial6 = {
             nextStepActions: [
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -298,14 +298,14 @@ const cogJrBlocksTutorial6 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/12-busSprite.png",
-                    text: "Add a bus sprite, make it smaller and move Marty"
+                    text: "Add a <i><u>bus sprite</i></u>, make it smaller and move Marty"
                 }
             ],
             nextStepActions: [
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -323,7 +323,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -341,7 +341,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -359,7 +359,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -370,14 +370,14 @@ const cogJrBlocksTutorial6 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/16-text.png",
-                    text: "Press the Add Text button"
+                    text: "Press the <i><u>Add Text</i></u> button"
                 }
             ],
             nextStepActions: [
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -395,7 +395,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -406,7 +406,7 @@ const cogJrBlocksTutorial6 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/2-cogEvents.png",
-                    text: "Select the Cog Events category"
+                    text: "Select the <i><u>Cog Events</u></i> category"
                 }
             ],
             nextStepActions: [
@@ -418,7 +418,7 @@ const cogJrBlocksTutorial6 = {
                 }
             ],
             hintActions: [],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -456,7 +456,7 @@ const cogJrBlocksTutorial6 = {
                     block: "onobjectsensed_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onobjectsensed"],
             presenter: "marty"
         },
@@ -467,7 +467,7 @@ const cogJrBlocksTutorial6 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/5-setColor.png",
-                    text: "Add a Set Color block"
+                    text: "Add a <i><u>Set Color</u></i> block"
                 }
             ],
             nextStepActions: [
@@ -494,7 +494,7 @@ const cogJrBlocksTutorial6 = {
                     block: "selectcolour_block",
                 }
             ],
-            buttons: ["previous", "next", "hint"],
+            buttons: ["readAloud", "previous", "next", "hint"],
             expectedCode: ["onobjectsensed=>selectcolour"],
             presenter: "marty"
         },
@@ -505,7 +505,7 @@ const cogJrBlocksTutorial6 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/21-addNote.png",
-                    text: "Add a musical note"
+                    text: "Add a <i><u>musical note</u></i>"
                 }
             ],
             nextStepActions: [
@@ -532,7 +532,7 @@ const cogJrBlocksTutorial6 = {
                     block: "playnote_block",
                 }
             ],
-            buttons: ["previous", "next", "hint", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "hint", "readAloud"],
             expectedCode: ["onobjectsensed=>selectcolour=>playnote"],
             presenter: "marty"
         },   
@@ -551,7 +551,7 @@ const cogJrBlocksTutorial6 = {
             hintActions: [
 
             ],
-            buttons: ["previous", "next"],
+            buttons: ["readAloud", "previous", "next"],
             expectedCode: ["onobjectsensed=>selectcolour=>playnote=>selectcolour=>waitcrotchet"],
             presenter: "marty"
         },   
@@ -569,7 +569,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -588,7 +588,7 @@ const cogJrBlocksTutorial6 = {
             hintActions: [
 
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: ["onobjectsensed=>selectcolour=>playnote=>selectcolour=>waitcrotchet", "onobjectsensed=>wait=>clearcolours=>gotopage"],
             presenter: "marty"
         },  
@@ -606,7 +606,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: ["onobjectsensed=>selectcolour=>playnote=>selectcolour=>playnote", "onobjectsensed=>wait=>clearcolours=>gotopage"],
             presenter: "marty"
         },
@@ -625,7 +625,7 @@ const cogJrBlocksTutorial6 = {
             hintActions: [
 
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -643,7 +643,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: [],
             presenter: "marty"
         },  
@@ -681,7 +681,7 @@ const cogJrBlocksTutorial6 = {
                     block: "gotopage_block",
                 }
             ],
-            buttons: ["previous", "next", "readAloud","hint"],
+            buttons: ["readAloud", "previous", "next", "readAloud","hint"],
             expectedCode: ["onobjectsensed=>selectcolour=>gotopage", "onobjectsensed=>selectcolour"],
             presenter: "marty"
         },
@@ -699,7 +699,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -717,7 +717,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -735,7 +735,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -753,7 +753,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: ["onflag=>selectcolour=>playnote=>clearcolours=>playnote"],
             presenter: "marty"
         },
@@ -791,7 +791,7 @@ const cogJrBlocksTutorial6 = {
                     block: "forever_block",
                 }
             ],
-            buttons: ["previous", "next", "hint", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "hint", "readAloud"],
             expectedCode: ["onflag=>selectcolour=>playnote=>clearcolours=>playnote=>forever"],
             presenter: "marty"
         },  
@@ -809,7 +809,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: ["onflag=>selectcolour=>playnote=>clearcolours=>playnote=>forever", "onobjectsensed=>wait=>clearcolours=>gotopage"],
             presenter: "marty"
         },
@@ -827,7 +827,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: ["onflag=>selectcolour=>playnote=>clearcolours=>playnote=>forever", "onobjectsensed=>wait=>clearcolours=>gotopage"],
             presenter: "marty"
         },  
@@ -845,7 +845,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: [],
             presenter: "marty"
         },  
@@ -863,7 +863,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: ["onobjectsensed=>selectcolour=>gotopage", "onobjectsensed=>selectcolour=>gotopage", "onflag=>clearcolours"],
             presenter: "marty"
         },
@@ -880,7 +880,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: [],
             presenter: "marty"
         },  
@@ -898,7 +898,7 @@ const cogJrBlocksTutorial6 = {
             ],
             hintActions: [
             ],
-            buttons: ["previous", "next", "readAloud"],
+            buttons: ["readAloud", "previous", "next", "readAloud"],
             expectedCode: [],
             presenter: "marty"
         },
@@ -910,10 +910,10 @@ const cogJrBlocksTutorial6 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Well done! Now try making your lights and sounds more exciting"
+                    text: "Well done!</br>Now try making your lights and sounds more exciting"
                 }
             ],
-            buttons: ["previous"],
+            buttons: ["readAloud", "previous"],
             expectedCode: [],
             presenter: "marty"
         },
