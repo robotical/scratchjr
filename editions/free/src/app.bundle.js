@@ -12481,10 +12481,10 @@ __webpack_require__.r(__webpack_exports__);
 
 class TutorialUI {
   static _highlightedElements = [];
+  static onReadAloudClickBound = null;
 
   /* Sets up tutorial UI elements */
   static setupUI(tutorial) {
-    speechSynthesis.getVoices(); // This is needed to get the voices in time
     this.tutorial = tutorial;
     const frame = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('frame');
     TutorialUI.frame = frame;
@@ -12512,22 +12512,34 @@ class TutorialUI {
     const nextButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('nextStep');
     nextButton.style.visibility = 'visible';
     nextButton.addEventListener('click', this.onNextClick);
+    const nextButtonInInstructor = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('speechBubbleNextStep');
+    nextButtonInInstructor.style.visibility = 'visible';
+    nextButtonInInstructor.addEventListener('click', this.onNextClick);
   }
   static hideNextButton() {
     const nextButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('nextStep');
     nextButton.style.visibility = 'hidden';
     nextButton.removeEventListener('click', this.onNextClick);
+    const nextButtonInInstructor = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('speechBubbleNextStep');
+    nextButtonInInstructor.style.visibility = 'hidden';
+    nextButtonInInstructor.removeEventListener('click', this.onNextClick);
   }
   static showPreviousButton(onClick) {
     this.onPreviousClick = onClick;
     const previousButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('previousStep');
     previousButton.style.visibility = 'visible';
     previousButton.addEventListener('click', this.onPreviousClick);
+    const previousButtonInInstructor = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('speechBubblePreviousStep');
+    previousButtonInInstructor.style.visibility = 'visible';
+    previousButtonInInstructor.addEventListener('click', this.onPreviousClick);
   }
   static hidePreviousButton() {
     const previousButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('previousStep');
     previousButton.style.visibility = 'hidden';
     previousButton.removeEventListener('click', this.onPreviousClick);
+    const previousButtonInInstructor = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('speechBubblePreviousStep');
+    previousButtonInInstructor.style.visibility = 'hidden';
+    previousButtonInInstructor.removeEventListener('click', this.onPreviousClick);
   }
   static showHintButton(onClick) {
     this.onHintClick = onClick;
@@ -12540,33 +12552,44 @@ class TutorialUI {
     hintButton.style.visibility = 'hidden';
     hintButton.removeEventListener('click', this.onHintClick);
   }
-  static showReadAloudButton(textToRead, voiceName = "Google US English") {
-    const readAloudButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('tutorialReadAloud');
-    this.onReadAloudClick = () => {
-      if (this.utterance) {
-        speechSynthesis.cancel();
-        this.utterance = null;
-      } else {
-        this.utterance = new SpeechSynthesisUtterance((0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.stripHtml)(textToRead));
-        this.utterance.lang = 'en-US';
-        const voices = speechSynthesis.getVoices();
-        const selectedVoice = voices.find(voice => voice.name === voiceName);
-        if (selectedVoice) {
-          this.utterance.voice = selectedVoice;
-        }
-        this.utterance.onend = () => {
-          this.utterance = null;
-        };
-        speechSynthesis.speak(this.utterance);
-      }
+  static onReadAloudClick() {
+    // If already speaking, cancel
+    if (this.utterance && speechSynthesis.speaking) {
+      console.log("Cancelling...");
+      speechSynthesis.cancel();
+      this.utterance = null;
+      return;
+    }
+    // Create a new this.utterance
+    this.utterance = new SpeechSynthesisUtterance((0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.stripHtml)(this.textToRead).trim() || " ");
+    this.utterance.lang = 'en-US';
+
+    // Debug hooks
+    this.utterance.onstart = () => console.log("▶️ started");
+    this.utterance.onboundary = e => console.log("boundary", e.charIndex);
+    this.utterance.onerror = e => console.error("❌ error", e);
+    this.utterance.onend = () => {
+      console.log("✅ finished");
+      this.utterance = null;
     };
-    readAloudButton.style.visibility = 'visible';
-    readAloudButton.addEventListener('click', this.onReadAloudClick);
+    this.utterance.onpause = () => console.log("⏸ paused");
+    this.utterance.onresume = () => console.log("▶️ resumed");
+    console.log("Speaking:", this.utterance.text);
+    speechSynthesis.speak(this.utterance);
+  }
+  static showReadAloudButton(textToRead, voiceName = "Google US English") {
+    this.utterance = null;
+    this.voiceName = voiceName;
+    this.textToRead = textToRead;
+    const btn = document.getElementById('tutorialReadAloud');
+    btn.style.visibility = 'visible';
+    this.onReadAloudClickBound = this.onReadAloudClick.bind(this);
+    btn.addEventListener('click', this.onReadAloudClickBound);
   }
   static hideReadAloudButton() {
     const readAloudButton = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)('tutorialReadAloud');
     readAloudButton.style.visibility = 'hidden';
-    readAloudButton.removeEventListener('click', this.onReadAloudClick);
+    readAloudButton.removeEventListener('click', this.onReadAloudClickBound);
   }
 
   /* Menu Bar */
@@ -12622,9 +12645,21 @@ class TutorialUI {
     TutorialUI.instructor.innerHTML = `
             <img src="./assets/ui/Marty_Instructor.svg" alt="instructor" class="tutorialInstructorImage" />
             <div class="speechBubble">
-            <div id="speechBubbleText"></div>
-            <div id="speechBubbleImage"></div>
-            <div id="speechBubbleVideo"></div>
+                <div class="speechBubbleControls">
+                    <div class="speechBubblePreviousStep" id="speechBubblePreviousStep">
+                        <svg id="tutorial-left-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                            <path d="M16 6L10 12L16 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="speechBubbleNextStep" id="speechBubbleNextStep">
+                        <svg id="tutorial-right-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                            <path d="M8 6L14 12L8 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="speechBubbleText"></div>
+                <div id="speechBubbleImage"></div>
+                <div id="speechBubbleVideo"></div>
                 <svg id="tutorial-down-pointing-arrow-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6 8L12 14L18 8" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -12852,6 +12887,10 @@ class TutorialUI {
   /* Highlight Element */
   static highlightElement(elementID, colorRGBA, onClick) {
     const element = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_3__.gn)(elementID);
+    if (!element) {
+      console.warn(`Element with ID ${elementID} not found.`);
+      return;
+    }
     element.classList.add('highlightedElement');
     TutorialUI._setHighlightedElementColor(colorRGBA || 'rgba(255, 0, 0, 0.5)');
 
@@ -13695,6 +13734,7 @@ class UI {
     if (_ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].isEditable()) {
       var ns = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_18__.newHTML)('div', 'addsprite', sprites);
       ns.onclick = UI.addSprite;
+      ns.setAttribute('id', 'addsprite');
     }
   }
   static mascotData(page) {
@@ -17721,10 +17761,8 @@ class Ghost {
     }
     var pt = _PaintAction__WEBPACK_IMPORTED_MODULE_4__["default"].getScreenPt(evt);
     if (Ghost.outsideArea(_geom_Vector__WEBPACK_IMPORTED_MODULE_6__["default"].floor(_geom_Vector__WEBPACK_IMPORTED_MODULE_6__["default"].scale(pt, _Paint__WEBPACK_IMPORTED_MODULE_3__["default"].currentZoom)), maskCanvas)) {
-      console.log("Ghost: outside area");
       return null;
     } else {
-      console.log("Ghost: inside area");
       return Ghost.allTools(pt);
     }
   }
@@ -27249,12 +27287,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tutorials_data_cog_jrblocks_2__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tutorials-data/cog-jrblocks-2 */ "./src/tutorial/tutorials-data/cog-jrblocks-2.js");
 /* harmony import */ var _tutorials_data_cog_jrblocks_3__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tutorials-data/cog-jrblocks-3 */ "./src/tutorial/tutorials-data/cog-jrblocks-3.js");
 /* harmony import */ var _tutorials_data_cog_jrblocks_4__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tutorials-data/cog-jrblocks-4 */ "./src/tutorial/tutorials-data/cog-jrblocks-4.js");
+/* harmony import */ var _tutorials_data_cog_jrblocks_5__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tutorials-data/cog-jrblocks-5 */ "./src/tutorial/tutorials-data/cog-jrblocks-5.js");
+/* harmony import */ var _tutorials_data_cog_jrblocks_6__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./tutorials-data/cog-jrblocks-6 */ "./src/tutorial/tutorials-data/cog-jrblocks-6.js");
+/* harmony import */ var _tutorials_data_cog_jrblocks_7__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./tutorials-data/cog-jrblocks-7 */ "./src/tutorial/tutorials-data/cog-jrblocks-7.js");
 
 
 
 
 
-const allTutorials = [_tutorials_data_cog_and_marty__WEBPACK_IMPORTED_MODULE_0__["default"], _tutorials_data_cog_jrblocks_1__WEBPACK_IMPORTED_MODULE_1__["default"], _tutorials_data_cog_jrblocks_2__WEBPACK_IMPORTED_MODULE_2__["default"], _tutorials_data_cog_jrblocks_3__WEBPACK_IMPORTED_MODULE_3__["default"], _tutorials_data_cog_jrblocks_4__WEBPACK_IMPORTED_MODULE_4__["default"]];
+
+
+
+const allTutorials = [_tutorials_data_cog_and_marty__WEBPACK_IMPORTED_MODULE_0__["default"], _tutorials_data_cog_jrblocks_1__WEBPACK_IMPORTED_MODULE_1__["default"], _tutorials_data_cog_jrblocks_2__WEBPACK_IMPORTED_MODULE_2__["default"], _tutorials_data_cog_jrblocks_3__WEBPACK_IMPORTED_MODULE_3__["default"], _tutorials_data_cog_jrblocks_4__WEBPACK_IMPORTED_MODULE_4__["default"], _tutorials_data_cog_jrblocks_5__WEBPACK_IMPORTED_MODULE_5__["default"], _tutorials_data_cog_jrblocks_6__WEBPACK_IMPORTED_MODULE_6__["default"], _tutorials_data_cog_jrblocks_7__WEBPACK_IMPORTED_MODULE_7__["default"]];
 class TutorialFetcher {
   static fetchTutorial(tutorialId) {
     return allTutorials.find(tutorial => tutorial.id === tutorialId);
@@ -29748,6 +29792,2035 @@ const cogJrBlocksTutorial4 = {
 
 /***/ }),
 
+/***/ "./src/tutorial/tutorials-data/cog-jrblocks-5.js":
+/*!*******************************************************!*\
+  !*** ./src/tutorial/tutorials-data/cog-jrblocks-5.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const cogJrBlocksTutorial5 = {
+  id: "cog-jrblocks-5",
+  platform: "blocksjr",
+  title: "Make a maze game",
+  description: "We'll make a maze game that uses cog to steer a sprite around a maze",
+  tutorialSteps: [/* STEP 1 -- intro*/
+  {
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "nextStep",
+      hexColor: "#FF0000"
+    }],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Let's make a maze game!"
+    }],
+    buttons: ["readAloud", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 2 - select the events category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/2-events.png",
+      text: "Select the <i><u>Cog Events</u></i> category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-start",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 3 - add four tilt blocks
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/3-tiltBlocks.png",
+      text: "Add four <i><u>on tilt</u></i> blocks"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["tiltany_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["tiltany_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "tiltany_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["tiltany", "tiltany", "tiltany", "tiltany"],
+    presenter: "marty"
+  },
+  // step 4 - select the sprite motion category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/4-motion.png",
+      text: "Select the <i><u>sprite motion</u></i> category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "sprite-motion",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: ["tiltany", "tiltany", "tiltany", "tiltany"],
+    presenter: "marty"
+  },
+  // step 5 - add four motion blocks
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/5-motionBlocks.png",
+      text: "Add four <i><u>motion</u></i> blocks"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["forward_block", "back_block", "up_block", "down_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["forward_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "forward_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up"],
+    presenter: "marty"
+  },
+  // step 6 - Click the add sprite button
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/6-addSprite.png",
+      text: "Press the <i><u>Add Sprite</u></i> button"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "addsprite",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 7 - Click the draw sprite button
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/7-drawSprite.png",
+      text: "Press the <i><u>Draw</u></i> button"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 8 - select the thick line
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/8-thickLine.png",
+      text: "Select the <i><u>thick line</u></i> option"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 9 - draw a maze
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/9-drawMaze.png",
+      text: "Draw a maze"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 10 - click the tick
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/10-tick.png",
+      text: "Click the tick"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 11 - Select the looks category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/11-looks.png",
+      text: "Select the <i><u>sprite loooks</u></i> category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "sprite-looks",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 12 - add a grow block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/12-grow.png",
+      text: "Add a <i><u>grow block</u></i>"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["grow_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["grow_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "grow_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["grow"],
+    presenter: "marty"
+  },
+  // step 13 - Click the grow block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/13-clickGrow.png",
+      text: "Click the grow block"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["grow"],
+    presenter: "marty"
+  },
+  // step 14 - Until the maze is big
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/14-bigMaze.png",
+      text: "Press grow until the maze is big"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["grow"],
+    presenter: "marty"
+  },
+  // step 15 - Move the marty sprite to the beginning of the maze
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/15-moveMarty.gif",
+      text: "Drag Marty to the beginning of the maze"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: ["grow"],
+    presenter: "marty"
+  },
+  // step 16 - Select the Marty Sprite
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/16-selectMartySprite.png",
+      text: "Select the Marty sprite"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 17 - add a make smaller block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/17-shrink.png",
+      text: "Add a <i><u>shrink</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["shrink_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["shrink_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "shrink_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "shrink"],
+    presenter: "marty"
+  },
+  // step 18 - Make Marty small
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/18-smallMarty.png",
+      text: "Make Marty small"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "shrink"],
+    presenter: "marty"
+  },
+  // step 19 - Select the maze sprite
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/19-mazeSprite.png",
+      text: "Select the maze sprite"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 20 - Select the sprite events category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/20-spriteEvents.png",
+      text: "Select the <i><u>sprite events</u></i> category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "sprite-start",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: ["grow"],
+    presenter: "marty"
+  },
+  // step 21 - Add an on bump block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/21-onBump.png",
+      text: "Add an <i><u>on bump</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouch_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouch_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "ontouch_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["ontouch"],
+    presenter: "marty"
+  },
+  // step 22 - add a send message block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/22-sendMessage.png",
+      text: "Add a <i><u>send message</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["message_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["message_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "message_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["ontouch=>message"],
+    presenter: "marty"
+  },
+  // step 23 - select the Marty sprite
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/23-martySprite.png",
+      text: "Select the Marty sprite"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 24 - add an onmessage block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/24-onMessage.png",
+      text: "Add an <i><u>on message</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onmessage_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onmessage_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "onmessage_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "onmessage"],
+    presenter: "marty"
+  },
+  // step 25 - Select the sprite motion category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/25-spriteMotion.png",
+      text: "Select the <i><u>sprite motion</u></i> category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "sprite-motion",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "onmessage"],
+    presenter: "marty"
+  },
+  // step 26 - add a rotate 12 block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/26-rotate12.png",
+      text: "Add a <i><u>rotate</u></i> block and set the number to 12"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["right_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["right_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "right_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "onmessage=>right"],
+    presenter: "marty"
+  },
+  // step 27 - add a go home block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/27-goHome.png",
+      text: "Add a <i><u>go home</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["home_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["home_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "home_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "onmessage=>right=>home"],
+    presenter: "marty"
+  },
+  // step 28 - Try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/cogTiltFwdBwd.gif",
+      text: "Try to steer Marty around the maze!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: ["tiltany=>forward", "tiltany=>back", "tiltany=>down", "tiltany=>up", "onmessage=>right=>home"],
+    presenter: "marty"
+  },
+  // step 29 - click the add scene button
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/29-addScene.png",
+      text: "Click the <i><u>add scene</u></i> button"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 30 - Click the edit background button
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/30-editBackground.png",
+      text: "Click the <i><u>background</u></i> button"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 31 - choose a background
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/31-chooseBackground.png",
+      text: "Choose a background"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 32 Click the tick
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/10-tick.png",
+      text: "Click the tick"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 33 - add an on green flag block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/33-onGreenFlag.png",
+      text: "Add an <i><u>on green flag</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onflag_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onflag_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "onflag_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onflag"],
+    presenter: "marty"
+  },
+  // step 34 - add a loop
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/34-loop.png",
+      text: "Add a <i><u>repeat</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["repeat_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["repeat_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "repeat_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onflag=>repeat"],
+    presenter: "marty"
+  },
+  // step 35 - add a jump block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/35-jump.png",
+      text: "Add a <i><u>hop</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["hop_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-motion"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["hop_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "hop_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onflag=>repeat=>hop"],
+    presenter: "marty"
+  },
+  // step 36 - add an on touch block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/36-onTouch.png",
+      text: "Add an <i><u>on tap</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onclick_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onclick_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "onclick_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onflag=>repeat=>hop", "ontap"],
+    presenter: "marty"
+  },
+  // step 37 - select the sprite stop category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/37-stop.png",
+      text: "Select the <i><u>sprite stop</u></i> category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "sprite-stop",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: ["onflag=>repeat=>hop", "ontap"],
+    presenter: "marty"
+  },
+  // step 38 - add a go to page 1 block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/38-goToPage1.png",
+      text: "Add a <i><u>Go To Page 1</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-stop"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["gotopage_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-stop"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["gotopage_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "gotopage_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onflag=>repeat=>hop", "ontap=>gotopage"],
+    presenter: "marty"
+  },
+  // step 39 - click on Marty to go back to the maze scene
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/39-clickMarty.png",
+      text: "Press Marty to go back to the maze scene!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 40 - click the add sprite button
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/40-addSprite.png",
+      text: "Click Add Sprite button"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // Add a star sprite
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/41-star.png",
+      text: "Add a star sprite"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 42 - move it to the goal
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/42-moveStar.gif",
+      text: "Move the star to the goal"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 43 - add an on bump block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/21-onBump.png",
+      text: "Add an <i><u>on bump</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouch_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["ontouch_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "ontouch_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onbump"],
+    presenter: "marty"
+  },
+  // step 42 - add a go to page 2 block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/42-goToPage2.png",
+      text: "Add a Go To Page 2 block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-stop"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["gotopage_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-stop"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["gotopage_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "gotopage_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["ontouch=>gotopage"],
+    presenter: "marty"
+  },
+  // step 43 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/5/solveMaze.gif",
+      text: "Try to steer Marty to the goal!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 44 - next steps!
+  {
+    nextStepActions: [],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Well done!</br>Now see if you can add more levels to the maze!"
+    }],
+    buttons: ["readAloud", "previous"],
+    expectedCode: [],
+    presenter: "marty"
+  }]
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (cogJrBlocksTutorial5);
+
+/***/ }),
+
+/***/ "./src/tutorial/tutorials-data/cog-jrblocks-6.js":
+/*!*******************************************************!*\
+  !*** ./src/tutorial/tutorials-data/cog-jrblocks-6.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const cogJrBlocksTutorial6 = {
+  id: "cog-jrblocks-6",
+  platform: "blocksjr",
+  title: "Make a parking sensor",
+  description: "We'll use the IR sensors on cog to detect obstacles!",
+  tutorialSteps: [/* STEP 1 -- intro*/
+  {
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "nextStep",
+      hexColor: "#FF0000"
+    }],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Let's make a parking sensor!"
+    }],
+    buttons: ["readAloud", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 2 - select the events category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/2-cogEvents.png",
+      text: "Select the <i><u>Cog Events</u></i> category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-start",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 3 - add an object sensed block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/3-objectSensed.png",
+      text: "Add an <i><u>On Object Sensed</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onobjectsensed_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onobjectsensed_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "onobjectsensed_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onobjectsensed"],
+    presenter: "marty"
+  },
+  // step 4 - select the cog lights category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/4-lights.png",
+      text: "Select the <i><u>Cog lights</u></i> category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-looks",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: ["onobjectsensed"],
+    presenter: "marty"
+  },
+  // step 5 - add a set color block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/5-setColor.png",
+      text: "Add a <i><u>Set Color</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "selectcolour_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onobjectsensed=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 6 - Try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/6-tryItOut.gif",
+      text: "Try it out! Cover the left object sensor"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 7 - Add another object sensed block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/7-secondObjectSensed.png",
+      text: "Add another On Object Sensed block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onobjectsensed_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onobjectsensed_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "onobjectsensed_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onobjectsensed=>selectcolour", "onobjectsensed"],
+    presenter: "marty"
+  },
+  // step 8 - change it to the right sensor
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/irSense-right.png",
+      text: "Change it to the right sensor"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 9 - add another set color block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/9-setColor.png",
+      text: "Add another Set Color block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "selectcolour_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onobjectsensed=>selectcolour", "onobjectsensed=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 10 - change the color
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/10-changeColor.png",
+      text: "Change the color"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: ["onobjectsensed=>selectcolour", "onobjectsensed=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 11 - Try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/11-tryItOut.gif",
+      text: "Try it out! Cover one sensor then the other"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 12 - add a bus sprite
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/12-busSprite.png",
+      text: "Add a <i><u>bus sprite</i></u>, make it smaller and move Marty"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 13 - Add another scene
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/13-addScene.png",
+      text: "Add another scene"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 14 - Add a bus sprite
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/14-busSprite.png",
+      text: "Add another bus sprite and move it"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 15 - Add a background
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/15-addBackground.png",
+      text: "Make a background with something behind the bus"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 16 - Click the text button
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/16-text.png",
+      text: "Press the <i><u>Add Text</i></u> button"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 17 - add the text "Look Out Behind"
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/17-lookOutBehind.png",
+      text: "Add text saying <b>Look out behind</b>"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 18 - Select the cog event blocks
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/2-cogEvents.png",
+      text: "Select the <i><u>Cog Events</u></i> category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-start",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 19 - add an on object sensed block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/3-objectSensed.png",
+      text: "Add an On Object Sensed block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onobjectsensed_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onobjectsensed_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "onobjectsensed_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onobjectsensed"],
+    presenter: "marty"
+  },
+  // step 20 - Add a set color
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/5-setColor.png",
+      text: "Add a <i><u>Set Color</u></i> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-looks"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["selectcolour_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "selectcolour_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint"],
+    expectedCode: ["onobjectsensed=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 21 - Add a note
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/21-addNote.png",
+      text: "Add a <i><u>musical note</u></i>"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-sound"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["playnote_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "playnote_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint", "readAloud"],
+    expectedCode: ["onobjectsensed=>selectcolour=>playnote"],
+    presenter: "marty"
+  },
+  // step 22 - add another color and a rest
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/22-colorAndRest.png",
+      text: "Add another color and a rest"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next"],
+    expectedCode: ["onobjectsensed=>selectcolour=>playnote=>selectcolour=>waitcrotchet"],
+    presenter: "marty"
+  },
+  // step 23 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/23-tryItOut.gif",
+      text: "Try it out! Put something close to the left object sensor"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 24 - Add obstacle sense, wait, clear color, go to page 1
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/24-addBlocks.png",
+      text: "Add <b>On Object Sensed<b>, <b>Pause</b>, <b>Clear Color</b> and <b>Go To Page 1</b> blocks"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: ["onobjectsensed=>selectcolour=>playnote=>selectcolour=>waitcrotchet", "onobjectsensed=>wait=>clearcolours=>gotopage"],
+    presenter: "marty"
+  },
+  // step 25 - Change the object sense to no object
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/25-setNoObstacle.png",
+      text: "Set the new object sense to <b>No Object</b>"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: ["onobjectsensed=>selectcolour=>playnote=>selectcolour=>playnote", "onobjectsensed=>wait=>clearcolours=>gotopage"],
+    presenter: "marty"
+  },
+  // step 26 - back to page 1
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/26-page1.png",
+      text: "It'll go back to page 1!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 27 - select the Marty sprite
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/27-martySprite.png",
+      text: "Select the Marty sprite"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 28 - add go to page 2
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/28-goToPage2.png",
+      text: "Add a <b>Go To Page 2</b> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-stop"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["gotopage_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-stop"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["gotopage_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "gotopage_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "readAloud", "hint"],
+    expectedCode: ["onobjectsensed=>selectcolour=>gotopage", "onobjectsensed=>selectcolour"],
+    presenter: "marty"
+  },
+  // step 29 - Try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/29-tryItOut.gif",
+      text: "Try it out! Cover the left object sensor for a while"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 30 - Add another scene
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/30-addScene.png",
+      text: "Add a third scene"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 31 - make the scene
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/31-scene.png",
+      text: "Make a scene with the text <b>Look out in front!</b>"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 32 - add sound and light
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/32-soundAndLight.png",
+      text: "Add an <b>On Flag</b> block, and sound and lights"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: ["onflag=>selectcolour=>playnote=>clearcolours=>playnote"],
+    presenter: "marty"
+  },
+  // step 33 - add a repeat forever block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/33-forever.png",
+      text: "Add a <b>Repeat Forever</b> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-stop"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["forever_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-stop"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["forever_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "forever_block"
+    }],
+    buttons: ["readAloud", "previous", "next", "hint", "readAloud"],
+    expectedCode: ["onflag=>selectcolour=>playnote=>clearcolours=>playnote=>forever"],
+    presenter: "marty"
+  },
+  // step 34 - add no object blocks
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/34-noObjectBlocks.png",
+      text: "Add <b>On Object</b>, <b>Pause</b>, <b>Lights Off</b>, and <b>Go To Page 1</b> blocks"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: ["onflag=>selectcolour=>playnote=>clearcolours=>playnote=>forever", "onobjectsensed=>wait=>clearcolours=>gotopage"],
+    presenter: "marty"
+  },
+  // step 35 - change it to be no object
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/35-setNoObject2.png",
+      text: "Set it trigger on <b>No Object</b> sensed"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: ["onflag=>selectcolour=>playnote=>clearcolours=>playnote=>forever", "onobjectsensed=>wait=>clearcolours=>gotopage"],
+    presenter: "marty"
+  },
+  // step 36 - back to page 1
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/36-page1.png",
+      text: "It'll go back to page 1!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 37 - add go to page 3, lights off
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/37-lastCode.png",
+      text: "Add a <b>Go To Page 3</b> block, and a <b>On Flag</b>=><b>Lights off</b>"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: ["onobjectsensed=>selectcolour=>gotopage", "onobjectsensed=>selectcolour=>gotopage", "onflag=>clearcolours"],
+    presenter: "marty"
+  },
+  // step 39 - Try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Try it out!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 39 - Try it out in fullscreen!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/6/39-fullscreen.png",
+      text: "Try it out in full screen mode"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["readAloud", "previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 40 - next steps!
+  {
+    nextStepActions: [],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Well done!</br>Now try making your lights and sounds more exciting"
+    }],
+    buttons: ["readAloud", "previous"],
+    expectedCode: [],
+    presenter: "marty"
+  }]
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (cogJrBlocksTutorial6);
+
+/***/ }),
+
+/***/ "./src/tutorial/tutorials-data/cog-jrblocks-7.js":
+/*!*******************************************************!*\
+  !*** ./src/tutorial/tutorials-data/cog-jrblocks-7.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const cogJrBlocksTutorial7 = {
+  id: "cog-jrblocks-7",
+  platform: "blocksjr",
+  title: "Let's get counting!",
+  description: "We'll introduce the counter in Jr Blocks, and use the IR sensor and tilt sensor to make a checkout and an odometer!",
+  tutorialSteps: [/* STEP 1 -- intro*/
+  {
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "nextStep",
+      hexColor: "#FF0000"
+    }],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Let's make a counter!"
+    }],
+    buttons: ["next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 2 - add an object sensed block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/2-objectSensed.png",
+      text: "Add an <b>On Object Sensed</b> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onobjectsensed_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onobjectsensed_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "onobjectsensed_block"
+    }],
+    buttons: ["previous", "next", "hint", "readAloud"],
+    expectedCode: ["onobjectsensed"],
+    presenter: "marty"
+  },
+  // step 3 - change it to on right object
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/irSense-right.png",
+      text: "Change it to trigger on the <b>right</b> object sensor"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: ["onobjectsensed"],
+    presenter: "marty"
+  },
+  // step 4 - select the flow category
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/4-flow.png",
+      text: "Select the <b>flow</b> category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "sprite-flow",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: ["onobjectsensed"],
+    presenter: "marty"
+  },
+  // step 5 - add a +1 block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/5-plus1.png",
+      text: "Add a <b>+1</b> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["increasecounter_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["increasecounter_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "increasecounter_block"
+    }],
+    buttons: ["previous", "next", "hint", "readAloud"],
+    expectedCode: ["onobjectsensed=>increasecounter"],
+    presenter: "marty"
+  },
+  // step 6 - Try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/6-tryItOut.gif",
+      text: "Try it out! Cover the right object sensor"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 7 - Add another object sensed block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/7-secondObjectSensed.png",
+      text: "Add another On Object Sensed block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onobjectsensed_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onobjectsensed_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "onobjectsensed_block"
+    }],
+    buttons: ["previous", "next", "hint", "readAloud"],
+    expectedCode: ["onobjectsensed=>increasecounter", "onobjectsensed"],
+    presenter: "marty"
+  },
+  // step 8 - add a -1 block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/8-minus1.png",
+      text: "Add a <b>-1</b> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["decreasecounter_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["decreasecounter_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "decreasecounter_block"
+    }],
+    buttons: ["previous", "next", "hint", "readAloud"],
+    expectedCode: ["onobjectsensed=>increasecounter", "onobjectsensed=>decreasecounter"],
+    presenter: "marty"
+  },
+  // step 9 - try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/9-tryItOut.gif",
+      text: "Try it out!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 10 - add some feedback
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/10-feedback.png",
+      text: "Add some sound and light feedback"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: ["onobjectsensed=>selectcolour=>increasecounter=>playnote=>clearcolours", "onobjectsensed=>selectcolour=>decreasecounter=>playnote=>clearcolours"],
+    presenter: "marty"
+  },
+  // step 11 - Try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/9-tryItOut.gif",
+      text: "Try it out! Use cog like a counter at the shop to count the number of items passing it"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 12 - go to the cog events
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/12-cogEvents.png",
+      text: "Select the Cog Events category"
+    }],
+    nextStepActions: [{
+      type: "HighlightElement",
+      elementId: "cog-start",
+      hexColor: "#FF0000",
+      onClickAction: "NextStep"
+    }],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 13 - Add an on shake block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/13-onShake.png",
+      text: "Add an <b>On Shake</b> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onshake_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "cog-start"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["onshake_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "onshake_block"
+    }],
+    buttons: ["previous", "next", "hint", "readAloud"],
+    expectedCode: ["onobjectsensed=>selectcolour=>increasecounter=>playnote=>clearcolours", "onobjectsensed=>selectcolour=>decreasecounter=>playnote=>clearcolours", "onshake"],
+    presenter: "marty"
+  },
+  // step 14 - Add a reset counter block
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/14-resetCounter.png",
+      text: "Add a <b>Reset Counter</b> block"
+    }],
+    nextStepActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["startstopcounter_block"]
+    }],
+    hintActions: [{
+      type: "ShowCategory",
+      category: "sprite-flow"
+    }, {
+      type: "HighlightBlocks",
+      blocks: ["startstopcounter_block"]
+    }, {
+      type: "DragBlockToScriptArea",
+      block: "startstopcounter_block"
+    }],
+    buttons: ["previous", "next", "hint", "readAloud"],
+    expectedCode: ["onobjectsensed=>selectcolour=>increasecounter=>playnote=>clearcolours", "onobjectsensed=>selectcolour=>decreasecounter=>playnote=>clearcolours", "onshake=>startstopcounter"],
+    presenter: "marty"
+  },
+  // step 15 - Try it out
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/shakeCog.gif",
+      text: "Shake cog to reset the counter"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 16 - Try it out!
+  {
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "Try it out! Count some things around the room"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 17 - clear the code
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/17-clearCode.png",
+      text: "Clear all the code by dragging it back to the blocks area"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 18 - Add a second scene
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/18-secondScene.png",
+      text: "Add a second scene"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 19 - add tilt left, +1, go to page 1
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/19-page2code.png",
+      text: "Add a <b>On Tilt Left</b>, <b>+1</b>, and <b>Go To Page 1</b> blocks"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: ["tiltany=>increasecounter=>gotopage"],
+    presenter: "marty"
+  },
+  // step 20 - Go back to page 1
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/20-page1.png",
+      text: "Go back to page 1"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 21 - Add tilt right, go to page 2
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/21-page1code.png",
+      text: "Add <b>On Tilt Right</b> and <b>Go To Page 2</b> blocks"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: ["tiltany=>gotopage"],
+    presenter: "marty"
+  },
+  // step 22 - try it out
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/22-tryItOut.gif",
+      text: "Try rotating cog!"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 23 - add push to clear
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/23-pushToClear.png",
+      text: "Add <b>On Button Push</b> and <b>Reset Counter</b> blocks"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: ["tiltany=>gotopage", "ontouchcog=>startstopcounter"],
+    presenter: "marty"
+  },
+  // step 24 - try it out
+  {
+    instructionActions: [{
+      type: "ShowInstructorImage",
+      url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/7/pushCogButton.jpg",
+      text: "Push the button on Cog to reset the counter"
+    }],
+    nextStepActions: [],
+    hintActions: [],
+    buttons: ["previous", "next", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  },
+  // step 25 - Next steps
+  {
+    nextStepActions: [],
+    instructionActions: [{
+      type: "ShowInstructorText",
+      text: "<p><b>Well done!</b> You've made cog an <b>odometer</b> - a device to measure number of rotations!</p> <p>&nbsp;</p><ul><li>Can you make it count down when you rotate cog the other way?</li><li>Make a trundle wheel and use cog to measure distance</li></ul>"
+    }],
+    buttons: ["previous", "readAloud"],
+    expectedCode: [],
+    presenter: "marty"
+  }]
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (cogJrBlocksTutorial7);
+
+/***/ }),
+
 /***/ "./src/utils/Cookie.js":
 /*!*****************************!*\
   !*** ./src/utils/Cookie.js ***!
@@ -31240,6 +33313,7 @@ class SVG2Canvas {
     return res;
   }
   static arrayToString(res) {
+    // NT: This seems to be working better than the previous version
     return res.map(cmd => {
       const [op, ...coords] = cmd;
       // join the coords with commas (or spaces, if you prefer)

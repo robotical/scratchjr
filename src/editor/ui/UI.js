@@ -809,6 +809,7 @@ export default class UI {
         if (ScratchJr.isEditable()) {
             var ns = newHTML('div', 'addsprite', sprites);
             ns.onclick = UI.addSprite;
+            ns.setAttribute('id', 'addsprite');
         }
     }
 

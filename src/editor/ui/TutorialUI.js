@@ -9,10 +9,10 @@ import UI from "./UI";
 export default class TutorialUI {
 
     static _highlightedElements = [];
+    static onReadAloudClickBound = null;
 
     /* Sets up tutorial UI elements */
     static setupUI(tutorial) {
-        speechSynthesis.getVoices(); // This is needed to get the voices in time
         this.tutorial = tutorial;
         const frame = gn('frame');
         TutorialUI.frame = frame;
@@ -41,12 +41,18 @@ export default class TutorialUI {
         const nextButton = gn('nextStep');
         nextButton.style.visibility = 'visible';
         nextButton.addEventListener('click', this.onNextClick);
+        const nextButtonInInstructor = gn('speechBubbleNextStep');
+        nextButtonInInstructor.style.visibility = 'visible';
+        nextButtonInInstructor.addEventListener('click', this.onNextClick);
     }
 
     static hideNextButton() {
         const nextButton = gn('nextStep');
         nextButton.style.visibility = 'hidden';
         nextButton.removeEventListener('click', this.onNextClick);
+        const nextButtonInInstructor = gn('speechBubbleNextStep');
+        nextButtonInInstructor.style.visibility = 'hidden';
+        nextButtonInInstructor.removeEventListener('click', this.onNextClick);
     }
 
     static showPreviousButton(onClick) {
@@ -54,12 +60,18 @@ export default class TutorialUI {
         const previousButton = gn('previousStep');
         previousButton.style.visibility = 'visible';
         previousButton.addEventListener('click', this.onPreviousClick);
+        const previousButtonInInstructor = gn('speechBubblePreviousStep');
+        previousButtonInInstructor.style.visibility = 'visible';
+        previousButtonInInstructor.addEventListener('click', this.onPreviousClick);
     }
 
     static hidePreviousButton() {
         const previousButton = gn('previousStep');
         previousButton.style.visibility = 'hidden';
         previousButton.removeEventListener('click', this.onPreviousClick);
+        const previousButtonInInstructor = gn('speechBubblePreviousStep');
+        previousButtonInInstructor.style.visibility = 'hidden';
+        previousButtonInInstructor.removeEventListener('click', this.onPreviousClick);
     }
 
     static showHintButton(onClick) {
@@ -75,34 +87,47 @@ export default class TutorialUI {
         hintButton.removeEventListener('click', this.onHintClick);
     }
 
-    static showReadAloudButton(textToRead, voiceName = "Google US English") {
-        const readAloudButton = gn('tutorialReadAloud');
-        this.onReadAloudClick = () => {
-            if (this.utterance) {
-                speechSynthesis.cancel();
-                this.utterance = null;
-            } else {
-                this.utterance = new SpeechSynthesisUtterance(stripHtml(textToRead));
-                this.utterance.lang = 'en-US';
-                const voices = speechSynthesis.getVoices();
-                const selectedVoice = voices.find(voice => voice.name === voiceName);
-                if (selectedVoice) {
-                    this.utterance.voice = selectedVoice;
-                }
-                this.utterance.onend = () => {
-                    this.utterance = null;
-                };
-                speechSynthesis.speak(this.utterance);
-            }
+    static onReadAloudClick() {
+        // If already speaking, cancel
+        if (this.utterance && speechSynthesis.speaking) {
+            console.log("Cancelling...");
+            speechSynthesis.cancel();
+            this.utterance = null;
+            return;
+        }
+        // Create a new this.utterance
+        this.utterance = new SpeechSynthesisUtterance(stripHtml(this.textToRead).trim() || " ");
+        this.utterance.lang = 'en-US';
+
+        // Debug hooks
+        this.utterance.onstart = () => console.log("▶️ started");
+        this.utterance.onboundary = e => console.log("boundary", e.charIndex);
+        this.utterance.onerror = e => console.error("❌ error", e);
+        this.utterance.onend = () => {
+            console.log("✅ finished");
+            this.utterance = null;
         };
-        readAloudButton.style.visibility = 'visible';
-        readAloudButton.addEventListener('click', this.onReadAloudClick);
+        this.utterance.onpause = () => console.log("⏸ paused");
+        this.utterance.onresume = () => console.log("▶️ resumed");
+
+        console.log("Speaking:", this.utterance.text);
+        speechSynthesis.speak(this.utterance);
+    }
+
+    static showReadAloudButton(textToRead, voiceName = "Google US English") {
+        this.utterance = null;
+        this.voiceName = voiceName;
+        this.textToRead = textToRead;
+        const btn = document.getElementById('tutorialReadAloud');
+        btn.style.visibility = 'visible';
+        this.onReadAloudClickBound = this.onReadAloudClick.bind(this);
+        btn.addEventListener('click', this.onReadAloudClickBound);
     }
 
     static hideReadAloudButton() {
         const readAloudButton = gn('tutorialReadAloud');
         readAloudButton.style.visibility = 'hidden';
-        readAloudButton.removeEventListener('click', this.onReadAloudClick);
+        readAloudButton.removeEventListener('click', this.onReadAloudClickBound);
     }
 
     /* Menu Bar */
@@ -159,9 +184,21 @@ export default class TutorialUI {
         TutorialUI.instructor.innerHTML = `
             <img src="./assets/ui/Marty_Instructor.svg" alt="instructor" class="tutorialInstructorImage" />
             <div class="speechBubble">
-            <div id="speechBubbleText"></div>
-            <div id="speechBubbleImage"></div>
-            <div id="speechBubbleVideo"></div>
+                <div class="speechBubbleControls">
+                    <div class="speechBubblePreviousStep" id="speechBubblePreviousStep">
+                        <svg id="tutorial-left-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                            <path d="M16 6L10 12L16 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="speechBubbleNextStep" id="speechBubbleNextStep">
+                        <svg id="tutorial-right-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                            <path d="M8 6L14 12L8 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="speechBubbleText"></div>
+                <div id="speechBubbleImage"></div>
+                <div id="speechBubbleVideo"></div>
                 <svg id="tutorial-down-pointing-arrow-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6 8L12 14L18 8" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -243,7 +280,7 @@ export default class TutorialUI {
         TutorialUI.momentarilyHighlightSpeechBubble(speechBubble);
     }
 
-    static showSpeechBubbleWithImage(imageURL, text="") {
+    static showSpeechBubbleWithImage(imageURL, text = "") {
         const speechBubble = TutorialUI.instructor.querySelector('.speechBubble');
         speechBubble.style.display = 'block';
         const speechBubbleImage = TutorialUI.instructor.querySelector('#speechBubbleImage');
@@ -410,6 +447,10 @@ export default class TutorialUI {
     /* Highlight Element */
     static highlightElement(elementID, colorRGBA, onClick) {
         const element = gn(elementID);
+        if (!element) {
+            console.warn(`Element with ID ${elementID} not found.`);
+            return;
+        }
         element.classList.add('highlightedElement');
         TutorialUI._setHighlightedElementColor(colorRGBA || 'rgba(255, 0, 0, 0.5)');
 
