@@ -6,6 +6,9 @@ import cogJrBlocksTutorial4 from "./tutorials-data/cog-jrblocks-4";
 import cogJrBlocksTutorial5 from "./tutorials-data/cog-jrblocks-5";
 import cogJrBlocksTutorial6 from "./tutorials-data/cog-jrblocks-6";
 import cogJrBlocksTutorial7 from "./tutorials-data/cog-jrblocks-7";
+import cogJrBlocksTutorial8 from "./tutorials-data/cog-jrblocks-8";
+import cogJrBlocksTutorial9 from "./tutorials-data/cog-jrblocks-9";
+import cogJrBlocksTutorial10 from "./tutorials-data/cog-jrblocks-10";
 
 
 const allTutorials = [
@@ -17,6 +20,9 @@ const allTutorials = [
     cogJrBlocksTutorial5,
     cogJrBlocksTutorial6,
     cogJrBlocksTutorial7,
+    cogJrBlocksTutorial8,
+    cogJrBlocksTutorial9,
+    cogJrBlocksTutorial10,
 ];
 export default class TutorialFetcher {
 

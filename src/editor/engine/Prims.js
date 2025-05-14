@@ -1106,7 +1106,7 @@ export default class Prims {
     }
 
     static martyTurnRight(strip) {
-        var num = Number(strip.thisblock.getArgValue()) * MartyBlocks.turnSize * 1.4;
+        var num = Number(strip.thisblock.getArgValue()) * MartyBlocks.turnSize;
         var s = strip.spr;
         const moveTime = MartyBlocks.turnMoveTime;
         let steps = Number(strip.thisblock.getArgValue());

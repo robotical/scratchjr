@@ -9,8 +9,8 @@ import { isVersionEqual } from "../utils/versionChecker";
 
 export default class MartyBlocks {
     static moveTimeBuffer = 500; //(in ms) this is a little extra time added to move time to allow Marty to keep up with the Sprite
-    static turnSize = 20;        //the angle in degrees that a turn should be, this is both sent to Marty and used in the Sprite
-    static turnStepCount = 50;    //the number of sprite 'steps' to make in a single turn
+    static turnSize = 10;        //the angle in degrees that a turn should be, this is both sent to Marty and used in the Sprite
+    static turnStepCount = 10;    //the number of sprite 'steps' to make in a single turn
     static turnMoveTime = 1500;  //the movetime parameter for left and right turns
     static stepMoveTime = 1500;  //the movetime parameter for forward, backward, left and right steps
     static YStepSize = 25;       //the size of a forward/backward step used by the sprite and Marty
