@@ -588,7 +588,12 @@ export default class Prims {
 
         } else {
             s.setPos(s.xcoor + strip.stepVector.x, s.ycoor + strip.stepVector.y);
-            strip.waitTimer = parseInt(tinterval * intervalToSeconds * (strip.waitTime));
+            const isMartyConnected = Prims.martyBlocks && Prims.martyBlocks?.marty;
+            if (isMartyConnected) {
+                strip.waitTimer = parseInt(tinterval * intervalToSeconds * (strip.waitTime));
+            } else {
+                strip.waitTimer = parseInt(tinterval * intervalToSeconds * (strip.waitTime) / 4);
+            }
             strip.distance = distance;
         }
     }
@@ -1139,7 +1144,7 @@ export default class Prims {
     }
 
     static martyTurnLeft(strip) {
-        var num = Number(strip.thisblock.getArgValue()) * MartyBlocks.turnSize * 1.4;
+        var num = Number(strip.thisblock.getArgValue()) * MartyBlocks.turnSize;
         var s = strip.spr;
         const moveTime = MartyBlocks.turnMoveTime;
         let steps = Number(strip.thisblock.getArgValue());

@@ -47,7 +47,7 @@ const cogJrBlocksTutorial9 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/9/3-text.png",
-                    text: "Add the text '<b>Shake to Start</b>'"
+                    text: "Add the text '<b>Shake to Start</b>' using the <i><u>Text</u></i> button"
                 }
             ],
             nextStepActions: [

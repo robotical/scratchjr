@@ -4231,7 +4231,14 @@ class Prims {
       strip.thisblock = strip.thisblock.next;
     } else {
       s.setPos(s.xcoor + strip.stepVector.x, s.ycoor + strip.stepVector.y);
-      strip.waitTimer = parseInt(tinterval * intervalToSeconds * strip.waitTime);
+      const isMartyConnected = Prims.martyBlocks && Prims.martyBlocks?.marty;
+      console.log("Prims.martyBlocks: ", Prims.martyBlocks);
+      console.log("Prims.martyBlocks.marty: ", Prims.martyBlocks?.marty);
+      if (isMartyConnected) {
+        strip.waitTimer = parseInt(tinterval * intervalToSeconds * strip.waitTime);
+      } else {
+        strip.waitTimer = parseInt(tinterval * intervalToSeconds * strip.waitTime / 4);
+      }
       strip.distance = distance;
     }
   }
@@ -4720,7 +4727,7 @@ class Prims {
     Prims.turning(strip);
   }
   static martyTurnLeft(strip) {
-    var num = Number(strip.thisblock.getArgValue()) * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnSize * 1.4;
+    var num = Number(strip.thisblock.getArgValue()) * _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnSize;
     var s = strip.spr;
     const moveTime = _marty_MartyBlocks__WEBPACK_IMPORTED_MODULE_6__["default"].turnMoveTime;
     let steps = Number(strip.thisblock.getArgValue());
@@ -28532,7 +28539,7 @@ const cogJrBlocksTutorial10 = {
     instructionActions: [{
       type: "ShowInstructorImage",
       url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/10/19-squareExplain-3.png",
-      text: "And <b>4 repeats</b> means there will be <b>4 corners</b>"
+      text: "And <b>4 repeats</b> means there will be <b>4 sides</b>"
     }],
     nextStepActions: [],
     hintActions: [],
@@ -32966,7 +32973,7 @@ const cogJrBlocksTutorial9 = {
     instructionActions: [{
       type: "ShowInstructorImage",
       url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/9/3-text.png",
-      text: "Add the text '<b>Shake to Start</b>'"
+      text: "Add the text '<b>Shake to Start</b>' using the <i><u>Text</u></i> button"
     }],
     nextStepActions: [],
     hintActions: [],
