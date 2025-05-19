@@ -3,6 +3,16 @@
   "path": "./svglibrary/",
   "samples": ["samples/Star.txt"],
   "backgrounds": [
+    {"md5":"Mars.svg","width":480,"height":360,"ext":"svg","name":"Mars"},
+    {"md5":"RedCarpet.svg","width":480,"height":360,"ext":"svg","name":"RedCarpet"},
+    {"md5":"WoodenFloor.svg","width":480,"height":360,"ext":"svg","name":"WoodenFloor"},
+
+    {"md5":"Road1.svg","width":480,"height":360,"ext":"svg","name":"Road1"},
+    {"md5":"Road2.svg","width":480,"height":360,"ext":"svg","name":"Road2"},
+    {"md5":"USMap.svg","width":480,"height":360,"ext":"svg","name":"USMap"},
+    {"md5":"Beach.svg","width":480,"height":360,"ext":"svg","name":"Beach"},
+    {"md5":"Racetrack.svg","width":480,"height":360,"ext":"svg","name":"Racetrack"},
+
     {"md5":"Farm.svg","width":480,"height":360,"ext":"svg","name":"Farm"},
     {"md5":"Park.svg","width":480,"height":360,"ext":"svg","name":"Park"},
     {"md5":"Suburbs.svg","width":480,"height":360,"ext":"svg","name":"Suburbs"},
