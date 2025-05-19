@@ -9,6 +9,19 @@ let size = 24;
 let prevX = 0;
 let prevY = 0;
 
+const SPRITE_COLORS = [
+  "orange",    // 0
+  "red",   // 1
+  "blue",  // 2
+  "green", // 3
+  "purple", // 4
+  "yellow", // 5
+  "pink",   // 6
+  "cyan",   // 7
+  "lime",   // 8
+  "brown"   // 9
+];
+
 export default class Trace {
   static get hidden() {
     return hidden;
@@ -53,20 +66,25 @@ export default class Trace {
       c.parentElement.removeChild(c);
       gn(ScratchJr.stage.currentPage.id).appendChild(c);
     }
+    for (var i = 0; i < ScratchJr.stage.currentPage.getSprites().length; i++) {
+      const spriteName = ScratchJr.stage.currentPage.getSprites()[i];
+      var spr = gn(spriteName);
+      if (!spr) {
+        return;
+      }
+      var obj = spr.owner;
 
-    var spr = gn(ScratchJr.stage.currentPage.currentSpriteName);
-    if (!spr) {
-      return;
+      var dx = obj.xcoor + size / 2;
+      var dy = obj.ycoor - size / 2;
+      c.style.visibility = "visible";
+
+      const color = SPRITE_COLORS[i % SPRITE_COLORS.length];
+
+      Trace.setTraceValues(dx, dy, color);
     }
-    var obj = spr.owner;
-
-    var dx = obj.xcoor + size / 2;
-    var dy = obj.ycoor - size / 2;
-    c.style.visibility = "visible";
-    Trace.setTraceValues(dx, dy);
   }
 
-  static setTraceValues(dx, dy) {
+  static setTraceValues(dx, dy, color = "red") {
     var cnv = gn("trace");
     let numX = +(dx / size).toFixed(2);
     let numY = +(dy / size).toFixed(2);
@@ -90,7 +108,7 @@ export default class Trace {
 
     // Draw the trace line
     ctx.beginPath();
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = color;
     ctx.moveTo(prevX, prevY);
     ctx.lineTo(numX, numY);
     ctx.stroke();

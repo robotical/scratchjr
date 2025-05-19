@@ -12358,6 +12358,26 @@ let height = 362;
 let size = 24;
 let prevX = 0;
 let prevY = 0;
+const SPRITE_COLORS = ["orange",
+// 0
+"red",
+// 1
+"blue",
+// 2
+"green",
+// 3
+"purple",
+// 4
+"yellow",
+// 5
+"pink",
+// 6
+"cyan",
+// 7
+"lime",
+// 8
+"brown" // 9
+];
 class Trace {
   static get hidden() {
     return hidden;
@@ -12399,17 +12419,21 @@ class Trace {
       c.parentElement.removeChild(c);
       (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)(_ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].stage.currentPage.id).appendChild(c);
     }
-    var spr = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)(_ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].stage.currentPage.currentSpriteName);
-    if (!spr) {
-      return;
+    for (var i = 0; i < _ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].stage.currentPage.getSprites().length; i++) {
+      const spriteName = _ScratchJr__WEBPACK_IMPORTED_MODULE_1__["default"].stage.currentPage.getSprites()[i];
+      var spr = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)(spriteName);
+      if (!spr) {
+        return;
+      }
+      var obj = spr.owner;
+      var dx = obj.xcoor + size / 2;
+      var dy = obj.ycoor - size / 2;
+      c.style.visibility = "visible";
+      const color = SPRITE_COLORS[i % SPRITE_COLORS.length];
+      Trace.setTraceValues(dx, dy, color);
     }
-    var obj = spr.owner;
-    var dx = obj.xcoor + size / 2;
-    var dy = obj.ycoor - size / 2;
-    c.style.visibility = "visible";
-    Trace.setTraceValues(dx, dy);
   }
-  static setTraceValues(dx, dy) {
+  static setTraceValues(dx, dy, color = "red") {
     var cnv = (0,_utils_lib__WEBPACK_IMPORTED_MODULE_0__.gn)("trace");
     let numX = +(dx / size).toFixed(2);
     let numY = +(dy / size).toFixed(2);
@@ -12433,7 +12457,7 @@ class Trace {
 
     // Draw the trace line
     ctx.beginPath();
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = color;
     ctx.moveTo(prevX, prevY);
     ctx.lineTo(numX, numY);
     ctx.stroke();
