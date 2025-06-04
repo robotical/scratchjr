@@ -9605,7 +9605,7 @@ class Project {
     });
   }
   static save(id, whenDone) {
-    console.log(Error().stack);
+    // console.log(Error().stack);
     saving = true;
     var th = metadata.thumbnail;
     if (th && _ScratchJr__WEBPACK_IMPORTED_MODULE_0__["default"].editmode != 'storyStarter') {
@@ -20084,6 +20084,7 @@ class Paint {
     }
   }
   static createCharFromXML(str) {
+    console.log("HEEEERER");
     nativeJr = str.indexOf('Scratch Jr') > -1;
     var dx = workspaceWidth < 432 ? Math.floor((432 - workspaceWidth) / 2) : 0;
     var dy = workspaceHeight < 384 ? Math.floor((384 - workspaceHeight) / 2) : 0;
@@ -37160,7 +37161,7 @@ class ScratchAudio {
       prefix = '';
     }
     if (!_lib__WEBPACK_IMPORTED_MODULE_0__.isAndroid) {
-      prefix = 'HTML5/';
+      prefix = '';
     }
     uiSounds = {};
     for (var i = 0; i < defaultSounds.length; i++) {
@@ -37182,7 +37183,6 @@ class ScratchAudio {
           fcn(name);
         }
       };
-      console.log('TODO: Sounds not playing when load as object');
       _tablet_OS__WEBPACK_IMPORTED_MODULE_2__["default"].registerSound(url, snd, whenDone);
     } else {
       // In Android, this is handled outside of JavaScript, so just place a stub here.
@@ -38896,6 +38896,7 @@ class DatabaseManager {
     const values = "?,?";
     json.values = [fileMD5, content];
     json.stmt = `insert into projectfiles (${keylist.toString()}) values (${values})`;
+    console.log("json", json);
     var insertSQLResult = this.stmt(json);
     this.save(); // flush the database to disk.
 
@@ -39211,17 +39212,18 @@ class SoundManager {
   constructor() {
     this.currentAudio = {};
   }
-  async io_registersound(name) {
+  async io_registersound(dir, name) {
     if (!this.currentAudio[name]) {
-      const dataUri = await this.io_getAudioData(name);
+      const dataUri = await this.io_getAudioData(dir, name);
       this.loadSoundFromDataURI(name, dataUri);
     }
   }
-  async io_getAudioData(audioName) {
-    // console.log("io_getAudioData - looking for", audioName);
+  async io_getAudioData(dir, audioName) {
+    console.log("io_getAudioData - looking for sound", dir, audioName);
 
     // try fishing out of the app directory first - pig.wav
-    let filePath = await _StaticFiles__WEBPACK_IMPORTED_MODULE_2__["default"].getFilenameFromStaticFiles(audioName, "");
+    let filePath = await _StaticFiles__WEBPACK_IMPORTED_MODULE_2__["default"].getFilenameFromStaticFiles(audioName, dir);
+    console.log("filePath", filePath);
     if (!filePath) {
       // if not pull from the sounds directory
       filePath = await _StaticFiles__WEBPACK_IMPORTED_MODULE_2__["default"].getFilenameFromStaticFiles(audioName, "sounds");
@@ -39236,21 +39238,27 @@ class SoundManager {
       return projectDBFile;
     }
     const data = await _StaticFiles__WEBPACK_IMPORTED_MODULE_2__["default"].readFile(filePath);
+    console.log("data", data);
     if (!data) {
       console.log("io_getAudioData - could not find on disk", audioName, filePath);
       return null;
     }
     const dataStr = _StaticFiles__WEBPACK_IMPORTED_MODULE_2__["default"].arrayBufferToBase64(data);
+    console.log("dataStr", dataStr);
     const extension = path_browserify__WEBPACK_IMPORTED_MODULE_1___default().extname(filePath);
     if (extension === ".mp3") {
       return `data:audio/mp3;base64,${dataStr}`;
     } else if (extension === ".wav") {
       return `data:audio/wav;base64,${dataStr}`;
+    } else if (extension === ".webm") {
+      return `data:audio/wav;base64,${dataStr}`;
     } else {
+      console.log("io_getAudioData - unknown sound format", audioName, filePath, extension);
       return null;
     }
   }
   loadSoundFromDataURI(name, dataUri) {
+    console.log("loadSoundFromDataURI", name, dataUri);
     if (dataUri && name) {
       let audio = new window.Audio(dataUri);
       audio.volume = 0.8; // don't oversaturate the speakers
@@ -39280,7 +39288,6 @@ class SoundManager {
       }
       this.playSoundStartTime = null;
       console.log("io_playsound: unable to play unregistered sound - skipping", name);
-      console.log(this.currentAudio);
       // tell scratch the empty sound has finished - otherwise
       // the green blocks will not progress
       setTimeout(function () {
@@ -39311,6 +39318,7 @@ class SoundManager {
   }
 }
 const soundManagerInstance = new SoundManager();
+
 
 /***/ }),
 
@@ -39557,10 +39565,33 @@ class StaticFiles {
     if (!filePath || filePath === "") throw new Error("File path cannot be null or empty");
     try {
       const response = await fetch(filePath);
+      const text = await response.clone().text();
+      if (text.includes("<!DOCTYPE html") || text.includes("<html")) {
+        console.warn("Received HTML instead of file for:", filePath);
+        return null;
+      }
       return response.arrayBuffer();
     } catch (e) {
       console.log("Something went wrong with file:", filePath, "error =>", e);
       return "";
+    }
+  }
+  static async fileExists(filePath) {
+    if (!filePath || filePath === "") {
+      console.warn("File path cannot be null or empty");
+      return false;
+    }
+    try {
+      const response = await fetch(filePath);
+      const text = await response.clone().text();
+      if (text.includes("<!DOCTYPE html") || text.includes("<html")) {
+        console.warn("Received HTML instead of file for:", filePath);
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.log("Something went wrong with file:", filePath, "error =>", e);
+      return false;
     }
   }
   static async getFilenameFromStaticFiles(file, directory) {
@@ -39583,18 +39614,23 @@ class StaticFiles {
     // if not return null.
     return null;
   }
-  static async fileExists(filePath) {
-    try {
-      var http = new XMLHttpRequest();
-      http.open('HEAD', filePath, false);
-      http.send();
-      return http.status != 404;
-    } catch (e) {
-      console.log("File", filePath, "doesnt exist.", e);
-      return false;
-    }
-  }
+
+  // static fileExists(url) {
+  //   return new Promise((resolve) => {
+  //     const xhr = new XMLHttpRequest();
+  //     xhr.open("HEAD", url, true);
+  //     xhr.onload = function () {
+  //       // If status is 200, the file exists
+  //       resolve(xhr.status === 200);
+  //     };
+  //     xhr.onerror = function () {
+  //       resolve(false); // Network error = file doesn't exist
+  //     };
+  //     xhr.send();
+  //   });
+  // }
 }
+window.StaticFiles = StaticFiles;
 
 /***/ }),
 
@@ -39631,7 +39667,7 @@ class WebappInterface {
     return db.stmt(json);
   }
   static io_registersound(dir, name) {
-    _SoundManager__WEBPACK_IMPORTED_MODULE_1__.soundManagerInstance.io_registersound(name);
+    _SoundManager__WEBPACK_IMPORTED_MODULE_1__.soundManagerInstance.io_registersound(dir, name);
   }
   static io_setfile(arg) {
     console.log("io_setfile", arg);

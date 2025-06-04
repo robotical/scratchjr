@@ -44,7 +44,7 @@ export default class ScratchAudio {
             prefix = '';
         }
         if (!isAndroid) {
-            prefix = 'HTML5/';
+            prefix = '';
         }
         uiSounds = {};
 
@@ -68,7 +68,6 @@ export default class ScratchAudio {
                     fcn(name);
                 }
             };
-            console.log('TODO: Sounds not playing when load as object');
             OS.registerSound(url, snd, whenDone);
         } else {
             // In Android, this is handled outside of JavaScript, so just place a stub here.

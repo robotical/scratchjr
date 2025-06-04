@@ -17,7 +17,7 @@ export default class WebappInterface {
   }
 
   static io_registersound(dir, name) {
-    soundManagerInstance.io_registersound(name);
+    soundManagerInstance.io_registersound(dir, name);
   }
 
   static io_setfile(arg) {
@@ -256,7 +256,6 @@ export default class WebappInterface {
             // saving new sound...  will save as a webm file.
             const fn = await WebappInterface.io_setmedianame(fileReader.result, filename, 'webm');
             soundManagerInstance.loadSoundFromDataURI(filename + '.webm', fileReader.result);
-
           };
           fileReader.readAsDataURL(blob);
         }

@@ -16,10 +16,38 @@ export default class StaticFiles {
       throw new Error("File path cannot be null or empty");
     try {
       const response = await fetch(filePath);
+      const text = await response.clone().text();
+
+      if (text.includes("<!DOCTYPE html") || text.includes("<html")) {
+        console.warn("Received HTML instead of file for:", filePath);
+        return null;
+      }
+
       return response.arrayBuffer();
     } catch (e) {
       console.log("Something went wrong with file:", filePath, "error =>", e);
       return "";
+    }
+  }
+
+  static async fileExists(filePath) {
+    if (!filePath || filePath === "") {
+      console.warn("File path cannot be null or empty");
+      return false;
+    }
+    try {
+      const response = await fetch(filePath);
+      const text = await response.clone().text();
+
+      if (text.includes("<!DOCTYPE html") || text.includes("<html")) {
+        console.warn("Received HTML instead of file for:", filePath);
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      console.log("Something went wrong with file:", filePath, "error =>", e);
+      return false;
     }
   }
 
@@ -46,16 +74,6 @@ export default class StaticFiles {
     // if not return null.
     return null;
   }
-
-  static async fileExists(filePath) {
-    try {
-      var http = new XMLHttpRequest();
-      http.open('HEAD', filePath, false);
-      http.send();
-      return http.status!=404;
-    } catch (e) {
-      console.log("File", filePath, "doesnt exist.", e);
-      return false;
-    }
-  }
 }
+
+window.StaticFiles = StaticFiles;

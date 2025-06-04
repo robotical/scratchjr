@@ -437,7 +437,7 @@ export default class Project {
     }
 
     static save (id, whenDone) {
-        console.log(Error().stack);
+        // console.log(Error().stack);
         saving = true;
         var th = metadata.thumbnail;
         if (th && ScratchJr.editmode != 'storyStarter') { // Don't try to delete the thumbnail in a sample project

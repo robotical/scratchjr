@@ -8,19 +8,18 @@ export default class SoundManager {
     this.currentAudio = {};
   }
 
-  async io_registersound(name) {
+  async io_registersound(dir, name) {
     if (!this.currentAudio[name]) {
-      const dataUri = await this.io_getAudioData(name);
+      const dataUri = await this.io_getAudioData(dir, name);
       this.loadSoundFromDataURI(name, dataUri);
     }
   }
 
-  async io_getAudioData(audioName) {
-    // console.log("io_getAudioData - looking for", audioName);
+  async io_getAudioData(dir, audioName) {
+    console.log("io_getAudioData - looking for sound", dir, audioName);
 
     // try fishing out of the app directory first - pig.wav
-    let filePath = await StaticFiles.getFilenameFromStaticFiles(audioName, "");
-
+    let filePath = await StaticFiles.getFilenameFromStaticFiles(audioName, dir);
     if (!filePath) {
       // if not pull from the sounds directory
       filePath = await StaticFiles.getFilenameFromStaticFiles(
@@ -28,7 +27,6 @@ export default class SoundManager {
         "sounds"
       );
     }
-
     if (!filePath) {
       // if not pull from the scratch document folder.
       console.log("...trying to look in the PROJECTFILE table", audioName);
@@ -40,7 +38,6 @@ export default class SoundManager {
       console.log("...WARNING: unable to find: ", audioName);
       return projectDBFile;
     }
-
     const data = await StaticFiles.readFile(filePath);
     if (!data) {
       console.log(
@@ -56,7 +53,17 @@ export default class SoundManager {
       return `data:audio/mp3;base64,${dataStr}`;
     } else if (extension === ".wav") {
       return `data:audio/wav;base64,${dataStr}`;
-    } else {
+    }
+    else if (extension === ".webm") {
+      return `data:audio/wav;base64,${dataStr}`;
+    }
+    else {
+      console.log(
+        "io_getAudioData - unknown sound format",
+        audioName,
+        filePath,
+        extension
+      );
       return null;
     }
   }
@@ -97,7 +104,6 @@ export default class SoundManager {
         "io_playsound: unable to play unregistered sound - skipping",
         name
       );
-      console.log(this.currentAudio);
       // tell scratch the empty sound has finished - otherwise
       // the green blocks will not progress
       setTimeout(function () {
@@ -131,4 +137,5 @@ export default class SoundManager {
   }
 }
 
-export const soundManagerInstance = new SoundManager();
+const soundManagerInstance = new SoundManager();
+export { soundManagerInstance };
