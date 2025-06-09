@@ -1,7 +1,9 @@
+import Localization from "../../utils/Localization";
+
 const cogJrBlocksTutorial11 = {
     id: "cog-jrblocks-11",
     platform: "blocksjr",
-    title: "Space Game",
+    title: Localization.localize("COG_JRBLOCKS11_TITLE"),
     description: "We'll make a game where you fly a rocket through space!",
     tutorialSteps: [
         /* STEP 1 -- intro*/
@@ -16,7 +18,7 @@ const cogJrBlocksTutorial11 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Let's make a game set in space!"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_1_TEXT")
                 }
             ],
             buttons: ["next", "readAloud"],
@@ -30,7 +32,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/2-background.png",
-                    text: "Add a <b>space background</b>"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_2_TEXT")
                 }
             ],
             nextStepActions: [
@@ -48,7 +50,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/3-rocket.png",
-                    text: "Add a <b>rocket sprite</B>"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_3_TEXT")
                 }
             ],
             nextStepActions: [
@@ -66,7 +68,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/4-rocketPosition.png",
-                    text: "Make the rocket smaller and move it to the bottom"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_4_TEXT")
                 }
             ],
             nextStepActions: [
@@ -83,7 +85,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/5-deleteMarty.png",
-                    text: "<b>Delete the Marty sprite</b> by pressing and holding it"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_5_TEXT")
                 }
             ],
             nextStepActions: [
@@ -101,7 +103,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/6-motionControl.png",
-                    text: "Add <b>tilt left</b> and <b>tilt right</b> blocks to add motion control"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_6_TEXT")
                 }
             ],
             nextStepActions: [
@@ -119,7 +121,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/cogTiltLeft.gif",
-                    text: "Try it out!<br /><br />Tilt cog <b>left and right</b> to move the rocket"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_7_TEXT")
                 }
             ],
             nextStepActions: [
@@ -137,7 +139,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/8-speed.png",
-                    text: "Make the rocket move faster!"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_8_TEXT")
                 }
             ],
             nextStepActions: [
@@ -155,7 +157,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/9-star.png",
-                    text: "Add a <b>star sprite</b>"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_9_TEXT")
                 }
             ],
             nextStepActions: [
@@ -173,7 +175,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/10-moveStar.png",
-                    text: "Move it to the top of the screen"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_10_TEXT")
                 }
             ],
             nextStepActions: [
@@ -191,7 +193,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/11-down.png",
-                    text: "Make it move down <b>15 steps</b>"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_11_TEXT")
                 }
             ],
             nextStepActions: [
@@ -208,7 +210,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/12-tryItOut.gif",
-                    text: "<b>Try it out!</b><Br/><Br />Press the green flag to run the code"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_12_TEXT")
                 }
             ],
             nextStepActions: [
@@ -227,7 +229,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/13-repeat.png",
-                    text: "Make it happen <b>10 times</b>"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_13_TEXT")
                 }
             ],
             nextStepActions: [
@@ -245,7 +247,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/14-right.png",
-                    text: "Add a <b>forward</b> block to make the star come down in a different place each time"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_14_TEXT")
                 }
             ],
             nextStepActions: [
@@ -263,7 +265,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/15-speed.png",
-                    text: "Speed up that movement"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_15_TEXT")
                 }
             ],
             nextStepActions: [
@@ -281,7 +283,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/16-hideStar.png",
-                    text: "Hide the star while it's moving sideways"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_16_TEXT")
                 }
             ],
             nextStepActions: [
@@ -299,7 +301,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/17-onBump.png",
-                    text: "Also hide the star when the rocket collects it"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_17_TEXT")
                 }
             ],
             nextStepActions: [
@@ -317,7 +319,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/18-rocket.png",
-                    text: "Go back to the <b>rocket sprite</b>"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_18_TEXT")
                 }
             ],
             nextStepActions: [
@@ -334,7 +336,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/19-resetScore.png",
-                    text: "Add blocks to <b>reset the counter</b> at the start"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_19_TEXT")
                 }
             ],
             nextStepActions: [
@@ -352,7 +354,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/20-increaseScore.png",
-                    text: "Increase the score when the rocket collects a star"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_20_TEXT")
                 }
             ],
             nextStepActions: [
@@ -370,7 +372,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/21-lightFeedback.png",
-                    text: "Also <b>add some lights</b> when a star is collected"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_21_TEXT")
                 }
             ],
             nextStepActions: [
@@ -388,7 +390,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/22-sound.png",
-                    text: "Add a sound too"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_22_TEXT")
                 }
             ],
             nextStepActions: [
@@ -407,7 +409,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/23-tryItOut.gif",
-                    text: "Try it out!"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_23_TEXT")
                 }
             ],
             nextStepActions: [
@@ -425,7 +427,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/24-backgroundLights.png",
-                    text: "Add some background lights and set them to repeat forever"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_24_TEXT")
                 }
             ],
             nextStepActions: [
@@ -444,7 +446,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/25-secondStar.png",
-                    text: "Add another star"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_25_TEXT")
                 }
             ],
             nextStepActions: [
@@ -463,7 +465,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/26-moveStar.png",
-                    text: "Move it to the top of the screen too"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_26_TEXT")
                 }
             ],
             nextStepActions: [
@@ -482,7 +484,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/27-firstStar.png",
-                    text: "Select the first star"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_27_TEXT")
                 }
             ],
             nextStepActions: [
@@ -501,7 +503,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/28-copyCode.gif",
-                    text: "Copy the code to the new star by <b>holding and dragging</b>"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_28_TEXT")
                 }
             ],
             nextStepActions: [
@@ -520,7 +522,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/29-secondStar.png",
-                    text: "Select the second star"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_29_TEXT")
                 }
             ],
             nextStepActions: [
@@ -539,7 +541,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/30-changeMoves.png",
-                    text: "Change the movement and the number of repeats"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_30_TEXT")
                 }
             ],
             nextStepActions: [
@@ -558,7 +560,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/31-tryItOut.gif",
-                    text: "Try it out!"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_31_TEXT")
                 }
             ],
             nextStepActions: [
@@ -577,7 +579,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/32-page2.png",
-                    text: "Add a <b>second page</b>"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_32_TEXT")
                 }
             ],
             nextStepActions: [
@@ -595,7 +597,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/33-gameOver.png",
-                    text: "Make a <b>Game over screen</b>"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_33_TEXT")
                 }
             ],
             nextStepActions: [
@@ -614,7 +616,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/34-shake.png",
-                    text: "Add <b>shake to go to page 1</b> blocks"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_34_TEXT")
                 }
             ],
             nextStepActions: [
@@ -632,7 +634,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/35-page1.png",
-                    text: "Go back to <b>page 1</b>"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_35_TEXT")
                 }
             ],
             nextStepActions: [
@@ -651,7 +653,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/36-star.png",
-                    text: "Select a star sprite"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_36_TEXT")
                 }
             ],
             nextStepActions: [
@@ -670,7 +672,7 @@ const cogJrBlocksTutorial11 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/11/37-goToPage.png",
-                    text: "Add a <b>Go to page 2</b> block"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_37_TEXT")
                 }
             ],
             nextStepActions: [
@@ -688,7 +690,7 @@ const cogJrBlocksTutorial11 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Try it out! Press the green flag to start, then shake cog to restart"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_38_TEXT")
                 }
             ],
             nextStepActions: [
@@ -708,7 +710,7 @@ const cogJrBlocksTutorial11 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "<p><b>Well done!</b><br />You've made a space game!<br /><br />Can you add more stars to collect?"
+                    text: Localization.localize("COG_JRBLOCKS11_STEP_44_TEXT")
                 }
             ],
             buttons: ["previous", "readAloud"],

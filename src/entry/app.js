@@ -17,6 +17,9 @@ import {
   inappPrivacyPolicy,
 } from "./inapp";
 
+// import TutorialFetcher from '../tutorial/TutorialFetcher';
+import TutorialEngine from '../tutorial/TutorialEngine';
+
 function loadSettings(settingsRoot, whenDone) {
   IO.requestFromServer(settingsRoot + "settings.json", (result) => {
     try {
@@ -40,7 +43,7 @@ function loadSettings(settingsRoot, whenDone) {
 window.onload = () => {
   // Function to be called after settings, locale strings, and Media Lib
   // are asynchronously loaded. This is overwritten per HTML page below.
-  let entryFunction = () => {};
+  let entryFunction = () => { };
 
   // Root directory for includes. Needed in case we are in the inapp-help
   // directory (and root becomes '../')
@@ -138,11 +141,28 @@ window.onload = () => {
   // Start up sequence
   // Load settings from JSON
   loadSettings(root, () => {
+
     // Load locale strings from JSON
     Localization.includeLocales(root, () => {
       // Load Media Lib from JSON
       MediaLib.loadMediaLib(root, () => {
         entryFunction();
+        
+        /*Tutorial*/
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("tutorial")) {
+          // Load tutorial
+          const TutorialFetcher = require('../tutorial/TutorialFetcher').default;
+          const tutorial = TutorialFetcher.fetchTutorial(urlParams.get("tutorial"));
+          if (tutorial) {
+            // For better UI, give a little time for the UI to load before starting the tutorial
+            setTimeout(() => {
+              window.tutorialEngine = new TutorialEngine(tutorial);
+            }, 1000);
+          }
+        }
+        /* End Tutorial */
+
       });
     });
     // Initialize currentUsage data

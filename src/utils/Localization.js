@@ -77,13 +77,13 @@ export default class Localization {
             }
         }
 
-        return defaultLocale;
+        return window.applicationManager?.selectedLocale || defaultLocale;
     }
 
     // Include locale support files and load the messages
     // Call this when the app is initialized
     static includeLocales (localizationRoot, whenDone) {
-        var localizationCookie = Cookie.get('localization');
+        var localizationCookie = window.applicationManager?.selectedLocale || Cookie.get('localization');
 
         if (localizationCookie === null) {
             currentLocale = this.determineLocaleFromBrowser();

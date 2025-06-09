@@ -35,8 +35,6 @@ import { spriteToggleOn } from "../../html-svgs/sprite_toggle_on";
 import { batterySvg } from '../../html-svgs/battery-svg';
 import { signalSvg } from '../../html-svgs/signal-svg';
 import { createRaftConnectionIssueDetectedHelper, createRaftConnectionIssueResolvedHelper, raftDisconnectedSubscriptionHelper, raftVerifiedSubscriptionHelper } from '../../utils/raft-subscription-helpers';
-import TutorialFetcher from '../../tutorial/TutorialFetcher';
-import TutorialEngine from '../../tutorial/TutorialEngine';
 import { truncateString } from "../../utils/truncate-string";
 import Trace from './Trace';
 
@@ -71,18 +69,7 @@ export default class UI {
         ScratchJr.setupEditableField();
         UI.aspectRatioAdjustment();
 
-        /*Tutorial*/
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get("tutorial")) {
-            // Load tutorial
-            const tutorial = TutorialFetcher.fetchTutorial(urlParams.get("tutorial"));
-            if (tutorial) {
-                // For better UI, give a little time for the UI to load before starting the tutorial
-                setTimeout(() => {
-                    window.tutorialEngine = new TutorialEngine(tutorial);
-                }, 1000);
-            }
-        }
+
     }
 
     // Helps debug on Android 4.2 by enabling the user to type in a
