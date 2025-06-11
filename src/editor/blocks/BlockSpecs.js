@@ -272,7 +272,7 @@ export default class BlockSpecs {
         ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'],
         ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'],
         [],
-        ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'],
+        ['wait', 'stopmine', 'setspeed', 'decreasecounter', 'startstopcounter', 'increasecounter', 'repeat'],
         ['endstack', 'forever']];
     }
 
@@ -287,7 +287,7 @@ export default class BlockSpecs {
         ['martyGetReady', 'martyStepForward', 'martyStepBackward', 'martyStepRight', 'martyStepLeft', 'martyTurnRight', 'martyTurnLeft', 'martyDance', 'martyKickLeft', 'martyKickRight'],
         ['martyEyesExcited', 'martyEyesWide', 'martyEyesAngry', 'martyEyesNormal', 'martyEyesWiggle', 'martyWaveLeft', 'martyWaveRight', 'martyCelebrate', 'martyLedEyesP1', 'martyLedEyesP2', 'martyLedEyesColour'],
         ['martyConfusion', 'martyDisbelief', 'martyExcitement', 'martyNoway', 'martyNo', 'martyWhistle'],
-        ['wait', 'stopmine', 'setspeed', 'startstopcounter', 'increasecounter', 'decreasecounter', 'repeat'],
+        ['wait', 'stopmine', 'setspeed', 'decreasecounter', 'startstopcounter', 'increasecounter',  'repeat'],
         ['endstack', 'forever']];
     }
 
