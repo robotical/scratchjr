@@ -1,7 +1,9 @@
+import Localization from "../../utils/Localization";
+
 const cogJrBlocksTutorial4 = {
     id: "cog-jrblocks-4",
     platform: "blocksjr",
-    title: "Make an etch-a-sketch",
+    title: Localization.localize("COG_JRBLOCKS4_TITLE"),
     description: "We'll introduce the tilt sensing on cog, and show how to interact with sprites in Jr Blocks",
     tutorialSteps: [
         /* STEP 1 -- intro*/
@@ -16,7 +18,7 @@ const cogJrBlocksTutorial4 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Let's make an etch-a-sketch!"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_1_TEXT")
                 }
             ],
             buttons: ["readAloud", "next"],
@@ -30,7 +32,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/2-events.png",
-                    text: "Select the <i><u>Cog Events</u></i> category"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_2_TEXT")
                 }
             ],
             nextStepActions: [
@@ -53,7 +55,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/3-tiltBlock.png",
-                    text: "Add the <i><u>on tilt</u></i> block"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_3_TEXT")
                 }
             ],
             nextStepActions: [
@@ -91,7 +93,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/4-motion.png",
-                    text: "Select the <i><u>sprite motion</u></i> category"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_4_TEXT")
                 }
             ],
             nextStepActions: [
@@ -114,7 +116,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/5-moveRight.png",
-                    text: "Add a <i><u>move forward</u></i> block"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_5_TEXT")
                 }
             ],
             nextStepActions: [
@@ -152,7 +154,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/cogTiltRight.gif",
-                    text: "Tilt Cog Right"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_6_TEXT")
                 }
             ],
             nextStepActions: [
@@ -170,7 +172,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/7-secondTilt.png",
-                    text: "Add a second on tilt block"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_7_TEXT")
                 }
             ],
             nextStepActions: [
@@ -208,7 +210,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/8-tiltLeft.png",
-                    text: "Change the tilt direction to left"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_8_TEXT")
                 }
             ],
             nextStepActions: [
@@ -226,7 +228,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/9-moveLeft.png",
-                    text: "Add a <i><u>move backward</u></i> block"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_9_TEXT")
                 }
             ],
             nextStepActions: [
@@ -264,7 +266,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/cogTiltLeft.gif",
-                    text: "Tilt Cog left"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_10_TEXT")
                 }
             ],
             nextStepActions: [
@@ -282,7 +284,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/11-thirdTilt.png",
-                    text: "Add a third on tilt block"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_11_TEXT")
                 }
             ],
             nextStepActions: [
@@ -320,7 +322,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/12-tiltDown.png",
-                    text: "Change the tilt direction to down"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_12_TEXT")
                 }
             ],
             nextStepActions: [
@@ -338,7 +340,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/13-moveDown.png",
-                    text: "Add a <i><u>move down</u></i> block"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_13_TEXT")
                 }
             ],
             nextStepActions: [
@@ -376,7 +378,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/14-fourthTilt.png",
-                    text: "Add a fourth on tilt block"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_14_TEXT")
                 }
             ],
             nextStepActions: [
@@ -414,7 +416,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/15-tiltUp.png",
-                    text: "Change the tilt direction to up"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_15_TEXT")
                 }
             ],
             nextStepActions: [
@@ -432,7 +434,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/16-moveUp.png",
-                    text: "Add a <i><u>move up</u></i> block"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_16_TEXT")
                 }
             ],
             nextStepActions: [
@@ -470,7 +472,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/cogTiltFwdBwd.gif",
-                    text: "Tilt Cog forward and backward"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_17_TEXT")
                 }
             ],
             nextStepActions: [
@@ -488,7 +490,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/18-spriteTrail.png",
-                    text: "Turn on the sprite trail"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_18_TEXT")
                 }
             ],
             nextStepActions: [
@@ -506,7 +508,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/cogTiltFwdBwd.gif",
-                    text: "Try it out!"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_19_TEXT")
                 }
             ],
             nextStepActions: [
@@ -524,7 +526,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/20-clearTrail.png",
-                    text: "Push the button to clear the trail"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_20_TEXT")
                 }
             ],
             nextStepActions: [
@@ -542,7 +544,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/21-control.png",
-                    text: "Select the <i><u>control</u></i> category"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_21_TEXT")
                 }
             ],
             nextStepActions: [
@@ -565,7 +567,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/22-setSpeed.png",
-                    text: "Add a <i><u>set speed</u></i> block"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_22_TEXT")
                 }
             ],
             nextStepActions: [
@@ -603,7 +605,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/23-selectSpeed.png",
-                    text: "Change the speed to slow"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_23_TEXT")
                 }
             ],
             nextStepActions: [
@@ -621,7 +623,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/24-clickSetSpeed.png",
-                    text: "Run the set speed block"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_24_TEXT")
                 }
             ],
             nextStepActions: [
@@ -639,7 +641,7 @@ const cogJrBlocksTutorial4 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/4/25-drawSomething.png",
-                    text: "Draw something!"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_25_TEXT")
                 }
             ],
             nextStepActions: [
@@ -658,7 +660,7 @@ const cogJrBlocksTutorial4 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Well done! </br> Now see what else you can draw!"
+                    text: Localization.localize("COG_JRBLOCKS4_STEP_26_TEXT")
                 }
             ],
             buttons: ["readAloud", "previous"],

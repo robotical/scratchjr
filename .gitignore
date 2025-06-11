@@ -36,6 +36,7 @@ GoogleService-Info.plist
 /docs
 
 editions/free/src/localizations/localizations.csv
+editions/free/src/localizations/localizations.csv
 
 *app.bundle.js.map
 app.bundle.js

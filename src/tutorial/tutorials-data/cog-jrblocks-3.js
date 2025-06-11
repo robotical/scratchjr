@@ -1,7 +1,9 @@
+import Localization from "../../utils/Localization";
+
 const cogJrBlocksTutorial3 = {
     id: "cog-jrblocks-3",
     platform: "blocksjr",         // should this be jrblocks?
-    title: "Make a sound and light show",
+    title: Localization.localize("COG_JRBLOCKS3_TITLE"),
     description: "Combining what they've learned in the last two activities, students can construct a combined sound and light show on their cog! They can connect the sound sequence and the light sequence up to the same starting event, to see that they can make two sequences run simultaneously",
     tutorialSteps: [
         /* STEP 1 -- intro*/
@@ -16,7 +18,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Let's make a sound and light show! 🎵✨"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_1_TEXT")
                 }
             ],
             buttons: ["readAloud", "next"],
@@ -31,7 +33,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Select the <i><u>cog event</u></i> blocks"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_2_TEXT")
                 }
             ],
             nextStepActions: [
@@ -51,7 +53,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Add the  <i><u>on button press</u></i> block"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_3_TEXT")
                 }
             ],
             nextStepActions: [
@@ -87,7 +89,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Select the  <i><u>cog sound</u></i> blocks"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_4_TEXT")
                 }
             ],
             nextStepActions: [
@@ -107,7 +109,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Add a  <i><u>musical note</u></i> block"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_5_TEXT")
                 }
             ],
             nextStepActions: [
@@ -145,7 +147,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/4-selectNote.png",
-                    text: "Change the note to an E"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_6_TEXT")
                 }
             ],
             nextStepActions: [
@@ -163,7 +165,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/5-pushCogButton.jpg",
-                    text: "Push the button!"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_7_TEXT")
                 }
             ],
             nextStepActions: [
@@ -181,7 +183,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/6-twoButtonPushEvents.png",
-                    text: "Add another button push event"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_8_TEXT")
                 }
             ],
             nextStepActions: [
@@ -218,7 +220,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Select the  <i><u>cog lights</u></i> blocks"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_9_TEXT")
                 }
             ],
             nextStepActions: [
@@ -239,7 +241,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/7-ledCommand.png",
-                    text: "Add a  <i><u>set color </u></i> block"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_10_TEXT")
                 }
             ],
             nextStepActions: [
@@ -277,7 +279,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/8-selectColor.png",
-                    text: "Change the color"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_11_TEXT")
                 }
             ],
             nextStepActions: [
@@ -295,7 +297,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/5-pushCogButton.jpg",
-                    text: "Push the button!"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_12_TEXT")
                 }
             ],
             nextStepActions: [
@@ -313,7 +315,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/10-firstBar.png",
-                    text: "Add more notes -  <b>EDCD</b>"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_13_TEXT")
                 }
             ],
             nextStepActions: [
@@ -351,7 +353,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/11-rest.png",
-                    text: "Add a pause after the LED command"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_14_TEXT")
                 }
             ],
             nextStepActions: [
@@ -389,7 +391,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/12-setRestLength.png",
-                    text: "Set the color for 4 beats"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_15_TEXT")
                 }
             ],
             nextStepActions: [
@@ -407,7 +409,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/5-pushCogButton.jpg",
-                    text: "Push the button!"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_16_TEXT")
                 }
             ],
             nextStepActions: [
@@ -425,7 +427,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/14-secondBar.png",
-                    text: "Add more notes - <b>EEE_</b>"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_17_TEXT")
                 }
             ],
             nextStepActions: [
@@ -463,7 +465,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/15-secondBarLEDs.png",
-                    text: "Add a color for the second bar"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_18_TEXT")
                 }
             ],
             nextStepActions: [
@@ -501,7 +503,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/5-pushCogButton.jpg",
-                    text: "Push the button!"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_19_TEXT")
                 }
             ],
             nextStepActions: [
@@ -519,7 +521,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/17-thirdBar.png",
-                    text: "Add more notes - <b>DDD_</b>"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_20_TEXT")
                 }
             ],
             nextStepActions: [
@@ -556,7 +558,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/18-fourthBar.png",
-                    text: "Add more notes - <b>DDD_</b>"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_21_TEXT")
                 }
             ],
             nextStepActions: [
@@ -593,7 +595,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/19-ledPattern.png",
-                    text: "Lets add a pattern"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_22_TEXT")
                 }
             ],
             nextStepActions: [
@@ -631,7 +633,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/20-flashPattern.png",
-                    text: "Set it to a flashing pattern"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_23_TEXT")
                 }
             ],
             nextStepActions: [
@@ -649,7 +651,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/5-pushCogButton.jpg",
-                    text: "Push the button!"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_24_TEXT")
                 }
             ],
             nextStepActions: [
@@ -667,7 +669,7 @@ const cogJrBlocksTutorial3 = {
                 {
                     type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/cog/jr-blocks/3/22-wholeSong.png",
-                    text: "Push the button!"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_25_TEXT")
                 }
             ],
             nextStepActions: [
@@ -686,7 +688,7 @@ const cogJrBlocksTutorial3 = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Well done!</br>Next Steps :- Try changing the colors and patterns. Try making another song. See if you can make the colors change with every note. See if you can use loops to reduce the length of your code. Group activity :- Demonstrate your sound and light show to the class"
+                    text: Localization.localize("COG_JRBLOCKS3_STEP_26_TEXT")
                 }
             ],
             buttons: ["readAloud", "previous"],

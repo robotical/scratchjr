@@ -20,7 +20,26 @@
     "defaultLocale": "en",
     "defaultLocaleShort": "en",
     "supportedLocales": {
-        "English": "en"
+        "English": "en",
+        "Danish": "da",
+        "German": "de",
+        "Greek": "el",
+        "Spanish": "es",
+        "French": "fr",
+        "Italian": "it",
+        "Japanese": "ja",
+        "Korean": "ko",
+        "Dutch": "nl",
+        "Norwegian": "no",
+        "Polish": "pl",
+        "Portuguese (Brazil)": "pt-br",
+        "Portuguese": "pt",
+        "Swedish": "sv",
+        "Thai": "th",
+        "Turkish": "tr",
+        "Ukrainian": "uk",
+        "Chinese (Simplified)": "zh-cn",
+        "Chinese (Traditional)": "zh-tw"
     },
     "settingsPageDisabled": false
 }
