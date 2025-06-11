@@ -1,7 +1,7 @@
-import {gn} from '../utils/lib';
+import { gn } from '../utils/lib';
 import Localization from '../utils/Localization';
 
-export function inappAbout () {
+export function inappAbout() {
     gn('aboutScratchjrTitle').textContent = Localization.localize('ABOUT_SCRATCHJR');
     gn('aboutWhatIs').textContent = Localization.localize('ABOUT_WHAT_IS');
     gn('aboutDescription').innerHTML = Localization.localize('ABOUT_DESCRIPTION');
@@ -20,11 +20,11 @@ export function inappAbout () {
     }
 }
 
-export function inappInterfaceGuide () {
+export function inappInterfaceGuide() {
     var interfaceKeyHeaderNode = gn('interface-key-header');
     var interfaceKeyDescriptionNode = gn('interface-key-description');
 
-    interfaceKeyHeaderNode.textContent = Localization.localize('INTERFACE_GUIDE_NEW_PROJECT', {N: 1});
+    interfaceKeyHeaderNode.textContent = Localization.localize('INTERFACE_GUIDE_NEW_PROJECT', { N: 1 });
     interfaceKeyDescriptionNode.textContent = Localization.localize('INTERFACE_GUIDE_NEW_PROJECT_DESCRIPTION');
 
     var interfaceKeys = [
@@ -55,7 +55,7 @@ export function inappInterfaceGuide () {
     for (var i = 0; i < interfaceKeys.length; i++) {
         var key = interfaceKeys[i];
         interfaceDescriptions.push([
-            Localization.localize('INTERFACE_GUIDE_' + key, {N: i+1}),
+            Localization.localize('INTERFACE_GUIDE_' + key, { N: i + 1 }),
             Localization.localize('INTERFACE_GUIDE_' + key + '_DESCRIPTION')
         ]);
     }
@@ -78,11 +78,11 @@ export function inappInterfaceGuide () {
     document.addEventListener('click', switchHelp, false);
 }
 
-export function inappPaintEditorGuide () {
+export function inappPaintEditorGuide() {
     var paintKeyHeaderNode = gn('paint-key-header');
     var paintKeyDescriptionNode = gn('paint-key-description');
 
-    paintKeyHeaderNode.textContent = Localization.localize('PAINT_GUIDE_UNDO', {N:1});
+    paintKeyHeaderNode.textContent = Localization.localize('PAINT_GUIDE_UNDO', { N: 1 });
     paintKeyDescriptionNode.textContent = Localization.localize('PAINT_GUIDE_UNDO_DESCRIPTION');
 
     var paintKeys = [
@@ -105,7 +105,7 @@ export function inappPaintEditorGuide () {
     for (var i = 0; i < paintKeys.length; i++) {
         var key = paintKeys[i];
         paintDescriptions.push([
-            Localization.localize('PAINT_GUIDE_' + key, {N: i+1}),
+            Localization.localize('PAINT_GUIDE_' + key, { N: i + 1 }),
             Localization.localize('PAINT_GUIDE_' + key + '_DESCRIPTION')
         ]);
     }
@@ -128,7 +128,7 @@ export function inappPaintEditorGuide () {
     document.addEventListener('click', switchHelp, false);
 }
 
-export function inappBlocksGuide () {
+export function inappBlocksGuide() {
     // Localized category names
     gn('yellow-block-category-header').textContent = Localization.localize('BLOCKS_TRIGGERING_BLOCKS');
     gn('blue-block-category-header').textContent = Localization.localize('BLOCKS_MOTION_BLOCKS');
@@ -209,20 +209,56 @@ export function inappBlocksGuide () {
         'BLOCKS_END',
         'BLOCKS_END_DESCRIPTION',
         'BLOCKS_REPEAT_FOREVER',
-        'BLOCKS_REPEAT_FOREVER_DESCRIPTION'
+        'BLOCKS_REPEAT_FOREVER_DESCRIPTION',
+        'BLOCKS_ON_TILT',
+        'BLOCKS_ON_TILT_DESCRIPTION',
+        'BLOCKS_ON_TOUCH_Cog',
+        'BLOCKS_ON_TOUCH_Cog_DESCRIPTION',
+        'BLOCKS_ON_MOVE',
+        'BLOCKS_ON_MOVE_DESCRIPTION',
+        'BLOCKS_ON_TAP',
+        'BLOCKS_ON_TAP_DESCRIPTION',
+        'BLOCKS_ON_TOUCH',
+        'BLOCKS_ON_TOUCH_DESCRIPTION',
+        'BLOCKS_ON_MESSAGE',
+        'BLOCKS_ON_MESSAGE_DESCRIPTION',
+        'BLOCKS_SEND_MESSAGE',
+        'BLOCKS_SEND_MESSAGE_DESCRIPTION',
+        'BLOCKS_HOP',
+        'BLOCKS_HOP_DESCRIPTION',
+        'BLOCKS_GO_HOME',
+        'BLOCKS_GO_HOME_DESCRIPTION',
+        'BLOCKS_SELECT_COLOUR',
+        'BLOCKS_SELECT_COLOUR_DESCRIPTION',
+        'BLOCKS_SET_PATTERN',
+        'BLOCKS_SET_PATTERN_DESCRIPTION',
+        'BLOCKS_SAY',  
+        'BLOCKS_SAY_DESCRIPTION',
+        'BLOCKS_GROW',
+        'BLOCKS_GROW_DESCRIPTION',
+        'BLOCKS_SHRINK',
+        'BLOCKS_SHRINK_DESCRIPTION',
+        'BLOCKS_HIDE',  
+        'BLOCKS_HIDE_DESCRIPTION',
+        'BLOCKS_SHOW',
+        'BLOCKS_SHOW_DESCRIPTION',
+        'BLOCKS_SET_SPEED',
+        'BLOCKS_SET_SPEED_DESCRIPTION',
+        'BLOCKS_GO_TO_PAGE',
+        'BLOCKS_GO_TO_PAGE_DESCRIPTION',
     ];
 
 
-    
+
 
     for (let i = 0; i < blockDescriptionKeys.length; i++) {
         try {
             gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);
-        } catch(e){ console.log(e)}
+        } catch (e) { console.log(e) }
     }
 }
 
-export function inappPrivacyPolicy () {
+export function inappPrivacyPolicy() {
     const elements = document.querySelectorAll('[data-i18n]');
     elements.forEach(function (item) {
         const key = item.getAttribute('data-i18n');

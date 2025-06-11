@@ -1,4 +1,3 @@
-
 /**
     * categories: 
         * sprite: sprite-start sprite-motion sprite-looks sprite-sound sprite-flow sprite-stop
@@ -93,11 +92,13 @@
         * NextStep 
  */
 
+import Localization from "../../utils/Localization";
+
 
 const cogAndMartyTutorial = {
     id: "cog-and-marty-tutorial",
     platform: "blocksjr",
-    title: "Cog and Marty Interaction",
+    title: Localization.localize("COG_AND_MARTY_TUTORIAL_TITLE"),
     description: "Learn how Cog and Marty can interact with each other",
     tutorialSteps: [
         /* STEP 1 -- intro*/
@@ -112,7 +113,8 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "In this tutorial, we will learn how Cog and Marty can interact with each other. Press 'Next' to start!"
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_INTRO"),
+                    // text: "In this tutorial, we will learn how Cog and Marty can interact with each other. Press 'Next' to start!"
                 }
             ],
             buttons: ["readAloud", "next"],
@@ -124,7 +126,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "First, let's connect to Cog. Click on the Cog button to connect to Cog."
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_CONNECT_COG"),
                 }
             ],
             nextStepActions: [
@@ -145,7 +147,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Next, let's connect to Marty. Click on the Marty button to connect to Marty"
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_CONNECT_MARTY"),
                 }
             ],
             nextStepActions: [
@@ -166,7 +168,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Great, let's do some coding! The Cog blocks are on the right side of the screen. Click on the Start block category to see the Cog blocks"
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_COG_BLOCKS"),
                 }
             ],
             nextStepActions: [
@@ -186,7 +188,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Once you have selected the Start block category, drag the 'on touch cog' block to the script area. Make sure to press 'Next' when you are done."
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_ONTOUCHCOG"),
                 }
             ],
             nextStepActions: [
@@ -222,7 +224,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Great! Now let's move to the Sprite blocks, which are on the left side of the screen."
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_SPRITE_BLOCKS"),
                 }
             ],
             nextStepActions: [
@@ -243,7 +245,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Now drag the 'message' block from the Sprite Start category to the script area. This block will send a message to Marty when the sprite is clicked."
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_MESSAGE_BLOCK"),
                 }
             ],
             nextStepActions: [
@@ -279,7 +281,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Now let's move to Marty. We need to enable Marty Mode to see the Marty blocks. Click on the Marty Mode button."
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_MARTY_MODE"),
                 }
             ],
             nextStepActions: [
@@ -301,7 +303,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Once in Marty Mode, drag the 'on message' block from the Marty Start category to the script area. This block will listen for the message sent by Cog."
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK"),
                 }
             ],
             nextStepActions: [
@@ -343,7 +345,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Now, let's select Marty's motion blocks. Click on the Motion category of Marty blocks."
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS"),
                 }
             ],
             nextStepActions: [
@@ -369,7 +371,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "We're almost there! Drag the 'Marty Dance' block to the script area. This block will make Marty dance when the message is received."
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK"),
                 }
             ],
             nextStepActions: [
@@ -411,7 +413,7 @@ const cogAndMartyTutorial = {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Great job! You have successfully coded Cog and Marty to interact with each other. Now click Cog's button to see Marty dance!"
+                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_END"),
                 }
             ],
             nextStepActions: [],
