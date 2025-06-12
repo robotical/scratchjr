@@ -873,6 +873,12 @@ export default class UI {
 
     static spriteInView(spr) {
         var sc = gn('spritecc');
+        var parentOfSc = sc.parentNode;
+        if (parentOfSc) {
+            parentOfSc.scrollTop = parentOfSc.scrollHeight;
+        } else {
+            console.warn('spriteInView: spritecc parent not found');
+        }
         var achild = spr.thumbnail;
         if (!achild) {
             return;
@@ -889,7 +895,7 @@ export default class UI {
         if (dy > 0) {
             dy = 0;
         }
-        sc.style.top = dy + 'px';
+        // sc.style.top = dy + 'px'; // NT: this moves the whole division to the top making it impossible to scroll
         UI.needsScroll();
     }
 
