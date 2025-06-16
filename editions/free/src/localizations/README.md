@@ -78,6 +78,7 @@ The script will:
 - The workflow ensures that all language files stay in sync with the master `en.json`.
 - Only keys present in `en.json` are included in the output files.
 - Fields containing commas, quotes, or newlines are properly escaped in the CSV.
+- The google-sheets function to translations is =GOOGLETRANSLATE($G2, "en", B$1) (update the cell number <2> as needed).
 
 ---
 
