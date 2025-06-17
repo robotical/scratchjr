@@ -2,7 +2,7 @@
     "edition": "free",
     "scratchJrVersion": "iOSv01",
     "useStoryStarters": false,
-    "shareEnabled": true,
+    "shareEnabled": false,
     "defaultSprite": "Sprites_Marty.svg",
     "spriteOutlineColor": "white",
     "stageColor": "#F5F2F7",

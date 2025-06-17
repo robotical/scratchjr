@@ -416,10 +416,10 @@ export default class UI {
         var author = newHTML('div', 'infolabel', staticinfo);
         author.setAttribute('id', 'deviceName');
 
+        var parentsSection = newHTML('div', 'infoboxParentsSection', infobox);
+        parentsSection.setAttribute('id', 'parentsection');
         if (window.Settings.shareEnabled) {
             // For Parents button
-            var parentsSection = newHTML('div', 'infoboxParentsSection', infobox);
-            parentsSection.setAttribute('id', 'parentsection');
 
             var parentsButton = newHTML('div', 'infoboxParentsButton', parentsSection);
             parentsButton.id = 'infoboxParentsSectionButton';
@@ -683,7 +683,9 @@ export default class UI {
         }
 
         var canShare = ScratchJr.editmode != 'storyStarter' || ScratchJr.changed;
-        gn('infoboxParentsSectionButton').style.display = canShare ? 'block' : 'none';
+        try {
+            gn('infoboxParentsSectionButton').style.display = canShare ? 'block' : 'none';
+        } catch {}
 
         // Prevent button from thrashing
         setTimeout(function () {
