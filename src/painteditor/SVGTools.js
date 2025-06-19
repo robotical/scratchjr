@@ -190,7 +190,7 @@ export default class SVGTools {
 
     static getPolyAttr () {
         return {
-            'fill': 'transparent',
+            'fill': 'none',
             'stroke': Paint.fillcolor,
             'stroke-width': Paint.strokewidth,
             'stroke-linecap': 'round',

@@ -90,8 +90,8 @@
     },
     {
       "md5": "Sprites_Octopus-Blue.svg",
-      "width": 80,
-      "height": 101,
+      "width": 385.18585,
+      "height": 321.28673,
       "ext": "svg",
       "name": "Octopus-Blue",
       "order": "characters,07 weather",
@@ -99,26 +99,26 @@
     },
     {
       "md5": "Sprites_Octopus-Pink.svg",
-      "width": 80,
-      "height": 101,
+      "width": 385.18585,
+      "height": 321.28673,
       "ext": "svg",
       "name": "Octopus-Pink",
       "order": "characters,07 weather",
-      "tags": ["characters", "07 weather"]
+      "tags":["characters", "07 weather"]
     },
     {
       "md5": "Sprites_Raccoon.svg",
-      "width": 80,
-      "height": 101,
+      "width": 258,
+      "height": 321.28673,
       "ext": "svg",
       "name": "Raccoon",
       "order": "characters,07 weather",
-      "tags": ["characters", "07 weather"]
+      "tags":["characters", "07 weather"]
     },
     {
       "md5": "Sprites_Tree.svg",
-      "width": 80,
-      "height": 101,
+      "width": 258,
+      "height": 320,
       "ext": "svg",
       "name": "Tree",
       "order": "characters,07 weather",
@@ -126,10 +126,10 @@
     },
     {
       "md5": "Sprites_Unicorn.svg",
-      "width": 80,
-      "height": 101,
+      "width": 385.18585,
+      "height": 321.28673,
       "ext": "svg",
-      "name": "Tree",
+      "name": "Unicorn",
       "order": "characters,07 weather",
       "tags": ["characters", "07 weather"]
     },

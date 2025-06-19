@@ -346,7 +346,8 @@ div.frame {
 
 .deleteasset {
     position: absolute;
-    margin: ${css_vh(-13.02)} ${css_vh(0)} ${css_vh(0)};
+    /* margin: ${css_vh(-13.02)} ${css_vh(0)} ${css_vh(0)}; */
+    top: 0; /* top: 0 seems to work better than negative margin as it's not affected by the height of the image which can be variable */
     width: ${css_vh(5.86)};
     height: ${css_vh(5.73)};
     background: url('../assets/ui/closeit.svg');

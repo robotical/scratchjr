@@ -338,7 +338,6 @@ export default class Path {
         attr.d = SVG2Canvas.arrayToString(d);
         attr.id = getIdFor('path');
         attr['stroke-miterlimit'] = shape.getAttribute('stroke-miterlimit');
-        shape.setAttribute('fill', 'transparent');
         var elem = SVGTools.addChild(gn('layer1'), 'path', attr);
         return elem;
     }

@@ -356,8 +356,7 @@ export default class Transform {
             plist.push(cmd);
         }
         var path = SVG2Canvas.arrayToString(plist);
-        // NT: note. This is a workaround that doesn't really solve the 'edit svg' problem, but at least makes the editing look better
-        shape.setAttribute('d', d);
+        shape.setAttribute('d', path);
     }
 
     static getModifiedCmd (cmd, mtx) {

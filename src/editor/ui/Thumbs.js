@@ -633,7 +633,11 @@ export default class Thumbs {
     }
 
     static highlighSprite(spr) {
-        spr.setAttribute('class', ScratchJr.isEditable() ? 'spritethumb on' : 'spritethumb noneditable');
+        if (spr.owner.includes('Marty')) { // we don't want to make Marty editable as our svg is can't be edited
+            spr.setAttribute('class', 'spritethumb on martynoneditable');
+        } else {
+            spr.setAttribute('class', ScratchJr.isEditable() ? 'spritethumb on' : 'spritethumb noneditable');
+        }
         ScriptsPane.setActiveScript(spr.owner);
         Palette.reset();
     }

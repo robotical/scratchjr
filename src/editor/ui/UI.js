@@ -1012,6 +1012,7 @@ export default class UI {
         if (ScratchJr.isEditable() && ScratchJr.getSprite() &&
             (((t.className == 'sname') && (el.owner == ScratchJr.getSprite().id))
                 || (t.className == 'brush'))) {
+                    if (el.owner.includes('Marty')) return; // Marty sprites are not editable 
             UI.putInPaintEditor(e);
             return;
         }
@@ -1023,7 +1024,6 @@ export default class UI {
     }
 
     static putInPaintEditor(e) {
-        return;
         ScratchJr.unfocus(e);
         var s = ScratchJr.getSprite();
         if (!s) {

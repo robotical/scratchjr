@@ -343,7 +343,7 @@
 }
 
 .spritethumb .brush {
-    display: none; // Hide the brush icon until we fix the issue with editing svgs
+    display: absolute;
     position: absolute;
     background:  url('../assets/paint/paintbrush.svg');
     background-size: ${css_vh(7.03)} ${css_vh(7.03)};
@@ -358,3 +358,4 @@
 .spritethumb .brush:active { background:  url('../assets/paint/paintbrushPressed.svg'); background-size: 100%; }
 .spritethumb.off .brush{ display: none;}
 .spritethumb.noneditable .brush{ display: none;}
+.spritethumb.martynoneditable .brush{ display: none;}
