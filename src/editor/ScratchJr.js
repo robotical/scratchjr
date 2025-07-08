@@ -24,6 +24,7 @@ import {
 } from '../utils/lib';
 import CogManager from "../cog/CogManager";
 import MartyManager from '../marty/MartyManager';
+import ApplicationManagerMock from "../utils/ApplicationManagerMock";
 import Thumbs from './ui/Thumbs';
 import Trace from "./ui/Trace";
 
@@ -1219,3 +1220,4 @@ export default class ScratchJr {
 window.ScratchJr = ScratchJr;
 window.cogManager = new CogManager();
 window.martyManager = new MartyManager();
+window.applicationManagerMock = new ApplicationManagerMock();
