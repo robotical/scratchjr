@@ -21,6 +21,8 @@
   "BLOCKS_GREEN_FLAG_DESCRIPTION": "Starts the script when the Green Flag is tapped.",
   "BLOCKS_ON_TILT": "Start on Tilt",
   "BLOCKS_ON_TILT_DESCRIPTION": "Starts the script when Cog is tilted in a specified direction.",
+  "BLOCK_ON_STEER_COG": "Start on Steer Cog",
+  "BLOCK_ON_STEER_COG_DESCRIPTION": "Starts the script when Cog is steered in a specified direction.",
   "BLOCKS_ON_TOUCH_Cog": "Start on Touch",
   "BLOCKS_ON_TOUCH_Cog_DESCRIPTION": "Starts the script when Cog button is pressed",
   "BLOCKS_ON_MOVE": "Start on move",

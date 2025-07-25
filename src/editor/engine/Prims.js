@@ -66,6 +66,7 @@ export default class Prims {
 
         /* Cog Prims */
         Prims.table.tiltany = Prims.Ignore;
+        Prims.table.onsteercog = Prims.Ignore;
         Prims.table.ontouchcog = Prims.Ignore;
         Prims.table.onshake = Prims.Ignore;
         Prims.table.onobjectsensed = Prims.Ignore;
@@ -1504,6 +1505,16 @@ export default class Prims {
                     ScratchJr.startCurrentPageStrips(['ontouch']);
                 }
             }
+            if (block.blocktype == 'onsteercog') {
+                if (block.getArgValue() == 'steerleft' && event == 'steerleft') {
+                    receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
+                }
+                if (block.getArgValue() == 'steerright' && event == 'steerright') {
+                    receivers.push([s, block]);
+                    ScratchJr.startCurrentPageStrips(['ontouch']);
+                }
+            }
             if (block.blocktype == 'onshake' && event == 'onshake') {
                 receivers.push([s, block]);
                 ScratchJr.startCurrentPageStrips(['ontouch']);
@@ -1538,7 +1549,7 @@ export default class Prims {
             }
         }
 
-        Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onshake', 'onobjectsensed', 'onlight'], findReceivers);
+        Prims.applyToAllStrips(['ontouchcog', 'tiltany', 'onsteercog', 'onshake', 'onobjectsensed', 'onlight'], findReceivers);
         var newthreads = [];
         for (var i in receivers) {
             pair = receivers[i];

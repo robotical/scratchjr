@@ -30,6 +30,9 @@ export default class CogBlocks {
         this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.objectSense.right, this.onObjectSensedRight.bind(this));
         this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.objectSense.left, this.onObjectSensedLeft.bind(this));
         this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.objectSense.none, this.onNoObjectSensed.bind(this));
+
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.steering.right, this.onSteerRight.bind(this));
+        this.cog.publishedDataAnalyser.on(this.cog.publishedDataAnalyser.eventsMap.steering.left, this.onSteerLeft.bind(this));
     }
 
     destroy() {
@@ -50,6 +53,9 @@ export default class CogBlocks {
         this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.objectSense.right, this.onObjectSensedRight.bind(this));
         this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.objectSense.left, this.onObjectSensedLeft.bind(this));
         this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.objectSense.none, this.onNoObjectSensed.bind(this));
+
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.steering.right, this.onSteerRight.bind(this));
+        this.cog.publishedDataAnalyser.removeListener(this.cog.publishedDataAnalyser.eventsMap.steering.left, this.onSteerLeft.bind(this));
     }
 
     onTiltLeft() {
@@ -98,6 +104,14 @@ export default class CogBlocks {
 
     onNoObjectSensed() {
         Prims.OnCogEvent("onnoobjectsensed");
+    }
+
+    onSteerRight() {
+        Prims.OnCogEvent("steerright");
+    }
+
+    onSteerLeft() {
+        Prims.OnCogEvent("steerleft");
     }
 
     async setPattern(pattern) {

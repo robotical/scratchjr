@@ -22,7 +22,8 @@ let fontcolors = [fontred, fontorange, fontyellow,
 
 let fontsizes = [16, 24, 36, 48, 56, 72];
 
-const tiltshapes = ['tiltright', 'tiltleft', 'tiltbackward', 'tiltforward', 'tiltbackwardforward', 'tiltleftright']
+const tiltshapes = ['tiltright', 'tiltleft', 'tiltbackward', 'tiltforward', 'tiltbackwardforward', 'tiltleftright'];
+const steershapes = ['steerright', 'steerleft'];
 const moveshapes = ['onshake'];
 const onobjectsensedshapes = ['onobjectsensedleft', 'onobjectsensedright', 'onnoobjectsensed'];
 const lightshapes = ['onhighlight', 'onmidlight', 'onlowlight'];
@@ -277,7 +278,7 @@ export default class BlockSpecs {
     }
 
     static setupPalettesDefCog() {
-        return [['tiltany', 'ontouchcog', 'onshake', 'onobjectsensed', 'onlight'],
+        return [['tiltany', 'onsteercog', 'ontouchcog', 'onshake', 'onobjectsensed', 'onlight'],
         ['setpattern', 'selectcolour', 'clearcolours'],
         ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote', 'waitcrotchet', 'settempo']];
     }
@@ -393,6 +394,8 @@ export default class BlockSpecs {
             /* Cog Blocks */
             'tiltany': ['tiltany', tiltshapes,
                 BlockSpecs.yellowStart, 'm', 'tiltright', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'onsteercog': ['onsteercog', steershapes,
+                BlockSpecs.yellowStart, 'm', 'steerright', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'ontouchcog': ['ontouchcog', BlockSpecs.getImageFrom('assets/blockicons/ontouchcog', 'svg'),
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'onshake': ['onshake', BlockSpecs.getImageFrom('assets/blockicons/onshake', 'svg'),
@@ -492,6 +495,7 @@ export default class BlockSpecs {
         return {
             'onflag': Localization.localize('BLOCK_DESC_GREEN_FLAG'),
             'tiltany': Localization.localize('BLOCK_DESC_ON_TILT'),
+            'onsteercog': Localization.localize('BLOCK_ON_STEER_COG'),
             'ontouchcog': Localization.localize('BLOCK_DESC_ON_TOUCH_Cog'),
             'onshake': Localization.localize('BLOCK_DESC_ON_MOVE'),
             'onobjectsensed': Localization.localize('BLOCK_DESC_ON_OBJECT_SENSED'),
