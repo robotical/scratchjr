@@ -495,7 +495,7 @@ export default class BlockSpecs {
         return {
             'onflag': Localization.localize('BLOCK_DESC_GREEN_FLAG'),
             'tiltany': Localization.localize('BLOCK_DESC_ON_TILT'),
-            'onsteercog': Localization.localize('BLOCK_ON_STEER_COG'),
+            'onsteercog': Localization.localize('BLOCK_DESC_ON_STEER'),
             'ontouchcog': Localization.localize('BLOCK_DESC_ON_TOUCH_Cog'),
             'onshake': Localization.localize('BLOCK_DESC_ON_MOVE'),
             'onobjectsensed': Localization.localize('BLOCK_DESC_ON_OBJECT_SENSED'),
