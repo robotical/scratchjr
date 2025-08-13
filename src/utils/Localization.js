@@ -84,7 +84,7 @@ export default class Localization {
     // Call this when the app is initialized
     static includeLocales (localizationRoot, whenDone) {
         var localizationCookie = window.applicationManager?.selectedLocale || Cookie.get('localization');
-
+        console.log("localizationCookie", localizationCookie)
         if (localizationCookie === null) {
             currentLocale = this.determineLocaleFromBrowser();
         } else {

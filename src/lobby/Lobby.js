@@ -214,10 +214,14 @@ export default class Lobby {
             languageButton.textContent = l;
 
             languageButton.onclick = function (e) {
+                console.log("HERE")
                 ScratchAudio.sndFX('tap.wav');
                 let newLocale = window.Settings.supportedLocales[e.target.textContent];
                 Cookie.set('localization', newLocale);
                 OS.analyticsEvent('lobby', 'language_changed', newLocale);
+                if (window.applicationManager) {
+                    window.applicationManager.selectedLocale = newLocale;
+                }
                 window.location = '?place=gear';
             };
         }
