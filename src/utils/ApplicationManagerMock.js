@@ -34,6 +34,11 @@ class ApplicationManagerMock {
             raft.publish("conn", 3);
         }, 10)
     }
+
+    isPhoneApp(){
+    return false
+    }
+
 }
 
 export default ApplicationManagerMock;
