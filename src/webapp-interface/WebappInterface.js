@@ -4,6 +4,7 @@ import cameraInstance from "./Camera";
 import path from "path-browserify";
 import Camera from "../painteditor/Camera";
 import AudioCapture from "./SoundRecording";
+import { saveProjectPackage, loadProjectPackageByCustomId, listProjectPackages } from "../services/CloudProjectService";
 
 export default class WebappInterface {
   constructor() { }
@@ -292,5 +293,17 @@ export default class WebappInterface {
 
   static libraryHasAsset(md5) {
     return assetList.includes(md5);
+  }
+
+  static async cloud_saveProject({ packageData }) {
+    return saveProjectPackage(packageData);
+  }
+
+  static async cloud_loadProject(identifier) {
+    return loadProjectPackageByCustomId(identifier);
+  }
+
+  static async cloud_listProjects() {
+    return listProjectPackages();
   }
 }

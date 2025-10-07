@@ -6,6 +6,7 @@ import ScratchJr from '../ScratchJr';
 import BlockSpecs from '../blocks/BlockSpecs';
 import Alert from './Alert';
 import Project from './Project';
+import ProjectCloud from '../ProjectCloud';
 import Thumbs from './Thumbs';
 import Palette from './Palette';
 import Grid from './Grid';
@@ -20,6 +21,8 @@ import Paint from '../../painteditor/Paint';
 import Events from '../../utils/Events';
 import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
+import { addStoredCloudId, getStoredCloudIds, removeStoredCloudId, touchStoredCloudId } from '../../utils/cloudLocalStore';
+import goToLink from '../../utils/goToLink';
 import {
     frame, gn, CSSTransition, localx, newHTML, scaleMultiplier, fullscreenScaleMultiplier,
     getIdFor, isTablet, newDiv, newTextInput, isAndroid, getDocumentWidth, getDocumentHeight,
@@ -42,6 +45,7 @@ let projectNameTextInput = null;
 let info = null;
 let okclicky = null;
 let infoBoxOpen = false;
+let activeCloudPanel = null;
 
 const EMAILSHARE = 0;
 const AIRDROPSHARE = 1;
@@ -466,6 +470,52 @@ export default class UI {
             };
         }
 
+        var cloudSection = newHTML('div', 'infoboxCloudSection', infobox);
+        cloudSection.setAttribute('id', 'cloudsection');
+
+        var cloudControls = newHTML('div', 'infoboxCloudControls', cloudSection);
+
+        var cloudSaveToggle = newHTML('div', 'infoboxCloudToggleButton', cloudControls);
+        cloudSaveToggle.id = 'cloudToggleSave';
+        cloudSaveToggle.textContent = 'Save';
+        cloudSaveToggle.onclick = function () {
+            UI.showCloudPanel('save');
+        };
+
+        var cloudLoadToggle = newHTML('div', 'infoboxCloudToggleButton', cloudControls);
+        cloudLoadToggle.id = 'cloudToggleLoad';
+        cloudLoadToggle.textContent = 'Load';
+        cloudLoadToggle.onclick = function () {
+            UI.showCloudPanel('load');
+        };
+
+        var cloudPanels = newHTML('div', 'infoboxCloudPanels', cloudSection);
+
+        var cloudSavePanel = newHTML('div', 'infoboxCloudPanel', cloudPanels);
+        cloudSavePanel.id = 'cloudSavePanel';
+        var cloudSaveDescription = newHTML('div', 'infoboxCloudDescription', cloudSavePanel);
+        cloudSaveDescription.textContent = 'Save a copy of this project to the cloud.';
+        var cloudSaveButton = newHTML('div', 'infoboxCloudButton', cloudSavePanel);
+        cloudSaveButton.id = 'infoboxCloudSave';
+        cloudSaveButton.textContent = 'Save to Cloud';
+        cloudSaveButton.onclick = function (e) {
+            UI.handleCloudSave(e);
+        };
+
+        var cloudLoadPanel = newHTML('div', 'infoboxCloudPanel', cloudPanels);
+        cloudLoadPanel.id = 'cloudLoadPanel';
+        var cloudLoadDescription = newHTML('div', 'infoboxCloudDescription', cloudLoadPanel);
+        cloudLoadDescription.textContent = 'Choose a saved ID or enter a new one to load a project.';
+        var cloudLoadActions = newHTML('div', 'infoboxCloudLoadActions', cloudLoadPanel);
+        var cloudLoadPromptButton = newHTML('div', 'infoboxCloudSecondaryButton', cloudLoadActions);
+        cloudLoadPromptButton.id = 'infoboxCloudLoadPrompt';
+        cloudLoadPromptButton.textContent = 'Enter ID to Load';
+        cloudLoadPromptButton.onclick = function (e) {
+            UI.promptCloudLoad(e);
+        };
+        var cloudLoadList = newHTML('div', 'infoboxCloudList', cloudLoadPanel);
+        cloudLoadList.id = 'cloudIdList';
+
         info.onclick = UI.showInfoBox;
         okclicky.onclick = function (evt) {
             UI.hideInfoBox(evt, nameField);
@@ -628,6 +678,193 @@ export default class UI {
         return ti;
     }
 
+    static showCloudPanel(mode) {
+        var savePanel = gn('cloudSavePanel');
+        var loadPanel = gn('cloudLoadPanel');
+        var saveToggle = gn('cloudToggleSave');
+        var loadToggle = gn('cloudToggleLoad');
+        if (!savePanel || !loadPanel || !saveToggle || !loadToggle) {
+            return;
+        }
+        if (mode == activeCloudPanel) {
+            mode = null;
+        }
+        activeCloudPanel = mode;
+        savePanel.className = (mode == 'save') ? 'infoboxCloudPanel show' : 'infoboxCloudPanel';
+        loadPanel.className = (mode == 'load') ? 'infoboxCloudPanel show' : 'infoboxCloudPanel';
+        saveToggle.className = (mode == 'save') ? 'infoboxCloudToggleButton active' : 'infoboxCloudToggleButton';
+        loadToggle.className = (mode == 'load') ? 'infoboxCloudToggleButton active' : 'infoboxCloudToggleButton';
+        if (mode == 'load') {
+            UI.renderCloudIdList();
+        }
+    }
+
+    static renderCloudIdList() {
+        var listContainer = gn('cloudIdList');
+        if (!listContainer) {
+            return;
+        }
+        while (listContainer.firstChild) {
+            listContainer.removeChild(listContainer.firstChild);
+        }
+        var entries = getStoredCloudIds();
+        entries.sort(function (a, b) {
+            var at = a.lastUsed || a.savedAt || 0;
+            var bt = b.lastUsed || b.savedAt || 0;
+            return bt - at;
+        });
+        if (entries.length < 1) {
+            var emptyMessage = newHTML('div', 'infoboxCloudListEmpty', listContainer);
+            emptyMessage.textContent = 'No stored IDs yet. Save a project or add one manually.';
+            return;
+        }
+        var header = newHTML('div', 'infoboxCloudListHeader', listContainer);
+        newHTML('div', 'infoboxCloudCell id', header).textContent = 'Custom ID';
+        newHTML('div', 'infoboxCloudCell name', header).textContent = 'Project';
+        newHTML('div', 'infoboxCloudCell saved', header).textContent = 'Updated';
+        newHTML('div', 'infoboxCloudCell actions', header).textContent = 'Actions';
+
+        for (var i = 0; i < entries.length; i++) {
+            UI.addCloudIdRow(listContainer, entries[i]);
+        }
+    }
+
+    static addCloudIdRow(parent, entry) {
+        var row = newHTML('div', 'infoboxCloudRow', parent);
+        newHTML('div', 'infoboxCloudCell id', row).textContent = entry.customId;
+        var nameCell = newHTML('div', 'infoboxCloudCell name', row);
+        nameCell.textContent = entry.projectName ? entry.projectName : 'Unnamed Project';
+        var savedCell = newHTML('div', 'infoboxCloudCell saved', row);
+        if (entry.lastUsed || entry.savedAt) {
+            var ts = entry.lastUsed || entry.savedAt;
+            ts = parseInt(ts, 10);
+            if (ts && !isNaN(ts)) {
+                savedCell.textContent = UI.formatTime(ts);
+            } else {
+                savedCell.textContent = '-';
+            }
+        } else {
+            savedCell.textContent = '-';
+        }
+        var actions = newHTML('div', 'infoboxCloudCell actions', row);
+        var loadButton = newHTML('div', 'infoboxCloudActionButton primary', actions);
+        loadButton.textContent = 'Load';
+        loadButton.onclick = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            UI.loadCloudProject(entry.customId, true);
+        };
+        var deleteButton = newHTML('div', 'infoboxCloudActionButton danger', actions);
+        deleteButton.textContent = 'Delete';
+        deleteButton.onclick = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            removeStoredCloudId(entry.customId);
+            UI.renderCloudIdList();
+        };
+    }
+
+    static handleCloudSave(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        ScratchAudio.sndFX('tap.wav');
+        if (!ScratchJr.currentProject) {
+            Alert.close();
+            Alert.open(frame, gn('flip'), 'No active project', '#ff0000');
+            return;
+        }
+        UI.handleTextFieldSave(true);
+        Project.prepareToSave(ScratchJr.currentProject, function () {
+            ProjectCloud.saveCurrentProjectToCloud().then(function (result) {
+                Alert.close();
+                var message = 'Saved to cloud';
+                if (result && result.customId) {
+                    message += ' (Custom ID: ' + result.customId + ')';
+                }
+                message += '. Please note this ID to load later.';
+                Alert.open(frame, gn('flip'), message, '#28A5DA');
+                if (result && result.customId) {
+                    addStoredCloudId({
+                        customId: result.customId,
+                        projectName: result.projectName || (Project.metadata && Project.metadata.name) || '',
+                        savedAt: result.savedAt || Date.now(),
+                    });
+                    if (activeCloudPanel == 'load') {
+                        UI.renderCloudIdList();
+                    }
+                }
+                setTimeout(function () {
+                    Alert.close();
+                }, 2500);
+            }).catch(function (err) {
+                console.error(err);
+                Alert.close();
+                Alert.open(frame, gn('flip'), 'Cloud save failed', '#ff0000');
+            });
+        });
+    }
+
+    static promptCloudLoad(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        ScratchAudio.sndFX('tap.wav');
+        var identifier = window.prompt('Enter the custom ID to load');
+        if (!identifier) {
+            return;
+        }
+        var trimmed = identifier.trim();
+        if (trimmed.length < 1) {
+            return;
+        }
+        UI.loadCloudProject(trimmed, true);
+    }
+
+    static loadCloudProject(customId, storeOnSuccess) {
+        if (!customId) {
+            return;
+        }
+        customId = customId.trim();
+        if (!customId) {
+            return;
+        }
+        var shouldStore = storeOnSuccess ? true : false;
+        ScratchJr.saveProject(null, function () {
+            Alert.close();
+            Alert.open(frame, gn('flip'), 'Loading from cloud', '#28A5DA');
+            ProjectCloud.loadProjectFromCloud(customId).then(function (result) {
+                Alert.close();
+                Alert.open(frame, gn('flip'), 'Cloud project ready', '#28A5DA');
+                if (result && result.projectId) {
+                    ScratchJr.currentProject = result.projectId;
+                    ScratchJr.editmode = 'edit';
+                    ScratchJr.changed = false;
+                    ScratchJr.storyStarted = false;
+                }
+                if (shouldStore) {
+                    addStoredCloudId({
+                        customId: result.customId || customId,
+                        projectName: result.projectName || '',
+                        savedAt: result.savedAt || (result.packageData && result.packageData.exportedAt ? result.packageData.exportedAt : Date.now()),
+                        lastUsed: Date.now(),
+                    });
+                } else {
+                    touchStoredCloudId(result.customId || customId);
+                }
+                if (activeCloudPanel == 'load') {
+                    UI.renderCloudIdList();
+                }
+                setTimeout(function () {
+                    Alert.close();
+                    goToLink('editor.html?pmd5=' + result.projectId + '&mode=edit');
+                }, 1000);
+            }).catch(function (err) {
+                console.error(err);
+                Alert.close();
+                Alert.open(frame, gn('flip'), 'Cloud load failed', '#ff0000');
+            });
+        });
+    }
+
     static handleTextFieldSave(dontHide) {
         // Handle story-starter mode project
         if (ScratchJr.isEditable() && ScratchJr.editmode == 'storyStarter' && !Project.error && ScratchJr.changed) {
@@ -717,6 +954,9 @@ export default class UI {
             Project.metadata.mtime = (new Date()).getTime();
             Project.metadata.ctime = UI.formatTime((new Date()).getTime());
         }
+
+        UI.showCloudPanel(null);
+        UI.renderCloudIdList();
 
         if (ScratchJr.isEditable()) {
             var name = Project.metadata.name;

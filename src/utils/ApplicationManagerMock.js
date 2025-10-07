@@ -13,6 +13,11 @@ class ApplicationManagerMock {
         return !!!window.applicationManager;
     }
 
+    getTheCurrentlySelectedDeviceOrFirstOfItsKind(type) {
+        const raft = new RaftMock();
+        return raft;
+    }
+    
     connectGenericCog(callback) {
         const raft = new RaftMock();
         callback(raft);

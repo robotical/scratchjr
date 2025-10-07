@@ -285,6 +285,7 @@ export default class Home {
   }
 
   static displayProjects(str) {
+    console.log("displayProjects", str);
     setTimeout(function () {
       let data = JSON.parse(str);
       var div = gn("scrollarea");
