@@ -809,7 +809,7 @@ div.infoboxCloudSecondaryButton:active {
 
 div.infoboxCloudList {
    width: 100%;
-   max-height: ${css_vh(20)};
+   max-height: ${css_vh(30)};
    overflow-y: auto;
    background: rgba(255,255,255,0.1);
    border-radius: 12px;

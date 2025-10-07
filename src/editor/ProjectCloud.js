@@ -274,7 +274,7 @@ export default class ProjectCloud {
     }
     var importResult = await ProjectCloud.importPackage(packageData);
     var newProjectId = importResult.projectId;
-    var newName = "Cloud (" + (packageData.project && packageData.project.name || "Untitled Project") + ")";
+    var newName = (packageData.project && packageData.project.name || "Untitled Project");
     var metadata = importResult.metadata;
     return {
       projectId: newProjectId,
@@ -301,7 +301,7 @@ export default class ProjectCloud {
     if (!projectMetadata.name) {
       projectMetadata.name = "Imported Project";
     } else {
-      projectMetadata.name = `Cloud (${projectMetadata.name})`;
+      projectMetadata.name = projectMetadata.name;
     }
     if (projectMetadata.json && typeof projectMetadata.json === "string") {
       try {

@@ -18,29 +18,43 @@ export default class Alert {
     }
 
     static open (p, obj, label, color) {
-        if (balloon) {
-            Alert.close();
+        Alert.close();
+        if (!obj) {
+            return;
         }
         var scale = scaleMultiplier;
         var w = 80;
         var h = 24;
-        var dx = (globalx(obj, obj.offsetLeft) + (obj.offsetWidth / 2)) - (w + 7 * 2 + 4) * scale / 2;
-        var dy = globaly(obj, obj.offsetTop) - (24 * scale);
+
+        var anchorMetrics = Alert.getAnchorMetrics(p, obj);
+        if (!isFinite(anchorMetrics.centerX)) {
+            anchorMetrics.centerX = ((p && p.offsetWidth) ? p.offsetWidth / 2 : window.innerWidth / 2);
+        }
+        if (!isFinite(anchorMetrics.top)) {
+            anchorMetrics.top = 0;
+        }
+        var bubbleWidth = Alert.getScaledBubbleWidth(w, scale);
+        var dx = anchorMetrics.centerX - (bubbleWidth / 2);
+        var dy = anchorMetrics.top - (h * scale);
         if (dy < 5 * scale) {
             dy = 5 * scale;
         }
 
+        var targetZIndex = Alert.getBalloonZIndex(obj);
         balloon = newCanvas(p, dx, dy, w, h, {
             position: 'absolute',
-            zIndex: 2
+            zIndex: targetZIndex
         });
         balloon.icon = obj;
+        balloon.addEventListener('click', Alert.close);
+        balloon.style.cursor = 'pointer';
         var ctx = balloon.getContext('2d');
         w = 16 + getStringSize(ctx, 'bold 14px Verdana', label).width;
         if (w < 36) {
             w = 36;
         }
-        dx = (globalx(obj, obj.offsetLeft) + (obj.offsetWidth / 2)) - (w + 7 * 2 + 4) * scale / 2;
+        bubbleWidth = Alert.getScaledBubbleWidth(w, scale);
+        dx = anchorMetrics.centerX - (bubbleWidth / 2);
         if (dx < 5 * scale) {
             dx = 5 * scale;
         }
@@ -49,7 +63,7 @@ export default class Alert {
         setProps(balloon.style, {
             position: 'absolute',
             left: dx + 'px',
-            zIndex: 1000,
+            zIndex: targetZIndex,
             webkitTransform: 'translate(' + (-w / 2) + 'px, ' + (-h / 2) + 'px) ' +
                 'scale(' + scale + ', ' + scale + ') ' +
                 'translate(' + (w / 2) + 'px, ' + (h / 2) + 'px) '
@@ -70,5 +84,56 @@ export default class Alert {
         ctx.beginPath();
         DrawPath.render(ctx, path);
         ctx.fill();
+    }
+
+    static getBalloonZIndex (anchor) {
+        var maxZ = 0;
+        if (anchor && window && window.getComputedStyle) {
+            var el = anchor;
+            while (el && el !== document.body) {
+                var computed = window.getComputedStyle(el);
+                if (computed) {
+                    var value = parseInt(computed.zIndex, 10);
+                    if (!isNaN(value)) {
+                        if (value > maxZ) {
+                            maxZ = value;
+                        }
+                    }
+                }
+                el = el.parentElement;
+            }
+        }
+        return Math.max(maxZ + 1, 12000);
+    }
+
+    static getAnchorMetrics (parent, obj) {
+        var parentRect = (parent && parent.getBoundingClientRect) ? parent.getBoundingClientRect() : null;
+        if (obj && obj.getBoundingClientRect && parentRect) {
+            var objRect = obj.getBoundingClientRect();
+            return {
+                centerX: (objRect.left + (objRect.width / 2)) - parentRect.left,
+                top: objRect.top - parentRect.top
+            };
+        }
+        var parentOffsetX = parent ? Alert.safeGlobal(parent, 'offsetLeft', globalx) : 0;
+        var parentOffsetY = parent ? Alert.safeGlobal(parent, 'offsetTop', globaly) : 0;
+        var globalCenterX = obj ? Alert.safeGlobal(obj, 'offsetLeft', globalx) + ((obj.offsetWidth || 0) / 2) : 0;
+        var globalTop = obj ? Alert.safeGlobal(obj, 'offsetTop', globaly) : 0;
+        return {
+            centerX: globalCenterX - parentOffsetX,
+            top: globalTop - parentOffsetY
+        };
+    }
+
+    static safeGlobal (element, offsetProp, fn) {
+        if (!element) {
+            return 0;
+        }
+        var offsetValue = element[offsetProp] || 0;
+        return fn(element, offsetValue);
+    }
+
+    static getScaledBubbleWidth (w, scale) {
+        return (w + 7 * 2 + 4) * scale;
     }
 }

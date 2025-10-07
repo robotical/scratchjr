@@ -46,6 +46,7 @@ let info = null;
 let okclicky = null;
 let infoBoxOpen = false;
 let activeCloudPanel = null;
+let cloudAlertAnchor = null;
 
 const EMAILSHARE = 0;
 const AIRDROPSHARE = 1;
@@ -74,6 +75,37 @@ export default class UI {
         UI.aspectRatioAdjustment();
 
 
+    }
+
+    static setCloudAlertAnchor(anchor) {
+        if (anchor) {
+            cloudAlertAnchor = anchor;
+        }
+    }
+
+    static getCloudAlertAnchor() {
+        if (UI.isValidCloudAlertAnchor(cloudAlertAnchor)) {
+            return cloudAlertAnchor;
+        }
+        cloudAlertAnchor = null;
+        var fallbackIds = ['infoboxCloudSection', 'infobox', 'flip'];
+        for (var i = 0; i < fallbackIds.length; i++) {
+            var el = gn(fallbackIds[i]);
+            if (UI.isValidCloudAlertAnchor(el)) {
+                return el;
+            }
+        }
+        return frame;
+    }
+
+    static isValidCloudAlertAnchor(anchor) {
+        if (!anchor || !document || !document.body) {
+            return false;
+        }
+        if (!document.body.contains(anchor)) {
+            return false;
+        }
+        return !!(anchor.offsetWidth || anchor.offsetHeight);
     }
 
     // Helps debug on Android 4.2 by enabling the user to type in a
@@ -471,7 +503,8 @@ export default class UI {
         }
 
         var cloudSection = newHTML('div', 'infoboxCloudSection', infobox);
-        cloudSection.setAttribute('id', 'cloudsection');
+        cloudSection.setAttribute('id', 'infoboxCloudSection');
+        UI.setCloudAlertAnchor(cloudSection);
 
         var cloudControls = newHTML('div', 'infoboxCloudControls', cloudSection);
 
@@ -499,6 +532,7 @@ export default class UI {
         cloudSaveButton.id = 'infoboxCloudSave';
         cloudSaveButton.textContent = 'Save to Cloud';
         cloudSaveButton.onclick = function (e) {
+            UI.setCloudAlertAnchor(e.currentTarget);
             UI.handleCloudSave(e);
         };
 
@@ -511,6 +545,7 @@ export default class UI {
         cloudLoadPromptButton.id = 'infoboxCloudLoadPrompt';
         cloudLoadPromptButton.textContent = 'Enter ID to Load';
         cloudLoadPromptButton.onclick = function (e) {
+            UI.setCloudAlertAnchor(e.currentTarget);
             UI.promptCloudLoad(e);
         };
         var cloudLoadList = newHTML('div', 'infoboxCloudList', cloudLoadPanel);
@@ -752,6 +787,7 @@ export default class UI {
         loadButton.onclick = function (e) {
             e.preventDefault();
             e.stopPropagation();
+            UI.setCloudAlertAnchor(e.currentTarget);
             UI.loadCloudProject(entry.customId, true);
         };
         var deleteButton = newHTML('div', 'infoboxCloudActionButton danger', actions);
@@ -770,19 +806,19 @@ export default class UI {
         ScratchAudio.sndFX('tap.wav');
         if (!ScratchJr.currentProject) {
             Alert.close();
-            Alert.open(frame, gn('flip'), 'No active project', '#ff0000');
+            Alert.open(frame, UI.getCloudAlertAnchor(), 'No active project', '#ff0000');
             return;
         }
         UI.handleTextFieldSave(true);
         Project.prepareToSave(ScratchJr.currentProject, function () {
             ProjectCloud.saveCurrentProjectToCloud().then(function (result) {
                 Alert.close();
-                var message = 'Saved to cloud';
+                var message = "";
                 if (result && result.customId) {
-                    message += ' (Custom ID: ' + result.customId + ')';
+                    message += "Here’s your project ID: " + result.customId +
+                        ". Keep this ID safe — you’ll need it to load your data later.";
                 }
-                message += '. Please note this ID to load later.';
-                Alert.open(frame, gn('flip'), message, '#28A5DA');
+                Alert.open(frame, UI.getCloudAlertAnchor(), message, '#28A5DA');
                 if (result && result.customId) {
                     addStoredCloudId({
                         customId: result.customId,
@@ -793,13 +829,10 @@ export default class UI {
                         UI.renderCloudIdList();
                     }
                 }
-                setTimeout(function () {
-                    Alert.close();
-                }, 2500);
             }).catch(function (err) {
                 console.error(err);
                 Alert.close();
-                Alert.open(frame, gn('flip'), 'Cloud save failed', '#ff0000');
+                Alert.open(frame, UI.getCloudAlertAnchor(), 'Cloud save failed', '#ff0000');
             });
         });
     }
@@ -830,10 +863,10 @@ export default class UI {
         var shouldStore = storeOnSuccess ? true : false;
         ScratchJr.saveProject(null, function () {
             Alert.close();
-            Alert.open(frame, gn('flip'), 'Loading from cloud', '#28A5DA');
+            Alert.open(frame, UI.getCloudAlertAnchor(), 'Loading from cloud', '#28A5DA');
             ProjectCloud.loadProjectFromCloud(customId).then(function (result) {
                 Alert.close();
-                Alert.open(frame, gn('flip'), 'Cloud project ready', '#28A5DA');
+                Alert.open(frame, UI.getCloudAlertAnchor(), 'Cloud project ready', '#28A5DA');
                 if (result && result.projectId) {
                     ScratchJr.currentProject = result.projectId;
                     ScratchJr.editmode = 'edit';
@@ -854,13 +887,12 @@ export default class UI {
                     UI.renderCloudIdList();
                 }
                 setTimeout(function () {
-                    Alert.close();
                     goToLink('editor.html?pmd5=' + result.projectId + '&mode=edit');
                 }, 1000);
             }).catch(function (err) {
                 console.error(err);
                 Alert.close();
-                Alert.open(frame, gn('flip'), 'Cloud load failed', '#ff0000');
+                Alert.open(frame, UI.getCloudAlertAnchor(), 'Cloud load failed', '#ff0000');
             });
         });
     }
@@ -922,7 +954,7 @@ export default class UI {
         var canShare = ScratchJr.editmode != 'storyStarter' || ScratchJr.changed;
         try {
             gn('infoboxParentsSectionButton').style.display = canShare ? 'block' : 'none';
-        } catch {}
+        } catch { }
 
         // Prevent button from thrashing
         setTimeout(function () {
@@ -989,6 +1021,7 @@ export default class UI {
     static hideInfoBox(e) {
         e.preventDefault();
         e.stopPropagation();
+        Alert.close();
         ScratchJr.onBackButtonCallback.pop();
 
         // Prevent button thrashing
@@ -1004,8 +1037,10 @@ export default class UI {
             ScratchAudio.sndFX('exittap.wav');
             gn('infobox').className = 'infobox fade';
         }
-        gn('sharebuttons').style.visibility = 'hidden';
-        gn('parentsection').style.visibility = 'visible';
+        try {
+            gn('sharebuttons').style.visibility = 'hidden';
+            gn('parentsection').style.visibility = 'visible';
+        } catch { }
         infoBoxOpen = false;
     }
 
@@ -1252,7 +1287,7 @@ export default class UI {
         if (ScratchJr.isEditable() && ScratchJr.getSprite() &&
             (((t.className == 'sname') && (el.owner == ScratchJr.getSprite().id))
                 || (t.className == 'brush'))) {
-                    if (el.owner.includes('Marty')) return; // Marty sprites are not editable 
+            if (el.owner.includes('Marty')) return; // Marty sprites are not editable 
             UI.putInPaintEditor(e);
             return;
         }
