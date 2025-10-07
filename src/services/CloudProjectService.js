@@ -1,5 +1,4 @@
 import randomHashGenerator from "../utils/randomHashGenerator";
-
 const BASE_URL = "https://blocksjr-projects-default-rtdb.firebaseio.com";
 const PROJECTS_ENDPOINT = `${BASE_URL}/projects`;
 
@@ -112,6 +111,14 @@ export async function saveProjectPackage(packageData) {
       projectObject = JSON.parse(projectObject);
     } catch (err) {
       console.warn("CloudProjectService: project data is string but not valid JSON", err);
+    }
+  }
+  if (projectObject && !projectObject.name) {
+    projectObject.name = projectName;
+    try {
+      packageData.project = projectObject;
+    } catch (err) {
+      console.warn("CloudProjectService: unable to assign project name", err);
     }
   }
 

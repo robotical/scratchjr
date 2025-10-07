@@ -204,6 +204,20 @@ async function insertProject(metadata) {
 export default class ProjectCloud {
   static async buildExportPackage(projectId) {
     var metadata = await fetchProjectMetadata(projectId);
+    if (metadata.json && typeof metadata.json === "string") {
+      try {
+        metadata.json = JSON.parse(metadata.json);
+      } catch (err) {
+        console.warn("ProjectCloud.buildExportPackage could not parse project json", err);
+      }
+    }
+    if (metadata.thumbnail && typeof metadata.thumbnail === "string") {
+      try {
+        metadata.thumbnail = JSON.parse(metadata.thumbnail);
+      } catch (err) {
+        console.warn("ProjectCloud.buildExportPackage could not parse thumbnail json", err);
+      }
+    }
     var assetIds = collectAssetIds(metadata);
     var assets = {};
     for (var i = 0; i < assetIds.length; i++) {
@@ -255,13 +269,17 @@ export default class ProjectCloud {
       throw new Error("Project not found in cloud");
     }
     var packageData = result.packageData;
+    if (packageData && packageData.project && !packageData.project.name && result.projectName) {
+      packageData.project.name = result.projectName;
+    }
     var importResult = await ProjectCloud.importPackage(packageData);
     var newProjectId = importResult.projectId;
+    var newName = "Cloud (" + (packageData.project && packageData.project.name || "Untitled Project") + ")";
     var metadata = importResult.metadata;
     return {
       projectId: newProjectId,
       customId: result.customId || customId,
-      projectName: result.projectName || (metadata && metadata.name) || (packageData.project && packageData.project.name),
+      projectName: newName,
       packageData: packageData,
       metadata: metadata,
       cloudId: result.cloudId || packageData.cloudId,
@@ -282,6 +300,8 @@ export default class ProjectCloud {
     var projectMetadata = packageData.project;
     if (!projectMetadata.name) {
       projectMetadata.name = "Imported Project";
+    } else {
+      projectMetadata.name = `Cloud (${projectMetadata.name})`;
     }
     if (projectMetadata.json && typeof projectMetadata.json === "string") {
       try {
@@ -310,7 +330,8 @@ export default class ProjectCloud {
         resolve();
       });
     });
-    debugger
+    var db = await dataStoreInstance.getDatabaseManager();
+    await db.save();
     return {
       projectId: newId,
       metadata: projectMetadata,
