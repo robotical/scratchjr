@@ -13,6 +13,13 @@ export const LINEAR_GRADIENT_COLOUR = "linear-gradient(to right, red, orange, ye
 const intervalToSeconds = 31.25; // runtime tick is set at 32ms by Runtime.js. 32*31.25 = 1s
 
 const lastCogEventTimestamps = {};
+const lastMartyEventTimestamps = {};
+const MARTY_EVENT_ARGUMENTS = {
+    martycoloursensed: ['martycoloursensedred', 'martycoloursensedgreen', 'martycoloursensedblue', 'martycoloursensedpurple', 'martycoloursensedyellow', 'martycoloursensednone'],
+    martyobstaclesensed: ['martyobstaclesensedobstaclesensed', 'martyobstaclesensedobstaclenotsensed'],
+    martylightsensed: ['martylightsensednone', 'martylightsensedmid', 'martylightsensedhigh'],
+};
+const MARTY_EVENT_BLOCK_TYPES = Object.keys(MARTY_EVENT_ARGUMENTS);
 export default class Prims {
     static get hopList() {
         return hopList;
@@ -87,6 +94,9 @@ export default class Prims {
 
 
         /* Marty Prims */
+        Prims.table.martycoloursensed = Prims.Ignore;
+        Prims.table.martyobstaclesensed = Prims.Ignore;
+        Prims.table.martylightsensed = Prims.Ignore;
         Prims.table.martyDance = Prims.martyDance;
         Prims.table.martyGetReady = Prims.martyGetReady;
         Prims.table.martyStepForward = Prims.martyStepForward;
@@ -1449,6 +1459,51 @@ export default class Prims {
             return maxStepArgument;
         } else {
             return argValue;
+        }
+    }
+
+    static OnMartyEvent(event) {
+        // We need to be able to move on with the event even if there is another script running
+        // if executing a script, then don't do anything
+        // if (this.isScriptRunning()) {
+        //     return;
+        // }
+
+        // only proceed if at least x ms have passed since last event of the same type
+        const now = Date.now();
+        if (
+            lastMartyEventTimestamps[event] &&
+            now - lastMartyEventTimestamps[event] < 0
+        ) {
+            return;
+        }
+
+        lastMartyEventTimestamps[event] = now;
+
+        var pair;
+        var receivers = [];
+
+        var findReceivers = function (block, s) {
+            const allowedEvents = MARTY_EVENT_ARGUMENTS[block.blocktype];
+            if (!allowedEvents || allowedEvents.indexOf(event) === -1) {
+                return;
+            }
+            if (block.getArgValue() === event) {
+                receivers.push([s, block]);
+                ScratchJr.startCurrentPageStrips(['ontouch']);
+            }
+        };
+        Prims.applyToAllStrips(MARTY_EVENT_BLOCK_TYPES, findReceivers);
+        var newthreads = [];
+        for (var i in receivers) {
+            pair = receivers[i];
+            // console.log("found receiver", pair[0], pair[1]);
+            const isScriptRunningForThatBlock = ScratchJr.runtime.isScriptRunningForThatBlock(pair[1]);
+            if (isScriptRunningForThatBlock) {
+                // don't start a new thread if the script this block belongs to is already running
+                continue;
+            }
+            newthreads.push(ScratchJr.runtime.restartThread(pair[0], pair[1], true));
         }
     }
 

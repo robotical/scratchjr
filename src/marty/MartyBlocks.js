@@ -5,6 +5,7 @@
  */
 import isVersionGreater, { isVersionGreater_errorCatching } from "../utils/compare-version";
 import { isVersionEqual } from "../utils/versionChecker";
+import Prims from "../editor/engine/Prims";
 
 
 export default class MartyBlocks {
@@ -25,6 +26,85 @@ export default class MartyBlocks {
 
     constructor(marty) {
         this.marty = marty;
+
+        // Subscribe to the published data events of the marty
+        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.red, this.onColourSensedRed.bind(this));
+        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.green, this.onColourSensedGreen.bind(this));
+        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.blue, this.onColourSensedBlue.bind(this));
+        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.purple, this.onColourSensedPurple.bind(this));
+        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.yellow, this.onColourSensedYellow.bind(this));
+        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.air, this.onColourSensedNone.bind(this));
+        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.unclear, this.onColourSensedNone.bind(this));
+
+        const obstacleSenseEvents = this.marty.publishedDataAnalyser.eventsMap?.obstacleSense
+            || this.marty.publishedDataAnalyser.eventsMap?.obstacleSensed;
+        if (obstacleSenseEvents) {
+            const obstacleDetectedEvent = obstacleSenseEvents.sensed
+                || obstacleSenseEvents.obstacleSensed
+                || obstacleSenseEvents.detected;
+            if (obstacleDetectedEvent) {
+                this.marty.publishedDataAnalyser.on(obstacleDetectedEvent, this.onObstacleSensed.bind(this));
+            }
+
+            const obstacleNotDetectedEvent = obstacleSenseEvents.notSensed
+                || obstacleSenseEvents.obstacleNotSensed
+                || obstacleSenseEvents.none;
+            if (obstacleNotDetectedEvent) {
+                this.marty.publishedDataAnalyser.on(obstacleNotDetectedEvent, this.onObstacleNotSensed.bind(this));
+            }
+        }
+
+        const lightSenseEvents = this.marty.publishedDataAnalyser.eventsMap?.lightSense;
+        if (lightSenseEvents) {
+            if (lightSenseEvents.none) {
+                this.marty.publishedDataAnalyser.on(lightSenseEvents.none, this.onLightSensedNone.bind(this));
+            }
+            if (lightSenseEvents.mid) {
+                this.marty.publishedDataAnalyser.on(lightSenseEvents.mid, this.onLightSensedMid.bind(this));
+            }
+            if (lightSenseEvents.high) {
+                this.marty.publishedDataAnalyser.on(lightSenseEvents.high, this.onLightSensedHigh.bind(this));
+            }
+        }
+    }
+
+    onColourSensedRed() {
+        Prims.OnMartyEvent('martycoloursensedred');
+    }
+    onColourSensedGreen() {
+        Prims.OnMartyEvent('martycoloursensedgreen');
+    }
+    onColourSensedNone() {
+        Prims.OnMartyEvent('martycoloursensednone');
+    }
+    onColourSensedYellow() {
+        Prims.OnMartyEvent('martycoloursensedyellow');
+    }
+    onColourSensedPurple() {
+        Prims.OnMartyEvent('martycoloursensedpurple');
+    }
+    onColourSensedBlue() {
+        Prims.OnMartyEvent('martycoloursensedblue');
+    }
+
+    onObstacleSensed() {
+        Prims.OnMartyEvent('martyobstaclesensedobstaclesensed');
+    }
+
+    onObstacleNotSensed() {
+        Prims.OnMartyEvent('martyobstaclesensedobstaclenotsensed');
+    }
+
+    onLightSensedNone() {
+        Prims.OnMartyEvent('martylightsensednone');
+    }
+
+    onLightSensedMid() {
+        Prims.OnMartyEvent('martylightsensedmid');
+    }
+
+    onLightSensedHigh() {
+        Prims.OnMartyEvent('martylightsensedhigh');
     }
 
     destroy() {
