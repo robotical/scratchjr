@@ -31,7 +31,8 @@ const patternshapes = ['patternrainbow', 'patternpinwheel', 'patternshowoff'];
 const colourshapes = ['selectcolourred', 'selectcolourgreen', 'selectcolourblue', 'selectcolourpurple', 'selectcolourorange', 'selectcolouryellow'];
 const coloursensedshapes = ['martycoloursensedred', 'martycoloursensedgreen', 'martycoloursensedblue', 'martycoloursensedpurple', 'martycoloursensedyellow', 'martycoloursensednone'];
 const martyobstaclesensedshapes = ['martyobstaclesensedobstaclesensed', 'martyobstaclesensedobstaclenotsensed'];
-const martylightsensedshapes = ['martylightsensednone', 'martylightsensedmid', 'martylightsensedhigh'];
+const martylightsensedshapes = ['martylightsensedlow', 'martylightsensedmid', 'martylightsensedhigh'];
+const martynoisesensedshapes = ['martynoisesensednoisesensed', 'martynoisesensednonoisesensed'];
 const noteshapes = ['notec', 'notecsharp', 'noted', 'notedsharp', 'notee', 'notef', 'notefsharp', 'noteg', 'notegsharp', 'notea', 'noteasharp', 'noteb'];
 
 let getshapes = ['LetterGet_Orange', 'LetterGet_Red', 'LetterGet_Yellow', 'LetterGet_Green',
@@ -287,7 +288,7 @@ export default class BlockSpecs {
     }
 
     static setupPalettesDefMarty() {
-        return [['onflag', 'martycoloursensed', 'martyobstaclesensed', 'martylightsensed', 'onmessage', 'message', 'onclick', 'ontouch'],
+        return [['onflag', 'martycoloursensed', 'martyobstaclesensed', 'martylightsensed', 'martynoisesensed', 'onmessage', 'message', 'onclick', 'ontouch'],
         ['martyGetReady', 'martyStepForward', 'martyStepBackward', 'martyStepRight', 'martyStepLeft', 'martyTurnRight', 'martyTurnLeft', 'martyDance', 'martyKickLeft', 'martyKickRight'],
         ['martyEyesExcited', 'martyEyesWide', 'martyEyesAngry', 'martyEyesNormal', 'martyEyesWiggle', 'martyWaveLeft', 'martyWaveRight', 'martyCelebrate', 'martyLedEyesP1', 'martyLedEyesP2', 'martyLedEyesColour'],
         ['martyConfusion', 'martyDisbelief', 'martyExcitement', 'martyNoway', 'martyNo', 'martyWhistle'],
@@ -434,11 +435,13 @@ export default class BlockSpecs {
 
             /* Marty Blocks */
             'martycoloursensed': ['martycoloursensed', coloursensedshapes,
-                BlockSpecs.yellowStart, 'm', 'martycoloursensedred', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+                BlockSpecs.yellowStart, 'm', 'martycoloursensedblue', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'martyobstaclesensed': ['martyobstaclesensed', martyobstaclesensedshapes,
                 BlockSpecs.yellowStart, 'm', 'martyobstaclesensedobstaclesensed', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'martylightsensed': ['martylightsensed', martylightsensedshapes,
-                BlockSpecs.yellowStart, 'm', 'martylightsensednone', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+                BlockSpecs.yellowStart, 'm', 'martylightsensedlow', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'martynoisesensed': ['martynoisesensed', martynoisesensedshapes,
+                BlockSpecs.yellowStart, 'm', 'martynoisesensednonoisesensed', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'martyGetReady': ['martyGetReady', BlockSpecs.getImageFrom('assets/blockicons/MartyGetReady', 'svg'),
                 BlockSpecs.blueCmd, null, null, BlockSpecs.blueCmdH, 1, 20, BlockSpecs.cmdS],
             'martyDance': ['martyDance', BlockSpecs.getImageFrom('assets/blockicons/MartyDance', 'svg'),
@@ -506,6 +509,7 @@ export default class BlockSpecs {
             'martycoloursensed': Localization.localize('BLOCK_DESC_MARTY_ON_COLOUR_SENSED'),
             'martyobstaclesensed': Localization.localize('BLOCK_DESC_MARTY_ON_OBSTACLE_SENSED'),
             'martylightsensed': Localization.localize('BLOCK_DESC_MARTY_ON_LIGHT_SENSED'),
+            'martynoisesensed': Localization.localize('BLOCK_DESC_MARTY_ON_NOISE_SENSED'),
             'tiltany': Localization.localize('BLOCK_DESC_ON_TILT'),
             'onsteercog': Localization.localize('BLOCK_DESC_ON_STEER'),
             'ontouchcog': Localization.localize('BLOCK_DESC_ON_TOUCH_Cog'),

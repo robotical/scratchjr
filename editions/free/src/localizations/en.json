@@ -94,6 +94,8 @@
   "BLOCK_DESC_MARTY_ON_OBSTACLE_SENSED_DESCRIPTION": "Starts the script when Marty's obstacle sensor matches the selected state.",
   "BLOCK_DESC_MARTY_ON_LIGHT_SENSED": "Start on Light Sensed",
   "BLOCK_DESC_MARTY_ON_LIGHT_SENSED_DESCRIPTION": "Starts the script when Marty's light sensor reaches the chosen level.",
+  "BLOCK_DESC_MARTY_ON_NOISE_SENSED": "Start on Noise Sensed",
+  "BLOCK_DESC_MARTY_ON_NOISE_SENSED_DESCRIPTION": "Starts the script when Marty's noise sensor matches the selected state.",
   "BLOCK_PLAY_NOTE": "Play note",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Play note",
   "BLOCKS_POP": "Pop",

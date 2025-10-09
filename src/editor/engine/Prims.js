@@ -17,7 +17,8 @@ const lastMartyEventTimestamps = {};
 const MARTY_EVENT_ARGUMENTS = {
     martycoloursensed: ['martycoloursensedred', 'martycoloursensedgreen', 'martycoloursensedblue', 'martycoloursensedpurple', 'martycoloursensedyellow', 'martycoloursensednone'],
     martyobstaclesensed: ['martyobstaclesensedobstaclesensed', 'martyobstaclesensedobstaclenotsensed'],
-    martylightsensed: ['martylightsensednone', 'martylightsensedmid', 'martylightsensedhigh'],
+    martylightsensed: ['martylightsensedlow', 'martylightsensedmid', 'martylightsensedhigh'],
+    martynoisesensed: ['martynoisesensednoisesensed', 'martynoisesensednonoisesensed'],
 };
 const MARTY_EVENT_BLOCK_TYPES = Object.keys(MARTY_EVENT_ARGUMENTS);
 export default class Prims {
@@ -97,6 +98,7 @@ export default class Prims {
         Prims.table.martycoloursensed = Prims.Ignore;
         Prims.table.martyobstaclesensed = Prims.Ignore;
         Prims.table.martylightsensed = Prims.Ignore;
+        Prims.table.martynoisesensed = Prims.Ignore;
         Prims.table.martyDance = Prims.martyDance;
         Prims.table.martyGetReady = Prims.martyGetReady;
         Prims.table.martyStepForward = Prims.martyStepForward;

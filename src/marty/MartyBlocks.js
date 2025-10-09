@@ -36,19 +36,14 @@ export default class MartyBlocks {
         this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.air, this.onColourSensedNone.bind(this));
         this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.unclear, this.onColourSensedNone.bind(this));
 
-        const obstacleSenseEvents = this.marty.publishedDataAnalyser.eventsMap?.obstacleSense
-            || this.marty.publishedDataAnalyser.eventsMap?.obstacleSensed;
+        const obstacleSenseEvents = this.marty.publishedDataAnalyser.eventsMap?.objectSense;
         if (obstacleSenseEvents) {
-            const obstacleDetectedEvent = obstacleSenseEvents.sensed
-                || obstacleSenseEvents.obstacleSensed
-                || obstacleSenseEvents.detected;
+            const obstacleDetectedEvent = obstacleSenseEvents.near;
             if (obstacleDetectedEvent) {
                 this.marty.publishedDataAnalyser.on(obstacleDetectedEvent, this.onObstacleSensed.bind(this));
             }
 
-            const obstacleNotDetectedEvent = obstacleSenseEvents.notSensed
-                || obstacleSenseEvents.obstacleNotSensed
-                || obstacleSenseEvents.none;
+            const obstacleNotDetectedEvent = obstacleSenseEvents.none;
             if (obstacleNotDetectedEvent) {
                 this.marty.publishedDataAnalyser.on(obstacleNotDetectedEvent, this.onObstacleNotSensed.bind(this));
             }
@@ -57,13 +52,26 @@ export default class MartyBlocks {
         const lightSenseEvents = this.marty.publishedDataAnalyser.eventsMap?.lightSense;
         if (lightSenseEvents) {
             if (lightSenseEvents.none) {
-                this.marty.publishedDataAnalyser.on(lightSenseEvents.none, this.onLightSensedNone.bind(this));
+                this.marty.publishedDataAnalyser.on(lightSenseEvents.none, this.onLightSensedLow.bind(this));
             }
             if (lightSenseEvents.mid) {
                 this.marty.publishedDataAnalyser.on(lightSenseEvents.mid, this.onLightSensedMid.bind(this));
             }
             if (lightSenseEvents.high) {
                 this.marty.publishedDataAnalyser.on(lightSenseEvents.high, this.onLightSensedHigh.bind(this));
+            }
+        }
+
+        const noiseSenseEvents = this.marty.publishedDataAnalyser.eventsMap?.noiseSense;
+        if (noiseSenseEvents) {
+            const noiseDetectedEvent = noiseSenseEvents.high;
+            if (noiseDetectedEvent) {
+                this.marty.publishedDataAnalyser.on(noiseDetectedEvent, this.onNoiseSensed.bind(this));
+            }
+            
+            const noNoiseEvent = noiseSenseEvents.low;
+            if (noNoiseEvent) {
+                this.marty.publishedDataAnalyser.on(noNoiseEvent, this.onNoNoiseSensed.bind(this));
             }
         }
     }
@@ -95,8 +103,8 @@ export default class MartyBlocks {
         Prims.OnMartyEvent('martyobstaclesensedobstaclenotsensed');
     }
 
-    onLightSensedNone() {
-        Prims.OnMartyEvent('martylightsensednone');
+    onLightSensedLow() {
+        Prims.OnMartyEvent('martylightsensedlow');
     }
 
     onLightSensedMid() {
@@ -105,6 +113,14 @@ export default class MartyBlocks {
 
     onLightSensedHigh() {
         Prims.OnMartyEvent('martylightsensedhigh');
+    }
+
+    onNoiseSensed() {
+        Prims.OnMartyEvent('martynoisesensednoisesensed');
+    }
+
+    onNoNoiseSensed() {
+        Prims.OnMartyEvent('martynoisesensednonoisesensed');
     }
 
     destroy() {
