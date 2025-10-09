@@ -219,6 +219,17 @@ export default class UI {
                 // - the raft is connected
                 // - the raft is disconnected
                 raftVerifiedSubscriptionHelper(raft).subscribe(() => {
+                    // Check which Marty's sensors are connected
+                    // When sensor availability is known, call UI.updateMartySensorAvailability(raft, availability)
+
+                    setTimeout(() => {
+                        UI.updateMartySensorAvailability(raft, {
+                            colour: raft.publishedDataAnalyser.connectedSensors.colourSensor , 
+                            obstacle: raft.publishedDataAnalyser.connectedSensors.objectSensor, 
+                            light: raft.publishedDataAnalyser.connectedSensors.lightSensor, 
+                            noise: raft.publishedDataAnalyser.connectedSensors.noiseSensor
+                        });
+                    }, 3000);
                     UI.setupMartyConnectionButton(connectButton, raft);
                     // turn off the verified subscription to avoid memory leaks
                     raftVerifiedSubscriptionHelper(raft).unsubscribe();
@@ -232,6 +243,18 @@ export default class UI {
             UI.setupMartyConnectionButton(martyButton, connectedMarty);
         }
         /* END MARTY */
+    }
+
+    static updateMartySensorAvailability(martyOrId, availability) {
+        const manager = window.martyManager;
+        if (!manager || typeof manager.setMartySensorAvailability !== 'function') {
+            return;
+        }
+        const martyId = typeof martyOrId === 'string' ? martyOrId : martyOrId?.id;
+        if (!martyId) {
+            return;
+        }
+        manager.setMartySensorAvailability(martyId, availability);
     }
 
     static showConnIssueOverlay(button) {

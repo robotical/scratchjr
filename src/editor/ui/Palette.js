@@ -30,6 +30,15 @@ let timeoutid = undefined;
 let helpballoon = undefined;
 let dxblocks = 10;
 
+const MARTY_SENSOR_BLOCKS = new Set([
+    'martycoloursensed',
+    'martyobstaclesensed',
+    'martylightsensed',
+    'martynoisesensed'
+]);
+
+let currentCategorySide = 'left';
+
 export default class Palette {
     static get numcat() {
         return numcat;
@@ -418,6 +427,7 @@ export default class Palette {
         const isRightCategories = n >= div.childNodes.length - 1;
         n = isRightCategories ? n - (div.childNodes.length - 1) : n;
         div = isRightCategories ? gn('selectorsright') : gn('selectors');
+    currentCategorySide = isRightCategories ? 'right' : 'left';
         // set the icons for text or sprite
         numcat = n;
         var currentSel = div.childNodes[n + 1];
@@ -449,6 +459,9 @@ export default class Palette {
             pallets = BlockSpecs.palettesMarty;
         }
         var list = (pallets[n]).concat();
+        if (!isRightCategories && ScratchJr.isMartyModeEnabled) {
+            list = Palette.applyMartySensorVisibility(list);
+        }
         var dx = dxblocks;
         if (isRightCategories) {
             dx = gn('palette').offsetWidth - 90;
@@ -489,6 +502,34 @@ export default class Palette {
         if (!isRightCategories && !ScratchJr.isMartyModeEnabled && (n == 3) && (ScratchJr.getSprite().sounds.length > 0)) {
             Palette.addSoundsBlocks(dxblocks);
         }
+    }
+
+    static applyMartySensorVisibility(blockNames) {
+        const manager = window.martyManager;
+        if (!manager || typeof manager.getVisibleMartySensorBlocks !== 'function') {
+            return blockNames;
+        }
+        const visibleBlocks = manager.getVisibleMartySensorBlocks();
+        if (!visibleBlocks || visibleBlocks.length === 0) {
+            return blockNames.filter((blockName) => !MARTY_SENSOR_BLOCKS.has(blockName));
+        }
+        const visibleSet = new Set(visibleBlocks);
+        return blockNames.filter((blockName) => {
+            if (!MARTY_SENSOR_BLOCKS.has(blockName)) {
+                return true;
+            }
+            return visibleSet.has(blockName);
+        });
+    }
+
+    static refreshMartySensorBlocks() {
+        if (!ScratchJr.isMartyModeEnabled) {
+            return;
+        }
+        if (currentCategorySide !== 'left') {
+            return;
+        }
+        Palette.selectCategory(numcat);
     }
 
     static reset() {
@@ -712,4 +753,8 @@ export default class Palette {
         }
         ScratchJr.getActiveScript().owner.dragList = [];
     }
+}
+
+if (typeof window !== 'undefined') {
+    window.Palette = Palette;
 }
