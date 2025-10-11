@@ -80,6 +80,10 @@ All changes should be made in a fork. Before making a pull request, ensure all c
 
 For more information, see [CONTRIBUTING.md](https://github.com/LLK/scratchjr/blob/develop/.github/CONTRIBUTING.md).
 
+## Custom background uploads
+
+When the project editor background library is open you can now add your own images directly from disk. Click the new upload button (next to the paintbrush) and pick any PNG, JPG, or SVG file. ScratchJr will scale the image to fit the stage, store it in your user library, and immediately apply it to the current page, so it behaves just like any other background and can be edited in the paint editor later.
+
 ## GitHub Actions
 
 ### Versioning

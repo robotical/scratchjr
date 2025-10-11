@@ -17,7 +17,7 @@ export default class Alert {
         balloon = undefined;
     }
 
-    static open (p, obj, label, color) {
+    static open (p, obj, label, color, autoCloseDuration) {
         Alert.close();
         if (!obj) {
             return;
@@ -70,6 +70,12 @@ export default class Alert {
         });
         Alert.draw(balloon.getContext('2d'), 6, w, h, color);
         writeText(ctx, 'bold 14px Verdana', 'white', label, 20, 8);
+
+        if (autoCloseDuration && autoCloseDuration > 0) {
+            setTimeout(() => {
+                Alert.close();
+            }, autoCloseDuration);
+        }
     }
 
     static draw (ctx, curve, w, h, color) {

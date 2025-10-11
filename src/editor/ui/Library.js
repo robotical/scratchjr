@@ -7,6 +7,7 @@ import Paint from '../../painteditor/Paint';
 import Events from '../../utils/Events';
 import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
+import Alert from './Alert';
 import {gn, newHTML, scaleMultiplier,
     getDocumentWidth, getDocumentHeight, setProps, newCanvas, frame,
     isTablet} from '../../utils/lib';
@@ -18,6 +19,11 @@ let shaking;
 let type;
 let timeoutEvent;
 let libFrame;
+let headerButtons;
+let uploadButton;
+let uploadInput;
+let pendingSelectId;
+let uploadInProgress = false;
 
 export default class Library {
     static init () {
@@ -53,6 +59,7 @@ export default class Library {
         gn('okbut').onclick = (type == 'costumes') ? Library.closeSpriteSelection : Library.closeBkgSelection;
         Library.clean();
         Library.createScrollPanel();
+    Library.updateUploadVisibility();
         Library.addThumbnails(type);
         window.ontouchstart = undefined;
         window.ontouchend = undefined;
@@ -99,13 +106,29 @@ export default class Library {
 
     static layoutHeader () {
         var buttons = newHTML('div', 'bkgbuttons', gn('libactions'));
+        headerButtons = buttons;
         var paintme = newHTML('div', 'painticon', buttons);
         paintme.id = 'library_paintme';
         paintme.onclick = Library.editResource;
+        uploadButton = newHTML('div', 'uploadicon', buttons);
+        uploadButton.id = 'library_upload';
+        uploadButton.style.display = 'none';
+        uploadButton.onclick = Library.triggerUpload;
+        uploadButton.setAttribute('role', 'button');
+        uploadButton.setAttribute('aria-label', 'Upload Background');
         var okbut = newHTML('div', 'okicon', buttons);
         okbut.setAttribute('id', 'okbut');
         var cancelbut = newHTML('div', 'cancelicon', buttons);
         cancelbut.onclick = Library.cancelPick;
+        if (!uploadInput) {
+            uploadInput = document.createElement('input');
+            uploadInput.type = 'file';
+            uploadInput.accept = 'image/png,image/jpeg,image/jpg,image/svg+xml';
+            uploadInput.id = 'library_upload_input';
+            uploadInput.style.display = 'none';
+            uploadInput.addEventListener('change', Library.handleUploadChange);
+            libFrame.appendChild(uploadInput);
+        }
     }
 
     static cancelPick (e) {
@@ -164,6 +187,7 @@ export default class Library {
         nativeJr = false;
         data = (type == 'costumes') ? MediaLib.sprites : MediaLib.backgrounds;
         Library.displayLibAssets(data);
+        Library.applyPendingSelection();
     }
 
     static displayLibAssets (data) {
@@ -541,6 +565,30 @@ export default class Library {
         }
     }
 
+    static manualSelect (tb) {
+        if (!tb) {
+            return;
+        }
+        Library.clearAllSelections();
+        var thumbID = tb.id;
+        var thumbType = thumbID.substr(thumbID.length - 3);
+        if (thumbType == 'png') {
+            gn('library_paintme').style.opacity = 0;
+            gn('library_paintme').onclick = null;
+        } else {
+            gn('library_paintme').style.opacity = 1;
+            gn('library_paintme').onclick = Library.editResource;
+        }
+        tb.className = 'assetbox on';
+        selectedOne = tb.id;
+        clickThumb = tb;
+        if (tb.fieldname) {
+            gn('assetname').textContent = tb.fieldname;
+        } else {
+            gn('assetname').textContent = '';
+        }
+    }
+
     static resizeScroll () {
         var w = Math.min(getDocumentWidth(), frame.offsetWidth);
         var h = Math.max(getDocumentHeight(), frame.offsetHeight);
@@ -623,5 +671,272 @@ export default class Library {
         var dx = pt1.x - pt2.x;
         var dy = pt1.y - pt2.y;
         return Math.round(Math.sqrt((dx * dx) + (dy * dy)));
+    }
+
+    /////////////////////////////////////////
+    // Background upload support
+    /////////////////////////////////////////
+
+    static triggerUpload () {
+        if (uploadInProgress) {
+            return;
+        }
+        if (type != 'backgrounds') {
+            return;
+        }
+        ScratchAudio.sndFX('tap.wav');
+        if (uploadInput) {
+            uploadInput.click();
+        }
+    }
+
+    static async handleUploadChange (event) {
+        if (!event || !event.target) {
+            console.error("Invalid upload event");
+            return;
+        }
+        var files = event.target.files;
+        if (!files || files.length < 1) {
+            console.error("Invalid upload event");
+            return;
+        }
+        if (type != 'backgrounds') {
+            console.error("Invalid upload event", type);
+            return;
+        }
+        var file = files[0];
+        event.target.value = '';
+        if (!Library.isValidUpload(file)) {
+            Library.showUploadError('Unsupported file type');
+            return;
+        }
+        try {
+            uploadInProgress = true;
+            Library.updateUploadState(true);
+            var result = await Library.importBackgroundFile(file);
+            pendingSelectId = result.backgroundMd5;
+            Library.reloadAssets();
+            ScratchJr.stage.currentPage.setBackground(result.backgroundMd5, ScratchJr.stage.currentPage.updateBkg);
+            Library.showUploadSuccess('Background added');
+        } catch (err) {
+            console.error('Background upload failed', err);
+            Library.showUploadError('Upload failed');
+        } finally {
+            uploadInProgress = false;
+            Library.updateUploadState(false);
+        }
+    }
+
+    static isValidUpload (file) {
+        if (!file || !file.name) {
+            return false;
+        }
+        var ext = file.name.substring(file.name.lastIndexOf('.') + 1).toLowerCase();
+        return ['png', 'jpg', 'jpeg', 'svg'].indexOf(ext) > -1;
+    }
+
+    static updateUploadVisibility () {
+        if (!uploadButton || !headerButtons) {
+            return;
+        }
+        headerButtons.className = (type == 'costumes') ? 'shapebuttons' : 'bkgbuttons';
+        if (type == 'backgrounds') {
+            uploadButton.style.display = 'inline-block';
+            uploadButton.setAttribute('aria-hidden', 'false');
+        } else {
+            uploadButton.style.display = 'none';
+            uploadButton.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    static updateUploadState (busy) {
+        if (!uploadButton) {
+            return;
+        }
+        if (busy) {
+            uploadButton.classList.add('disabled');
+            uploadButton.setAttribute('aria-busy', 'true');
+        } else {
+            uploadButton.classList.remove('disabled');
+            uploadButton.removeAttribute('aria-busy');
+        }
+    }
+
+    static showUploadError (message) {
+        if (uploadButton && libFrame) {
+            Alert.open(libFrame, uploadButton, message, '#ff5a5f', 5000);
+        }
+    }
+
+    static showUploadSuccess (message) {
+        if (uploadButton && libFrame) {
+            Alert.open(libFrame, uploadButton, message, '#28A5DA', 5000);
+        }
+    }
+
+    static reloadAssets () {
+        Library.clean();
+        Library.createScrollPanel();
+        Library.addThumbnails(type);
+    }
+
+    static applyPendingSelection () {
+        if (!pendingSelectId) {
+            return;
+        }
+        var selectId = pendingSelectId;
+        var selectLater = function () {
+            var tb = document.getElementById(selectId);
+            if (tb) {
+                Library.manualSelect(tb);
+                pendingSelectId = undefined;
+            }
+        };
+        if (window.requestAnimationFrame) {
+            window.requestAnimationFrame(selectLater);
+        } else {
+            setTimeout(selectLater, 0);
+        }
+    }
+
+    static async importBackgroundFile (file) {
+        console.log("Importing background file", file);
+        var dataUrl = await Library.readFileAsDataURL(file);
+        var image = await Library.loadImage(dataUrl);
+        var stageWidth = 480;
+        var stageHeight = 360;
+        var canvas = document.createElement('canvas');
+        canvas.width = stageWidth;
+        canvas.height = stageHeight;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = ScratchJr.stagecolor || '#FFFFFF';
+        ctx.fillRect(0, 0, stageWidth, stageHeight);
+        var scale = Math.max(stageWidth / image.width, stageHeight / image.height);
+        var drawWidth = image.width * scale;
+        var drawHeight = image.height * scale;
+        var dx = (stageWidth - drawWidth) / 2;
+        var dy = (stageHeight - drawHeight) / 2;
+        ctx.drawImage(image, dx, dy, drawWidth, drawHeight);
+        var pngDataUrl = canvas.toDataURL('image/png');
+        var svgString = Library.wrapImageInSvg(pngDataUrl);
+        var backgroundMd5 = await Library.saveSvg(svgString);
+        var existing = await Library.fetchUserBackground(backgroundMd5);
+        if (existing.length > 0) {
+            var existingData = Library.parseAssetData(existing[0]);
+            return {
+                backgroundMd5: backgroundMd5,
+                thumbnailMd5: existingData.altmd5
+            };
+        }
+        var thumbDataUrl = Library.createThumbnailFromCanvas(canvas);
+        var thumbMd5 = await Library.savePngDataUrl(thumbDataUrl);
+        await Library.insertBackgroundRecord(backgroundMd5, thumbMd5);
+        return {
+            backgroundMd5: backgroundMd5,
+            thumbnailMd5: thumbMd5
+        };
+    }
+
+    static readFileAsDataURL (file) {
+        return new Promise(function (resolve, reject) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                resolve(reader.result);
+            };
+            reader.onerror = function () {
+                reject(new Error('Failed to read file'));
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    static loadImage (dataUrl) {
+        return new Promise(function (resolve, reject) {
+            var img = new Image();
+            img.onload = function () {
+                var naturalWidth = img.naturalWidth || img.width;
+                var naturalHeight = img.naturalHeight || img.height;
+                if (!naturalWidth || !naturalHeight) {
+                    naturalWidth = 480;
+                    naturalHeight = 360;
+                }
+                img.width = naturalWidth;
+                img.height = naturalHeight;
+                resolve(img);
+            };
+            img.onerror = function () {
+                reject(new Error('Failed to load image data'));
+            };
+            img.src = dataUrl;
+        });
+    }
+
+    static wrapImageInSvg (pngDataUrl) {
+        return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480" height="360" viewBox="0 0 480 360">' +
+            '<image width="480" height="360" x="0" y="0" xlink:href="' + pngDataUrl + '" />' +
+            '</svg>';
+    }
+
+    static createThumbnailFromCanvas (canvas) {
+        var thumbCanvas = document.createElement('canvas');
+        thumbCanvas.width = 120;
+        thumbCanvas.height = 90;
+        var tctx = thumbCanvas.getContext('2d');
+        tctx.drawImage(canvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
+        return thumbCanvas.toDataURL('image/png');
+    }
+
+    static saveSvg (svgString) {
+        return new Promise(function (resolve, reject) {
+            IO.setMedia(svgString, 'svg', function (md5) {
+                if (!md5) {
+                    reject(new Error('Failed to save svg background'));
+                } else {
+                    resolve(md5);
+                }
+            });
+        });
+    }
+
+    static savePngDataUrl (dataUrl) {
+        var base64 = dataUrl.split(',')[1];
+        return new Promise(function (resolve, reject) {
+            OS.setmedia(base64, 'png', function (md5) {
+                if (!md5) {
+                    reject(new Error('Failed to save thumbnail'));
+                } else {
+                    resolve(md5);
+                }
+            });
+        });
+    }
+
+    static fetchUserBackground (md5) {
+        return new Promise(function (resolve, reject) {
+            var json = {};
+            json.cond = 'md5 = ? AND version = ?';
+            json.items = ['*'];
+            json.values = [md5, ScratchJr.version];
+            IO.query('userbkgs', json, function (str) {
+                try {
+                    resolve(JSON.parse(str));
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    static insertBackgroundRecord (md5, thumbMd5) {
+        return new Promise(function (resolve, reject) {
+            var json = {};
+            var keylist = ['md5', 'altmd5', 'version', 'width', 'height', 'ext'];
+            var values = '?,?,?,?,?,?';
+            json.values = [md5, thumbMd5, ScratchJr.version, '480', '360', 'svg'];
+            json.stmt = 'insert into userbkgs (' + keylist.toString() + ') values (' + values + ')';
+            OS.stmt(json, function (res) {
+                resolve(res);
+            });
+        });
     }
 }

@@ -75,7 +75,7 @@
     display: block;
     margin: ${css_vh(0.00)};
     padding: ${css_vh(0.00)};
-    width: ${css_vh(31.25)};
+    width: ${css_vh(41.67)};
     height: ${css_vh(8.46)};
 }
 
@@ -97,6 +97,17 @@
     height: ${css_vh(8.46)};
     background: url('../assets/paint/paintbrush.svg');
     background-size: ${css_vh(8.46)} ${css_vh(8.46)};
+    background-size: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.uploadicon {
+    display: inline-block;
+    position: relative;
+    margin: ${css_vh(0.00)} ${css_vh(0.91)} ${css_vh(0.00)};
+    width: ${css_vh(8.46)};
+    height: ${css_vh(8.46)};
+    background: url('../assets/paint/upload.svg');
     background-size: 100%;
     -webkit-tap-highlight-color: transparent;
 }
@@ -134,6 +145,19 @@
 .painticon:active {
      background: url('../assets/paint/paintbrushPressed.svg');
      background-size: 100%;
+}
+
+.uploadicon:active {
+    background: url('../assets/paint/uploadPressed.svg');
+    background-size: 100%;
+}
+
+.uploadicon.disabled, .uploadicon.disabled:active {
+    opacity: 0.4;
+    cursor: default;
+    background: url('../assets/paint/upload.svg');
+    background-size: 100%;
+    pointer-events: none;
 }
 
 /*
