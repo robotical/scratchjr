@@ -80,9 +80,12 @@ All changes should be made in a fork. Before making a pull request, ensure all c
 
 For more information, see [CONTRIBUTING.md](https://github.com/LLK/scratchjr/blob/develop/.github/CONTRIBUTING.md).
 
-## Custom background uploads
+## Custom asset uploads
 
-When the project editor background library is open you can now add your own images directly from disk. Click the new upload button (next to the paintbrush) and pick any PNG, JPG, or SVG file. ScratchJr will scale the image to fit the stage, store it in your user library, and immediately apply it to the current page, so it behaves just like any other background and can be edited in the paint editor later.
+The asset libraries now support importing media from disk:
+
+- **Backgrounds:** Open the background library, click the upload button next to the paintbrush, and choose any PNG, JPG, or SVG. ScratchJr scales it to the stage, saves it to your user backgrounds, and applies it to the current page so you can edit it later in the paint editor.
+- **Characters:** Open the character library and use the same upload button to add a sprite image. Supported formats (PNG/JPG/SVG) are scaled for the stage, stored in your user characters, and dropped into the project immediately.
 
 ## GitHub Actions
 

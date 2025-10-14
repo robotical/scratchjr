@@ -110,12 +110,13 @@ export default class Library {
         var paintme = newHTML('div', 'painticon', buttons);
         paintme.id = 'library_paintme';
         paintme.onclick = Library.editResource;
-        uploadButton = newHTML('div', 'uploadicon', buttons);
-        uploadButton.id = 'library_upload';
-        uploadButton.style.display = 'none';
-        uploadButton.onclick = Library.triggerUpload;
-        uploadButton.setAttribute('role', 'button');
-        uploadButton.setAttribute('aria-label', 'Upload Background');
+    uploadButton = newHTML('div', 'uploadicon', buttons);
+    uploadButton.id = 'library_upload';
+    uploadButton.style.display = 'none';
+    uploadButton.onclick = Library.triggerUpload;
+    uploadButton.setAttribute('role', 'button');
+    uploadButton.setAttribute('aria-label', 'Upload Asset');
+    uploadButton.setAttribute('title', 'Upload Asset');
         var okbut = newHTML('div', 'okicon', buttons);
         okbut.setAttribute('id', 'okbut');
         var cancelbut = newHTML('div', 'cancelicon', buttons);
@@ -681,7 +682,7 @@ export default class Library {
         if (uploadInProgress) {
             return;
         }
-        if (type != 'backgrounds') {
+        if (type != 'backgrounds' && type != 'costumes') {
             return;
         }
         ScratchAudio.sndFX('tap.wav');
@@ -700,8 +701,8 @@ export default class Library {
             console.error("Invalid upload event");
             return;
         }
-        if (type != 'backgrounds') {
-            console.error("Invalid upload event", type);
+        if ((type != 'backgrounds') && (type != 'costumes')) {
+            console.error('Upload not supported for library type', type);
             return;
         }
         var file = files[0];
@@ -713,13 +714,21 @@ export default class Library {
         try {
             uploadInProgress = true;
             Library.updateUploadState(true);
-            var result = await Library.importBackgroundFile(file);
-            pendingSelectId = result.backgroundMd5;
-            Library.reloadAssets();
-            ScratchJr.stage.currentPage.setBackground(result.backgroundMd5, ScratchJr.stage.currentPage.updateBkg);
-            Library.showUploadSuccess('Background added');
+            if (type == 'backgrounds') {
+                var result = await Library.importBackgroundFile(file);
+                pendingSelectId = result.backgroundMd5;
+                Library.reloadAssets();
+                // ScratchJr.stage.currentPage.setBackground(result.backgroundMd5, ScratchJr.stage.currentPage.updateBkg);
+                Library.showUploadSuccess('Background added');
+            } else {
+                var sprite = await Library.importSpriteFile(file);
+                pendingSelectId = sprite.spriteMd5;
+                Library.reloadAssets();
+                // ScratchJr.stage.currentPage.addSprite(sprite.scale, sprite.spriteMd5, sprite.name);
+                Library.showUploadSuccess('Character added');
+            }
         } catch (err) {
-            console.error('Background upload failed', err);
+            console.error('Asset upload failed', err);
             Library.showUploadError('Upload failed');
         } finally {
             uploadInProgress = false;
@@ -739,10 +748,14 @@ export default class Library {
         if (!uploadButton || !headerButtons) {
             return;
         }
+        var supportsUpload = (type == 'costumes') || (type == 'backgrounds');
         headerButtons.className = (type == 'costumes') ? 'shapebuttons' : 'bkgbuttons';
-        if (type == 'backgrounds') {
+        if (supportsUpload) {
             uploadButton.style.display = 'inline-block';
             uploadButton.setAttribute('aria-hidden', 'false');
+            var ariaLabel = (type == 'costumes') ? 'Upload Character' : 'Upload Background';
+            uploadButton.setAttribute('aria-label', ariaLabel);
+            uploadButton.setAttribute('title', ariaLabel);
         } else {
             uploadButton.style.display = 'none';
             uploadButton.setAttribute('aria-hidden', 'true');
@@ -764,13 +777,13 @@ export default class Library {
 
     static showUploadError (message) {
         if (uploadButton && libFrame) {
-            Alert.open(libFrame, uploadButton, message, '#ff5a5f', 5000);
+            Alert.open(libFrame, uploadButton, message, '#ff5a5f');
         }
     }
 
     static showUploadSuccess (message) {
         if (uploadButton && libFrame) {
-            Alert.open(libFrame, uploadButton, message, '#28A5DA', 5000);
+            Alert.open(libFrame, uploadButton, message, '#28A5DA');
         }
     }
 
@@ -837,6 +850,60 @@ export default class Library {
         };
     }
 
+    static async importSpriteFile (file) {
+        console.log('Importing sprite file', file);
+        var dataUrl = await Library.readFileAsDataURL(file);
+        var image = await Library.loadImage(dataUrl);
+        var maxDimension = 300;
+        var longestSide = Math.max(image.width, image.height) || 1;
+        var scale = Math.min(1, maxDimension / longestSide);
+        var spriteWidth = Math.max(1, Math.round(image.width * scale));
+        var spriteHeight = Math.max(1, Math.round(image.height * scale));
+        var canvas = document.createElement('canvas');
+        canvas.width = spriteWidth;
+        canvas.height = spriteHeight;
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, spriteWidth, spriteHeight);
+        ctx.drawImage(image, 0, 0, spriteWidth, spriteHeight);
+
+        var spritePngDataUrl = canvas.toDataURL('image/png');
+        var svgString = Library.wrapSpriteInSvg(spritePngDataUrl, spriteWidth, spriteHeight);
+        var spriteMd5 = await Library.saveSvg(svgString);
+        var existing = await Library.fetchUserSprite(spriteMd5);
+        var defaultName = Library.generateSpriteName(file.name);
+        if (existing.length > 0) {
+            var existingData = Library.parseAssetData(existing[0]);
+            return {
+                spriteMd5: spriteMd5,
+                thumbnailMd5: existingData.altmd5,
+                width: Number(existingData.width),
+                height: Number(existingData.height),
+                scale: existingData.scale ? Number(existingData.scale) : 0.5,
+                name: existingData.name || defaultName
+            };
+        }
+
+        var thumbDataUrl = Library.createSpriteThumbnail(canvas);
+        var thumbMd5 = await Library.savePngDataUrl(thumbDataUrl);
+        var spriteScale = 0.5;
+        await Library.insertSpriteRecord({
+            md5: spriteMd5,
+            thumbMd5: thumbMd5,
+            width: spriteWidth,
+            height: spriteHeight,
+            scale: spriteScale,
+            name: defaultName
+        });
+        return {
+            spriteMd5: spriteMd5,
+            thumbnailMd5: thumbMd5,
+            width: spriteWidth,
+            height: spriteHeight,
+            scale: spriteScale,
+            name: defaultName
+        };
+    }
+
     static readFileAsDataURL (file) {
         return new Promise(function (resolve, reject) {
             var reader = new FileReader();
@@ -877,12 +944,34 @@ export default class Library {
             '</svg>';
     }
 
+    static wrapSpriteInSvg (pngDataUrl, width, height) {
+        return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">' +
+            '<image width="' + width + '" height="' + height + '" x="0" y="0" xlink:href="' + pngDataUrl + '" />' +
+            '</svg>';
+    }
+
     static createThumbnailFromCanvas (canvas) {
         var thumbCanvas = document.createElement('canvas');
         thumbCanvas.width = 120;
         thumbCanvas.height = 90;
         var tctx = thumbCanvas.getContext('2d');
         tctx.drawImage(canvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
+        return thumbCanvas.toDataURL('image/png');
+    }
+
+    static createSpriteThumbnail (canvas) {
+        var thumbCanvas = document.createElement('canvas');
+        thumbCanvas.width = 120;
+        thumbCanvas.height = 90;
+        var tctx = thumbCanvas.getContext('2d');
+        tctx.fillStyle = ScratchJr.stagecolor || '#FFFFFF';
+        tctx.fillRect(0, 0, thumbCanvas.width, thumbCanvas.height);
+        var scale = Math.min(thumbCanvas.width / canvas.width, thumbCanvas.height / canvas.height);
+        var drawWidth = canvas.width * scale;
+        var drawHeight = canvas.height * scale;
+        var dx = (thumbCanvas.width - drawWidth) / 2;
+        var dy = (thumbCanvas.height - drawHeight) / 2;
+        tctx.drawImage(canvas, dx, dy, drawWidth, drawHeight);
         return thumbCanvas.toDataURL('image/png');
     }
 
@@ -927,6 +1016,22 @@ export default class Library {
         });
     }
 
+    static fetchUserSprite (md5) {
+        return new Promise(function (resolve, reject) {
+            var json = {};
+            json.cond = 'md5 = ? AND version = ?';
+            json.items = ['*'];
+            json.values = [md5, ScratchJr.version];
+            IO.query('usershapes', json, function (str) {
+                try {
+                    resolve(JSON.parse(str));
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        });
+    }
+
     static insertBackgroundRecord (md5, thumbMd5) {
         return new Promise(function (resolve, reject) {
             var json = {};
@@ -938,5 +1043,33 @@ export default class Library {
                 resolve(res);
             });
         });
+    }
+
+    static insertSpriteRecord (info) {
+        return new Promise(function (resolve, reject) {
+            var json = {};
+            var keylist = ['scale', 'md5', 'altmd5', 'version', 'width', 'height', 'ext', 'name'];
+            var values = '?,?,?,?,?,?,?,?';
+            json.values = [info.scale.toString(), info.md5, info.thumbMd5, ScratchJr.version,
+                info.width.toString(), info.height.toString(), 'svg', info.name];
+            json.stmt = 'insert into usershapes (' + keylist.toString() + ') values (' + values + ')';
+            OS.stmt(json, function (res) {
+                resolve(res);
+            });
+        });
+    }
+
+    static generateSpriteName (filename) {
+        var base = filename ? filename.replace(/\.[^/.]+$/, '') : '';
+        try {
+            base = decodeURIComponent(base);
+        } catch (err) {
+            // ignore decode errors
+        }
+        base = base.replace(/[^A-Za-z]/g, '');
+        if (!base) {
+            base = Localization.localize('LIBRARY_CHARACTER');
+        }
+        return base.length > 20 ? base.substr(0, 20) : base;
     }
 }
