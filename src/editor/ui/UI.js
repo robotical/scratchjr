@@ -241,12 +241,6 @@ export default class UI {
         // check if we're alredy connected to a marty, and if so, update the UI button
         const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
         if (connectedMarty) {
-            UI.updateMartySensorAvailability(raft, {
-                colour: raft.publishedDataAnalyser.connectedSensors.colourSensor,
-                obstacle: raft.publishedDataAnalyser.connectedSensors.objectSensor,
-                light: raft.publishedDataAnalyser.connectedSensors.lightSensor,
-                noise: raft.publishedDataAnalyser.connectedSensors.noiseSensor
-            });
             UI.setupMartyConnectionButton(martyButton, connectedMarty);
         }
         /* END MARTY */
@@ -405,6 +399,13 @@ export default class UI {
         // Add the raft to the marty manager and wire it with blocks
         window.martyManager.addMarty(raft);
         window.martyManager.wireMartyWithBlocks(raft.id);
+
+        UI.updateMartySensorAvailability(raft, {
+            colour: raft.publishedDataAnalyser.connectedSensors.colourSensor,
+            obstacle: raft.publishedDataAnalyser.connectedSensors.objectSensor,
+            light: raft.publishedDataAnalyser.connectedSensors.lightSensor,
+            noise: raft.publishedDataAnalyser.connectedSensors.noiseSensor
+        });
 
         // Store the old onClick function to restore it later
         const oldOnClick = button.onclick;
@@ -1599,6 +1600,15 @@ export default class UI {
 
     /*MartyMode*/
     static toggleMartyMode() {
+        const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
+        if (connectedMarty) {
+            UI.updateMartySensorAvailability(connectedMarty, {
+                colour: connectedMarty.publishedDataAnalyser.connectedSensors.colourSensor,
+                obstacle: connectedMarty.publishedDataAnalyser.connectedSensors.objectSensor,
+                light: connectedMarty.publishedDataAnalyser.connectedSensors.lightSensor,
+                noise: connectedMarty.publishedDataAnalyser.connectedSensors.noiseSensor
+            });
+        }
         ScratchAudio.sndFX('tap.wav');
         ScratchJr.isMartyModeEnabled = !ScratchJr.isMartyModeEnabled;
         UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
