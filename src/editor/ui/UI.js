@@ -209,6 +209,7 @@ export default class UI {
         // check if we're alredy connected to a cog, and if so, update the UI button
         const connectedCog = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Cog');
         if (connectedCog) {
+
             UI.setupCogConnectionButton(cogButotn, connectedCog);
         }
         /* END COG */
@@ -224,9 +225,9 @@ export default class UI {
 
                     setTimeout(() => {
                         UI.updateMartySensorAvailability(raft, {
-                            colour: raft.publishedDataAnalyser.connectedSensors.colourSensor , 
-                            obstacle: raft.publishedDataAnalyser.connectedSensors.objectSensor, 
-                            light: raft.publishedDataAnalyser.connectedSensors.lightSensor, 
+                            colour: raft.publishedDataAnalyser.connectedSensors.colourSensor,
+                            obstacle: raft.publishedDataAnalyser.connectedSensors.objectSensor,
+                            light: raft.publishedDataAnalyser.connectedSensors.lightSensor,
                             noise: raft.publishedDataAnalyser.connectedSensors.noiseSensor
                         });
                     }, 3000);
@@ -240,6 +241,12 @@ export default class UI {
         // check if we're alredy connected to a marty, and if so, update the UI button
         const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
         if (connectedMarty) {
+            UI.updateMartySensorAvailability(raft, {
+                colour: raft.publishedDataAnalyser.connectedSensors.colourSensor,
+                obstacle: raft.publishedDataAnalyser.connectedSensors.objectSensor,
+                light: raft.publishedDataAnalyser.connectedSensors.lightSensor,
+                noise: raft.publishedDataAnalyser.connectedSensors.noiseSensor
+            });
             UI.setupMartyConnectionButton(martyButton, connectedMarty);
         }
         /* END MARTY */
