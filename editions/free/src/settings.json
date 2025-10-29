@@ -39,7 +39,12 @@
         "Turkish": "tr",
         "Ukrainian": "uk",
         "Chinese (Simplified)": "zh-cn",
-        "Chinese (Traditional)": "zh-tw"
+        "Chinese (Traditional)": "zh-tw",
+        "Catalan": "ca",
+        "Welsh": "cy",
+        "Bulgarian": "bg",
+        "Czech": "cs",
+        "Finnish": "fi"
     },
     "settingsPageDisabled": false
 }
