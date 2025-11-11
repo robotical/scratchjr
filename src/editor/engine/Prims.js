@@ -912,11 +912,13 @@ export default class Prims {
         steps = Prims.sanitiseArgument(steps);
         Prims.setTime(strip);
 
+        console.log("!Prims.isMartyCommanded(strip): ", !Prims.isMartyCommanded(strip));
         if (Prims.martyBlocks && !Prims.isMartyCommanded(strip)) {
+            console.log("stepping Marty forward: ", steps);
             steps = Math.min(Math.max(steps, 1), 20);
             Prims.martyBlocks.stepForward(steps);
             strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
-            Prims.stopMartyCommandedAfterTime(strip, (steps * moveTime) + MartyBlocks.moveTimeBuffer);
+            Prims.stopMartyCommandedAfterTime(strip, steps * (moveTime + MartyBlocks.moveTimeBuffer));
         }
 
         if (steps == 0) {
@@ -971,7 +973,7 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             Prims.martyBlocks.stepBackward(steps);
             strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
-            Prims.stopMartyCommandedAfterTime(strip, (steps * moveTime) + MartyBlocks.moveTimeBuffer);
+            Prims.stopMartyCommandedAfterTime(strip, steps * (moveTime + MartyBlocks.moveTimeBuffer));
         }
 
         if (steps == 0) {
@@ -1026,7 +1028,7 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             Prims.martyBlocks.stepLeft(steps);
             strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
-            Prims.stopMartyCommandedAfterTime(strip, (steps * moveTime) + MartyBlocks.moveTimeBuffer);
+            Prims.stopMartyCommandedAfterTime(strip, steps * (moveTime + MartyBlocks.moveTimeBuffer));
         }
 
         if (steps == 0) {
@@ -1081,7 +1083,7 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             Prims.martyBlocks.stepRight(steps);
             strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
-            Prims.stopMartyCommandedAfterTime(strip, (steps * moveTime) + MartyBlocks.moveTimeBuffer);
+            Prims.stopMartyCommandedAfterTime(strip, steps * (moveTime + MartyBlocks.moveTimeBuffer));
         }
 
         if (steps == 0) {
@@ -1135,7 +1137,7 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             Prims.martyBlocks.turnRight(steps);
             strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
-            Prims.stopMartyCommandedAfterTime(strip, (steps * moveTime) + MartyBlocks.moveTimeBuffer);
+            Prims.stopMartyCommandedAfterTime(strip, steps * (moveTime + MartyBlocks.moveTimeBuffer));
         }
 
         if (strip.count < 0) {
@@ -1168,7 +1170,7 @@ export default class Prims {
             steps = Math.min(Math.max(steps, 1), 20);
             Prims.martyBlocks.turnLeft(steps);
             strip.cmdSent = true; //this stops the loop entering this if statement whilst it's still controlling the sprite movement
-            Prims.stopMartyCommandedAfterTime(strip, (steps * moveTime) + MartyBlocks.moveTimeBuffer);
+            Prims.stopMartyCommandedAfterTime(strip, steps * (moveTime + MartyBlocks.moveTimeBuffer));
         }
 
         if (strip.count < 0) {
