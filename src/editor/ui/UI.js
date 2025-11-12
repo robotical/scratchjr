@@ -1601,7 +1601,7 @@ export default class UI {
     /*MartyMode*/
     static toggleMartyMode() {
         const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
-        if (connectedMarty) {
+        if (connectedMarty && connectedMarty.publishedDataAnalyser) {
             UI.updateMartySensorAvailability(connectedMarty, {
                 colour: connectedMarty.publishedDataAnalyser.connectedSensors.colourSensor,
                 obstacle: connectedMarty.publishedDataAnalyser.connectedSensors.objectSensor,

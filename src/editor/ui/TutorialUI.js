@@ -414,6 +414,22 @@ export default class TutorialUI {
                 found = true;
             }
         }
+        if (blockIDs.includes("none")) {
+            for (let i = 0; i < allBlocksInPalette.length; i++) {
+                const block = allBlocksInPalette[i];
+                block.style.opacity = '0.1';
+                block.style.pointerEvents = 'none';
+            }
+            found = true;
+        }
+        if  (blockIDs.includes("all")) {
+            for (let i = 0; i < allBlocksInPalette.length; i++) {
+                const block = allBlocksInPalette[i];
+                block.style.opacity = '1';
+                block.style.pointerEvents = 'auto';
+            }
+            found = true;
+        }
         if (!found) {
             TutorialUI.unhighlightBlocks();
         }
@@ -502,6 +518,35 @@ export default class TutorialUI {
 
     static _setHighlightedElementColor(colorRGBA) {
         document.documentElement.style.setProperty('--highlightedElementColor', colorRGBA);
+    }
+
+    /* Click Element */
+    static clickElement(elementID) {
+        const element = gn(elementID);
+        if (!element) {
+            console.warn(`Element with ID ${elementID} not found.`);
+            return;
+        }
+        const pointerInit = {
+            bubbles: true,
+            cancelable: true,
+            pointerId: Date.now(),
+            pointerType: 'mouse',
+            isPrimary: true
+        };
+        const mouseInit = {
+            bubbles: true,
+            cancelable: true,
+        };
+        try {
+            element.dispatchEvent(new PointerEvent('pointerdown', pointerInit));
+            element.dispatchEvent(new PointerEvent('pointerup', pointerInit));
+        } catch (err) {
+            // Fallback for environments without PointerEvent constructor
+            element.dispatchEvent(new MouseEvent('mousedown', mouseInit));
+            element.dispatchEvent(new MouseEvent('mouseup', mouseInit));
+        }
+        element.dispatchEvent(new MouseEvent('click', mouseInit));
     }
 
     /*MartyMode*/

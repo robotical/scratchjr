@@ -9,7 +9,9 @@ type ActionType =
     | "ShowCategory"
     | "HighlightBlocks"
     | "DragBlockToScriptArea"
-    | "ShowMartyMode";
+    | "ShowMartyMode"
+    | "WaitForTime"
+    | "ClickOnElement";
 
 type UIElement = "nextStep" | "cogConnectionButton" | "martyConnectionButton" | "cog-start" | "sprite-start" | "martyMode" | "marty-motion";
 
@@ -22,6 +24,8 @@ type Action = {
     category?: Category;
     blocks?: Block[];
     block?: Block;
+    time?: number;
+    wait?: number;
 };
 
 type TutorialStep = {

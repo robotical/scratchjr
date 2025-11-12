@@ -52,7 +52,6 @@ export default ApplicationManagerMock;
 class RaftMock {
     constructor() {
         this._observers = {};
-
     }
 
     // RAFT observer
@@ -102,4 +101,5 @@ class RaftMock {
     getRSSI () {
         return 120
     }
+
 }

@@ -1045,7 +1045,7 @@
   "COG_JRBLOCKS13_STEP_48_TEXT": "<p><b>Well done!</b><br />Now, using everything you've learned before, continue the story and make an adventure for Marty and the unicorn",
   "MARTY_JRBLOCKS1_TITLE": "Getting Marty Moving",
   "MARTY_JRBLOCKS1_STEP_1_TEXT": "In this tutorial, we're going to learn how to use basic functions in BlocksJr.",
-  "MARTY_JRBLOCKS1_STEP_2_TEXT": "First, let's connect to Marty. Click on the Marty button to connect to Marty",
+  "MARTY_JRBLOCKS1_STEP_2_TEXT": "First, let's flip to the <b>Marty mode</b> by clicking the Marty mode toggle on the top right of the screen.",
   "MARTY_JRBLOCKS1_STEP_3_TEXT": "These puzzle piece shaped blocks are called <b/>functions</b>.<br/><br/>Functions are like actions, a piece of code that tells Marty <i/>“hey, do this!”",
   "MARTY_JRBLOCKS1_STEP_4_TEXT": "Some functions tell Marty to <b/>go</b>",
   "MARTY_JRBLOCKS1_STEP_5_TEXT": "Some functions tell Marty to <b/>stop</b>",

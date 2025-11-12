@@ -27,17 +27,17 @@ export default class TutorialEngine {
         this.updateUI(this.tutorial.tutorialSteps[this.currentStep]);
     }
 
-    updateUI(step) {
+    async updateUI(step) {
         TutorialUI.clearUIBeforeStep();
         TutorialUI.updateProgressBar(this.currentStep, this.tutorial.tutorialSteps.length - 1);
         /* First, decide which buttons to show */
         this._handleButtons(step.buttons, step);
 
         /* Do the instruction actions */
-        this._handleActions(step.instructionActions);
+        await this._handleActions(step.instructionActions);
 
         /* Do the nextStepAction actions */
-        this._handleActions(step.nextStepActions);
+        await this._handleActions(step.nextStepActions);
     }
 
     _handleButtons(buttons, step) {
@@ -62,41 +62,58 @@ export default class TutorialEngine {
         });
     }
 
-    _handleActions(actions) {
-        actions.forEach(action => {
-            switch (action.type) {
-                case "ShowInstructorText":
-                    TutorialUI.showSpeechBubbleWithText(action.text);
-                    break;
-                case "ShowInstructorImage":
-                    TutorialUI.showSpeechBubbleWithImage(action.url, action.text);
-                    break;
-                case "ShowInstructorVideo":
-                    TutorialUI.showSpeechBubbleWithVideo(action.url);
-                    break;
-                case "ShowCategory":
-                    TutorialUI.selectCategory(action.category);
-                    break;
-                case "HighlightBlocks":
-                    TutorialUI.highlightBlocks(action.blocks);
-                    break;
-                case "DragBlockToScriptArea":
-                    TutorialUI.blockToScriptsAnimation(action.block);
-                    break;
-                case "HighlightElement":
-                    TutorialUI.highlightElement(
-                        action.elementId,
-                        colorToRGBA(action.hexColor, .5),
-                        this._onHighlightedElementClickActionDecider(action.onClickAction, action.args)
-                    );
-                    break;
-                case "ShowMartyMode":
-                    TutorialUI.showMartyMode();
-                    break;
-                default:
-                    break;
-            }
-        });
+    async _handleActions(actions = []) {
+        if (!actions) {
+            return;
+        }
+        for (const action of actions) {
+            await this._executeAction(action);
+        }
+    }
+
+    _executeAction(action) {
+        switch (action.type) {
+            case "ShowInstructorText":
+                TutorialUI.showSpeechBubbleWithText(action.text);
+                return;
+            case "ShowInstructorImage":
+                TutorialUI.showSpeechBubbleWithImage(action.url, action.text);
+                return;
+            case "ShowInstructorVideo":
+                TutorialUI.showSpeechBubbleWithVideo(action.url);
+                return;
+            case "ShowCategory":
+                TutorialUI.selectCategory(action.category);
+                return;
+            case "HighlightBlocks":
+                TutorialUI.highlightBlocks(action.blocks);
+                return;
+            case "DragBlockToScriptArea":
+                TutorialUI.blockToScriptsAnimation(action.block);
+                return;
+            case "HighlightElement":
+                TutorialUI.highlightElement(
+                    action.elementId,
+                    colorToRGBA(action.hexColor, .5),
+                    this._onHighlightedElementClickActionDecider(action.onClickAction, action.args)
+                );
+                return;
+            case "ShowMartyMode":
+                TutorialUI.showMartyMode();
+                return;
+            case "WaitForTime":
+                return new Promise(resolve => setTimeout(resolve, action.time ?? 0));
+            case "ClickOnElement":
+                return new Promise(resolve => {
+                    const delay = action.wait ?? 0;
+                    setTimeout(() => {
+                        TutorialUI.clickElement(action.elementId);
+                        resolve();
+                    }, delay);
+                });
+            default:
+                return;
+        }
     }
 
     _onHighlightedElementClickActionDecider(onClickAction, args) {
@@ -152,4 +169,3 @@ export default class TutorialEngine {
         return false;
     }
 }
-
