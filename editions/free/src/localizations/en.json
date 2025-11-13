@@ -1070,7 +1070,7 @@
   "MARTY_JRBLOCKS2_STEP_7_TEXT": "Now let's see if you can simplify code using arguments all by yourself! <br/><br/>You already have a <b/>walk forward</b> block in the right place, how many are in this code? write the correct number in the arguments box.",
   "MARTY_JRBLOCKS2_STEP_8_TEXT": "Great work! Now add in a <b/>slide right</b> block like shown - what number will you put as an argument to match the example code?",
   "MARTY_JRBLOCKS2_STEP_9_TEXT": "Now add a <b/>slide left</b> block like the example code - how many left blocks are there? what argument should you put in your left block?",
-  "MARTY_JRBLOCKS2_STEP_10_TEXT": "Almost there! Add a <b/>walk backwards</b> block like the example code and add in the right argument.",
+  "MARTY_JRBLOCKS2_STEP_10_TEXT": "Almost there! Add a <b>walk backwards</b> block like the example code and add in the right argument.",
   "MARTY_JRBLOCKS2_END": "You did it! You're an arguments expert and a code-simplifying genius!",
   "MARTY_JRBLOCKS3_TITLE": "Traffic Light Marty",
   "MARTY_JRBLOCKS3_STEP_1_TEXT": "In this tutorial, we're going to learn how to use wait functions in BlocksJr.",

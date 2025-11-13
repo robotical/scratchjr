@@ -95,7 +95,7 @@
 import Localization from "../../../utils/Localization";
 
 
-const martyJrBlocksTutorial2= {
+const martyJrBlocksTutorial2 = {
     id: "marty-jr-blocks-2",
     platform: "blocksjr",
     title: Localization.localize("MARTY_JRBLOCKS2_TITLE"),
@@ -114,7 +114,7 @@ const martyJrBlocksTutorial2= {
                 {
                     type: "ShowInstructorText",
                     text: Localization.localize("MARTY_JRBLOCKS2_STEP_1_TEXT"),
-                   
+
                 }
             ],
             buttons: ["readAloud", "next"],
@@ -122,32 +122,32 @@ const martyJrBlocksTutorial2= {
             presenter: "marty"
         },
         /* STEP 2 --connect to Marty*/
-        {
-            instructionActions: [
-                {
-                    type: "ShowInstructorText",
-                    text: Localization.localize("MARTY_JRBLOCKS2_STEP_2_TEXT"),
-                }
-            ],
-            nextStepActions: [
-                {
-                    
-                    type: "HighlightElement",
-                    elementId: "martyConnectionButton",
-                    hexColor: "#855cd659",
-                    onClickAction: "NextStep"
-                }
-            ],
-            hintActions: [],
-            buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
-            presenter: "marty"
-        },
+        // {
+        //     instructionActions: [
+        //         {
+        //             type: "ShowInstructorText",
+        //             text: Localization.localize("MARTY_JRBLOCKS2_STEP_2_TEXT"),
+        //         }
+        //     ],
+        //     nextStepActions: [
+        //         {
+
+        //             type: "HighlightElement",
+        //             elementId: "martyConnectionButton",
+        //             hexColor: "#855cd659",
+        //             onClickAction: "NextStep"
+        //         }
+        //     ],
+        //     hintActions: [],
+        //     buttons: ["previous", "readAloud", "next"],
+        //     expectedCode: [],
+        //     presenter: "marty"
+        // },
         /* STEP 3 -- previous code*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText", 
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/walkForward.png",
                     text: Localization.localize("MARTY_JRBLOCKS2_STEP_3_TEXT"),
                 }
@@ -155,9 +155,8 @@ const martyJrBlocksTutorial2= {
             nextStepActions: [
                 {
                     type: "HighlightElement",
-                    elementId: "marty-motion", 
-                    hexColor: "#855cd659",
-                    onClickAction: "NextStep"
+                    elementId: "nextStep",
+                    hexColor: "#855cd659"
                 }
             ],
             hintActions: [],
@@ -169,15 +168,16 @@ const martyJrBlocksTutorial2= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
-                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/argumentsCircled.png",
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/argumentsCircled.png",
                     text: Localization.localize("MARTY_JRBLOCKS2_STEP_4_TEXT"),
                 }
             ],
             nextStepActions: [
-                {
-                    type: "HighlightBlocks",
-                    blocks: ["up_block"]
+                 {
+                    type: "HighlightElement",
+                    elementId: "nextStep",
+                    hexColor: "#855cd659"
                 }
             ],
             hintActions: [],
@@ -188,17 +188,27 @@ const martyJrBlocksTutorial2= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/step5.png",
                     text: Localization.localize("MARTY_JRBLOCKS2_STEP_5_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
-                    type: "HighlightBlocks",
-                    blocks: ["up_block"]
+                    type: "ClickOnElement",
+                    elementId: "martyMode",
                 },
+                // {
+                //     type: "ClickOnElement",
+                //     elementId: "marty-motion",
+                // },
+                // {
+                //     type: "HighlightBlocks",
+                //     blocks: ["martyStepForward_block"]
+                // },
             ],
-            hintActions: [ ],
+            expectedCode: ["onflag=>martyGetReady=>martyStepForward=>endstack"],
+            hintActions: [],
             buttons: ["previous", "readAloud", "next"],
             presenter: "marty"
         },
@@ -206,15 +216,18 @@ const martyJrBlocksTutorial2= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/step6.png",
                     text: Localization.localize("MARTY_JRBLOCKS2_STEP_6_TEXT"),
                 }
             ],
             nextStepActions: [
-              {  type: "HighlightElement",
-                    elementId: "nextStep",
-                    hexColor: "#855cd659"
-              }
+                {
+                    type: "HighlightElement",
+                    elementId: "go",
+                    hexColor: "#855cd659",
+                    onClickAction: "NextStep"
+                }
             ],
             hintActions: [],
             buttons: ["previous", "readAloud", "next"],
@@ -225,49 +238,46 @@ const martyJrBlocksTutorial2= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
-                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/upArrow.png",
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/step7.png",
                     text: Localization.localize("MARTY_JRBLOCKS2_STEP_7_TEXT"),
                 }
             ],
             nextStepActions: [
-                {
-                  type: "HighlightBlocks",
-                    blocks: ["up_block"]
-                }
+               
             ],
             hintActions: [],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["onflag=>martyStepForward", "endstack"],
             presenter: "marty"
         },
         /* STEP 8 -- right arrow */
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/rightArrow.png",
                     text: Localization.localize("MARTY_JRBLOCKS2_STEP_8_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
-                   type: "HighlightBlocks",
+                    type: "HighlightBlocks",
                     blocks: ["forward_block"]
                 }
             ],
             hintActions: [
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["onflag=>martyStepForward=>martyStepRight", "endstack"],
             presenter: "marty"
         },
         /* STEP 9 -- left arrow*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
-                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/leftArrow.png",
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/leftArrow.png",
                     text: Localization.localize("MARTY_JRBLOCKS2_STEP_9_TEXT"),
                 }
             ],
@@ -277,17 +287,17 @@ const martyJrBlocksTutorial2= {
                     blocks: ["wait_block"]
                 }
             ],
-            hintActions: [ ],
+            hintActions: [],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["onflag=>martyStepForward=>martyStepRight=>martyStepLeft", "endstack"],
             presenter: "marty"
         },
         /* STEP 10-- backwards block */
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
-                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/downArrow.png",
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/step10.png",
                     text: Localization.localize("MARTY_JRBLOCKS2_STEP_10_TEXT"),
                 }
             ],
@@ -301,15 +311,15 @@ const martyJrBlocksTutorial2= {
 
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["onflag=>martyStepForward=>martyStepRight=>martyStepLeft=>martyStepBackward=>endstack"],
             presenter: "marty"
         },
-       
+
         /* STEP 11 -- end */
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/2/simplifiedCode.png",
                     text: Localization.localize("MARTY_JRBLOCKS2_END"),
                 }
@@ -323,4 +333,4 @@ const martyJrBlocksTutorial2= {
     ]
 }
 
-export default  martyJrBlocksTutorial2;
+export default martyJrBlocksTutorial2;
