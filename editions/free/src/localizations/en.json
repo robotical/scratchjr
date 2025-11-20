@@ -1078,7 +1078,7 @@
   "MARTY_JRBLOCKS3_STEP_3_TEXT": "Now add a green flag block to start off our code",
   "MARTY_JRBLOCKS3_STEP_4_TEXT": "Now add an end block to finish our code",
   "MARTY_JRBLOCKS3_STEP_5_TEXT": "Waiting is really important in programming <b/>and</b> in the real world. <br/><br/>In programming, waiting helps us do the right tasks at the right time, giving us control over when things happen.<br/><br/> In the real world, waiting can help keep us safe - like at traffic lights!",
-  "MARTY_JRBLOCKS3_STEP_6_TEXT": "Let’s learn about the wait function and turn Marty into a traffic light. <br/><br/>Here is the basic sequence of a traffic light: red means wait, orange means wait then get ready, green means go!",
+  "MARTY_JRBLOCKS3_STEP_6_TEXT": "Let’s learn about the wait function and turn Marty into a traffic light. <br/><br/>Here is the basic sequence of a traffic light: <span style='color:red'>red</span> means wait, <span style='color:orange'>orange</span> means wait then get ready, <span style='color:green'>green</span> means go!",
   "MARTY_JRBLOCKS3_STEP_7_TEXT": "We need to turn Marty’s eyes red, orange and green. Select three of the LED eye colour blocks, and make one red, one orange and one green.",
   "MARTY_JRBLOCKS3_STEP_8_TEXT": "Let’s start on red, turn to orange and then green. Based on our traffic light example, what should our code do at each colour?<br/><br/>Here's our code sequence:",
   "MARTY_JRBLOCKS3_STEP_9_TEXT": "Place two <b/>wait</b> blocks as shown here, one after the red LED eye block, and one after the orange LED eye block. <br/><br/>Change the arguments so Marty waits for 5 seconds at red, and 2 seconds at orange.",
