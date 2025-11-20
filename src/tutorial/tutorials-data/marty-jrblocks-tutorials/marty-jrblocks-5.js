@@ -95,7 +95,7 @@
 import Localization from "../../../utils/Localization";
 
 
-const martyJrBlocksTutorial5= {
+const martyJrBlocksTutorial5 = {
     id: "marty-jr-blocks-5",
     platform: "blocksjr",
     title: Localization.localize("MARTY_JRBLOCKS5_TITLE"),
@@ -114,7 +114,7 @@ const martyJrBlocksTutorial5= {
                 {
                     type: "ShowInstructorText",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_1_TEXT"),
-                   
+
                 }
             ],
             buttons: ["readAloud", "next"],
@@ -125,16 +125,16 @@ const martyJrBlocksTutorial5= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
-                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/chooseFarmBackdrop.gif", 
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/chooseFarmBackdrop.gif",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_2_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
-                    
-                   type: "HighlightElement",
-                    elementId: "nextStep",
+
+                    type: "HighlightElement",
+                    elementId: "setbkg",
                     hexColor: "#855cd659"
                 }
             ],
@@ -147,15 +147,15 @@ const martyJrBlocksTutorial5= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText", 
-                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/chooseSprites.gif", 
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/chooseSprites.gif",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_3_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
                     type: "HighlightElement",
-                    elementId: "nextStep",
+                    elementId: "addsprite",
                     hexColor: "#855cd659"
                 }
             ],
@@ -168,8 +168,8 @@ const martyJrBlocksTutorial5= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
-                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/initialSpritePlacement.png",  
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/initialSpritePlacement.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_4_TEXT"),
                 }
             ],
@@ -189,8 +189,8 @@ const martyJrBlocksTutorial5= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
-                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/clickOnMarty.png", 
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/clickOnMarty.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_5_TEXT"),
                 }
             ],
@@ -210,14 +210,14 @@ const martyJrBlocksTutorial5= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
-                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/4/martyKick.gif",
-                    text: Localization.localize("MARTY_JRBLOCKS_STEP_6_TEXT"),
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/martyKick.gif",
+                    text: Localization.localize("MARTY_JRBLOCKS5_STEP_6_TEXT"),
                 }
             ],
             nextStepActions: [
-                 {
-                     type: "HighlightElement",
+                {
+                    type: "HighlightElement",
                     elementId: "nextStep",
                     hexColor: "#855cd659"
                 }
@@ -230,58 +230,63 @@ const martyJrBlocksTutorial5= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
-                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/onTap.png",
+                    type: "ShowInstructorImage",
+                    url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/onTap.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_7_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
-                     type: "HighlightBlocks",
-                    blocks: ["onclick_block"] 
-                    
+                    type: "ClickOnElement",
+                    elementId: "sprite-start",
+                },
+                {
+                    type: "HighlightBlocks",
+                    blocks: ["onclick_block"]
+
                 },
             ],
-            hintActions: [ ],
+            hintActions: [],
             buttons: ["previous", "readAloud", "next"],
-            presenter: "marty"
+            presenter: "marty",
+            expectedCode: ["onclick"]
         },
         /* STEP 8 -- in and out arrows */
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/martyKickCode.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_8_TEXT"),
                 }
             ],
             nextStepActions: [
-              { 
+                {
+                    type: "ClickOnElement",
+                    elementId: "sprite-motion",
+                },
+                {
                     type: "HighlightBlocks",
-                    blocks: ["right_block"] 
-              },
-              { 
-                    type: "HighlightBlocks",
-                    blocks: ["left_block"] 
-              }
+                    blocks: ["forward_block", "back_block"]
+                }
             ],
             hintActions: [],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["onclick=>forward=>back"],
             presenter: "marty"
         },
         /* STEP 9 -- select soccer ball in sprite menu*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/soccerBallMode.gif",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_9_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
-                 type: "HighlightElement",
+                    type: "HighlightElement",
                     elementId: "nextStep",
                     hexColor: "#855cd659"
                 }
@@ -295,79 +300,87 @@ const martyJrBlocksTutorial5= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/onBump.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_10_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
-                   type: "HighlightBlocks",
+                    type: "ClickOnElement",
+                    elementId: "sprite-start",
+                },
+                {
+                    type: "HighlightBlocks",
                     blocks: ["ontouch_block"]
                 }
             ],
             hintActions: [
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["ontouch"],
             presenter: "marty"
         },
         /* STEP 11 --  move ball out to goal*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/ballMoveOut.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_11_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
-                   type: "HighlightBlocks",
-                    blocks: ["right_block"]
+                    type: "ClickOnElement",
+                    elementId: "sprite-motion",
+                },
+                {
+                    type: "HighlightBlocks",
+                    blocks: ["forward_block"]
                 }
             ],
             hintActions: [
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["forward"],
             presenter: "marty"
         },
         /* STEP 12 --  move ball back home*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/ballMoveCode.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_12_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
-                   type: "HighlightBlocks",
+                    type: "HighlightBlocks",
                     blocks: ["home_block"]
                 }
             ],
             hintActions: [
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["home"],
             presenter: "marty"
         },
-        
-    
-    /* STEP 13 -- select soccer net sprite*/
+
+
+        /* STEP 13 -- select soccer net sprite*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/soccerNetMode.gif",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_13_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
-                   type: "HighlightElement",
+                    type: "HighlightElement",
                     elementId: "nextStep",
                     hexColor: "#855cd659"
                 }
@@ -378,16 +391,20 @@ const martyJrBlocksTutorial5= {
             expectedCode: [],
             presenter: "marty"
         },
-       /* STEP 14 -- on bump soccer net*/
+        /* STEP 14 -- on bump soccer net*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/onBump.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_14_TEXT"),
                 }
             ],
             nextStepActions: [
+                {
+                    type: "ClickOnElement",
+                    elementId: "sprite-start",
+                },
                 {
                     type: "HighlightBlocks",
                     blocks: ["ontouch_block"]
@@ -396,19 +413,23 @@ const martyJrBlocksTutorial5= {
             hintActions: [
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["ontouch"],
             presenter: "marty"
         },
-         /* STEP 15 -- increase counter*/
+        /* STEP 15 -- increase counter*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/increaseCounter.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_15_TEXT"),
                 }
             ],
             nextStepActions: [
+                {
+                    type: "ClickOnElement",
+                    elementId: "sprite-flow",
+                },
                 {
                     type: "HighlightBlocks",
                     blocks: ["increasecounter_block"]
@@ -417,21 +438,21 @@ const martyJrBlocksTutorial5= {
             hintActions: [
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["increasecounter"],
             presenter: "marty"
         },
         /* STEP 16 -- introduce moving net*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/movingNetExample.gif",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_16_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
-                   type: "HighlightElement",
+                    type: "HighlightElement",
                     elementId: "nextStep",
                     hexColor: "#855cd659"
                 }
@@ -446,14 +467,14 @@ const martyJrBlocksTutorial5= {
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/decreaseNetSize.gif",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_17_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
-                     type: "HighlightElement",
+                    type: "HighlightElement",
                     elementId: "nextStep",
                     hexColor: "#855cd659"
                 }
@@ -464,20 +485,24 @@ const martyJrBlocksTutorial5= {
             expectedCode: [],
             presenter: "marty"
         },
-         /* STEP 18 -- ACTUALLY decrease net size*/
+        /* STEP 18 -- ACTUALLY decrease net size*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/decreaseNetSize.gif",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_18_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
+                    type: "ClickOnElement",
+                    elementId: "sprite-looks",
+                },
+                {
                     type: "HighlightBlocks",
                     blocks: ["shrink_block"]
-                     
+
                 }
             ],
             hintActions: [
@@ -486,119 +511,135 @@ const martyJrBlocksTutorial5= {
             expectedCode: [],
             presenter: "marty"
         },
-        
+
         /* STEP 19 -- green flag*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/greenFlag.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_19_TEXT"),
                 }
             ],
             nextStepActions: [
                 {
+                    type: "ClickOnElement",
+                    elementId: "sprite-start",
+                },
+                {
                     type: "HighlightBlocks",
                     blocks: ["onflag_block"]
-                     
+
                 }
             ],
             hintActions: [
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["onflag"],
             presenter: "marty"
         },
-         /* STEP 20 -- up and down blocks*/
+        /* STEP 20 -- up and down blocks*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/upAndDown.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_20_TEXT"),
                 }
             ],
             nextStepActions: [
-                { 
+                {
+                    type: "ClickOnElement",
+                    elementId: "sprite-motion",
+                },
+                {
                     type: "HighlightBlocks",
-                    blocks: ["up_block"] 
-              },
-              { 
-                    type: "HighlightBlocks",
-                    blocks: ["down_block"] 
-              }
+                    blocks: ["up_block", "down_block"]
+                },
             ],
             hintActions: [
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["onflag=>up=>down"],
             presenter: "marty"
         },
-         /* STEP 21 -- forever repeat loop*/
+        /* STEP 21 -- forever repeat loop*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/netMoveCode.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_21_TEXT"),
                 }
             ],
             nextStepActions: [
-                { 
+                {
+                    type: "ClickOnElement",
+                    elementId: "sprite-stop",
+                },
+                {
                     type: "HighlightBlocks",
-                    blocks: ["forever_block"] 
-              }
+                    blocks: ["forever_block"]
+                }
             ],
             hintActions: [
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["onflag=>up=>down=>forever"],
             presenter: "marty"
         },
-         /* STEP 22 --another green flag block*/
+        /* STEP 22 --another green flag block*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/anotherFlagBlock.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_22_TEXT"),
                 }
             ],
             nextStepActions: [
-                { 
+                {
+                    type: "ClickOnElement",
+                    elementId: "sprite-start",
+                },
+                {
                     type: "HighlightBlocks",
-                    blocks: ["onflag_block"] 
-              }
+                    blocks: ["onflag_block"]
+                }
             ],
             hintActions: [
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["onflag=>up=>down=>forever", "onflag"],
             presenter: "marty"
         },
-          /* STEP 23 -- reset counter block*/
+        /* STEP 23 -- reset counter block*/
         {
             instructionActions: [
                 {
-                    type: "ShowInstructorText",
+                    type: "ShowInstructorImage",
                     url: "https://content.robotical.io/static/tutorials/marty/jr-blocks/5/resetCounter.png",
                     text: Localization.localize("MARTY_JRBLOCKS5_STEP_23_TEXT"),
                 }
             ],
             nextStepActions: [
-                { 
+                {
+                    type: "ClickOnElement",
+                    elementId: "sprite-flow",
+                },
+                {
                     type: "HighlightBlocks",
-                    blocks: ["startstopcounter_block"] 
-              }
+                    blocks: ["startstopcounter_block"]
+                }
             ],
             hintActions: [
             ],
             buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
+            expectedCode: ["onflag=>up=>down=>forever", "onflag=>startstopcounter"],
             presenter: "marty"
         },
-       
-       
+
+
         /* STEP 24 -- end */
         {
             instructionActions: [
@@ -616,4 +657,4 @@ const martyJrBlocksTutorial5= {
     ]
 }
 
-export default  martyJrBlocksTutorial5;
+export default martyJrBlocksTutorial5;
