@@ -596,6 +596,7 @@ export default class Prims {
                 y: 0
             };
             strip.cmdSent = false;
+            Prims.clearMartyCommandTimeout(strip);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
 
@@ -656,6 +657,9 @@ export default class Prims {
         if (count < 0) {
             strip.count = -1;
             s.setHeading(strip.finalAngle);
+            // Reset Marty command guard so subsequent turn blocks can trigger hardware commands.
+            strip.cmdSent = false;
+            Prims.clearMartyCommandTimeout(strip);
             Prims.showTime(strip);
             strip.thisblock = strip.thisblock.next;
         } else {
@@ -898,11 +902,24 @@ export default class Prims {
     }
 
     static stopMartyCommandedAfterTime(strip, time) {
-        const timeout = setTimeout(() => {
+        Prims.clearMartyCommandTimeout(strip);
+        const token = Symbol('martyCommand');
+        strip.cmdSentToken = token;
+        strip.cmdSentTimeout = setTimeout(() => {
+            if (strip.cmdSentToken !== token) {
+                return;
+            }
             console.log("stopping Marty after time");
-            strip.cmdSent = false;
-            clearTimeout(timeout);
+            Prims.clearMartyCommandTimeout(strip);
         }, time);
+    }
+
+    static clearMartyCommandTimeout(strip) {
+        if (strip.cmdSentTimeout) {
+            clearTimeout(strip.cmdSentTimeout);
+            strip.cmdSentTimeout = null;
+        }
+        strip.cmdSentToken = null;
     }
 
     static martyStepForward(strip) {

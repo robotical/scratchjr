@@ -127,30 +127,53 @@ export default class MartyBlocks {
         this.marty = null;
     }
 
+    logCommand(action, details) {
+        console.log('[MartyBlocks]', {
+            action,
+            ...details
+        });
+    }
+
     dance(reps, moveTime) {
-        this.marty.sendRestMessage(`traj/dance/${reps}?moveTime=${moveTime}`);
+        const message = `traj/dance/${reps}?moveTime=${moveTime}`;
+        this.logCommand('dance', { reps, moveTime, message });
+        this.marty.sendRestMessage(message);
     }
 
     getReady(moveTime) {
-        this.marty.sendRestMessage(`traj/getReady/?moveTime=${moveTime}`);
+        const message = `traj/getReady/?moveTime=${moveTime}`;
+        this.logCommand('getReady', { moveTime, message });
+        this.marty.sendRestMessage(message);
     }
     stepForward(steps) {
-        this.marty.sendRestMessage(`traj/step/${steps}/?moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.YStepSize}`);
+        const message = `traj/step/${steps}/?moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.YStepSize}`;
+        this.logCommand('stepForward', { steps, message });
+        this.marty.sendRestMessage(message);
     }
     stepBackward(steps) {
-        this.marty.sendRestMessage(`traj/step/${steps}/?moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.YStepSize * -1}`);
+        const message = `traj/step/${steps}/?moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.YStepSize * -1}`;
+        this.logCommand('stepBackward', { steps, message });
+        this.marty.sendRestMessage(message);
     }
     stepLeft(steps) {
-        this.marty.sendRestMessage(`traj/sidestep/${steps}/?side=0&moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.XStepSize}`);
+        const message = `traj/sidestep/${steps}/?side=0&moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.XStepSize}`;
+        this.logCommand('stepLeft', { steps, message });
+        this.marty.sendRestMessage(message);
     }
     stepRight(steps) {
-        this.marty.sendRestMessage(`traj/sidestep/${steps}/?side=1&moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.XStepSize}`);
+        const message = `traj/sidestep/${steps}/?side=1&moveTime=${MartyBlocks.stepMoveTime}&stepLength=${MartyBlocks.XStepSize}`;
+        this.logCommand('stepRight', { steps, message });
+        this.marty.sendRestMessage(message);
     }
     turnRight(steps) {
-        this.marty.sendRestMessage(`traj/step/${steps}/?moveTime=${MartyBlocks.turnMoveTime}&turn=${-1 * MartyBlocks.turnSize}&stepLength=1`);
+        const message = `traj/step/${steps}/?moveTime=${MartyBlocks.turnMoveTime}&turn=${-1 * MartyBlocks.turnSize}&stepLength=1`;
+        this.logCommand('turnRight', { steps, message });
+        this.marty.sendRestMessage(message);
     }
     turnLeft(steps) {
-        this.marty.sendRestMessage(`traj/step/${steps}/?moveTime=${MartyBlocks.turnMoveTime}&turn=${MartyBlocks.turnSize}&stepLength=1`);
+        const message = `traj/step/${steps}/?moveTime=${MartyBlocks.turnMoveTime}&turn=${MartyBlocks.turnSize}&stepLength=1`;
+        this.logCommand('turnLeft', { steps, message });
+        this.marty.sendRestMessage(message);
     }
     eyesExcited() {
         this.marty.sendRestMessage("traj/eyesExcited");

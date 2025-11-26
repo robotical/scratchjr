@@ -15,7 +15,9 @@
     "start": "npx serve --listen tcp://0.0.0.0:3011 ./editions/free/src",
     "build:copy": "npm run build-dev && cp -f src/build/bundles/* editions/free/src",
     "build-prod:copy": "npm run build && cp -f src/build/bundles/* editions/free/src",
-    "build:start": "npm run build:copy && npm start"
+    "build:start": "npm run build:copy && npm start",
+    "test": "vitest",
+    "test:e2e": "vitest run tests/e2e"
   },
   "author": "Massachusetts Institute of Technology",
   "license": "BSD-3-Clause",
@@ -39,6 +41,7 @@
     "eslint": "^1.10.3",
     "expose-loader": "^3.0.0",
     "strip-sourcemap-loader": "0.0.1",
+    "vitest": "^4.0.14",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0",
     "webpack-notifier": "^1.6.0"
