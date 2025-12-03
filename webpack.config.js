@@ -1,8 +1,23 @@
 var WebpackNotifierPlugin = require("webpack-notifier");
+const path = require("path");
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const mode = process.argv.find(arg => arg.startsWith('--mode=')).split('=')[1];
 const isProduction = mode === 'production';
+const sqlJsPath = path.dirname(require.resolve("sql.js/package.json"));
+
+const babelLoaderOptions = {
+  presets: [
+    ["@babel/preset-env", {
+      targets: {
+        chrome: "60",
+        firefox: "60",
+        safari: "11"
+      },
+      bugfixes: true,
+    }]
+  ]
+};
 
 module.exports = {
   resolve: {
@@ -44,16 +59,20 @@ module.exports = {
         //   },
       },
       {
-        loader: "babel-loader",
-        exclude: /node_modules/,
         test: /\.jsx?$/,
-        // options: {
-        //     // For `underscore` library, it can be `_.map map` or `_.map|map`
-        //     exposes: "babel-loader",
-        //   },
-        // query: {
-        //     presets: ['es2015', 'stage-3']
-        // }
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: babelLoaderOptions,
+        },
+      },
+      {
+        test: /\.js$/,
+        include: [sqlJsPath],
+        use: {
+          loader: "babel-loader",
+          options: babelLoaderOptions,
+        },
       },
     ],
   },
