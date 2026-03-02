@@ -575,8 +575,8 @@ export default class BlockSpecs {
 
             'martyGetReady': Localization.localize('BLOCK_DESC_MOVE_MARTY_GETREADY'),
             'martyDance': Localization.localize('BLOCK_DESC_MOVE_MARTY_DANCE'),
-            'martyStepRight': Localization.localize('BLOCK_DESC_MOVE_RIGHT'),
-            'martyStepLeft': Localization.localize('BLOCK_DESC_MOVE_LEFT'),
+            'martyStepRight': Localization.localize('BLOCK_DESC_MOVE_MARTY_RIGHT'),
+            'martyStepLeft': Localization.localize('BLOCK_DESC_MOVE_MARTY_LEFT'),
             'martyStepForward': Localization.localize('BLOCK_DESC_MOVE_MARTY_UP'),
             'martyStepBackward': Localization.localize('BLOCK_DESC_MOVE_MARTY_DOWN'),
             'martyHome': Localization.localize('BLOCK_DESC_GO_MARTY_HOME'),
