@@ -118,6 +118,7 @@ export default class Project {
             Project.setProgress(100);
             Project.liftCurtain();
             ScratchJr.stage.currentPage.update();
+            Project.setModeFromConnectedMarty();
             ScratchJr.changed = false;
             ScratchJr.storyStarted = false;
             UI.needsScroll();
@@ -297,6 +298,23 @@ export default class Project {
             }, 100);
             Project.liftCurtain();
             error = true;
+        }
+    }
+
+    static setModeFromConnectedMarty () {
+        var connectedMarty = null;
+        if (window.martyManager && typeof window.martyManager.getActiveMarty === 'function') {
+            connectedMarty = window.martyManager.getActiveMarty();
+        }
+        if (!connectedMarty &&
+            window.applicationManager &&
+            typeof window.applicationManager.getTheCurrentlySelectedDeviceOrFirstOfItsKind === 'function') {
+            connectedMarty = window.applicationManager.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
+        }
+        const shouldEnableMartyMode = !!connectedMarty;
+        if (ScratchJr.isMartyModeEnabled !== shouldEnableMartyMode) {
+            ScratchJr.isMartyModeEnabled = shouldEnableMartyMode;
+            UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
         }
     }
 
