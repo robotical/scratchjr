@@ -582,8 +582,6 @@ export default class BlockSpecs {
             'martyHome': Localization.localize('BLOCK_DESC_GO_MARTY_HOME'),
             'martyTurnLeft': Localization.localize('BLOCK_DESC_TURN_MARTY_LEFT'),
             'martyTurnRight': Localization.localize('BLOCK_DESC_TURN_MARTY_RIGHT'),
-            'martyStepRight': Localization.localize('BLOCK_DESC_MOVE_MARTY_FORWARD'),
-            'martyStepLeft': Localization.localize('BLOCK_DESC_MOVE_MARTY_BACK'),
             'martyKickLeft': Localization.localize('BLOCK_KICK_MARTY_LEFT'),
             'martyKickRight': Localization.localize('BLOCK_KICK_MARTY_RIGHT'),
             'martyEyesExcited': Localization.localize('BLOCK_EYES_MARTY_EXCITED'),
