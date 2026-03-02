@@ -557,6 +557,8 @@ export default class Page {
         var sprAttr = UI.mascotData(ScratchJr.stage.currentPage);
         Project.mediaCount++;
         var me = this;
+        const preserveMartyMode = ScratchJr.isMartyModeEnabled;
+        me.preserveMartyModeOnPageCreate = preserveMartyMode;
         /*MartyMode*/
         // if Marty Bird's Eye sprite exists, add just the cat sprite
         // if (this.getMartyBirdsEyeSprite()) {
@@ -564,9 +566,11 @@ export default class Page {
         // new Sprite(sprAttr, me.pageAdded);
         // } else { // if Marty Bird's Eye sprite doesn't exist, add it and when it's added, add the cat sprite
         this.addSprite(0.5, "MartyBirdsEye.svg", ScratchJr.BIRDS_EYE_SPRITE_NAME, (spr) => {
-            // also disable Marty Mode
-            ScratchJr.isMartyModeEnabled = false;
-            UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled)
+            if (!preserveMartyMode) {
+                // keep existing behavior when creating a page from sprite mode
+                ScratchJr.isMartyModeEnabled = false;
+                UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
+            }
             new Sprite(sprAttr, me.pageAdded);
             me.martyBirdsEyeSpriteAdded(spr);
         });
@@ -641,6 +645,12 @@ export default class Page {
         }
         Thumbs.updateSprites();
         Thumbs.updatePages();
+        if (me.preserveMartyModeOnPageCreate) {
+            // Re-apply mode after page setup so adding a page does not flip modes.
+            ScratchJr.isMartyModeEnabled = true;
+            UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
+        }
+        me.preserveMartyModeOnPageCreate = false;
     }
 
     addSprite(scale, md5, cname, fcn) {
