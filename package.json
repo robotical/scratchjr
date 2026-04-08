@@ -17,7 +17,10 @@
     "build-prod:copy": "npm run build && cp -f src/build/bundles/* editions/free/src",
     "build:start": "npm run build:copy && npm start",
     "test": "vitest",
-    "test:e2e": "vitest run tests/e2e"
+    "test:e2e": "vitest run tests/e2e",
+    "a11y:structure": "node scripts/a11y-structure.mjs",
+    "test:e2e-accessibility": "vitest run tests/e2e/accessibility.e2e.test.js",
+    "a11y:ci": "npm run a11y:structure && npm run test:e2e-accessibility"
   },
   "author": "Massachusetts Institute of Technology",
   "license": "BSD-3-Clause",
@@ -28,6 +31,7 @@
   "devDependencies": {
     "@babel/polyfill": "^7.10.4",
     "@babel/preset-env": "^7.25.4",
+    "axe-core": "^4.11.2",
     "babel-core": "^6.4.0",
     "babel-eslint": "^4.1.6",
     "babel-loader": "^8.2.5",

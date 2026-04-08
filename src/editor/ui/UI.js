@@ -24,10 +24,18 @@ import ScratchAudio from '../../utils/ScratchAudio';
 import { addStoredCloudId, getStoredCloudIds, removeStoredCloudId, touchStoredCloudId } from '../../utils/cloudLocalStore';
 import goToLink from '../../utils/goToLink';
 import {
-    frame, gn, CSSTransition, localx, newHTML, scaleMultiplier, fullscreenScaleMultiplier,
+    frame, gn, CSSTransition, localx, newHTML, newButton, scaleMultiplier, fullscreenScaleMultiplier,
     getIdFor, isTablet, newDiv, newTextInput, isAndroid, getDocumentWidth, getDocumentHeight,
     setProps, globalx
 } from '../../utils/lib';
+import {
+    closeDialog,
+    openDialog,
+    registerDialog,
+    setMainLandmark,
+    setPressedState,
+    setSelectedState
+} from '../../utils/accessibility';
 import { cogSvg } from '../../html-svgs/cog';
 import { spriteSvg } from '../../html-svgs/sprite';
 import { martySvg } from '../../html-svgs/marty';
@@ -63,7 +71,29 @@ export default class UI {
         return infoBoxOpen;
     }
 
+    static isProjectInfoReady() {
+        return !!(Project.metadata && ScratchJr.stage && ScratchJr.stage.currentPage);
+    }
+
+    static setProjectInfoEnabled(enabled) {
+        if (!info) {
+            return;
+        }
+        info.disabled = !enabled;
+        info.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+    }
+
+    static getGuideControlLabel(key) {
+        const label = Localization.localize(key, { N: 0 });
+        const parts = label.split('|');
+        return parts.length > 1 ? parts.slice(1).join('|').trim() : label;
+    }
+
     static layout() {
+        setMainLandmark(frame, {
+            id: 'frame',
+            label: Localization.localize('A11Y_MAIN_CONTENT')
+        });
         UI.topSection();
         UI.middleSection();
         UI.BottomSection();
@@ -108,6 +138,33 @@ export default class UI {
         return !!(anchor.offsetWidth || anchor.offsetHeight);
     }
 
+    static getControlAriaLabel(id) {
+        switch (id) {
+            case 'addtext':
+                return UI.getGuideControlLabel('INTERFACE_GUIDE_ADD_TEXT');
+            case 'setbkg':
+                return UI.getGuideControlLabel('INTERFACE_GUIDE_CHANGE_BG');
+            case 'grid':
+                return UI.getGuideControlLabel('INTERFACE_GUIDE_GRID');
+            case 'traceBtn':
+                return Localization.localize('A11Y_TRACE');
+            case 'traceClear':
+                return Localization.localize('A11Y_CLEAR_TRACE');
+            case 'go':
+                return Localization.localize('A11Y_RUN_PROJECT');
+            case 'resetall':
+                return Localization.localize('A11Y_RESET_ALL_CHARACTERS');
+            case 'full':
+                return UI.getGuideControlLabel('INTERFACE_GUIDE_PRESENTATION_MODE');
+            case 'nextpage':
+                return Localization.localize('A11Y_NEXT');
+            case 'prevpage':
+                return Localization.localize('A11Y_PREVIOUS');
+            default:
+                return null;
+        }
+    }
+
     // Helps debug on Android 4.2 by enabling the user to type in a
     // JavaScript expression and evaluate the output and render to console.log.
     /*static addDebugControl () {
@@ -150,7 +207,9 @@ export default class UI {
     // Function to create a connect button with an icon and title (for cog and marty buttons)
     static createConnectButton(parent, iconName, buttonText, buttonId, onClick) {
         // Create button container
-        const connectButton = newHTML('div', 'connectButton', parent);
+        const connectButton = newButton('connectButton', parent, {
+            ariaLabel: Localization.localize('A11Y_CONNECT') + ' ' + buttonText
+        });
 
         // Set button ID
         connectButton.setAttribute('id', buttonId);
@@ -183,7 +242,7 @@ export default class UI {
         // Action to perform when the button is clicked
         connectButton.onclick = () => {
             onClick(connectButton);
-        }
+        };
 
         return connectButton;
     }
@@ -261,14 +320,14 @@ export default class UI {
     static showConnIssueOverlay(button) {
         button.style.pointerEvents = 'none';
         const overlay = newHTML('div', 'connIssueOverlay', button);
-        overlay.textContent = 'Connection lost';
+        overlay.textContent = Localization.localize('A11Y_CONNECTION_LOST');
         button.appendChild(overlay);
 
         // in an interval countdown from 59 seconds to 0
         let seconds = 59;
         connectionLostButton1Interval = setInterval(() => {
             if (seconds >= 0) {
-                overlay.textContent = `Connection lost ${seconds}`;
+                overlay.textContent = `${Localization.localize('A11Y_CONNECTION_LOST')} ${seconds}`;
                 seconds--;
             } else {
                 clearInterval(connectionLostButton1Interval);
@@ -322,7 +381,8 @@ export default class UI {
         // Set the new onClick function to disconnect the raft
         button.onclick = () => {
             window.applicationManager.disconnectGeneric(raft);
-        }
+        };
+        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' + raft.getFriendlyName());
 
         // Set up a subscription to the raft issue detected event
         const connIssueSubs = createRaftConnectionIssueDetectedHelper(raft);
@@ -368,6 +428,7 @@ export default class UI {
 
             // Restore the old onClick function
             button.onclick = oldOnClick;
+            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' Cog');
         });
     }
 
@@ -413,7 +474,8 @@ export default class UI {
         // Set the new onClick function to disconnect the raft
         button.onclick = () => {
             window.applicationManager.disconnectGeneric(raft);
-        }
+        };
+        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' + raft.getFriendlyName());
 
         // Set up a subscription to the raft disconnected event
         raftDisconnectedSubscriptionHelper(raft).subscribe(() => {
@@ -444,13 +506,16 @@ export default class UI {
 
             // Restore the old onClick function
             button.onclick = oldOnClick;
+            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' Marty');
         });
     }
 
     static leftPanel(div) {
         // sprite library
         var sl = newHTML('div', 'leftpanel', div);
-        var flip = newHTML('div', 'flipme', sl);
+        var flip = newButton('flipme', sl, {
+            ariaLabel: Localization.localize('ALERT_BACK')
+        });
         UI.createConnectionButtons(sl);
 
         flip.setAttribute('id', 'flip');
@@ -472,11 +537,16 @@ export default class UI {
     }
 
     static addProjectInfo() {
-        info = newHTML('div', 'info', frame);
+        info = newButton('info', frame, {
+            ariaLabel: Localization.localize('A11Y_PROJECT_INFO')
+        });
         info.setAttribute('id', 'projectinfo');
+        UI.setProjectInfoEnabled(false);
         var infobox = newHTML('div', 'infobox fade', frame);
         infobox.setAttribute('id', 'infobox');
-        okclicky = newHTML('div', 'paintdone', infobox);
+        okclicky = newButton('paintdone', infobox, {
+            ariaLabel: Localization.localize('A11Y_CLOSE')
+        });
         newHTML('div', 'infoboxlogo', infobox);
         var nameField = UI.addEditableName(infobox);
         var staticinfo = newHTML('div', 'fixedinfo', infobox);
@@ -488,17 +558,19 @@ export default class UI {
         if (window.Settings.shareEnabled) {
             // For Parents button
 
-            var parentsButton = newHTML('div', 'infoboxParentsButton', parentsSection);
+            var parentsButton = newButton('infoboxParentsButton', parentsSection, {
+                textContent: Localization.localize('FOR_PARENTS')
+            });
             parentsButton.id = 'infoboxParentsSectionButton';
-            parentsButton.textContent = Localization.localize('FOR_PARENTS');
 
             // Sharing
             var shareButtons = newHTML('div', 'infoboxShareButtons', infobox);
             shareButtons.setAttribute('id', 'sharebuttons');
 
-            var shareEmail = newHTML('div', 'infoboxShareButton', shareButtons);
+            var shareEmail = newButton('infoboxShareButton', shareButtons, {
+                textContent: Localization.localize('SHARING_BY_EMAIL')
+            });
             shareEmail.id = 'infoboxShareButtonEmail';
-            shareEmail.textContent = Localization.localize('SHARING_BY_EMAIL');
             shareEmail.onclick = function (e) {
                 UI.infoDoShare(e, nameField, shareLoadingGif, EMAILSHARE);
             };
@@ -510,9 +582,10 @@ export default class UI {
             }
 
             if (!isAndroid) {
-                var shareAirdrop = newHTML('div', 'infoboxShareButton', shareButtons);
+                var shareAirdrop = newButton('infoboxShareButton', shareButtons, {
+                    textContent: Localization.localize('SHARING_BY_AIRDROP')
+                });
                 shareAirdrop.id = 'infoboxShareButtonAirdrop';
-                shareAirdrop.textContent = Localization.localize('SHARING_BY_AIRDROP');
                 shareAirdrop.style.float = 'right';
                 shareAirdrop.onclick = function (e) {
                     UI.infoDoShare(e, nameField, shareLoadingGif, AIRDROPSHARE);
@@ -525,6 +598,7 @@ export default class UI {
 
             var shareLoadingGif = newHTML('img', 'infoboxShareLoading', shareButtons);
             shareLoadingGif.src = './assets/ui/loader.png';
+            shareLoadingGif.alt = '';
 
             parentsButton.onclick = function (e) {
                 UI.parentalGate(e, function (e) {
@@ -539,16 +613,18 @@ export default class UI {
 
         var cloudControls = newHTML('div', 'infoboxCloudControls', cloudSection);
 
-        var cloudSaveToggle = newHTML('div', 'infoboxCloudToggleButton', cloudControls);
+        var cloudSaveToggle = newButton('infoboxCloudToggleButton', cloudControls, {
+            textContent: 'Save'
+        });
         cloudSaveToggle.id = 'cloudToggleSave';
-        cloudSaveToggle.textContent = 'Save';
         cloudSaveToggle.onclick = function () {
             UI.showCloudPanel('save');
         };
 
-        var cloudLoadToggle = newHTML('div', 'infoboxCloudToggleButton', cloudControls);
+        var cloudLoadToggle = newButton('infoboxCloudToggleButton', cloudControls, {
+            textContent: 'Load'
+        });
         cloudLoadToggle.id = 'cloudToggleLoad';
-        cloudLoadToggle.textContent = 'Load';
         cloudLoadToggle.onclick = function () {
             UI.showCloudPanel('load');
         };
@@ -559,9 +635,10 @@ export default class UI {
         cloudSavePanel.id = 'cloudSavePanel';
         var cloudSaveDescription = newHTML('div', 'infoboxCloudDescription', cloudSavePanel);
         cloudSaveDescription.textContent = 'Save a copy of this project to the cloud.';
-        var cloudSaveButton = newHTML('div', 'infoboxCloudButton', cloudSavePanel);
+        var cloudSaveButton = newButton('infoboxCloudButton', cloudSavePanel, {
+            textContent: 'Save to Cloud'
+        });
         cloudSaveButton.id = 'infoboxCloudSave';
-        cloudSaveButton.textContent = 'Save to Cloud';
         cloudSaveButton.onclick = function (e) {
             UI.setCloudAlertAnchor(e.currentTarget);
             UI.handleCloudSave(e);
@@ -572,9 +649,10 @@ export default class UI {
         var cloudLoadDescription = newHTML('div', 'infoboxCloudDescription', cloudLoadPanel);
         cloudLoadDescription.textContent = 'Choose a saved ID or enter a new one to load a project.';
         var cloudLoadActions = newHTML('div', 'infoboxCloudLoadActions', cloudLoadPanel);
-        var cloudLoadPromptButton = newHTML('div', 'infoboxCloudSecondaryButton', cloudLoadActions);
+        var cloudLoadPromptButton = newButton('infoboxCloudSecondaryButton', cloudLoadActions, {
+            textContent: 'Enter ID to Load'
+        });
         cloudLoadPromptButton.id = 'infoboxCloudLoadPrompt';
-        cloudLoadPromptButton.textContent = 'Enter ID to Load';
         cloudLoadPromptButton.onclick = function (e) {
             UI.setCloudAlertAnchor(e.currentTarget);
             UI.promptCloudLoad(e);
@@ -586,21 +664,35 @@ export default class UI {
         okclicky.onclick = function (evt) {
             UI.hideInfoBox(evt, nameField);
         };
+        registerDialog(infobox, {
+            label: Localization.localize('A11Y_PROJECT_INFO_DIALOG'),
+            initialFocus: function () {
+                return projectNameTextInput || okclicky;
+            },
+            scope: frame,
+            onRequestClose: function (event) {
+                UI.hideInfoBox(event);
+            }
+        });
     }
 
     static parentalGate(evt, callback) {
         ScratchAudio.sndFX('tap.wav');
         var pgFrame = newHTML('div', 'parentalgate', gn('frame'));
+        pgFrame.setAttribute('id', 'parentalgate');
 
-        var pgCloseButton = newHTML('div', 'paintdone', pgFrame);
+        var pgCloseButton = newButton('paintdone', pgFrame, {
+            ariaLabel: Localization.localize('A11Y_CLOSE')
+        });
         pgCloseButton.onclick = function () {
             parentalGateClose(false);
         };
 
         var pgProblem = newHTML('div', 'parentalgateproblem', pgFrame);
-        var pgChoiceA = newHTML('div', 'parentalgatechoice', pgFrame);
-        var pgChoiceB = newHTML('div', 'parentalgatechoice', pgFrame);
-        var pgChoiceC = newHTML('div', 'parentalgatechoice', pgFrame);
+        pgProblem.id = 'parentalgateproblem';
+        var pgChoiceA = newButton('parentalgatechoice', pgFrame);
+        var pgChoiceB = newButton('parentalgatechoice', pgFrame);
+        var pgChoiceC = newButton('parentalgatechoice', pgFrame);
 
         var problems = [
             // Problem, Choice A, Choice B, Choice C, Correct choice #
@@ -636,10 +728,25 @@ export default class UI {
 
 
         var pgExplain = newHTML('div', 'parentalgateexplain', pgFrame);
+        pgExplain.id = 'parentalgateexplain';
         pgExplain.textContent = Localization.localize('PARENTAL_GATE_EXPLANATION');
+
+        registerDialog(pgFrame, {
+            label: Localization.localize('A11Y_PARENTAL_GATE_DIALOG'),
+            describedBy: 'parentalgateexplain',
+            initialFocus: function () {
+                return pgChoiceA;
+            },
+            scope: frame,
+            onRequestClose: function () {
+                parentalGateClose(false);
+            }
+        });
+        openDialog(pgFrame);
 
         function parentalGateClose(success) {
             ScratchAudio.sndFX('exittap.wav');
+            closeDialog(pgFrame);
             gn('frame').removeChild(pgFrame);
             if (success) {
                 callback(evt);
@@ -763,6 +870,8 @@ export default class UI {
         if (mode == 'load') {
             UI.renderCloudIdList();
         }
+        setSelectedState(saveToggle, mode == 'save');
+        setSelectedState(loadToggle, mode == 'load');
     }
 
     static renderCloudIdList() {
@@ -813,16 +922,18 @@ export default class UI {
             savedCell.textContent = '-';
         }
         var actions = newHTML('div', 'infoboxCloudCell actions', row);
-        var loadButton = newHTML('div', 'infoboxCloudActionButton primary', actions);
-        loadButton.textContent = 'Load';
+        var loadButton = newButton('infoboxCloudActionButton primary', actions, {
+            textContent: 'Load'
+        });
         loadButton.onclick = function (e) {
             e.preventDefault();
             e.stopPropagation();
             UI.setCloudAlertAnchor(e.currentTarget);
             UI.loadCloudProject(entry.customId, true);
         };
-        var deleteButton = newHTML('div', 'infoboxCloudActionButton danger', actions);
-        deleteButton.textContent = 'Delete';
+        var deleteButton = newButton('infoboxCloudActionButton danger', actions, {
+            textContent: 'Delete'
+        });
         deleteButton.onclick = function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -981,6 +1092,9 @@ export default class UI {
         if (ScratchJr.onHold) {
             return;
         }
+        if (!UI.isProjectInfoReady()) {
+            return;
+        }
 
         var canShare = ScratchJr.editmode != 'storyStarter' || ScratchJr.changed;
         try {
@@ -997,9 +1111,14 @@ export default class UI {
             };
         }, 500);
         projectNameTextInput.onblur = function () {
-            if (ScratchJr.isEditable()) {
-                (document.forms.projectname.myproject).focus();
-            }
+            window.setTimeout(function () {
+                if (!ScratchJr.isEditable() || !infoBoxOpen || gn('parentalgate')) {
+                    return;
+                }
+                if (document.activeElement === document.body) {
+                    (document.forms.projectname.myproject).focus();
+                }
+            }, 0);
         };
         info.onclick = null;
 
@@ -1031,11 +1150,16 @@ export default class UI {
             gn('pname').textContent = Project.metadata.name;
         }
         gn('infobox').className = 'infobox fade in';
-        if (ScratchJr.isEditable()) {
-            setTimeout(function () {
-                //(document.forms["projectname"]["myproject"]).focus();
-            }, 500);
-        }
+        openDialog(gn('infobox'));
+        setTimeout(function () {
+            if (ScratchJr.isEditable() && projectNameTextInput) {
+                projectNameTextInput.focus();
+                return;
+            }
+            if (okclicky) {
+                okclicky.focus();
+            }
+        }, 0);
     }
 
     static formatTime(unixtime) {
@@ -1068,6 +1192,7 @@ export default class UI {
             ScratchAudio.sndFX('exittap.wav');
             gn('infobox').className = 'infobox fade';
         }
+        closeDialog(gn('infobox'));
         try {
             gn('sharebuttons').style.visibility = 'hidden';
             gn('parentsection').style.visibility = 'visible';
@@ -1102,7 +1227,9 @@ export default class UI {
 
         // new sprite
         if (ScratchJr.isEditable()) {
-            var ns = newHTML('div', 'addsprite', sprites);
+            var ns = newButton('addsprite', sprites, {
+                ariaLabel: Localization.localize('A11Y_CREATE') + ' ' + Localization.localize('LIBRARY_CHARACTER')
+            });
             ns.onclick = UI.addSprite;
             ns.setAttribute('id', 'addsprite');
         }
@@ -1448,22 +1575,38 @@ export default class UI {
     static setShowGrid(b) {
         Grid.hide(!b);
         gn('grid').className = Grid.hidden ? 'gridToggle off' : 'gridToggle on';
+        setPressedState(gn('grid'), !Grid.hidden);
     }
 
     static setShowTrace(b) {
         Trace.hide(!b);
         gn('traceBtn').className = Trace.hidden ? 'traceToggle off' : 'traceToggle on';
+        setPressedState(gn('traceBtn'), !Trace.hidden);
     }
 
     static createTopBarClicky(p, str, mstyle, fcn) {
-        var toggle = newHTML('div', mstyle, p);
+        var toggle = newButton(mstyle, p, {
+            ariaLabel: UI.getControlAriaLabel(str)
+        });
         toggle.onclick = fcn;
         toggle.setAttribute('id', str);
+        if (str == 'grid' || str == 'traceBtn' || str == 'martyMode') {
+            setPressedState(toggle, mstyle.indexOf(' on') > -1);
+        }
+        if (str == 'go') {
+            setPressedState(toggle, false);
+        }
     }
 
     static fullscreenControls() {
-        UI.nextpage = newHTML('div', 'nextpage off', frame);
-        UI.prevpage = newHTML('div', 'nextpage off', frame);
+        UI.nextpage = newButton('nextpage off', frame, {
+            ariaLabel: UI.getControlAriaLabel('nextpage')
+        });
+        UI.prevpage = newButton('nextpage off', frame, {
+            ariaLabel: UI.getControlAriaLabel('prevpage')
+        });
+        UI.nextpage.id = 'nextpage';
+        UI.prevpage.id = 'prevpage';
         UI.nextpage.onclick = UI.nextPage;
         UI.prevpage.onclick = UI.prevPage;
     }
@@ -1472,13 +1615,17 @@ export default class UI {
         var n = ScratchJr.stage.pages.indexOf(ScratchJr.stage.currentPage);
         if (n == 0) {
             UI.prevpage.setAttribute('class', 'prevpage off');
+            UI.prevpage.disabled = true;
         } else {
             UI.prevpage.setAttribute('class', 'prevpage on');
+            UI.prevpage.disabled = false;
         }
         if (n == (ScratchJr.stage.pages.length - 1)) {
             UI.nextpage.setAttribute('class', 'nextpage off');
+            UI.nextpage.disabled = true;
         } else {
             UI.nextpage.setAttribute('class', 'nextpage on');
+            UI.nextpage.disabled = false;
         }
     }
 
@@ -1562,9 +1709,12 @@ export default class UI {
     }
 
     static addMartyModeButton(rightPanel) {
-        var mm = newHTML('div', 'martyMode', rightPanel);
+        var mm = newButton('martyMode', rightPanel, {
+            ariaLabel: Localization.localize('A11Y_MARTY_MODE')
+        });
         mm.setAttribute('id', 'martyMode');
         mm.onclick = UI.toggleMartyMode;
+        setPressedState(mm, ScratchJr.isMartyModeEnabled);
 
         // Add SVG assets
 
@@ -1596,6 +1746,7 @@ export default class UI {
             martyIcon.innerHTML = martyDeselectedSvg;
             toggleDiv.innerHTML = spriteToggleOn;
         }
+        setPressedState(gn('martyMode'), ScratchJr.isMartyModeEnabled);
     }
 
     /*MartyMode*/
@@ -1626,9 +1777,13 @@ export default class UI {
             position: 'absolute'
         });
         tb.setAttribute('id', 'toolbar');
-        var addt = newHTML('div', 'addText', tb);
+        var addt = newButton('addText', tb, {
+            ariaLabel: UI.getGuideControlLabel('INTERFACE_GUIDE_ADD_TEXT')
+        });
         addt.onclick = UI.addText;
-        var changebkg = newHTML('div', 'changeBkg', tb);
+        var changebkg = newButton('changeBkg', tb, {
+            ariaLabel: UI.getGuideControlLabel('INTERFACE_GUIDE_CHANGE_BG')
+        });
         changebkg.onclick = UI.addBackground;
     }
 

@@ -9,7 +9,7 @@ import Project from "../editor/ui/Project";
 import Localization from "../utils/Localization";
 import ScratchAudio from "../utils/ScratchAudio";
 import Vector from "../geom/Vector";
-import { gn, newHTML, isTablet } from "../utils/lib";
+import { gn, newHTML, newButton, isTablet } from "../utils/lib";
 import goToLink from "../utils/goToLink";
 
 let frame;
@@ -42,6 +42,16 @@ export default class Home {
     var tb = newHTML("div", "projectthumb", parent);
     newHTML("div", "aproject empty", tb);
     tb.id = "newproject";
+    Home.addCardActionButton(
+      tb,
+      "card-action-open",
+      Localization.localize("A11Y_CREATE") + " " + Localization.localize("NEW_PROJECT_PREFIX"),
+      function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        Home.performActionForTarget(tb, "project");
+      }
+    );
   }
 
   //////////////////////////
@@ -155,8 +165,16 @@ export default class Home {
     if (Home.holding) {
       return;
     }
-    var md5 = Home.actionTarget.id;
-    switch (Home.getAction(e)) {
+    Home.performActionForTarget(Home.actionTarget, Home.getAction(e));
+  }
+
+  static performActionForTarget(target, action) {
+    if (!target) {
+      return;
+    }
+    Home.actionTarget = target;
+    var md5 = target.id;
+    switch (action) {
       case "project":
         ScratchAudio.sndFX("keydown.wav");
         if (md5 && md5 == "newproject") {
@@ -170,26 +188,26 @@ export default class Home {
       case "delete":
         ScratchAudio.sndFX("cut.wav");
         Project.thumbnailUnique(
-          Home.actionTarget.thumb,
-          Home.actionTarget.id,
+          target.thumb,
+          target.id,
           function (isUnique) {
             if (isUnique) {
-              OS.remove(Home.actionTarget.thumb, OS.trace);
+              OS.remove(target.thumb, OS.trace);
             }
           }
         );
         OS.setfield(
           OS.database,
-          Home.actionTarget.id,
+          target.id,
           "deleted",
           "YES",
           Home.removeProjThumb
         );
         break;
       default:
-        if (Home.actionTarget && Home.actionTarget.childElementCount > 2) {
-          Home.actionTarget.childNodes[
-            Home.actionTarget.childElementCount - 1
+        if (target && target.childElementCount > 2) {
+          target.childNodes[
+            target.childElementCount - 1
           ].style.visibility = "hidden";
         }
         break;
@@ -336,11 +354,32 @@ export default class Home {
     }
 
     newHTML("div", "closex", tb);
+    Home.addCardActionButton(
+      tb,
+      "card-action-open",
+      Localization.localize("A11Y_OPEN") + " " + data.name,
+      function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        Home.performActionForTarget(tb, "project");
+      }
+    );
+    Home.addCardActionButton(
+      tb,
+      "card-action-delete",
+      Localization.localize("A11Y_DELETE") + " " + data.name,
+      function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        Home.performActionForTarget(tb, "delete");
+      }
+    );
   }
 
   static insertThumbnail(p, w, h, data) {
     var md5 = data.md5;
     var img = newHTML("img", undefined, p);
+    img.alt = "";
     if (md5) {
       IO.getAsset(md5, drawMe);
     }
@@ -350,6 +389,15 @@ export default class Home {
     function drawMe(url) {
       img.src = url;
     }
+  }
+
+  static addCardActionButton(parent, className, label, handler) {
+    var button = newButton("sr-only-focusable lobby-card-action " + className, parent, {
+      ariaLabel: label
+    });
+    button.textContent = label;
+    button.onclick = handler;
+    return button;
   }
 }
 

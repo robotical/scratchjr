@@ -1,4 +1,5 @@
 import { preprocessAndLoadCss } from "../utils/lib";
+import { ensureSkipLink, setDocumentLanguage, setLocalizedDocumentTitle } from "../utils/accessibility";
 import Localization from "../utils/Localization";
 import InitialOptions from "../utils/InitialOptions";
 import OS from "../tablet/OS";
@@ -51,6 +52,8 @@ window.onload = () => {
 
   // scratchJrPage is defined in the HTML pages
   let page = window.scratchJrPage;
+  let titleKey = null;
+  let skipLinkTargetId = null;
 
   // Load CSS and set root/entryFunction for all pages
   switch (page) {
@@ -67,6 +70,8 @@ window.onload = () => {
           var assets = Object.keys(MediaLib.keys).join(",");
           OS.registerLibraryAssets(MediaLib.version, assets, indexMain);
         });
+      titleKey = "MY_PROJECTS";
+      skipLinkTargetId = "frame";
       break;
     case "home":
       // Lobby pages
@@ -75,6 +80,8 @@ window.onload = () => {
       preprocessAndLoadCss("css", "css/lobby.css");
       preprocessAndLoadCss("css", "css/thumbs.css");
       entryFunction = () => OS.waitForInterface(homeMain);
+      titleKey = "MY_PROJECTS";
+      skipLinkTargetId = "wrapc";
       break;
     case "editor":
       // Editor pages
@@ -94,6 +101,8 @@ window.onload = () => {
       preprocessAndLoadCss("css", "css/connection-modal.css");
       preprocessAndLoadCss("css", "css/tutorial.css");
       entryFunction = () => OS.waitForInterface(editorMain);
+      titleKey = "A11Y_PAGE_TITLE_EDITOR";
+      skipLinkTargetId = "frame";
       break;
     case "gettingStarted":
       // Getting started video page
@@ -101,12 +110,16 @@ window.onload = () => {
       preprocessAndLoadCss("css", "css/base.css");
       preprocessAndLoadCss("css", "css/gs.css");
       entryFunction = () => OS.waitForInterface(gettingStartedMain);
+      titleKey = "QUICK_INTRO";
+      skipLinkTargetId = "maincontent";
       break;
     case "inappAbout":
       // About ScratchJr in-app help frame
       preprocessAndLoadCss("style", "style/about.css");
       entryFunction = () => inappAbout();
       root = "../";
+      titleKey = "ABOUT_SCRATCHJR";
+      skipLinkTargetId = "content";
       break;
     case "inappInterfaceGuide":
       // Interface guide in-app help frame
@@ -114,6 +127,8 @@ window.onload = () => {
       preprocessAndLoadCss("style", "style/interface.css");
       entryFunction = () => inappInterfaceGuide();
       root = "../";
+      titleKey = "INTERFACE_GUIDE";
+      skipLinkTargetId = "content";
       break;
     case "inappPaintEditorGuide":
       // Paint editor guide in-app help frame
@@ -121,6 +136,8 @@ window.onload = () => {
       preprocessAndLoadCss("style", "style/paint.css");
       entryFunction = () => inappPaintEditorGuide();
       root = "../";
+      titleKey = "PAINT_EDITOR_GUIDE";
+      skipLinkTargetId = "content";
       break;
     case "inappBlocksGuide":
       // Blocks guide in-app help frame
@@ -128,6 +145,8 @@ window.onload = () => {
       preprocessAndLoadCss("style", "style/blocks.css");
       entryFunction = () => inappBlocksGuide();
       root = "../";
+      titleKey = "BLOCKS_GUIDE";
+      skipLinkTargetId = "content";
       break;
     case "inappPrivacyPolicy":
       // Blocks guide in-app help frame
@@ -135,6 +154,8 @@ window.onload = () => {
       preprocessAndLoadCss("style", "style/privacy.css");
       entryFunction = () => inappPrivacyPolicy();
       root = "../";
+      titleKey = "PRIVACY_POLICY";
+      skipLinkTargetId = "content";
       break;
   }
 
@@ -146,7 +167,14 @@ window.onload = () => {
     Localization.includeLocales(root, () => {
       // Load Media Lib from JSON
       MediaLib.loadMediaLib(root, () => {
+        setDocumentLanguage(Localization.currentLocale);
+        if (titleKey) {
+          setLocalizedDocumentTitle(titleKey);
+        }
         entryFunction();
+        if (skipLinkTargetId) {
+          ensureSkipLink(skipLinkTargetId, Localization.localize('A11Y_SKIP_TO_MAIN'));
+        }
         
         /*Tutorial*/
         const urlParams = new URLSearchParams(window.location.search);

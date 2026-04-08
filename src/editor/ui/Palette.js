@@ -375,6 +375,7 @@ export default class Palette {
         var officon = spec[1].cloneNode(true);
         officon.width = pxWidth;
         officon.height = pxHeight;
+        officon.alt = '';
         div.appendChild(officon);
         setProps(officon.style, {
             position: 'absolute',
@@ -384,6 +385,7 @@ export default class Palette {
         var onicon = spec[0].cloneNode(true);
         onicon.width = pxWidth;
         onicon.height = pxHeight;
+        onicon.alt = '';
         div.appendChild(onicon);
         div.bkg = spec[2];
         setProps(onicon.style, {

@@ -133,6 +133,7 @@ export default class Sprite {
         img.ondragstart = function () {
             return false;
         };
+        img.alt = '';
         img.src = dataurl;
         this.img = img;
         // Make a copy that is not affected by zoom transformation
@@ -1017,6 +1018,7 @@ export default class Sprite {
 
     getSVGimage(svg) {
         var img = document.createElement('img');
+        img.alt = '';
         let str;
         if (svg) {
             str = (new XMLSerializer()).serializeToString(svg);

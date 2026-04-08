@@ -172,6 +172,24 @@ export function newHTML(type, c, p) {
   return e;
 }
 
+export function newButton(c, p, options = {}) {
+  var button = newHTML("button", c, p);
+  button.type = options.type || "button";
+  if (options.id) {
+    button.id = options.id;
+  }
+  if (options.textContent !== undefined) {
+    button.textContent = options.textContent;
+  }
+  if (options.ariaLabel) {
+    button.setAttribute("aria-label", options.ariaLabel);
+  }
+  if (options.title) {
+    button.title = options.title;
+  }
+  return button;
+}
+
 export function getIDByClass(c) {
   var e = document.getElementsByClassName(c)[0].id;
   return e;

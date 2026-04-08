@@ -3,7 +3,9 @@ import Palette from './Palette';
 import Undo from './Undo';
 import OS from '../../tablet/OS';
 import ScratchAudio from '../../utils/ScratchAudio';
-import {frame, gn, newHTML, isAndroid, setProps} from '../../utils/lib';
+import Localization from '../../utils/Localization';
+import {frame, gn, newHTML, newButton, isAndroid, setProps} from '../../utils/lib';
+import { closeDialog, openDialog, registerDialog, setPressedState } from '../../utils/accessibility';
 
 let interval = null;
 let recordedSound = null;
@@ -39,7 +41,9 @@ export default class Record {
         var actions = newHTML('div', 'actions', topbar);
         newHTML('div', 'microphone', actions);
         var buttons = newHTML('div', 'recordbuttons', actions);
-        var okbut = newHTML('div', 'recorddone', buttons);
+        var okbut = newButton('recorddone', buttons, {
+            ariaLabel: Localization.localize('A11Y_CLOSE')
+        });
         okbut.onclick = Record.saveSoundAndClose;
         var sc = newHTML('div', 'soundbox', modal);
         sc.setAttribute('id', 'soundbox');
@@ -55,6 +59,17 @@ export default class Record {
         for (var j = 0; j < lib.length; j++) {
             Record.newToggleClicky(ctrol, 'id_', lib[j][0], lib[j][1]);
         }
+        registerDialog(modal, {
+            label: Localization.localize('A11Y_RECORD_DIALOG'),
+            initialFocus: function () {
+                return gn('id_record');
+            },
+            scope: document.body,
+            extraActiveElements: [gn('backdrop')],
+            onRequestClose: function () {
+                Record.saveSoundAndClose();
+            }
+        });
     }
 
     // Dialog box hide/show
@@ -65,9 +80,10 @@ export default class Record {
             display: 'block'
         });
         gn('recorddialog').setAttribute('class', 'record fade in');
+        openDialog(gn('recorddialog'));
         ScratchJr.stopStrips();
         dialogOpen = true;
-        ScratchJr.onBackButtonCallback.push(Record.saveSoundandClose);
+        ScratchJr.onBackButtonCallback.push(Record.saveSoundAndClose);
         OS.initRecording();
     }
 
@@ -80,16 +96,20 @@ export default class Record {
             });
             gn('recorddialog').setAttribute('class', 'record fade');
         }, 333);
+        closeDialog(gn('recorddialog'));
         dialogOpen = false;
         ScratchJr.onBackButtonCallback.pop();
     }
 
     // Register toggle buttons and handlers
     static newToggleClicky (p, prefix, key, fcn) {
-        var button = newHTML('div', 'controlwrap', p);
+        var button = newButton('controlwrap', p, {
+            ariaLabel: Record.getButtonLabel(key)
+        });
         newHTML('div', key + 'snd off', button);
         button.setAttribute('type', 'toggleclicky');
         button.setAttribute('id', prefix + key);
+        setPressedState(button, false);
         if (fcn) {
             button.onclick = function (evt) {
                 fcn(evt);
@@ -104,6 +124,7 @@ export default class Record {
         var newStateStr = (newState) ? 'on' : 'off';
         var attrclass = button + 'snd';
         gn(element).childNodes[0].setAttribute('class', attrclass + ' ' + newStateStr);
+        setPressedState(gn(element), newState);
     }
 
     // Volume UI updater
@@ -369,5 +390,18 @@ export default class Record {
     static recordError () {
         error = true;
         Record.killRecorder();
+    }
+
+    static getButtonLabel (key) {
+        switch (key) {
+            case 'record':
+                return Localization.localize('A11Y_RECORD');
+            case 'stop':
+                return Localization.localize('A11Y_STOP');
+            case 'play':
+                return Localization.localize('A11Y_PLAY');
+            default:
+                return key;
+        }
     }
 }

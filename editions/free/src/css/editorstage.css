@@ -196,7 +196,11 @@
     cursor: default;
     background: white;
     width: ${css_vh(62.50)};
-    outline: 0px;
+    outline: 2px solid transparent;
+}
+
+*.edittext:focus-visible {
+    outline-color: #133C46;
 }
 
 .pagetextactions {

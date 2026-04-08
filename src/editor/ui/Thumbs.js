@@ -353,6 +353,7 @@ export default class Thumbs {
                 position: 'absolute'
             });
         }
+        img.alt = '';
         img.setAttribute('class', 'unselectable');
         tb.setAttribute('id', 'emptypage');
         tb.onclick = function (evt) {
