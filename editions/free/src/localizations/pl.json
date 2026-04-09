@@ -1150,5 +1150,10 @@
   "A11Y_SKIP_TO_MAIN": "Skip to main content",
   "A11Y_STOP": "Stop",
   "A11Y_TRACE": "Trace",
-  "A11Y_TUTORIAL_DIALOG": "Tutorial media"
+  "A11Y_TUTORIAL_DIALOG": "Tutorial media",
+  "A11Y_ADD_PAGE": "Add page",
+  "A11Y_COPY_TO_PAGE": "Copy to page {PAGE}",
+  "A11Y_DELETE_PAGE": "Delete page {PAGE}",
+  "A11Y_MOVE_PAGE_EARLIER": "Move page {PAGE} earlier",
+  "A11Y_MOVE_PAGE_LATER": "Move page {PAGE} later"
 }

@@ -7,6 +7,7 @@ import Events from '../../utils/Events';
 import Scroll from './Scroll';
 import Zoom from './Zoom';
 import Menu from '../blocks/Menu';
+import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
 import {
     gn, localx, localy, newHTML, isTablet,
@@ -18,6 +19,12 @@ import { zoomOutSvg } from '../../html-svgs/zoom-out-svg';
 let scroll = undefined;
 let zoom = undefined;
 let watermark;
+
+function getGuideLabel(key) {
+    var label = Localization.localize(key, { N: 0 });
+    var parts = label.split('|');
+    return parts.length > 1 ? parts.slice(1).join('|').trim() : label;
+}
 
 export default class ScriptsPane {
     static get scroll() {
@@ -35,11 +42,15 @@ export default class ScriptsPane {
     static createScripts(parent) {
         var div = newHTML('div', 'scripts', parent);
         div.setAttribute('id', 'scripts');
+        div.setAttribute('role', 'group');
+        div.setAttribute('aria-label', getGuideLabel('INTERFACE_GUIDE_PROGRAMMING_AREA'));
         watermark = newHTML('div', 'watermark', div);
         var h = Math.max(getDocumentHeight(), frame.offsetHeight);
         setCanvasSize(div, div.offsetWidth, h - div.offsetTop);
         scroll = new Scroll(div, 'scriptscontainer', div.offsetWidth,
             h - div.offsetTop, ScratchJr.getActiveScript, ScratchJr.getBlocks);
+        scroll.contents.setAttribute('role', 'list');
+        scroll.contents.setAttribute('aria-label', getGuideLabel('INTERFACE_GUIDE_PROGRAMMING_SCRIPT'));
         zoom = new Zoom(scroll.contents);
 
         // Add zoom button

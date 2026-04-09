@@ -113,11 +113,20 @@ div.frame {
 
 .pagethumb {
     background: none;
+    position: relative;
     display: inline-block;
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0.13)};
     padding: ${css_vh(0)};
     width: ${145 * scaleMultiplier}px;
     height: ${109 * scaleMultiplier}px;
+}
+
+.pagethumb[role="button"] {
+    cursor: pointer;
+}
+
+.pagethumb[role="button"]:focus-visible {
+    outline-offset: 4px;
 }
 
 .pagethumb.on {
@@ -271,6 +280,25 @@ div.frame {
     overflow: hidden;
 }
 
+#blockspalette .categoryselector button,
+#blockspalette .categoryselectorright button{
+    display: block;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    line-height: 0;
+    cursor: pointer;
+    overflow: hidden;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+#blockspalette .categoryselector button:focus-visible,
+#blockspalette .categoryselectorright button:focus-visible{
+    outline-offset: 4px;
+}
+
 #blockspalette .categoryselectorright{
     display: inline-block;
     word-spacing: -1;
@@ -311,6 +339,16 @@ div.frame {
     width: 85%;
     z-index:4;
     overflow: hidden;
+}
+
+#blockspalette .paletteblock,
+#blockspalette .paletteRecordButton{
+    cursor: pointer;
+}
+
+#blockspalette .paletteblock:focus-visible,
+#blockspalette .paletteRecordButton:focus-visible{
+    outline-offset: 4px;
 }
 
 #blockspalette .yellow { background: #FFE75A;}    /* #ffe100;}{ background: #FFFA5A;} */
@@ -499,6 +537,20 @@ z-index: 5;
 
 #scriptscontainer .script {
     position: absolute;
+}
+
+#scriptscontainer .keyboard-script-strip[role="button"] {
+    cursor: pointer;
+}
+
+#scriptscontainer .keyboard-script-strip:focus-visible {
+    outline-offset: 6px;
+    border-radius: 12px;
+}
+
+#scriptscontainer .keyboard-script-strip[aria-pressed="true"]:not(:focus-visible) {
+    box-shadow: 0 0 0 3px rgba(15, 95, 255, 0.35);
+    border-radius: 12px;
 }
 
 .watermark {

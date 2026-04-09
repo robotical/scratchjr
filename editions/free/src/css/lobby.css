@@ -72,6 +72,11 @@ div.frame {
     width: ${css_vh(32)};
 }
 
+#logotab {
+    visibility: hidden;
+    pointer-events: none;
+}
+
 #topbar ul.topbar-nav .logo .logo-icon {
     display: block;
     width: ${css_vh(28.65)};

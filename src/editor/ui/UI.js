@@ -1211,6 +1211,8 @@ export default class UI {
         var p = newHTML('div', 'spritethumbs', sprites);
         var div = newHTML('div', 'spritecc', p);
         div.setAttribute('id', 'spritecc');
+        div.setAttribute('role', 'group');
+        div.setAttribute('aria-label', UI.getGuideControlLabel('INTERFACE_GUIDE_CHARACTERS'));
         // div.ontouchstart = UI.spriteThumbsActions;
         // div.onmousedown = UI.spriteThumbsActions;
         if (isTablet) {
@@ -1704,6 +1706,8 @@ export default class UI {
         tb.setAttribute('id', 'pages');
         var ndiv = newHTML('div', 'pagescc', tb);
         ndiv.setAttribute('id', 'pagecc');
+        ndiv.setAttribute('role', 'group');
+        ndiv.setAttribute('aria-label', UI.getGuideControlLabel('INTERFACE_GUIDE_PAGES'));
 
         UI.addMartyModeButton(rp);
     }

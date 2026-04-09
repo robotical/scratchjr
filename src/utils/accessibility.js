@@ -9,6 +9,7 @@ const FOCUSABLE_SELECTOR = [
     '[tabindex]:not([tabindex="-1"])'
 ].join(',');
 
+const ACTIVATION_KEYS = new Set(['Enter', ' ', 'Spacebar']);
 const dialogStates = new WeakMap();
 
 function isVisible(element) {
@@ -174,6 +175,101 @@ export function setSelectedState(element, selected) {
     } else {
         element.removeAttribute('aria-current');
     }
+}
+
+export function setAccessibleName(element, label) {
+    if (!element) {
+        return;
+    }
+    if (!label) {
+        element.removeAttribute('aria-label');
+        return;
+    }
+    element.setAttribute('aria-label', label);
+}
+
+export function makeSemanticButton(element, options = {}) {
+    if (!element) {
+        return null;
+    }
+    if (element.tagName.toLowerCase() !== 'button') {
+        element.setAttribute('role', options.role || 'button');
+        if (!element.hasAttribute('tabindex')) {
+            element.setAttribute('tabindex', options.tabIndex !== undefined ? String(options.tabIndex) : '0');
+        }
+    }
+    setAccessibleName(element, options.label);
+    if (element.__a11yActivateHandler) {
+        element.removeEventListener('keydown', element.__a11yActivateHandler);
+        delete element.__a11yActivateHandler;
+    }
+    if (typeof options.onActivate === 'function') {
+        const handler = function (event) {
+            if (!ACTIVATION_KEYS.has(event.key)) {
+                return;
+            }
+            event.preventDefault();
+            options.onActivate(event);
+        };
+        element.addEventListener('keydown', handler);
+        element.__a11yActivateHandler = handler;
+    }
+    return element;
+}
+
+export function moveFocusByKey(event, elements, currentElement, options = {}) {
+    if (!event || !elements || elements.length === 0 || !currentElement) {
+        return false;
+    }
+    const currentIndex = elements.indexOf(currentElement);
+    if (currentIndex < 0) {
+        return false;
+    }
+    const allowHorizontal = options.horizontal !== false;
+    const allowVertical = options.vertical !== false;
+    const wrap = options.wrap !== false;
+    let nextIndex = null;
+    switch (event.key) {
+        case 'ArrowLeft':
+            if (allowHorizontal) {
+                nextIndex = currentIndex - 1;
+            }
+            break;
+        case 'ArrowRight':
+            if (allowHorizontal) {
+                nextIndex = currentIndex + 1;
+            }
+            break;
+        case 'ArrowUp':
+            if (allowVertical) {
+                nextIndex = currentIndex - 1;
+            }
+            break;
+        case 'ArrowDown':
+            if (allowVertical) {
+                nextIndex = currentIndex + 1;
+            }
+            break;
+        case 'Home':
+            nextIndex = 0;
+            break;
+        case 'End':
+            nextIndex = elements.length - 1;
+            break;
+        default:
+            return false;
+    }
+    if (nextIndex === null) {
+        return false;
+    }
+    event.preventDefault();
+    if (wrap) {
+        nextIndex = (nextIndex + elements.length) % elements.length;
+    } else {
+        nextIndex = Math.max(0, Math.min(elements.length - 1, nextIndex));
+    }
+    elements[nextIndex].focus();
+    return true;
 }
 
 export function setDialogLabel(dialog, options = {}) {

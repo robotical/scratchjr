@@ -143,7 +143,7 @@ function expectVisibleFocusIndicator(focusStyles) {
     expect(focusStyles.outlineColor).not.toBe('rgba(0, 0, 0, 0)');
 }
 
-async function expectNamedButtons(page, selectors) {
+async function expectNamedControls(page, selectors) {
     const missing = await page.evaluate((buttonSelectors) => {
         return buttonSelectors.filter((selector) => {
             const button = document.querySelector(selector);
@@ -180,7 +180,7 @@ describe('Accessibility shell audit', () => {
             await page.goto(`${HOST}/home.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
             await waitForTitle(page, 'My Projects');
             await page.waitForSelector('#skip-link');
-            await page.waitForSelector('#logotab[aria-label]');
+            await page.waitForSelector('#logotab[aria-hidden="true"]');
             await page.waitForSelector('#newproject', { timeout: 30_000 });
 
             expect(await page.title()).toBe('My Projects - ScratchJr');
@@ -189,9 +189,23 @@ describe('Accessibility shell audit', () => {
             expect(await page.$eval('#topbar', (element) => element.getAttribute('role'))).toBe('navigation');
             expect(await page.$eval('#footernav', (element) => element.getAttribute('role'))).toBe('navigation');
             expect(await page.$eval('#wrapc', (element) => element.getAttribute('role'))).toBe('main');
+            expect(await page.$eval('#logotab', (element) => element.getAttribute('aria-hidden'))).toBe('true');
+            expect(await page.$eval('#logotab', (element) => element.getAttribute('tabindex'))).toBe('-1');
+            expect(await page.$eval('#logotab', (element) => {
+                const styles = window.getComputedStyle(element);
+                return {
+                    display: styles.display,
+                    visibility: styles.visibility,
+                    pointerEvents: styles.pointerEvents,
+                };
+            })).toEqual({
+                display: 'block',
+                visibility: 'hidden',
+                pointerEvents: 'none',
+            });
+            expect(await page.$eval('#logotab', (element) => element.getBoundingClientRect().width)).toBeGreaterThan(0);
 
-            await expectNamedButtons(page, [
-                '#logotab',
+            await expectNamedControls(page, [
                 '#hometab',
                 '#geartab',
                 '#booktab',
@@ -201,8 +215,8 @@ describe('Accessibility shell audit', () => {
             await tabToSelector(page, '#skip-link');
             expectVisibleFocusIndicator(await getFocusStyles(page, '#skip-link'));
 
-            await tabToSelector(page, '#logotab');
-            expectVisibleFocusIndicator(await getFocusStyles(page, '#logotab'));
+            await tabToSelector(page, '#hometab');
+            expectVisibleFocusIndicator(await getFocusStyles(page, '#hometab'));
 
             await new Promise((resolve) => setTimeout(resolve, 1200));
             await page.click('#booktab');
@@ -263,7 +277,7 @@ describe('Accessibility shell audit', () => {
                 expect(await page.$eval('#content', (element) => element.getAttribute('role'))).toBe('main');
 
                 if (guideCase.buttonSelectors.length > 0) {
-                    await expectNamedButtons(page, guideCase.buttonSelectors);
+                    await expectNamedControls(page, guideCase.buttonSelectors);
                 }
 
                 const decorativeAlts = await page.$$eval(guideCase.decorativeImageSelector, (images) => {
@@ -304,6 +318,10 @@ describe('Accessibility shell audit', () => {
             await page.waitForSelector('#projectinfo[aria-label]', { timeout: 30_000 });
             await page.waitForSelector('#grid[aria-label]', { timeout: 30_000 });
             await page.waitForSelector('#skip-link');
+            await page.waitForSelector('#sprite-start[aria-label]', { timeout: 30_000 });
+            await page.waitForSelector('#pagecc[aria-label]', { timeout: 30_000 });
+            await page.waitForSelector('#spritecc[aria-label]', { timeout: 30_000 });
+            await page.waitForSelector('#emptypage[aria-label]', { timeout: 30_000 });
             await page.waitForFunction(() => {
                 const projectInfoButton = document.getElementById('projectinfo');
                 return Boolean(projectInfoButton && !projectInfoButton.disabled);
@@ -313,10 +331,173 @@ describe('Accessibility shell audit', () => {
             expect(await page.$eval('html', (element) => element.lang)).toBe('en');
             expect(await page.$eval('#skip-link', (element) => element.getAttribute('href'))).toBe('#frame');
             expect(await page.$eval('#frame', (element) => element.getAttribute('role'))).toBe('main');
+            expect(await page.$eval('#pagecc', (element) => element.getAttribute('role'))).toBe('group');
+            expect(await page.$eval('#pagecc', (element) => element.getAttribute('aria-label'))).toBe('Pages');
+            expect(await page.$eval('#spritecc', (element) => element.getAttribute('role'))).toBe('group');
+            expect(await page.$eval('#spritecc', (element) => element.getAttribute('aria-label'))).toBe('Characters');
+            expect(await page.$eval('#selectors', (element) => element.getAttribute('role'))).toBe('toolbar');
+            expect(await page.$eval('#selectors', (element) => element.getAttribute('aria-label'))).toBe('Block Categories');
+            expect(await page.$eval('#palette', (element) => element.getAttribute('role'))).toBe('group');
+            expect(await page.$eval('#palette', (element) => element.getAttribute('aria-label'))).toBe('Blocks Palette');
+            expect(await page.$eval('#scripts', (element) => element.getAttribute('role'))).toBe('group');
+            expect(await page.$eval('#scripts', (element) => element.getAttribute('aria-label'))).toBe('Programming Area');
+            expect(await page.$eval('#scriptscontainer', (element) => element.getAttribute('role'))).toBe('list');
+            expect(await page.$eval('#scriptscontainer', (element) => element.getAttribute('aria-label'))).toBe('Programming Script');
 
-            await expectNamedButtons(page, ['#projectinfo', '#grid', '#traceBtn', '#go', '#resetall', '#full']);
-            await tabToSelector(page, '#projectinfo');
-            expectVisibleFocusIndicator(await getFocusStyles(page, '#projectinfo'));
+            await expectNamedControls(page, [
+                '#projectinfo',
+                '#grid',
+                '#traceBtn',
+                '#go',
+                '#resetall',
+                '#full',
+                '#sprite-start',
+                '#sprite-motion',
+                '#emptypage'
+            ]);
+            await tabToSelector(page, '#sprite-start', 50);
+            expectVisibleFocusIndicator(await getFocusStyles(page, '#sprite-start'));
+            await page.keyboard.press('ArrowRight');
+            expect(await page.evaluate(() => document.activeElement.id)).toBe('sprite-motion');
+            await page.keyboard.press('Enter');
+            await page.waitForFunction(() => {
+                const motionButton = document.getElementById('sprite-motion');
+                return motionButton && motionButton.getAttribute('aria-pressed') === 'true';
+            }, { timeout: 5_000 });
+            await page.waitForSelector('#forward_block[role="button"]', { timeout: 30_000 });
+
+            await expectNamedControls(page, ['#forward_block', '#back_block']);
+            await page.waitForFunction(() => {
+                const buttons = Array.from(document.querySelectorAll('#palette [role="button"]'));
+                return buttons.length > 1 && buttons.every((button) => button.getAttribute('aria-label'));
+            }, { timeout: 5_000 });
+
+            await page.focus('#forward_block');
+            expectVisibleFocusIndicator(await getFocusStyles(page, '#forward_block'));
+            await page.keyboard.press('ArrowRight');
+            expect(await page.evaluate(() => document.activeElement.getAttribute('data-blocktype'))).toBe('back');
+
+            const blockCountBefore = await page.evaluate(() => window.ScratchJr.getBlocks().length);
+            await page.keyboard.press('Enter');
+            await page.waitForFunction((before) => {
+                return window.ScratchJr.getBlocks().length === before + 1
+                    && window.ScratchJr.getBlocks().some((block) => block.blocktype === 'back');
+            }, { timeout: 30_000 }, blockCountBefore);
+            await page.waitForSelector('#scriptscontainer .keyboard-script-strip[role="button"]', { timeout: 30_000 });
+            await expectNamedControls(page, ['#scriptscontainer .keyboard-script-strip[role="button"]']);
+
+            await page.focus('#scriptscontainer .keyboard-script-strip[role="button"]');
+            expectVisibleFocusIndicator(await getFocusStyles(page, '#scriptscontainer .keyboard-script-strip[role="button"]'));
+            expect(await page.$eval('#scriptscontainer .keyboard-script-strip[role="button"]',
+                (element) => element.getAttribute('aria-pressed'))).toBe('true');
+
+            const stripBlockCountBefore = await page.evaluate(() => window.ScratchJr.getBlocks().length);
+            await page.focus('#back_block');
+            await page.keyboard.press('Enter');
+            await page.waitForFunction((before) => {
+                return window.ScratchJr.getBlocks().length === before + 1
+                    && window.ScratchJr.getActiveScript().owner.gettopblocks().length === 1;
+            }, { timeout: 30_000 }, stripBlockCountBefore);
+
+            await page.focus('#scriptscontainer .keyboard-script-strip[role="button"]');
+            await page.keyboard.press('Delete');
+            await page.waitForFunction(() => {
+                return window.ScratchJr.getBlocks().length === 0
+                    && document.querySelectorAll('#scriptscontainer .keyboard-script-strip[role="button"]').length === 0;
+            }, { timeout: 30_000 });
+
+            await tabToSelector(page, '#emptypage', 80);
+            expectVisibleFocusIndicator(await getFocusStyles(page, '#emptypage'));
+            await page.keyboard.press('Enter');
+            await page.waitForFunction(() => {
+                return document.querySelectorAll('#pagecc .pagethumb[role="button"]').length === 3;
+            }, { timeout: 30_000 });
+
+            const initialPageIds = await page.$$eval('#pagecc .pagethumb[data-owner]', (thumbs) => {
+                return thumbs.map((thumb) => thumb.getAttribute('data-owner'));
+            });
+            const firstPageId = initialPageIds[0];
+            const secondPageId = initialPageIds[1];
+
+            expect(await page.$$eval('#pagecc .pagethumb .thumb-action', (buttons) => buttons.length)).toBe(0);
+
+            const pageOneSpriteCountBefore = await page.evaluate((pageId) => {
+                return JSON.parse(document.getElementById(pageId).owner.sprites).length;
+            }, firstPageId);
+            await page.focus(`.pagethumb[data-owner="${firstPageId}"]`);
+            await page.keyboard.press('c');
+            await page.waitForFunction((pageId, countBefore) => {
+                return JSON.parse(document.getElementById(pageId).owner.sprites).length === countBefore + 1;
+            }, { timeout: 30_000 }, firstPageId, pageOneSpriteCountBefore);
+
+            await page.focus(`.pagethumb[data-owner="${secondPageId}"]`);
+            await page.keyboard.down('Shift');
+            await page.keyboard.press('ArrowLeft');
+            await page.keyboard.up('Shift');
+            await page.waitForFunction((pageId) => {
+                const firstThumb = document.querySelector('#pagecc .pagethumb[data-owner]');
+                return firstThumb && firstThumb.getAttribute('data-owner') === pageId;
+            }, { timeout: 30_000 }, secondPageId);
+
+            await page.evaluate(() => {
+                const pageThumbs = Array.from(document.querySelectorAll('#pagecc .pagethumb[role="button"]'))
+                    .filter((thumb) => thumb.id !== 'emptypage');
+                pageThumbs[1].focus();
+            });
+            await page.keyboard.press('Enter');
+            await page.waitForFunction((pageId) => {
+                const currentThumb = document.querySelector('#pagecc .pagethumb[aria-current="page"]');
+                return currentThumb && currentThumb.getAttribute('data-owner') === pageId;
+            }, { timeout: 30_000 }, firstPageId);
+
+            await page.focus(`.pagethumb[data-owner="${secondPageId}"]`);
+            await page.keyboard.press('Delete');
+            await page.waitForFunction((pageId) => {
+                return !document.querySelector(`.pagethumb[data-owner="${pageId}"]`)
+                    && document.querySelectorAll('#pagecc .pagethumb[data-owner]').length === 1;
+            }, { timeout: 30_000 }, secondPageId);
+
+            await page.evaluate(() => {
+                window.ScratchJr.stage.currentPage.addSprite(0.5, window.ScratchJr.defaultSprite, 'Helper');
+            });
+            await page.waitForFunction(() => {
+                const visibleThumbs = Array.from(document.querySelectorAll('#spritecc .spritethumb[role="button"]'))
+                    .filter((thumb) => window.getComputedStyle(thumb).display !== 'none');
+                return visibleThumbs.length >= 2;
+            }, { timeout: 30_000 });
+
+            const unnamedSpriteThumbs = await page.$$eval('#spritecc .spritethumb[role="button"]', (thumbs) => {
+                return thumbs.filter((thumb) => {
+                    return window.getComputedStyle(thumb).display !== 'none' && !thumb.getAttribute('aria-label');
+                }).length;
+            });
+            expect(unnamedSpriteThumbs).toBe(0);
+
+            await page.evaluate(() => {
+                const visibleThumbs = Array.from(document.querySelectorAll('#spritecc .spritethumb[role="button"]'))
+                    .filter((thumb) => window.getComputedStyle(thumb).display !== 'none');
+                visibleThumbs[1].focus();
+            });
+            await page.keyboard.press('Enter');
+            await page.waitForFunction(() => {
+                const visibleThumbs = Array.from(document.querySelectorAll('#spritecc .spritethumb[role="button"]'))
+                    .filter((thumb) => window.getComputedStyle(thumb).display !== 'none');
+                return visibleThumbs.length >= 2
+                    && visibleThumbs[1].getAttribute('aria-pressed') === 'true'
+                    && visibleThumbs[0].getAttribute('aria-pressed') === 'false';
+            }, { timeout: 30_000 });
+
+            const spriteThumbIds = await page.$$eval('#spritecc .spritethumb[data-owner]', (thumbs) => {
+                return thumbs
+                    .filter((thumb) => window.getComputedStyle(thumb).display !== 'none')
+                    .map((thumb) => thumb.getAttribute('data-owner'));
+            });
+            const deletableSpriteId = spriteThumbIds[1];
+            await page.focus(`.spritethumb[data-owner="${deletableSpriteId}"]`);
+            await page.keyboard.press('Delete');
+            await page.waitForFunction((spriteId) => {
+                return !document.querySelector(`.spritethumb[data-owner="${spriteId}"]`);
+            }, { timeout: 30_000 }, deletableSpriteId);
 
             expectNoAxeViolations(await runAxe(page));
 
@@ -361,7 +542,7 @@ describe('Accessibility shell audit', () => {
             await page.waitForSelector('#tutorialMenuBar', { timeout: 40_000 });
             await page.waitForSelector('#nextStep', { timeout: 30_000 });
 
-            await expectNamedButtons(page, ['#closeTutorial', '#tutorialReadAloud', '#tutorialHelp', '#previousStep', '#nextStep']);
+            await expectNamedControls(page, ['#closeTutorial', '#tutorialReadAloud', '#tutorialHelp', '#previousStep', '#nextStep']);
             await tabToSelector(page, '#closeTutorial');
             expectVisibleFocusIndicator(await getFocusStyles(page, '#closeTutorial'));
 
