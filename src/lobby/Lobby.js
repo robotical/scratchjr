@@ -16,6 +16,7 @@ let busy = false;
 let errorTimer;
 const host = 'inapp/';
 let currentPage = null;
+let bookSubMenu = 'about';
 
 export default class Lobby {
     // Getters/setters for properties used in other classes
@@ -36,6 +37,7 @@ export default class Lobby {
         version = v;
         var urlvars = getUrlVars();
         var place = urlvars.place;
+        bookSubMenu = Lobby.normalizeBookSubMenu(urlvars.submenu);
         ScratchAudio.addSound('sounds/', 'tap.wav', ScratchAudio.uiSounds);
         ScratchAudio.addSound('sounds/', 'cut.wav', ScratchAudio.uiSounds);
         ScratchAudio.init();
@@ -87,6 +89,11 @@ export default class Lobby {
         gn('blockstab').onclick = function () {
             if (gn('blockstab').className != 'tab on') {
                 Lobby.setSubMenu('blocks');
+            }
+        };
+        gn('tutorialstab').onclick = function () {
+            if (gn('tutorialstab').className != 'tab on') {
+                Lobby.setSubMenu('tutorials');
             }
         };
         gn('privacytab').onclick = function () {
@@ -185,7 +192,7 @@ export default class Lobby {
         var div = newHTML('div', 'htmlcontents home', p);
         div.setAttribute('id', 'htmlcontents');
         setTimeout(function () {
-            Lobby.setSubMenu('about');
+            Lobby.setSubMenu(bookSubMenu);
         }, 250);
     }
 
@@ -231,6 +238,8 @@ export default class Lobby {
         if (busy) {
             return;
         }
+        page = Lobby.normalizeBookSubMenu(page);
+        bookSubMenu = page;
         document.ontouchmove = undefined;
         document.onpointermove = undefined;
         busy = true;
@@ -272,6 +281,10 @@ export default class Lobby {
                 url = host + 'blocks.html';
                 Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
                 break;
+            case 'tutorials':
+                url = host + 'tutorials.html';
+                Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
+                break;
             case 'privacy':
                 url = host + 'privacy.html';
                 Lobby.loadLink(div, url, 'contentwrap scroll', 'htmlcontents scrolled');
@@ -284,12 +297,20 @@ export default class Lobby {
     }
 
     static selectSubButton(str) {
-        var list = ['about', 'interface', 'paint', 'blocks', 'privacy'];
+        var list = ['about', 'interface', 'paint', 'blocks', 'tutorials', 'privacy'];
         for (var i = 0; i < list.length; i++) {
             var kid = gn(list[i] + 'tab');
             var cls = kid.className.split(' ')[0];
             kid.className = cls + ((list[i] == str) ? ' on' : ' off');
         }
+    }
+
+    static normalizeBookSubMenu(page) {
+        var list = ['about', 'interface', 'paint', 'blocks', 'tutorials', 'privacy'];
+        if (list.indexOf(page) < 0) {
+            return 'about';
+        }
+        return page;
     }
 
     static selectButton(str) {

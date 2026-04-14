@@ -138,7 +138,7 @@ export default class TutorialUI {
 
         // tutorial menu bar should have in this order a close button, the title of the tutorial, a question mark icon, previous and next buttons
         TutorialUI.tutorialMenuBar.innerHTML = `
-            <button id="closeTutorial" class="tutorialButton" onclick="window.applicationManager?.returnToMainApp()">${closexSvg}</button>
+            <button id="closeTutorial" class="tutorialButton">${closexSvg}</button>
             <div id="tutorialTitle" class="tutorialTitle">${this.tutorial.title}</div>
             <button id="tutorialReadAloud" class="tutorialButton">${readOutLoudSvg}</button>
             <button id="tutorialHelp" class="tutorialButton">${questionmarkSvg}</button>
@@ -153,6 +153,38 @@ export default class TutorialUI {
                 </svg>
             </button>
         `;
+        gn('closeTutorial').addEventListener('click', TutorialUI.closeTutorial);
+    }
+
+    static closeTutorial() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tutorialId = urlParams.get('tutorial');
+
+        if (tutorialId) {
+            window.location.href = 'home.html?place=book&submenu=tutorials';
+            return;
+        }
+
+        const tutorialReturnPlace = urlParams.get('tutorialReturnPlace');
+        const tutorialReturnSubmenu = urlParams.get('tutorialReturnSubmenu');
+
+        if (tutorialReturnPlace) {
+            const params = new URLSearchParams({
+                place: tutorialReturnPlace
+            });
+            if (tutorialReturnSubmenu) {
+                params.set('submenu', tutorialReturnSubmenu);
+            }
+            window.location.href = `home.html?${params.toString()}`;
+            return;
+        }
+
+        if (typeof window.applicationManager?.returnToMainApp === 'function') {
+            window.applicationManager.returnToMainApp();
+            return;
+        }
+
+        window.location.href = 'home.html?place=home';
     }
 
     /* Progress Bar */

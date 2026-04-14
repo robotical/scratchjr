@@ -9,6 +9,7 @@ import OS from '../../tablet/OS';
 import IO from '../../tablet/IO';
 import Paint from '../../painteditor/Paint';
 import SVG2Canvas from '../../utils/SVG2Canvas';
+import Localization from '../../utils/Localization';
 import {frame, gn, newHTML, scaleMultiplier, getIdFor,
     isAndroid, setProps, setCanvasSize} from '../../utils/lib';
 
@@ -83,6 +84,14 @@ export default class Project {
         ScratchJr.log('all UI assets recieved - procced to call server', ScratchJr.getTime(), 'sec');
         Project.setProgress(20);
         UI.layout();
+        if (!ScratchJr.currentProject) {
+            Project.dataRecieved(JSON.stringify([{
+                name: Localization.localize('TUTORIALS'),
+                version: ScratchJr.version,
+                mtime: (new Date()).getTime().toString()
+            }]));
+            return;
+        }
         IO.getObject(ScratchJr.currentProject, Project.dataRecieved);
     }
 

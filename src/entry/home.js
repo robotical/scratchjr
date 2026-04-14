@@ -8,7 +8,15 @@ export function homeMain() {
   const urlParams = new URLSearchParams(window.location.search);
   /*Tutorial*/
   if (urlParams.get("tutorial")) {
-    goToLink("editor.html?pmd5=" + -1 + "&mode=edit&tutorial=" + urlParams.get("tutorial"));
+    const editorParams = new URLSearchParams({
+      pmd5: "-1",
+      mode: "edit",
+      tutorial: urlParams.get("tutorial"),
+      tutorialReturnPlace: urlParams.get("tutorialReturnPlace") || "book",
+      tutorialReturnSubmenu: urlParams.get("tutorialReturnSubmenu") || "tutorials"
+    });
+    window.location.href = `editor.html?${editorParams.toString()}`;
+    return;
   }
   OS.martyCmd({cmd: "show-back-arrow"});
   gn("logotab").onclick = homeGoBack;
@@ -31,5 +39,6 @@ function homeStrings () {
     gn('interfacetab-text').textContent = Localization.localize('INTERFACE_GUIDE');
     gn('painttab-text').textContent = Localization.localize('PAINT_EDITOR_GUIDE');
     gn('blockstab-text').textContent = Localization.localize('BLOCKS_GUIDE');
+    gn('tutorialstab-text').textContent = Localization.localize('TUTORIALS');
     gn('privacytab-text').textContent = Localization.localize('PRIVACY_POLICY');
 }

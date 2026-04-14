@@ -18,7 +18,9 @@ import martyJrBlocksTutorial2 from "./tutorials-data/marty-jrblocks-tutorials/ma
 import martyJrBlocksTutorial3 from "./tutorials-data/marty-jrblocks-tutorials/marty-jrblocks-3";
 import martyJrBlocksTutorial4 from "./tutorials-data/marty-jrblocks-tutorials/marty-jrblocks-4";
 import martyJrBlocksTutorial5 from "./tutorials-data/marty-jrblocks-tutorials/marty-jrblocks-5";
+import Localization from "../utils/Localization";
 
+const MISSING_PREFIX = 'String missing: ';
 
 const allTutorials = [
     cogAndMartyTutorial,
@@ -42,10 +44,42 @@ const allTutorials = [
     martyJrBlocksTutorial4,
     martyJrBlocksTutorial5
 ];
+
+function resolveLocalizedValue(value) {
+    if (typeof value === 'string' && value.indexOf(MISSING_PREFIX) === 0) {
+        const key = value.slice(MISSING_PREFIX.length);
+        const localizedValue = Localization.localize(key);
+        return localizedValue.indexOf(MISSING_PREFIX) === 0 ? value : localizedValue;
+    }
+
+    if (Array.isArray(value)) {
+        return value.map((item) => resolveLocalizedValue(item));
+    }
+
+    if (value && typeof value === 'object') {
+        const resolvedValue = {};
+        Object.keys(value).forEach((key) => {
+            resolvedValue[key] = resolveLocalizedValue(value[key]);
+        });
+        return resolvedValue;
+    }
+
+    return value;
+}
+
 export default class TutorialFetcher {
 
     static fetchTutorial(tutorialId) {
-        return allTutorials.find(tutorial => tutorial.id === tutorialId);
+        const tutorial = allTutorials.find((item) => item.id === tutorialId);
+        return tutorial ? resolveLocalizedValue(tutorial) : undefined;
+    }
+
+    static fetchTutorials(filters = {}) {
+        return allTutorials.filter((tutorial) => {
+            if (filters.platform && tutorial.platform !== filters.platform) {
+                return false;
+            }
+            return true;
+        }).map((tutorial) => resolveLocalizedValue(tutorial));
     }
 }
-

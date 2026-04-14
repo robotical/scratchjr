@@ -15,6 +15,7 @@ import {
   inappBlocksGuide,
   inappPaintEditorGuide,
   inappPrivacyPolicy,
+  inappTutorials,
 } from "./inapp";
 
 // import TutorialFetcher from '../tutorial/TutorialFetcher';
@@ -134,6 +135,12 @@ window.onload = () => {
       preprocessAndLoadCss("style", "style/style.css");
       preprocessAndLoadCss("style", "style/privacy.css");
       entryFunction = () => inappPrivacyPolicy();
+      root = "../";
+      break;
+    case "inappTutorials":
+      preprocessAndLoadCss("style", "style/style.css");
+      preprocessAndLoadCss("style", "style/tutorials.css");
+      entryFunction = () => inappTutorials();
       root = "../";
       break;
   }

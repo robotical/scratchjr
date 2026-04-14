@@ -336,7 +336,16 @@ function indexGohome() {
     doNext();
   });
   function doNext() {
-    goToLink("home.html");
+    const currentParams = new URLSearchParams(window.location.search);
+    const homeParams = new URLSearchParams();
+    ["tutorial", "tutorialReturnPlace", "tutorialReturnSubmenu"].forEach((key) => {
+      const value = currentParams.get(key);
+      if (value) {
+        homeParams.set(key, value);
+      }
+    });
+    const homeUrl = homeParams.toString() ? `home.html?${homeParams.toString()}` : "home.html";
+    window.location.href = homeUrl;
   }
 }
 

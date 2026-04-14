@@ -1,5 +1,31 @@
-import { gn } from '../utils/lib';
+import { gn, newHTML } from '../utils/lib';
 import Localization from '../utils/Localization';
+import TutorialFetcher from '../tutorial/TutorialFetcher';
+
+function getNavigationHref(baseHref, fileName, query) {
+    const cleanHref = baseHref.split('#')[0].split('?')[0];
+    const inappMarker = '/inapp/';
+    let resolvedBaseHref = cleanHref.slice(0, cleanHref.lastIndexOf('/') + 1);
+
+    if (cleanHref.indexOf(inappMarker) > -1) {
+        resolvedBaseHref = cleanHref.slice(0, cleanHref.indexOf(inappMarker) + 1);
+    }
+
+    return resolvedBaseHref + fileName + (query ? '?' + query : '');
+}
+
+function navigateFromTutorials(fileName, query) {
+    try {
+        if (window.parent && window.parent !== window) {
+            window.parent.location.href = getNavigationHref(window.parent.location.href, fileName, query);
+            return;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+
+    window.location.href = getNavigationHref(window.location.href, fileName, query);
+}
 
 export function inappAbout() {
     gn('aboutScratchjrTitle').textContent = Localization.localize('ABOUT_SCRATCHJR');
@@ -258,6 +284,62 @@ export function inappBlocksGuide() {
             gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);
         } catch (e) { console.log(e) }
     }
+}
+
+export function inappTutorials() {
+    const title = gn('tutorials-title');
+    const content = gn('tutorials-content');
+    title.textContent = Localization.localize('TUTORIALS');
+
+    const tutorials = TutorialFetcher.fetchTutorials({ platform: 'blocksjr' });
+    const groups = [
+        {
+            title: 'Marty',
+            tutorials: tutorials.filter((tutorial) => tutorial.id.indexOf('marty-jr-blocks-') === 0)
+        },
+        {
+            title: 'Cog',
+            tutorials: tutorials.filter((tutorial) => tutorial.id.indexOf('cog-jrblocks-') === 0)
+        },
+        {
+            title: 'Cog + Marty',
+            tutorials: tutorials.filter((tutorial) => tutorial.id === 'cog-and-marty-tutorial')
+        }
+    ];
+
+    groups.forEach((group) => {
+        if (group.tutorials.length === 0) {
+            return;
+        }
+
+        const section = newHTML('section', 'tutorials-group', content);
+        const header = newHTML('h2', 'tutorials-group-title', section);
+        header.textContent = group.title;
+
+        const list = newHTML('div', 'tutorials-group-list', section);
+        group.tutorials.forEach((tutorial) => {
+            const card = newHTML('button', 'tutorial-card', list);
+            card.type = 'button';
+            card.setAttribute('data-tutorial-id', tutorial.id);
+
+            const cardTitle = newHTML('div', 'tutorial-card-title', card);
+            cardTitle.textContent = tutorial.title;
+
+            const cardDescription = newHTML('div', 'tutorial-card-description', card);
+            cardDescription.textContent = tutorial.description;
+
+            card.onclick = () => {
+                const query = [
+                    'pmd5=-1',
+                    'mode=edit',
+                    'tutorial=' + encodeURIComponent(tutorial.id),
+                    'tutorialReturnPlace=book',
+                    'tutorialReturnSubmenu=tutorials'
+                ].join('&');
+                navigateFromTutorials('editor.html', query);
+            };
+        });
+    });
 }
 
 export function inappPrivacyPolicy() {

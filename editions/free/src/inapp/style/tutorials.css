@@ -1,0 +1,110 @@
+body {
+    margin: 0;
+    background: #f4efe0;
+    color: #4c4d4f;
+    font-family: 'Lato Regular', arial, sans-serif;
+}
+
+#tutorials-page {
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 960px;
+    min-height: 100vh;
+    padding: 28px 24px 40px;
+}
+
+#tutorials-title {
+    color: #f5a322;
+    font-family: 'Lato Regular', arial, sans-serif;
+    font-size: 42px;
+    line-height: 1.1;
+    margin: 0 0 24px;
+}
+
+#tutorials-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.tutorials-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.tutorials-group-title {
+    color: #2c7e9e;
+    font-size: 28px;
+    margin: 0;
+}
+
+.tutorials-group-list {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.tutorial-card {
+    appearance: none;
+    background: #fffdf7;
+    border: 3px solid #d8d1bf;
+    border-radius: 20px;
+    box-shadow: 0 6px 0 rgba(193, 129, 52, 0.15);
+    color: inherit;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 148px;
+    padding: 18px 20px;
+    text-align: left;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+
+.tutorial-card:hover,
+.tutorial-card:focus {
+    border-color: #f5a322;
+    box-shadow: 0 10px 0 rgba(53, 168, 224, 0.2);
+    outline: none;
+    transform: translateY(-2px);
+}
+
+.tutorial-card:active {
+    transform: translateY(1px);
+}
+
+.tutorial-card-title {
+    color: #133c46;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1.15;
+}
+
+.tutorial-card-description {
+    color: #5d5c56;
+    font-size: 18px;
+    line-height: 1.35;
+}
+
+@media (max-width: 720px) {
+    #tutorials-page {
+        padding: 20px 16px 32px;
+    }
+
+    #tutorials-title {
+        font-size: 34px;
+    }
+
+    .tutorials-group-title {
+        font-size: 24px;
+    }
+
+    .tutorial-card-title {
+        font-size: 22px;
+    }
+
+    .tutorial-card-description {
+        font-size: 17px;
+    }
+}

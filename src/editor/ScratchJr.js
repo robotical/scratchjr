@@ -257,7 +257,7 @@ export default class ScratchJr {
         Project.loadIcon = document.createElement('img');
         Project.loadIcon.src = 'assets/loading.png';
         ScratchJr.log('blocks init', ScratchJr.getTime(), 'sec', BlockSpecs.loadCount);
-        currentProject = urlvars.pmd5;
+        currentProject = urlvars.pmd5 == '-1' ? undefined : urlvars.pmd5;
         editmode = urlvars.mode;
         libInit();
         Project.init();
