@@ -71,39 +71,27 @@ export default class Lobby {
                 Lobby.setPage('gear');
             }
         };
-        gn('abouttab').onclick = function () {
-            if (gn('abouttab').className != 'tab on') {
-                Lobby.setSubMenu('about');
-            }
-        };
-        gn('interfacetab').onclick = function () {
-            if (gn('interfacetab').className != 'tab on') {
-                Lobby.setSubMenu('interface');
-            }
-        };
-        gn('painttab').onclick = function () {
-            if (gn('painttab').className != 'tab on') {
-                Lobby.setSubMenu('paint');
-            }
-        };
-        gn('blockstab').onclick = function () {
-            if (gn('blockstab').className != 'tab on') {
-                Lobby.setSubMenu('blocks');
-            }
-        };
-        gn('tutorialstab').onclick = function () {
-            if (gn('tutorialstab').className != 'tab on') {
-                Lobby.setSubMenu('tutorials');
-            }
-        };
-        gn('privacytab').onclick = function () {
-            if (gn('privacytab').className != 'tab2 on') {
-                Lobby.setSubMenu('privacy');
-            }
-        };
+        Lobby.bindSubMenuTab('abouttab', 'about');
+        Lobby.bindSubMenuTab('interfacetab', 'interface');
+        Lobby.bindSubMenuTab('painttab', 'paint');
+        Lobby.bindSubMenuTab('blockstab', 'blocks');
+        Lobby.bindSubMenuTab('tutorialstab', 'tutorials');
+        Lobby.bindSubMenuTab('privacytab', 'privacy');
         if (isAndroid) {
             AndroidInterface.notifyDoneLoading();
         }
+    }
+
+    static bindSubMenuTab(tabId, page) {
+        var tab = gn(tabId);
+        if (!tab) {
+            return;
+        }
+        tab.onclick = function () {
+            if (tab.className.indexOf(' on') < 0) {
+                Lobby.setSubMenu(page);
+            }
+        };
     }
 
     static setPage(page) {
@@ -300,6 +288,9 @@ export default class Lobby {
         var list = ['about', 'interface', 'paint', 'blocks', 'tutorials', 'privacy'];
         for (var i = 0; i < list.length; i++) {
             var kid = gn(list[i] + 'tab');
+            if (!kid) {
+                continue;
+            }
             var cls = kid.className.split(' ')[0];
             kid.className = cls + ((list[i] == str) ? ' on' : ' off');
         }

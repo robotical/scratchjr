@@ -62,9 +62,16 @@ async function getTutorialFrame(page) {
   await page.waitForFunction(() => {
     const iframe = document.getElementById("htmlcontents");
     return iframe && iframe.tagName === "IFRAME" && iframe.src.includes("inapp/tutorials.html");
-  });
+  }, { timeout: 30_000 });
 
-  const frame = page.frames().find((entry) => entry.url().includes("/inapp/tutorials.html"));
+  await page.waitForFunction(() => {
+    const iframe = document.getElementById("htmlcontents");
+    const frameLocation = iframe?.contentWindow?.location?.href;
+    return typeof frameLocation === "string" && frameLocation.includes("/inapp/tutorials.html");
+  }, { timeout: 30_000 });
+
+  const iframeHandle = await page.$("#htmlcontents");
+  const frame = iframeHandle ? await iframeHandle.contentFrame() : null;
   if (!frame) {
     throw new Error("Tutorial frame not found");
   }

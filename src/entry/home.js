@@ -35,10 +35,17 @@ function homeGoBack() {
 }
 
 function homeStrings () {
-    gn('abouttab-text').textContent = Localization.localize('ABOUT_SCRATCHJR');
-    gn('interfacetab-text').textContent = Localization.localize('INTERFACE_GUIDE');
-    gn('painttab-text').textContent = Localization.localize('PAINT_EDITOR_GUIDE');
-    gn('blockstab-text').textContent = Localization.localize('BLOCKS_GUIDE');
-    gn('tutorialstab-text').textContent = Localization.localize('TUTORIALS');
-    gn('privacytab-text').textContent = Localization.localize('PRIVACY_POLICY');
+    const setTabText = (id, localizationKey) => {
+        const element = gn(id);
+        if (element) {
+            element.textContent = Localization.localize(localizationKey);
+        }
+    };
+
+    setTabText('abouttab-text', 'ABOUT_SCRATCHJR');
+    setTabText('interfacetab-text', 'INTERFACE_GUIDE');
+    setTabText('painttab-text', 'PAINT_EDITOR_GUIDE');
+    setTabText('blockstab-text', 'BLOCKS_GUIDE');
+    setTabText('tutorialstab-text', 'TUTORIALS');
+    setTabText('privacytab-text', 'PRIVACY_POLICY');
 }
