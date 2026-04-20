@@ -131,6 +131,7 @@ export default class Project {
             ScratchJr.changed = false;
             ScratchJr.storyStarted = false;
             UI.needsScroll();
+            UI.setProjectInfoEnabled(true);
             ScratchJr.log('all thumbnails updated', ScratchJr.getTime(), 'sec');
             if (isAndroid) {
                 AndroidInterface.notifyEditorDoneLoading();
@@ -147,6 +148,7 @@ export default class Project {
             display: 'none'
         });
         var modalOuter = newHTML('div', 'modal-outer', frame.parentNode);
+        modalOuter.setAttribute('aria-hidden', 'true');
         var modalMiddle = newHTML('div', 'modal-middle', modalOuter);
         var modal = newHTML('div', 'modal hide fade', modalMiddle);
         modal.setAttribute('id', 'modaldialog');

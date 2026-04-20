@@ -1,4 +1,5 @@
 import { gn, newHTML } from '../utils/lib';
+import { setMainLandmark, setSelectedState } from '../utils/accessibility';
 import Localization from '../utils/Localization';
 import TutorialFetcher from '../tutorial/TutorialFetcher';
 
@@ -27,7 +28,22 @@ function navigateFromTutorials(fileName, query) {
     window.location.href = getNavigationHref(window.location.href, fileName, query);
 }
 
+function setupGuidePage() {
+    setMainLandmark(gn('content'), {
+        id: 'content',
+        label: Localization.localize('A11Y_MAIN_CONTENT')
+    });
+}
+
+function markDecorativeImages(selector) {
+    const images = document.querySelectorAll(selector);
+    images.forEach((image) => {
+        image.alt = '';
+    });
+}
+
 export function inappAbout() {
+    setupGuidePage();
     gn('aboutScratchjrTitle').textContent = Localization.localize('ABOUT_SCRATCHJR');
     gn('aboutWhatIs').textContent = Localization.localize('ABOUT_WHAT_IS');
     gn('aboutDescription').innerHTML = Localization.localize('ABOUT_DESCRIPTION');
@@ -47,6 +63,7 @@ export function inappAbout() {
 }
 
 export function inappInterfaceGuide() {
+    setupGuidePage();
     var interfaceKeyHeaderNode = gn('interface-key-header');
     var interfaceKeyDescriptionNode = gn('interface-key-description');
 
@@ -86,25 +103,36 @@ export function inappInterfaceGuide() {
         ]);
     }
 
-
-    var currentButton = document.getElementById('interface-button-lobby-new-project');
+    var currentButton = document.getElementById('interface-button-save');
+    setSelectedState(currentButton, true);
 
     var switchHelp = function (e) {
-        var target = e.target;
-        if (target.className == 'interface-button-text') {
-            var descriptionId = parseInt(target.innerText - 1);
+        var target = e.target.closest('.interface-button');
+        if (target) {
+            var descriptionId = parseInt(target.textContent, 10) - 1;
             interfaceKeyHeaderNode.textContent = interfaceDescriptions[descriptionId][0];
             interfaceKeyDescriptionNode.textContent = interfaceDescriptions[descriptionId][1];
             currentButton.className = 'interface-button';
-            currentButton = target.parentNode;
+            setSelectedState(currentButton, false);
+            currentButton = target;
             currentButton.className = currentButton.className + ' interface-button-selected';
+            setSelectedState(currentButton, true);
             window.parent.ScratchAudio.sndFXWithVolume('keydown.wav', 0.3);
         }
     };
     document.addEventListener('click', switchHelp, false);
+    const buttons = document.querySelectorAll('.interface-button');
+    buttons.forEach((button) => {
+        var descriptionId = parseInt(button.textContent, 10) - 1;
+        if (!isNaN(descriptionId) && interfaceDescriptions[descriptionId]) {
+            button.setAttribute('aria-label', interfaceDescriptions[descriptionId][0]);
+        }
+    });
+    markDecorativeImages('.ipad-project-view');
 }
 
 export function inappPaintEditorGuide() {
+    setupGuidePage();
     var paintKeyHeaderNode = gn('paint-key-header');
     var paintKeyDescriptionNode = gn('paint-key-description');
 
@@ -138,23 +166,35 @@ export function inappPaintEditorGuide() {
 
 
     var currentButton = document.getElementById('paint-button-undo');
+    setSelectedState(currentButton, true);
 
     var switchHelp = function (e) {
-        var target = e.target;
-        if (target.className == 'paint-button-text') {
-            var descriptionId = parseInt(target.innerText - 1);
+        var target = e.target.closest('.paint-button');
+        if (target) {
+            var descriptionId = parseInt(target.textContent, 10) - 1;
             paintKeyHeaderNode.textContent = paintDescriptions[descriptionId][0];
             paintKeyDescriptionNode.textContent = paintDescriptions[descriptionId][1];
             currentButton.className = 'paint-button';
-            currentButton = target.parentNode;
+            setSelectedState(currentButton, false);
+            currentButton = target;
             currentButton.className = currentButton.className + ' paint-button-selected';
+            setSelectedState(currentButton, true);
             window.parent.ScratchAudio.sndFXWithVolume('keydown.wav', 0.3);
         }
     };
     document.addEventListener('click', switchHelp, false);
+    const buttons = document.querySelectorAll('.paint-button');
+    buttons.forEach((button) => {
+        var descriptionId = parseInt(button.textContent, 10) - 1;
+        if (!isNaN(descriptionId) && paintDescriptions[descriptionId]) {
+            button.setAttribute('aria-label', paintDescriptions[descriptionId][0]);
+        }
+    });
+    markDecorativeImages('.ipad-project-view');
 }
 
 export function inappBlocksGuide() {
+    setupGuidePage();
     // Localized category names
     gn('yellow-block-category-header').textContent = Localization.localize('BLOCKS_TRIGGERING_BLOCKS');
     gn('blue-block-category-header').textContent = Localization.localize('BLOCKS_MOTION_BLOCKS');
@@ -284,12 +324,16 @@ export function inappBlocksGuide() {
             gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);
         } catch (e) { console.log(e) }
     }
+    markDecorativeImages('.block-image, .block-image-repeat');
 }
 
 export function inappTutorials() {
     const title = gn('tutorials-title');
     const content = gn('tutorials-content');
     title.textContent = Localization.localize('TUTORIALS');
+    setMainLandmark(gn('tutorials-page'), {
+        label: Localization.localize('TUTORIALS')
+    });
 
     const tutorials = TutorialFetcher.fetchTutorials({ platform: 'blocksjr' });
     const groups = [
@@ -343,6 +387,7 @@ export function inappTutorials() {
 }
 
 export function inappPrivacyPolicy() {
+    setupGuidePage();
     const elements = document.querySelectorAll('[data-i18n]');
     elements.forEach(function (item) {
         const key = item.getAttribute('data-i18n');

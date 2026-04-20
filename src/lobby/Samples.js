@@ -8,7 +8,7 @@ import IO from '../tablet/IO';
 import MediaLib from '../tablet/MediaLib';
 import ScratchAudio from '../utils/ScratchAudio';
 import Localization from '../utils/Localization';
-import {gn, newHTML} from '../utils/lib';
+import {gn, newHTML, newButton} from '../utils/lib';
 
 let frame;
 // Should ScratchJr projects be saved when the sample project is changed?
@@ -51,9 +51,15 @@ export default class Samples {
             var mt = gn('sample-' + pos);
             var data = IO.parseProjectData(JSON.parse(str)[0]);
             var name = mt.childNodes[1];
+            var openButton = mt.querySelector('.card-action-open');
 
             // Localize sample project names
             name.textContent = Localization.localizeSampleName(data.name);
+            if (openButton) {
+                var label = Localization.localize('A11Y_OPEN') + ' ' + name.textContent;
+                openButton.setAttribute('aria-label', label);
+                openButton.textContent = label;
+            }
             var cnv = mt.childNodes[0].childNodes[1];
             Samples.insertThumbnail(cnv, data.thumbnail);
             mt.onclick = function (evt) {
@@ -96,6 +102,13 @@ export default class Samples {
         newHTML('div', 'sampleicon', mt);
         var name = newHTML('p', undefined, tb);
         name.textContent = 'Sample ' + pos;
+        var openButton = newButton('sr-only-focusable lobby-card-action card-action-open', tb, {
+            ariaLabel: Localization.localize('A11Y_OPEN') + ' ' + name.textContent
+        });
+        openButton.textContent = Localization.localize('A11Y_OPEN') + ' ' + name.textContent;
+        openButton.onclick = function (evt) {
+            Samples.loadMe(evt, tb);
+        };
     }
 
     static requestFromServer (pos, url, whenDone) {

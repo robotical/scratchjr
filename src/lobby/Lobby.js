@@ -2,7 +2,8 @@
 // Home Screen
 //////////////////////////////////////////////////
 
-import { libInit, getUrlVars, gn, isAndroid, newHTML } from '../utils/lib';
+import { libInit, getUrlVars, gn, isAndroid, newHTML, newButton } from '../utils/lib';
+import { setSelectedState } from '../utils/accessibility';
 import ScratchAudio from '../utils/ScratchAudio';
 import OS from '../tablet/OS';
 import Localization from '../utils/Localization';
@@ -198,6 +199,8 @@ export default class Lobby {
         title.textContent = Localization.localize('SELECT_LANGUAGE');
 
         var languageButtons = newHTML('div', 'languagebuttons', div);
+        languageButtons.setAttribute('role', 'group');
+        languageButtons.setAttribute('aria-label', Localization.localize('SELECT_LANGUAGE'));
 
         var languageButton;
         for (var l in window.Settings.supportedLocales) {
@@ -205,13 +208,17 @@ export default class Lobby {
             if (window.Settings.supportedLocales[l] == Localization.currentLocale) {
                 selected = ' selected';
             }
-            languageButton = newHTML('div', 'localizationselect' + selected, languageButtons);
+            languageButton = newButton('localizationselect' + selected, languageButtons, {
+                textContent: l
+            });
             languageButton.textContent = l;
+            languageButton.setAttribute('aria-label', Localization.localize('SELECT_LANGUAGE') + ': ' + l);
+            setSelectedState(languageButton, window.Settings.supportedLocales[l] == Localization.currentLocale);
 
             languageButton.onclick = function (e) {
                 console.log("HERE")
                 ScratchAudio.sndFX('tap.wav');
-                let newLocale = window.Settings.supportedLocales[e.target.textContent];
+                let newLocale = window.Settings.supportedLocales[e.currentTarget.textContent];
                 Cookie.set('localization', newLocale);
                 OS.analyticsEvent('lobby', 'language_changed', newLocale);
                 if (window.applicationManager) {
@@ -291,8 +298,9 @@ export default class Lobby {
             if (!kid) {
                 continue;
             }
-            var cls = kid.className.split(' ')[0];
-            kid.className = cls + ((list[i] == str) ? ' on' : ' off');
+            var baseClass = (list[i] == 'privacy') ? 'footer-tab-button tab2' : 'footer-tab-button tab';
+            kid.className = baseClass + ((list[i] == str) ? ' on' : ' off');
+            setSelectedState(kid, list[i] == str);
         }
     }
 
@@ -308,10 +316,12 @@ export default class Lobby {
         var list = ['home', 'help', 'book', 'gear'];
         for (var i = 0; i < list.length; i++) {
             if (str == list[i]) {
-                gn(list[i] + 'tab').className = list[i] + ' on';
+                gn(list[i] + 'tab').className = 'topbar-tab ' + list[i] + ' on';
+                setSelectedState(gn(list[i] + 'tab'), true);
             } else {
                 try {
-                    gn(list[i] + 'tab').className = list[i] + ' off';
+                    gn(list[i] + 'tab').className = 'topbar-tab ' + list[i] + ' off';
+                    setSelectedState(gn(list[i] + 'tab'), false);
                 } catch (e) {
                     // Do nothing
                 }
@@ -325,6 +335,7 @@ export default class Lobby {
         gn('wrapc').className = css;
         var iframe = newHTML('iframe', 'htmlcontents', p);
         iframe.setAttribute('id', 'htmlcontents');
+        iframe.setAttribute('title', Lobby.getGuideFrameTitle(url));
         gn('htmlcontents').className = css2;
         gn('htmlcontents').src = url;
         gn('htmlcontents').onload = function () {
@@ -379,6 +390,28 @@ export default class Lobby {
         if (gn('hometab') !== null) { // Check if we're on the lobby page
             Lobby.setPage('home');
         }
+    }
+
+    static getGuideFrameTitle(url) {
+        if (url.indexOf('about') > -1) {
+            return Localization.localize('ABOUT_SCRATCHJR');
+        }
+        if (url.indexOf('interface') > -1) {
+            return Localization.localize('INTERFACE_GUIDE');
+        }
+        if (url.indexOf('paint') > -1) {
+            return Localization.localize('PAINT_EDITOR_GUIDE');
+        }
+        if (url.indexOf('blocks') > -1) {
+            return Localization.localize('BLOCKS_GUIDE');
+        }
+        if (url.indexOf('tutorials') > -1) {
+            return Localization.localize('TUTORIALS');
+        }
+        if (url.indexOf('privacy') > -1) {
+            return Localization.localize('PRIVACY_POLICY');
+        }
+        return Localization.localize('ABOUT_SCRATCHJR');
     }
 }
 

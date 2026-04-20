@@ -17,6 +17,7 @@ import Events from '../utils/Events';
 import BlockSpecs from './blocks/BlockSpecs';
 import Runtime from './engine/Runtime';
 import Localization from '../utils/Localization';
+import { setPressedState } from '../utils/accessibility';
 import {
     libInit, gn, scaleMultiplier, newHTML,
     isAndroid, getUrlVars, CSSTransition3D, frame,
@@ -256,6 +257,7 @@ export default class ScratchJr {
         BlockSpecs.initBlocks();
         Project.loadIcon = document.createElement('img');
         Project.loadIcon.src = 'assets/loading.png';
+        Project.loadIcon.alt = '';
         ScratchJr.log('blocks init', ScratchJr.getTime(), 'sec', BlockSpecs.loadCount);
         currentProject = urlvars.pmd5 == '-1' ? undefined : urlvars.pmd5;
         editmode = urlvars.mode;
@@ -511,10 +513,12 @@ export default class ScratchJr {
         var isOff = runtime.inactive();
         if (inFullscreen) {
             gn('go').className = isOff ? 'go on presentationmode' : 'go off presentationmode';
+            setPressedState(gn('go'), !isOff);
             UI.updatePageControls();
         } else {
             try {
                 gn('go').className = isOff ? 'go on' : 'go off';
+                setPressedState(gn('go'), !isOff);
                 Grid.updateCursor();
                 Trace.updateTrace();
             } catch (e) {
@@ -581,7 +585,9 @@ export default class ScratchJr {
 
     static stopStrips() {
         runtime.stopThreads();
-        stage.currentPage.updateThumb();
+        if (stage && stage.currentPage && stage.currentPage.updateThumb) {
+            stage.currentPage.updateThumb();
+        }
     }
 
     static resetSprites() {

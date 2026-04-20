@@ -6,14 +6,17 @@ import ScratchJr from '../ScratchJr';
 import Block from '../blocks/Block';
 import BlockSpecs from '../blocks/BlockSpecs';
 import ScriptsPane from './ScriptsPane';
+import Undo from './Undo';
 import Events from '../../utils/Events';
 import ScratchAudio from '../../utils/ScratchAudio';
 import {gn, newHTML, setCanvasSize, setProps,
     localx, localy, scaleMultiplier, hit3DRect, isTablet} from '../../utils/lib';
+import { makeSemanticButton, moveFocusByKey, setPressedState } from '../../utils/accessibility';
 
 export default class Scripts {
     constructor (spr) {
         this.flowCaret = null;
+        this.keyboardTargetBlock = null;
         this.spr = spr;
         this.dragList = [];
         var dc = gn('scriptscontainer');
@@ -30,6 +33,7 @@ export default class Scripts {
         setProps(this.sc.style, {
             visibility: 'visible'
         });
+        this.refreshKeyboardAccessibility();
     }
 
     deactivate () {
@@ -131,6 +135,167 @@ export default class Scripts {
             // evaluate the scripts area
             window.tutorialEngine.evaluateScriptsArea();
         }
+        this.refreshKeyboardAccessibility();
+    }
+
+    getKeyboardStripElements () {
+        return this.gettopblocks().map((block) => block.div).filter((element) => {
+            if (!element) {
+                return false;
+            }
+            var style = window.getComputedStyle(element);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+        });
+    }
+
+    getKeyboardTargetStrip () {
+        if (this.keyboardTargetBlock && this.keyboardTargetBlock.div
+            && this.keyboardTargetBlock.div.parentNode == this.sc
+            && this.keyboardTargetBlock.prev == null) {
+            return this.keyboardTargetBlock;
+        }
+        return null;
+    }
+
+    getKeyboardStripLabel (block) {
+        if (!block) {
+            return '';
+        }
+        var blocks = this.findingGroup([], block).filter((item) => item && !item.isCaret);
+        var labels = [];
+        for (var i = 0; i < blocks.length; i++) {
+            var help = BlockSpecs.blockDesc(blocks[i], this.spr);
+            var label = help[blocks[i].blocktype] || blocks[i].blocktype;
+            if (!label) {
+                continue;
+            }
+            labels.push(label);
+            if (labels.length >= 6) {
+                break;
+            }
+        }
+        return labels.join(', ');
+    }
+
+    markKeyboardTarget (block) {
+        this.keyboardTargetBlock = block ? block.findFirst() : null;
+        this.refreshKeyboardStripStates();
+    }
+
+    refreshKeyboardStripStates () {
+        var strips = this.gettopblocks();
+        if (strips.indexOf(this.keyboardTargetBlock) < 0) {
+            this.keyboardTargetBlock = strips.length > 0 ? strips[0] : null;
+        }
+        for (var i = 0; i < strips.length; i++) {
+            var strip = strips[i];
+            setPressedState(strip.div, strip == this.keyboardTargetBlock);
+            strip.div.setAttribute('aria-label', this.getKeyboardStripLabel(strip));
+        }
+    }
+
+    handleKeyboardStripKeyDown (event) {
+        if (moveFocusByKey(event, this.getKeyboardStripElements(), event.currentTarget, {
+            horizontal: false,
+            vertical: true
+        })) {
+            return;
+        }
+        switch (event.key) {
+        case 'Backspace':
+        case 'Delete':
+            event.preventDefault();
+            this.deleteKeyboardStrip(event.currentTarget.owner);
+            break;
+        }
+    }
+
+    decorateKeyboardStrip (block) {
+        if (!block || !block.div) {
+            return;
+        }
+        var element = block.div;
+        element.classList.add('keyboard-script-strip');
+        makeSemanticButton(element, {
+            label: this.getKeyboardStripLabel(block),
+            onActivate: (event) => {
+                this.markKeyboardTarget(block);
+                ScriptsPane.runBlock(event, element);
+            }
+        });
+        element.onfocus = () => {
+            this.markKeyboardTarget(block);
+        };
+        element.onkeydown = (event) => {
+            this.handleKeyboardStripKeyDown(event);
+        };
+    }
+
+    refreshKeyboardAccessibility () {
+        var strips = this.gettopblocks();
+        if (strips.indexOf(this.keyboardTargetBlock) < 0) {
+            this.keyboardTargetBlock = strips.length > 0 ? strips[0] : null;
+        }
+        for (var i = 0; i < strips.length; i++) {
+            this.decorateKeyboardStrip(strips[i]);
+        }
+        this.refreshKeyboardStripStates();
+    }
+
+    insertKeyboardBlock (targetStrip, list) {
+        var blocks = this.recreateStrip(list);
+        if (blocks.length < 1) {
+            return null;
+        }
+        var newBlock = blocks[0];
+        if (targetStrip) {
+            var anchor = targetStrip.findLast();
+            var dock = anchor.cShape ? 2 : 1;
+            if (!this.isValid(newBlock, [anchor, dock, 0], 0)) {
+                if (newBlock.div.parentNode) {
+                    newBlock.div.parentNode.removeChild(newBlock.div);
+                }
+                return null;
+            }
+            newBlock.connectBlock(0, anchor, dock);
+            this.layout(targetStrip);
+            this.markKeyboardTarget(targetStrip);
+        } else {
+            this.markKeyboardTarget(newBlock);
+        }
+        this.refreshKeyboardAccessibility();
+        return newBlock;
+    }
+
+    deleteKeyboardStrip (block) {
+        var strip = block ? block.findFirst() : null;
+        if (!strip) {
+            return;
+        }
+        var strips = this.gettopblocks();
+        var currentIndex = strips.indexOf(strip);
+        this.dragList = this.findingGroup([], strip);
+        this.deleteBlocks();
+        this.dragList = [];
+        if (ScriptsPane.scroll) {
+            ScriptsPane.scroll.adjustCanvas();
+            ScriptsPane.scroll.refresh();
+            ScriptsPane.scroll.fitToScreen();
+        }
+        Undo.record({
+            action: 'scripts',
+            where: this.spr.page ? this.spr.page.id : ScratchJr.stage.currentPage.id,
+            who: this.spr.id
+        });
+        var remaining = this.gettopblocks();
+        this.keyboardTargetBlock = remaining[Math.min(currentIndex, remaining.length - 1)] || null;
+        this.refreshKeyboardAccessibility();
+        var nextTarget = this.keyboardTargetBlock ? this.keyboardTargetBlock.div : null;
+        window.setTimeout(function () {
+            if (nextTarget) {
+                nextTarget.focus();
+            }
+        }, 0);
     }
 
 
@@ -632,6 +797,7 @@ export default class Scripts {
             }
             b.div.parentNode.removeChild(b.div);
         }
+        this.refreshKeyboardAccessibility();
     }
 
     recreateStrip (list) {

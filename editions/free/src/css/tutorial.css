@@ -172,6 +172,7 @@
     /* padding: 2.5px 5px; */
     margin-left: -12px;
     cursor: pointer;
+    padding: 0;
 }
 .speechBubbleNextStep {
     background: #E6E6E6;
@@ -180,6 +181,7 @@
     /* padding: 2.5px 5px; */
     margin-right: -12px;
     cursor: pointer;
+    padding: 0;
 
 }
 
@@ -234,6 +236,9 @@
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+    background: none;
+    border: 0;
+    line-height: 1;
 }
 
 .closeModal:hover,

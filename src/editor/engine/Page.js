@@ -342,6 +342,7 @@ export default class Page {
         // tb.onmousedown = function (evt) {
         //     Thumbs.pageMouseDown(evt);
         // };
+        Thumbs.decoratePageThumb(tb, this);
         this.thumbnail = tb;
         return tb;
     }

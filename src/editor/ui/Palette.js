@@ -12,13 +12,15 @@ import MediaLib from '../../tablet/MediaLib';
 import Events from '../../utils/Events';
 import Rectangle from '../../geom/Rectangle';
 import DrawPath from '../../utils/DrawPath';
+import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
 import Record from './Record';
 import {
-    frame, gn, localx, newHTML, scaleMultiplier, isTablet, newDiv,
+    frame, gn, localx, newHTML, newButton, scaleMultiplier, isTablet, newDiv,
     setProps, globalx, localy, globaly, drawScaled, newCanvas,
     setCanvasSize, hitRect, writeText, getStringSize
 } from '../../utils/lib';
+import { makeSemanticButton, moveFocusByKey, setPressedState } from '../../utils/accessibility';
 import UI from './UI';
 
 
@@ -36,8 +38,28 @@ const MARTY_SENSOR_BLOCKS = new Set([
     'martylightsensed',
     'martynoisesensed'
 ]);
+const BLOCKS_WITH_ARGS = new Set(['playsnd', 'gotopage', 'playusersnd', 'setcolor', 'onmessage', 'message', 'setspeed']);
+const LOOP_BLOCKS = new Set(['repeat']);
 
 let currentCategorySide = 'left';
+
+const CATEGORY_LABELS = {
+    'sprite-start': 'BLOCKS_TRIGGERING_BLOCKS',
+    'sprite-motion': 'BLOCKS_MOTION_BLOCKS',
+    'sprite-looks': 'BLOCKS_LOOKS_BLOCKS',
+    'sprite-sound': 'BLOCKS_SOUND_BLOCKS',
+    'sprite-flow': 'BLOCKS_CONTROL_BLOCKS',
+    'sprite-stop': 'BLOCKS_END_BLOCKS',
+    'marty-start': 'BLOCKS_TRIGGERING_BLOCKS',
+    'marty-motion': 'BLOCKS_MOTION_BLOCKS',
+    'marty-looks': 'BLOCKS_LOOKS_BLOCKS',
+    'marty-sound': 'BLOCKS_SOUND_BLOCKS',
+    'marty-flow': 'BLOCKS_CONTROL_BLOCKS',
+    'marty-stop': 'BLOCKS_END_BLOCKS',
+    'cog-start': 'BLOCKS_TRIGGERING_BLOCKS',
+    'cog-looks': 'BLOCKS_LOOKS_BLOCKS',
+    'cog-sound': 'BLOCKS_SOUND_BLOCKS'
+};
 
 export default class Palette {
     static get numcat() {
@@ -96,6 +118,8 @@ export default class Palette {
         Palette.createCategorySelectorsRight(parent);
         var div = newHTML('div', 'palette', parent);
         div.setAttribute('id', 'palette');
+        div.setAttribute('role', 'group');
+        div.setAttribute('aria-label', UI.getGuideControlLabel('INTERFACE_GUIDE_BLOCKS_PALETTE'));
         div.style["touch-action"] = "none";
         // div.ontouchstart = function (evt) {
         //     Palette.paletteMouseDown(evt);
@@ -113,6 +137,8 @@ export default class Palette {
     static createCategorySelectors(parent) {
         var sel = newHTML('div', 'categoryselector', parent);
         sel.setAttribute('id', 'selectors');
+        sel.setAttribute('role', 'toolbar');
+        sel.setAttribute('aria-label', UI.getGuideControlLabel('INTERFACE_GUIDE_BLOCKS_CATEGORIES'));
         var bkg = newHTML('div', 'catbkg', sel);
         newHTML('div', 'catimage', bkg);
         var leftPx = 15 * scaleMultiplier;
@@ -127,6 +153,8 @@ export default class Palette {
     static createCategorySelectorsRight(parent) {
         var sel = newHTML('div', 'categoryselectorright', parent);
         sel.setAttribute('id', 'selectorsright');
+        sel.setAttribute('role', 'toolbar');
+        sel.setAttribute('aria-label', UI.getGuideControlLabel('INTERFACE_GUIDE_BLOCKS_CATEGORIES'));
         var bkg = newHTML('div', 'catbkg', sel);
         newHTML('div', 'catimage', bkg);
         var leftPx = 15 * scaleMultiplier;
@@ -367,39 +395,57 @@ export default class Palette {
     static createSelector(parent, n, dx, dy, spec) {
         var pxWidth = 51 * scaleMultiplier;
         var pxHeight = 57 * scaleMultiplier;
-        var div = newDiv(parent, dx, dy, pxWidth, pxHeight, {
-            position: 'absolute'
+        var div = newButton('category-selector-button', parent, {
+            ariaLabel: Palette.getCategoryLabel(spec[3])
+        });
+        setProps(div.style, {
+            position: 'absolute',
+            left: dx + 'px',
+            top: dy + 'px',
+            width: pxWidth + 'px',
+            height: pxHeight + 'px',
+            lineHeight: '0px',
+            overflow: 'hidden'
         });
         div.setAttribute('id', spec[3]);
+        div.setAttribute('aria-controls', 'palette');
         div.index = n;
         var officon = spec[1].cloneNode(true);
         officon.width = pxWidth;
         officon.height = pxHeight;
+        officon.alt = '';
+        officon.setAttribute('aria-hidden', 'true');
         div.appendChild(officon);
         setProps(officon.style, {
             position: 'absolute',
+            left: '0px',
+            top: '0px',
+            display: 'block',
             zIndex: 6,
-            visibility: 'visible'
+            visibility: 'visible',
+            pointerEvents: 'none'
         });
         var onicon = spec[0].cloneNode(true);
         onicon.width = pxWidth;
         onicon.height = pxHeight;
+        onicon.alt = '';
+        onicon.setAttribute('aria-hidden', 'true');
         div.appendChild(onicon);
         div.bkg = spec[2];
         setProps(onicon.style, {
             position: 'absolute',
+            left: '0px',
+            top: '0px',
+            display: 'block',
             zIndex: 8,
-            visibility: 'hidden'
+            visibility: 'hidden',
+            pointerEvents: 'none'
         });
-        div.onpointerdown = function (evt) {
+        setPressedState(div, false);
+        div.onclick = function (evt) {
             Palette.clickOnCategory(evt);
         };
-        // div.ontouchstart = function (evt) {
-        //     Palette.clickOnCategory(evt);
-        // };
-        // div.onmousedown = function (evt) {
-        //     Palette.clickOnCategory(evt);
-        // };
+        div.onkeydown = Palette.handleCategoryKeyDown;
     }
 
     static getPaletteSize() {
@@ -414,11 +460,161 @@ export default class Palette {
         }
         e.preventDefault();
         ScratchJr.unfocus(e);
-        var t = e.target;
+        var t = e.currentTarget || e.target.closest('button');
+        if (!t) {
+            return;
+        }
         ScratchAudio.sndFX('keydown.wav');
-        var index = t.parentNode ? t.parentNode.index : 2;
-        index = !isNaN(index) ? index : t.index;
-        Palette.selectCategory(index);
+        Palette.selectCategory(t.index);
+    }
+
+    static getCategoryButtons() {
+        var buttons = [];
+        ['selectors', 'selectorsright'].forEach((id) => {
+            var container = gn(id);
+            if (!container) {
+                return;
+            }
+            for (var i = 1; i < container.childElementCount; i++) {
+                buttons.push(container.childNodes[i]);
+            }
+        });
+        return buttons;
+    }
+
+    static getCategoryLabel(categoryId) {
+        var key = CATEGORY_LABELS[categoryId];
+        return key ? Localization.localize(key) : categoryId;
+    }
+
+    static getPaletteFocusableElements() {
+        var palette = gn('palette');
+        if (!palette) {
+            return [];
+        }
+        return Array.from(palette.childNodes).filter((element) => {
+            if (!element || !element.matches || element.getAttribute('role') !== 'button') {
+                return false;
+            }
+            var style = window.getComputedStyle(element);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+        }).sort((a, b) => a.offsetLeft - b.offsetLeft);
+    }
+
+    static handleCategoryKeyDown(event) {
+        moveFocusByKey(event, Palette.getCategoryButtons(), event.currentTarget, {
+            horizontal: true,
+            vertical: false
+        });
+    }
+
+    static handlePaletteBlockKeyDown(event) {
+        moveFocusByKey(event, Palette.getPaletteFocusableElements(), event.currentTarget, {
+            horizontal: true,
+            vertical: false
+        });
+    }
+
+    static getPaletteBlockLabel(block) {
+        if (!block) {
+            return '';
+        }
+        var help = BlockSpecs.blockDesc(block, ScratchJr.getSprite());
+        return help[block.blocktype] || block.blocktype;
+    }
+
+    static decoratePaletteBlock(blockDiv) {
+        if (!blockDiv || !blockDiv.owner) {
+            return;
+        }
+        blockDiv.classList.add('paletteblock');
+        makeSemanticButton(blockDiv, {
+            label: Palette.getPaletteBlockLabel(blockDiv.owner),
+            onActivate: function (event) {
+                Palette.insertBlockFromKeyboard(blockDiv, event);
+            }
+        });
+        blockDiv.onkeydown = Palette.handlePaletteBlockKeyDown;
+    }
+
+    static encodePaletteBlock(block) {
+        var arg = (block.arg != null) || BLOCKS_WITH_ARGS.has(block.blocktype) ? block.getArgValue() : null;
+        if (!arg && (arg !== 0)) {
+            arg = 'null';
+        }
+        var data = [[block.blocktype, arg, 0, 0]];
+        if (LOOP_BLOCKS.has(block.blocktype)) {
+            data[0].push([]);
+        }
+        return data;
+    }
+
+    static getKeyboardInsertionPoint(scriptElement) {
+        var point = {
+            x: 24,
+            y: 24
+        };
+        if (!scriptElement || !scriptElement.owner) {
+            return point;
+        }
+        var topBlocks = scriptElement.owner.gettopblocks();
+        if (topBlocks.length < 1) {
+            return point;
+        }
+        var maxBottom = point.y;
+        for (var i = 0; i < topBlocks.length; i++) {
+            var connectedBlocks = scriptElement.owner.findingGroup([], topBlocks[i]);
+            for (var j = 0; j < connectedBlocks.length; j++) {
+                maxBottom = Math.max(maxBottom,
+                    (connectedBlocks[j].div.top + connectedBlocks[j].div.offsetHeight) / scaleMultiplier);
+            }
+        }
+        point.y = maxBottom + 24;
+        return point;
+    }
+
+    static insertBlockFromKeyboard(blockElement, event) {
+        if (!blockElement || !blockElement.owner) {
+            return;
+        }
+        var sc = ScratchJr.getActiveScript();
+        if (!sc) {
+            return;
+        }
+        if (!ScratchJr.runtime.inactive()) {
+            ScratchJr.stopStrips();
+        }
+        ScratchJr.unfocus(event);
+        ScriptsPane.cleanCarets();
+        var point = Palette.getKeyboardInsertionPoint(sc);
+        var strip = Palette.encodePaletteBlock(blockElement.owner);
+        strip[0][2] = point.x;
+        strip[0][3] = point.y;
+        var inserted = sc.owner.insertKeyboardBlock(sc.owner.getKeyboardTargetStrip(), strip);
+        if (!inserted) {
+            inserted = sc.owner.insertKeyboardBlock(null, strip);
+        }
+        if (!inserted) {
+            return;
+        }
+        if (ScriptsPane.scroll) {
+            ScriptsPane.scroll.adjustCanvas();
+            ScriptsPane.scroll.refresh();
+            ScriptsPane.scroll.bounceBack();
+        }
+        if (window.tutorialEngine) {
+            window.tutorialEngine.evaluateScriptsArea();
+        }
+        var spr = sc.owner.spr;
+        Undo.record({
+            action: 'scripts',
+            where: spr.div.parentNode.owner.id,
+            who: spr.id
+        });
+        OS.analyticsEvent('editor', 'new_block_' + blockElement.owner.blocktype);
+        ScratchJr.storyStart('Palette.insertBlockFromKeyboard');
+        ScratchAudio.sndFX('snap.wav');
+        blockElement.focus();
     }
 
     static selectCategory(n) {
@@ -427,7 +623,7 @@ export default class Palette {
         const isRightCategories = n >= div.childNodes.length - 1;
         n = isRightCategories ? n - (div.childNodes.length - 1) : n;
         div = isRightCategories ? gn('selectorsright') : gn('selectors');
-    currentCategorySide = isRightCategories ? 'right' : 'left';
+        currentCategorySide = isRightCategories ? 'right' : 'left';
         // set the icons for text or sprite
         numcat = n;
         var currentSel = div.childNodes[n + 1];
@@ -436,6 +632,7 @@ export default class Palette {
             const selIndex = isRightCategories ? sel.index - (gn('selectors').childNodes.length - 1) : sel.index;
             sel.childNodes[0].style.visibility = (selIndex != n) ? 'visible' : 'hidden';
             sel.childNodes[1].style.visibility = (selIndex == n) ? 'visible' : 'hidden';
+            setPressedState(sel, selIndex == n);
         }
         // set to hidden the selectors for the other side categories
         const otherSideDiv = isRightCategories ? gn('selectors') : gn('selectorsright');
@@ -443,6 +640,7 @@ export default class Palette {
             var sel = otherSideDiv.childNodes[i];
             sel.childNodes[0].style.visibility = 'visible';
             sel.childNodes[1].style.visibility = 'hidden';
+            setPressedState(sel, false);
         }
 
         var pal = gn('palette');
@@ -593,6 +791,7 @@ export default class Palette {
         var div = newDiv(pal, dx, 0, w, h, {
             top: (6 * scaleMultiplier) + 'px'
         });
+        div.classList.add('paletteRecordButton');
         var cnv = newCanvas(div, 0, 0,
             div.offsetWidth * window.devicePixelRatio,
             div.offsetHeight * window.devicePixelRatio,
@@ -612,6 +811,11 @@ export default class Palette {
                 drawScaled(BlockSpecs.mic, cnv);
             };
         }
+        makeSemanticButton(div, {
+            label: Localization.localize('A11Y_RECORD'),
+            onActivate: Palette.recordSound
+        });
+        div.onkeydown = Palette.handlePaletteBlockKeyDown;
         // div.ontouchstart = Palette.recordSound;
         // div.onmousedown = Palette.recordSound;
         if (isTablet) {
@@ -720,12 +924,14 @@ export default class Palette {
     static newScaledBlock(parent, op, scale, dx, dy) {
         var bbx = new Block(BlockSpecs.defs[op], true, scale);
         bbx.div.setAttribute('id', op+"_block");
+        bbx.div.setAttribute('data-blocktype', op);
         setProps(bbx.div.style, {
             position: 'absolute',
             left: dx + 'px',
             top: dy + 'px'
         });
         parent.appendChild(bbx.div);
+        Palette.decoratePaletteBlock(bbx.div);
         return bbx;
     }
 

@@ -2,6 +2,8 @@ import { closexSvg } from "../../html-svgs/closex-svg";
 import { questionmarkSvg } from "../../html-svgs/questionmark-svg";
 import { readOutLoudSvg } from "../../html-svgs/readoutloud-svg";
 import { gn, newHTML, stripHtml } from "../../utils/lib";
+import { closeDialog, openDialog, registerDialog } from "../../utils/accessibility";
+import Localization from "../../utils/Localization";
 import ScratchJr from "../ScratchJr";
 import Palette from "./Palette";
 import UI from "./UI";
@@ -138,16 +140,16 @@ export default class TutorialUI {
 
         // tutorial menu bar should have in this order a close button, the title of the tutorial, a question mark icon, previous and next buttons
         TutorialUI.tutorialMenuBar.innerHTML = `
-            <button id="closeTutorial" class="tutorialButton">${closexSvg}</button>
+            <button id="closeTutorial" class="tutorialButton" aria-label="${Localization.localize('A11Y_CLOSE')}">${closexSvg}</button>
             <div id="tutorialTitle" class="tutorialTitle">${this.tutorial.title}</div>
-            <button id="tutorialReadAloud" class="tutorialButton">${readOutLoudSvg}</button>
-            <button id="tutorialHelp" class="tutorialButton">${questionmarkSvg}</button>
-            <button id="previousStep" class="tutorialButton">
+            <button id="tutorialReadAloud" class="tutorialButton" aria-label="${Localization.localize('A11Y_READ_ALOUD')}">${readOutLoudSvg}</button>
+            <button id="tutorialHelp" class="tutorialButton" aria-label="${Localization.localize('A11Y_HELP')}">${questionmarkSvg}</button>
+            <button id="previousStep" class="tutorialButton" aria-label="${Localization.localize('A11Y_PREVIOUS')}">
                 <svg id="tutorial-left-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg">
                     <path d="M16 6L10 12L16 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </button>
-            <button id="nextStep" class="tutorialButton">
+            <button id="nextStep" class="tutorialButton" aria-label="${Localization.localize('A11Y_NEXT')}">
                 <svg id="tutorial-right-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg">
                     <path d="M8 6L14 12L8 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -211,22 +213,24 @@ export default class TutorialUI {
         /* Instructor is a sprite that will guide the user through the tutorial */
         TutorialUI.instructor = newHTML('div', 'tutorialInstructor', document.body);
         TutorialUI.instructor.setAttribute('id', 'tutorialInstructor');
+        TutorialUI.instructor.setAttribute('role', 'complementary');
+        TutorialUI.instructor.setAttribute('aria-label', Localization.localize('A11Y_HELP'));
 
         // create img element for the instructor
         TutorialUI.instructor.innerHTML = `
-            <img src="./assets/ui/Marty_Instructor.svg" alt="instructor" class="tutorialInstructorImage" />
+            <img src="./assets/ui/Marty_Instructor.svg" alt="" class="tutorialInstructorImage" />
             <div class="speechBubble">
                 <div class="speechBubbleControls">
-                    <div class="speechBubblePreviousStep" id="speechBubblePreviousStep">
+                    <button class="speechBubblePreviousStep speechBubbleNavButton" id="speechBubblePreviousStep" aria-label="${Localization.localize('A11Y_PREVIOUS')}">
                         <svg id="tutorial-left-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
                             <path d="M16 6L10 12L16 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                    </div>
-                    <div class="speechBubbleNextStep" id="speechBubbleNextStep">
+                    </button>
+                    <button class="speechBubbleNextStep speechBubbleNavButton" id="speechBubbleNextStep" aria-label="${Localization.localize('A11Y_NEXT')}">
                         <svg id="tutorial-right-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
                             <path d="M8 6L14 12L8 18" stroke="#133C46" stroke-width="2" fill="#133C46" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                    </div>
+                    </button>
                 </div>
                 <div id="speechBubbleText"></div>
                 <div id="speechBubbleImage"></div>
@@ -248,7 +252,7 @@ export default class TutorialUI {
         TutorialUI.modal.setAttribute('id', 'tutorialModal');
         TutorialUI.modal.innerHTML = `
             <div class="modalContent">
-                <span class="closeModal">&times;</span>
+                <button class="closeModal" aria-label="${Localization.localize('A11Y_CLOSE')}">&times;</button>
                 <div id="modalMedia"></div>
             </div>
         `;
@@ -258,16 +262,28 @@ export default class TutorialUI {
                 TutorialUI.closeModal();
             }
         });
+        registerDialog(TutorialUI.modal, {
+            label: Localization.localize('A11Y_TUTORIAL_DIALOG'),
+            initialFocus: function () {
+                return TutorialUI.modal.querySelector('.closeModal');
+            },
+            scope: document.body,
+            onRequestClose: function () {
+                TutorialUI.closeModal();
+            }
+        });
     }
 
     static showModal(content) {
         const modalMedia = TutorialUI.modal.querySelector('#modalMedia');
         modalMedia.innerHTML = content;
         TutorialUI.modal.style.display = 'block';
+        openDialog(TutorialUI.modal);
     }
 
     static closeModal() {
         TutorialUI.modal.style.display = 'none';
+        closeDialog(TutorialUI.modal);
 
         const video = TutorialUI.modal.querySelector('video');
         if (video) {

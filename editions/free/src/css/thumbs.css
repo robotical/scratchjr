@@ -8,6 +8,11 @@
     vertical-align: top;
 }
 
+.projectthumb:focus-within,
+.samplethumb:focus-within {
+    z-index: 10;
+}
+
 .aproject {
     margin: 0px;
     padding: 0px;
@@ -142,6 +147,19 @@
 .samplethumb .thumb.pos5 { -webkit-transform: rotateZ(0.6deg);}
 .samplethumb .thumb.pos6 { -webkit-transform: rotateZ(-0.3deg);}
 .samplethumb .thumb.pos7 { -webkit-transform: rotateZ(1deg);}
+
+.lobby-card-action {
+    min-width: ${css_vh(12)};
+}
+
+.card-action-open {
+    left: 8px;
+}
+
+.card-action-delete {
+    left: auto;
+    right: 8px;
+}
 
 .closex {
     position: relative;

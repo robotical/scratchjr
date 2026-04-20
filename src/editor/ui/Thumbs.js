@@ -10,15 +10,186 @@ import Undo from './Undo';
 import UI from './UI';
 import OS from '../../tablet/OS';
 import Events from '../../utils/Events';
+import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
 import {
-    frame, gn, localx, newHTML, scaleMultiplier, getIdFor,
+    makeSemanticButton,
+    moveFocusByKey,
+    setAccessibleName,
+    setPressedState,
+    setSelectedState
+} from '../../utils/accessibility';
+import {
+    frame, gn, localx, newHTML, newButton, scaleMultiplier, getIdFor,
     isTablet, newImage, localy, setProps
 } from '../../utils/lib';
 
 let caret = undefined;
 
 export default class Thumbs {
+    static getVisibleFocusableChildren(containerId) {
+        var container = gn(containerId);
+        if (!container) {
+            return [];
+        }
+        return Array.from(container.childNodes).filter((element) => {
+            if (!element || !element.matches) {
+                return false;
+            }
+            if (element.getAttribute('role') !== 'button') {
+                return false;
+            }
+            var style = window.getComputedStyle(element);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+        });
+    }
+
+    static getPageThumbLabel(pageNumber) {
+        return Localization.localize('BLOCK_DESC_GO_TO_PAGE', {
+            PAGE: pageNumber
+        });
+    }
+
+    static getSpriteThumbLabel(spriteName) {
+        return Localization.localize('LIBRARY_CHARACTER') + ' ' + spriteName;
+    }
+
+    static focusWhenAvailable(selector, fallbackSelector) {
+        window.setTimeout(function () {
+            var target = document.querySelector(selector);
+            if (!target && fallbackSelector) {
+                target = document.querySelector(fallbackSelector);
+            }
+            if (target) {
+                target.focus();
+            }
+        }, 0);
+    }
+
+    static getDeletePageLabel(pageNumber) {
+        return Localization.localize('A11Y_DELETE_PAGE', {
+            PAGE: pageNumber
+        });
+    }
+
+    static getMovePageEarlierLabel(pageNumber) {
+        return Localization.localize('A11Y_MOVE_PAGE_EARLIER', {
+            PAGE: pageNumber
+        });
+    }
+
+    static getMovePageLaterLabel(pageNumber) {
+        return Localization.localize('A11Y_MOVE_PAGE_LATER', {
+            PAGE: pageNumber
+        });
+    }
+
+    static getCopyToPageLabel(pageNumber) {
+        return Localization.localize('A11Y_COPY_TO_PAGE', {
+            PAGE: pageNumber
+        });
+    }
+
+    static decoratePageThumb(tb, page) {
+        if (!tb) {
+            return;
+        }
+        tb.setAttribute('data-owner', page.id);
+        makeSemanticButton(tb, {
+            label: Thumbs.getPageThumbLabel(page.num),
+            onActivate: function (event) {
+                Thumbs.clickOnPage(event, tb.owner);
+            }
+        });
+        tb.onkeydown = Thumbs.handlePageThumbKeyDown;
+        if (!ScratchJr.isEditable()) {
+            return;
+        }
+    }
+
+    static decorateEmptyPageThumb(tb) {
+        if (!tb) {
+            return;
+        }
+        makeSemanticButton(tb, {
+            label: Localization.localize('A11Y_ADD_PAGE'),
+            onActivate: Thumbs.clickOnEmptyPage
+        });
+        tb.onkeydown = Thumbs.handlePageThumbKeyDown;
+    }
+
+    static refreshSpriteThumbAccessibility(tb, spr) {
+        if (!tb || !spr) {
+            return;
+        }
+        setAccessibleName(tb, Thumbs.getSpriteThumbLabel(spr.name));
+    }
+
+    static decorateSpriteThumb(tb, spr) {
+        if (!tb || !spr) {
+            return;
+        }
+        tb.setAttribute('data-owner', spr.id);
+        makeSemanticButton(tb, {
+            label: Thumbs.getSpriteThumbLabel(spr.name),
+            onActivate: function (event) {
+                Thumbs.clickOnSprite(event, tb);
+            }
+        });
+        tb.onkeydown = Thumbs.handleSpriteThumbKeyDown;
+        setPressedState(tb, false);
+    }
+
+    static handlePageThumbKeyDown(event) {
+        if (!event || !event.currentTarget) {
+            return;
+        }
+        var currentTarget = event.currentTarget;
+        var pageId = currentTarget.getAttribute('data-owner');
+        if (ScratchJr.isEditable() && pageId) {
+            if ((event.key == 'Delete') || (event.key == 'Backspace')) {
+                Thumbs.deletePageAction(event, pageId);
+                return;
+            }
+            if (event.shiftKey && ((event.key == 'ArrowLeft') || (event.key == 'ArrowUp'))) {
+                Thumbs.movePageBy(event, pageId, -1);
+                return;
+            }
+            if (event.shiftKey && ((event.key == 'ArrowRight') || (event.key == 'ArrowDown'))) {
+                Thumbs.movePageBy(event, pageId, 1);
+                return;
+            }
+            if ((event.key.toLowerCase() == 'c') && Thumbs.canCopyCurrentSpriteToPage(pageId)) {
+                Thumbs.copyCurrentSpriteToPage(event, pageId);
+                return;
+            }
+        }
+        moveFocusByKey(event, Thumbs.getVisibleFocusableChildren('pagecc'), currentTarget, {
+            horizontal: true,
+            vertical: true
+        });
+    }
+
+    static handleSpriteThumbKeyDown(event) {
+        if (moveFocusByKey(event, Thumbs.getVisibleFocusableChildren('spritecc'), event.currentTarget, {
+            horizontal: true,
+            vertical: true
+        })) {
+            return;
+        }
+        if (!ScratchJr.isEditable()) {
+            return;
+        }
+        if ((event.key != 'Delete') && (event.key != 'Backspace')) {
+            return;
+        }
+        var spriteId = event.currentTarget ? event.currentTarget.getAttribute('data-owner') : undefined;
+        if (!spriteId || !gn(spriteId)) {
+            return;
+        }
+        Thumbs.deleteSpriteAction(event, spriteId);
+    }
+
     static updatePages() {
         var pthumbs = gn('pagecc');
         while (pthumbs.childElementCount > 0) {
@@ -323,6 +494,73 @@ export default class Thumbs {
         });
     }
 
+    static movePageBy(event, pageId, delta) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        var oldlist = ScratchJr.stage.getPagesID();
+        var oldIndex = oldlist.indexOf(pageId);
+        if (oldIndex < 0) {
+            return;
+        }
+        var newIndex = Math.max(0, Math.min(ScratchJr.stage.pages.length - 1, oldIndex + delta));
+        if (newIndex === oldIndex) {
+            return;
+        }
+        var movedPage = ScratchJr.stage.pages.splice(oldIndex, 1)[0];
+        ScratchJr.stage.pages.splice(newIndex, 0, movedPage);
+        ScratchAudio.sndFX('snap.wav');
+        Thumbs.updatePages();
+        ScratchJr.stage.renumberPageBlocks(oldlist);
+        if (Palette.numcat == 5) {
+            Palette.selectCategory(5);
+        }
+        Undo.record({
+            action: 'pageorder',
+            who: pageId,
+            where: pageId
+        });
+        Thumbs.focusWhenAvailable('.pagethumb[data-owner="' + pageId + '"]', '#emptypage');
+    }
+
+    static deletePageAction(event, pageId) {
+        event.preventDefault();
+        event.stopPropagation();
+        ScratchJr.clearSelection();
+        OS.analyticsEvent('editor', 'delete_scene');
+        ScratchJr.stage.deletePage(pageId);
+        Thumbs.focusWhenAvailable('#pagecc .pagethumb[aria-current="page"]', '#pagecc .pagethumb');
+    }
+
+    static copyCurrentSpriteToPage(event, pageId) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!Thumbs.canCopyCurrentSpriteToPage(pageId)) {
+            return;
+        }
+        var currentSprite = ScratchJr.getSprite();
+        var thumb = Thumbs.getObjectFor(gn('pagecc'), pageId);
+        if (!thumb) {
+            return;
+        }
+        ScratchJr.clearSelection();
+        ScratchJr.stage.copySprite({
+            owner: currentSprite.id
+        }, thumb);
+        Thumbs.focusWhenAvailable('.pagethumb[data-owner="' + pageId + '"]', '#emptypage');
+    }
+
+    static canCopyCurrentSpriteToPage(pageId) {
+        var currentSprite = ScratchJr.getSprite();
+        return Boolean(
+            currentSprite &&
+            currentSprite.type == 'sprite' &&
+            pageId &&
+            pageId != ScratchJr.stage.currentPage.id
+        );
+    }
+
 
     static startPageShaking(tb) {
         ScratchJr.shaking = tb;
@@ -353,11 +591,13 @@ export default class Thumbs {
                 position: 'absolute'
             });
         }
+        img.alt = '';
         img.setAttribute('class', 'unselectable');
         tb.setAttribute('id', 'emptypage');
         tb.onclick = function (evt) {
             Thumbs.clickOnEmptyPage(evt);
         };
+        Thumbs.decorateEmptyPageThumb(tb);
         return tb;
     }
 
@@ -380,10 +620,12 @@ export default class Thumbs {
 
     static highlighPage(page) {
         page.setAttribute('class', 'pagethumb on');
+        setSelectedState(page, true);
     }
 
     static unhighlighPage(page) {
         page.setAttribute('class', 'pagethumb off');
+        setSelectedState(page, false);
     }
 
     static overpage(page) {
@@ -519,6 +761,17 @@ export default class Thumbs {
         Thumbs.selectThisSprite(spr);
     }
 
+    static deleteSpriteAction(event, spriteId) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!gn(spriteId)) {
+            return;
+        }
+        ScratchJr.clearSelection();
+        ScratchJr.stage.removeSprite(gn(spriteId).owner);
+        Thumbs.focusWhenAvailable('#spritecc .spritethumb[aria-pressed="true"]', '#addsprite');
+    }
+
     static prepareToDrag(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -638,12 +891,14 @@ export default class Thumbs {
         } else {
             spr.setAttribute('class', ScratchJr.isEditable() ? 'spritethumb on' : 'spritethumb noneditable');
         }
+        setPressedState(spr, true);
         ScriptsPane.setActiveScript(spr.owner);
         Palette.reset();
     }
 
     static unhighlighSprite(spr) {
         spr.setAttribute('class', 'spritethumb off');
+        setPressedState(spr, false);
         var currentsc = gn(spr.owner + '_scripts');
         currentsc.owner.deactivate();
         for (var i = 0; i < currentsc.childElementCount; i++) {

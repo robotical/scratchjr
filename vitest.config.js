@@ -9,6 +9,7 @@ module.exports = defineConfig({
     },
     test: {
         environment: 'node',
-        include: ['tests/**/*.test.js']
+        include: ['tests/**/*.test.js'],
+        fileParallelism: false
     }
 });

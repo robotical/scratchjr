@@ -113,11 +113,20 @@ div.frame {
 
 .pagethumb {
     background: none;
+    position: relative;
     display: inline-block;
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0.13)};
     padding: ${css_vh(0)};
     width: ${145 * scaleMultiplier}px;
     height: ${109 * scaleMultiplier}px;
+}
+
+.pagethumb[role="button"] {
+    cursor: pointer;
+}
+
+.pagethumb[role="button"]:focus-visible {
+    outline-offset: 4px;
 }
 
 .pagethumb.on {
@@ -271,6 +280,25 @@ div.frame {
     overflow: hidden;
 }
 
+#blockspalette .categoryselector button,
+#blockspalette .categoryselectorright button{
+    display: block;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    line-height: 0;
+    cursor: pointer;
+    overflow: hidden;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+#blockspalette .categoryselector button:focus-visible,
+#blockspalette .categoryselectorright button:focus-visible{
+    outline-offset: 4px;
+}
+
 #blockspalette .categoryselectorright{
     display: inline-block;
     word-spacing: -1;
@@ -311,6 +339,16 @@ div.frame {
     width: 85%;
     z-index:4;
     overflow: hidden;
+}
+
+#blockspalette .paletteblock,
+#blockspalette .paletteRecordButton{
+    cursor: pointer;
+}
+
+#blockspalette .paletteblock:focus-visible,
+#blockspalette .paletteRecordButton:focus-visible{
+    outline-offset: 4px;
 }
 
 #blockspalette .yellow { background: #FFE75A;}    /* #ffe100;}{ background: #FFFA5A;} */
@@ -501,6 +539,20 @@ z-index: 5;
     position: absolute;
 }
 
+#scriptscontainer .keyboard-script-strip[role="button"] {
+    cursor: pointer;
+}
+
+#scriptscontainer .keyboard-script-strip:focus-visible {
+    outline-offset: 6px;
+    border-radius: 12px;
+}
+
+#scriptscontainer .keyboard-script-strip[aria-pressed="true"]:not(:focus-visible) {
+    box-shadow: 0 0 0 3px rgba(15, 95, 255, 0.35);
+    border-radius: 12px;
+}
+
 .watermark {
     position: absolute;
     top: ${css_vh(2.60)};
@@ -652,13 +704,13 @@ z-index: 5;
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255, 255, 255, 0.2)), color-stop(35%,rgba(255, 255, 255, 0)), color-stop(100%,rgba(255, 255, 255, 0)));
 }
 
-div.infoboxParentsSection {
+.infoboxParentsSection {
    width: 51%;
    margin: auto;
    margin-top: 8%;
 }
 
-div.infoboxParentsButton {
+.infoboxParentsButton {
    color: #fff;
    background-image: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.2) 51%);
    text-transform: uppercase;
@@ -676,14 +728,14 @@ div.infoboxParentsButton {
    margin: auto;
 }
 
-div.infoboxShareButtons {
+.infoboxShareButtons {
    width: 51%;
    margin: auto;
    margin-top: 8%;
    visibility: hidden;
 }
 
-div.infoboxShareButton {
+.infoboxShareButton {
    color: #fff;
    background-image: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.2) 51%);
    text-transform: uppercase;
@@ -701,7 +753,7 @@ div.infoboxShareButton {
    margin: auto;
 }
 
-div.infoboxCloudSection {
+.infoboxCloudSection {
    width: 60%;
    margin: auto;
    margin-top: 6%;
@@ -710,7 +762,7 @@ div.infoboxCloudSection {
    align-items: center;
 }
 
-div.infoboxCloudButton {
+.infoboxCloudButton {
    color: #fff;
    background-image: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.2) 51%);
    text-transform: uppercase;
@@ -727,11 +779,11 @@ div.infoboxCloudButton {
    border: 2px solid #c19f21;
 }
 
-div.infoboxCloudButton:active {
+.infoboxCloudButton:active {
    filter: brightness(0.9);
 }
 
-div.infoboxCloudControls {
+.infoboxCloudControls {
    display: flex;
    justify-content: center;
    gap: ${css_vw(1.5)};
@@ -739,7 +791,7 @@ div.infoboxCloudControls {
    width: 100%;
 }
 
-div.infoboxCloudToggleButton {
+.infoboxCloudToggleButton {
    color: #fff;
    background: rgba(255,255,255,0.1);
    text-transform: uppercase;
@@ -752,16 +804,16 @@ div.infoboxCloudToggleButton {
    cursor: pointer;
 }
 
-div.infoboxCloudToggleButton.active {
+.infoboxCloudToggleButton.active {
    background: #f4a621;
    border-color: #9b6f14;
 }
 
-div.infoboxCloudPanels {
+.infoboxCloudPanels {
    width: 100%;
 }
 
-div.infoboxCloudPanel {
+.infoboxCloudPanel {
    display: none;
    margin-top: ${css_vh(2)};
    padding: ${css_vh(1.2)} ${css_vw(2)};
@@ -771,18 +823,18 @@ div.infoboxCloudPanel {
    box-sizing: border-box;
 }
 
-div.infoboxCloudPanel.show {
+.infoboxCloudPanel.show {
    display: block;
 }
 
-div.infoboxCloudDescription {
+.infoboxCloudDescription {
    text-align: center;
    color: #5b3c00;
    font-weight: bold;
    margin-bottom: ${css_vh(1.2)};
 }
 
-div.infoboxCloudLoadActions {
+.infoboxCloudLoadActions {
    display: flex;
    justify-content: center;
    gap: ${css_vw(1.2)};
@@ -790,7 +842,7 @@ div.infoboxCloudLoadActions {
    margin-bottom: ${css_vh(1)};
 }
 
-div.infoboxCloudSecondaryButton {
+.infoboxCloudSecondaryButton {
    color: #fff;
    background: rgba(255,255,255,0.1);
    text-transform: uppercase;
@@ -803,11 +855,11 @@ div.infoboxCloudSecondaryButton {
    cursor: pointer;
 }
 
-div.infoboxCloudSecondaryButton:active {
+.infoboxCloudSecondaryButton:active {
    filter: brightness(0.92);
 }
 
-div.infoboxCloudList {
+.infoboxCloudList {
    width: 100%;
    max-height: ${css_vh(30)};
    overflow-y: auto;
@@ -815,8 +867,8 @@ div.infoboxCloudList {
    border-radius: 12px;
 }
 
-div.infoboxCloudListHeader,
-div.infoboxCloudRow {
+.infoboxCloudListHeader,
+.infoboxCloudRow {
    display: grid;
    grid-template-columns: 2fr 2fr 2fr 1.5fr;
    align-items: center;
@@ -824,36 +876,36 @@ div.infoboxCloudRow {
    padding: ${css_vh(0.8)} ${css_vw(1)};
 }
 
-div.infoboxCloudCell {
+.infoboxCloudCell {
    overflow-wrap: anywhere;
    color: #3d2800;
 }
 
-div.infoboxCloudListHeader {
+.infoboxCloudListHeader {
    font-weight: bold;
    color: #5b3c00;
    border-bottom: 2px solid rgba(91,60,0,0.2);
 }
 
-div.infoboxCloudRow:nth-child(even) {
+.infoboxCloudRow:nth-child(even) {
    background: rgba(255,255,255,0.08);
 }
 
-div.infoboxCloudListEmpty {
+.infoboxCloudListEmpty {
    text-align: center;
    color: #5b3c00;
    font-style: italic;
    padding: ${css_vh(1.2)};
 }
 
-div.infoboxCloudCell.actions {
+.infoboxCloudCell.actions {
    display: flex;
    gap: ${css_vw(0.8)};
    justify-content: flex-end;
    flex-wrap: wrap;
 }
 
-div.infoboxCloudActionButton {
+.infoboxCloudActionButton {
    color: #fff;
    font-weight: bold;
    text-transform: uppercase;
@@ -864,26 +916,26 @@ div.infoboxCloudActionButton {
    cursor: pointer;
 }
 
-div.infoboxCloudActionButton.primary {
+.infoboxCloudActionButton.primary {
    background: #32a852;
    border-color: #1f6d35;
 }
 
-div.infoboxCloudActionButton.danger {
+.infoboxCloudActionButton.danger {
    background: #d9534f;
    border-color: #8a2d2b;
 }
 
-div.infoboxCloudActionButton:active {
+.infoboxCloudActionButton:active {
    filter: brightness(0.9);
 }
 
-div.infoboxCloudCell.id {
+.infoboxCloudCell.id {
    font-family: 'Courier New', Courier, monospace;
    font-size: 12pt;
 }
 
-div#infoboxShareButtonEmail::before {
+#infoboxShareButtonEmail::before {
    content: "";
    position: absolute;
    display: block;
@@ -897,7 +949,7 @@ div#infoboxShareButtonEmail::before {
    margin-top: -4%;
 }
 
-div#infoboxShareButtonAirdrop::before {
+#infoboxShareButtonAirdrop::before {
    content: "";
    position: absolute;
    display: block;
@@ -1265,7 +1317,7 @@ Blocks text fields and input fields
     background: #ffffff;
     -moz-border-radius: ${5 * scaleMultiplier}px;
     -webkit-border-radius: ${5 * scaleMultiplier}px;
-    outline: 0px solid;
+    outline: 2px solid transparent;
     text-align: center;
     color: #77787b;
     font-family: Verdana;
@@ -1280,7 +1332,7 @@ Blocks text fields and input fields
     border: 2px solid  #28A5DA;
     -moz-border-radius: ${5 * scaleMultiplier}px;
     -webkit-border-radius: ${5 * scaleMultiplier}px;
-    outline-color: rgba(0, 0, 0, 0);
+    outline-color: #133C46;
     width: ${css_vh(62.51)};
     height: ${css_vh(6.25)};
     font-size: ${css_vh(3.13)};

@@ -261,6 +261,14 @@
     padding: 0px;
 }
 
+.spritethumb[role="button"] {
+    cursor: pointer;
+}
+
+.spritethumb[role="button"]:focus-visible {
+    outline-offset: 4px;
+}
+
 .spritethumb .thumbcanvas{
     position: absolute;
     margin: ${css_vh(0.65)} ${css_vh(0.65)} 0px;

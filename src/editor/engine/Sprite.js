@@ -133,6 +133,7 @@ export default class Sprite {
         img.ondragstart = function () {
             return false;
         };
+        img.alt = '';
         img.src = dataurl;
         this.img = img;
         // Make a copy that is not affected by zoom transformation
@@ -225,6 +226,7 @@ export default class Sprite {
         p = newHTML('p', 'sname', tb);
         p.textContent = this.name;
         newHTML('div', 'brush', tb);
+        Thumbs.decorateSpriteThumb(tb, this);
         this.thumbnail = tb;
         /*MartyMode*/
         // we only display the sprite thumbnail if it is not the birds eye sprite
@@ -242,6 +244,7 @@ export default class Sprite {
         var cnv = tb.childNodes[0];
         this.drawMyImage(cnv, cnv.width, cnv.height);
         tb.childNodes[1].textContent = this.name;
+        Thumbs.refreshSpriteThumbAccessibility(tb, this);
     }
 
     drawMyImage(cnv, w, h) {
@@ -1017,6 +1020,7 @@ export default class Sprite {
 
     getSVGimage(svg) {
         var img = document.createElement('img');
+        img.alt = '';
         let str;
         if (svg) {
             str = (new XMLSerializer()).serializeToString(svg);
