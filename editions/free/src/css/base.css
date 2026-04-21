@@ -178,7 +178,7 @@ h4 {
 }
 
 @media screen and (orientation: portrait) {
-    html {
+    html:not(.embedded-in-parent-app) {
         transform: rotate(-90deg);
         transform-origin: left top;
         width: 100vh;

@@ -22,6 +22,16 @@ import {
 // import TutorialFetcher from '../tutorial/TutorialFetcher';
 import TutorialEngine from '../tutorial/TutorialEngine';
 
+function markEmbeddedHost() {
+  try {
+    if (window.parent !== window || window.frameElement) {
+      document.documentElement.classList.add("embedded-in-parent-app");
+    }
+  } catch (e) {
+    document.documentElement.classList.add("embedded-in-parent-app");
+  }
+}
+
 function loadSettings(settingsRoot, whenDone) {
   IO.requestFromServer(settingsRoot + "settings.json", (result) => {
     try {
@@ -43,6 +53,8 @@ function loadSettings(settingsRoot, whenDone) {
 
 // App-wide entry-point
 window.onload = () => {
+  markEmbeddedHost();
+
   // Function to be called after settings, locale strings, and Media Lib
   // are asynchronously loaded. This is overwritten per HTML page below.
   let entryFunction = () => { };
