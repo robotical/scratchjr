@@ -18,7 +18,7 @@ export function homeMain() {
     window.location.href = `editor.html?${editorParams.toString()}`;
     return;
   }
-  hideHostBackControls();
+  showHostBackControls();
   gn("logotab").onclick = null;
   gn("logotab").disabled = true;
   homeStrings();
@@ -40,16 +40,21 @@ export function homeMain() {
     var list = str.split(",");
     OS.path = list[1] == "0" ? list[0] + "/" : undefined;
     Lobby.appinit(window.Settings.scratchJrVersion);
-    hideHostBackControls();
+    showHostBackControls();
   }
 }
 
-function hideHostBackControls(remainingAttempts = 40) {
-  OS.martyCmd({ cmd: "hide-back-arrow" });
-  window.applicationManager?.hideBackHomeButton?.();
+function showHostBackControls(remainingAttempts = 12) {
+  OS.martyCmd({ cmd: "show-back-arrow" });
+  const showBackHomeButton = window.applicationManager?.showBackHomeButton;
+  if (typeof showBackHomeButton === "function") {
+    showBackHomeButton.call(window.applicationManager);
+    return;
+  }
+
   if (remainingAttempts > 0) {
     window.setTimeout(function () {
-      hideHostBackControls(remainingAttempts - 1);
+      showHostBackControls(remainingAttempts - 1);
     }, 250);
   }
 }
