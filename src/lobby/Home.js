@@ -24,12 +24,12 @@ export default class Home {
     var inner = newHTML("div", "inner", frame);
     var div = newHTML("div", "scrollarea", inner);
     div.setAttribute("id", "scrollarea");
-    if ('ontouchstart' in window) {
-      frame.ontouchstart = Home.handleTouchStart;
-      frame.ontouchend = Home.handleTouchEnd;
-    } else {
+    if (window.PointerEvent || !('ontouchstart' in window)) {
       frame.onpointerdown = Home.handleTouchStart;
       frame.onpointerup = Home.handleTouchEnd;
+    } else {
+      frame.ontouchstart = Home.handleTouchStart;
+      frame.ontouchend = Home.handleTouchEnd;
     }
     Home.displayYourProjects();
   }
@@ -76,12 +76,9 @@ export default class Home {
     var mytarget = Home.getMouseTarget(e);
     if (
       mytarget != Home.actionTarget &&
-      Home.actionTarget &&
-      Home.actionTarget.childElementCount > 2
+      Home.actionTarget
     ) {
-      Home.actionTarget.childNodes[
-        Home.actionTarget.childElementCount - 1
-      ].style.visibility = "hidden";
+      Home.setDeleteAffordanceVisibility(Home.actionTarget, "hidden");
     }
     Home.actionTarget = mytarget;
     Home.initialPt = Events.getTargetPoint(e);
@@ -92,11 +89,8 @@ export default class Home {
       frame.ontouchmove = Home.handleMove;
       frame.onpointermove = Home.handleMove;
       var repeat = function () {
-        if (Home.actionTarget && Home.actionTarget.childElementCount > 2) {
-          Home.actionTarget.childNodes[
-            Home.actionTarget.childElementCount - 1
-          ].style.visibility = "visible";
-
+        if (Home.getDeleteAffordance(Home.actionTarget)) {
+          Home.setDeleteAffordanceVisibility(Home.actionTarget, "visible");
           Home.holding = true;
         }
       };
@@ -205,11 +199,7 @@ export default class Home {
         );
         break;
       default:
-        if (target && target.childElementCount > 2) {
-          target.childNodes[
-            target.childElementCount - 1
-          ].style.visibility = "hidden";
-        }
+        Home.setDeleteAffordanceVisibility(target, "hidden");
         break;
     }
     function doNext() {
@@ -265,11 +255,7 @@ export default class Home {
     if (!Home.actionTarget) {
       return "none";
     }
-    var shown =
-      Home.actionTarget.childElementCount > 2
-        ? Home.actionTarget.childNodes[Home.actionTarget.childElementCount - 1]
-          .style.visibility == "visible"
-        : false;
+    var shown = Home.isDeleteAffordanceVisible(Home.actionTarget);
     if (e && shown) {
       var t;
       if (window.event) {
@@ -277,11 +263,27 @@ export default class Home {
       } else {
         t = e.target;
       }
-      if (t.getAttribute("class") == "closex") {
+      if (t.classList && t.classList.contains("closex")) {
         return "delete";
       }
     }
     return "project";
+  }
+
+  static getDeleteAffordance(target) {
+    return target ? target.querySelector(".closex") : null;
+  }
+
+  static setDeleteAffordanceVisibility(target, visibility) {
+    var close = Home.getDeleteAffordance(target);
+    if (close) {
+      close.style.visibility = visibility;
+    }
+  }
+
+  static isDeleteAffordanceVisible(target) {
+    var close = Home.getDeleteAffordance(target);
+    return close ? close.style.visibility == "visible" : false;
   }
 
   //////////////////////////
