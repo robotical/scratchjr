@@ -819,6 +819,7 @@ export default class UI {
         projectNameTextInput = ti;
         ti.name = 'myproject';
         ti.maxLength = 30;
+        ti.setAttribute('aria-label', Localization.localizeOptional('Project name'));
         ti.onkeypress = undefined;
         ti.autocomplete = 'off';
         ti.autocorrect = false;
