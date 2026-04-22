@@ -117,6 +117,8 @@ export function ensureSkipLink(targetId, label) {
     if (!document.body) {
         return null;
     }
+    const target = document.getElementById(targetId);
+    const skipTargetId = 'skip-' + targetId;
     let skipLink = document.getElementById('skip-link');
     if (!skipLink) {
         skipLink = document.createElement('a');
@@ -124,8 +126,23 @@ export function ensureSkipLink(targetId, label) {
         skipLink.className = 'skip-link';
         document.body.insertBefore(skipLink, document.body.firstChild);
     }
-    skipLink.href = '#' + targetId;
+    let skipTarget = document.getElementById(skipTargetId);
+    if (!skipTarget && target) {
+        skipTarget = document.createElement('span');
+        skipTarget.id = skipTargetId;
+        skipTarget.className = 'sr-only';
+        skipTarget.setAttribute('aria-hidden', 'true');
+        target.parentNode.insertBefore(skipTarget, target);
+    }
+    skipLink.href = '#' + skipTargetId;
     skipLink.textContent = label;
+    skipLink.onclick = function () {
+        if (target && typeof target.focus === 'function') {
+            setTimeout(function () {
+                target.focus();
+            }, 0);
+        }
+    };
     return skipLink;
 }
 

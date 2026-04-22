@@ -150,6 +150,7 @@
 
 .lobby-card-action {
     min-width: ${css_vh(12)};
+    min-height: 24px;
 }
 
 .card-action-open {
