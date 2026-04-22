@@ -59,13 +59,14 @@ div.frame {
     padding: 0;
 }
 
-#topbar ul.topbar-nav>div {
+#topbar ul.topbar-nav>li.topbar-separator {
     display: inline-block;
     margin: 1px -3px 0px;
     padding: 0px;
     width: 1px;
     height: ${css_vh(10.42)};
     background: white;
+    border: 0;
 }
 
 #topbar ul.topbar-nav>li>button.logo {
@@ -140,6 +141,13 @@ div.frame {
     padding: 0px;
     vertical-align: top;
     line-height:  ${css_vh(10.29)};
+    border-left: 1px solid white;
+}
+
+#topbar ul.reference>li.reference-separator {
+    width: 0;
+    height: ${css_vh(10.42)};
+    padding: 0;
     border-left: 1px solid white;
 }
 
@@ -222,10 +230,11 @@ ul#settings.reference {
 .topsection.home > div.tabtitle {
     height: ${css_vh(5.86)};
     background: #F9A737;
+    color: #34332b;
     margin: 0;
     padding: 0;
     padding-left: 2%;
-    text-shadow: 0 2px #C18134;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.55);
     line-height: ${css_vh(5.86)};
     vertical-align: middle;
     border-bottom: 1px solid #ADACA6;

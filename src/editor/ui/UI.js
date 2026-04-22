@@ -66,6 +66,12 @@ let martySignalAndBatteryInterval = null;
 let connectionLostButton1Interval = null;
 let connectionLostButton2Interval = null;
 
+const SVG_ID_ATTRIBUTE_RE = /\s+id="[^"]*"/g;
+
+function stripInlineSvgIds(svgMarkup) {
+    return svgMarkup.replace(SVG_ID_ATTRIBUTE_RE, '');
+}
+
 export default class UI {
     static get infoBoxOpen() {
         return infoBoxOpen;
@@ -219,15 +225,15 @@ export default class UI {
 
         // Create icon container (icon on the left)
         const iconDiv = newHTML('div', 'connectIcon', connectButton);
-        iconDiv.innerHTML = iconName; // Add the icon (could be an <i> tag or an SVG)
+        iconDiv.innerHTML = stripInlineSvgIds(iconName); // Add the icon (could be an <i> tag or an SVG)
 
         // Add battery and signal strength indicators
         const batteryAndSignalContainer = newHTML('div', 'batteryAndSignalContainer', connectButton);
 
         const signalIndicator = newHTML('div', 'signalIndicatorContainer', batteryAndSignalContainer);
         const batteryIndicator = newHTML('div', 'batteryIndicatorContainer', batteryAndSignalContainer);
-        batteryIndicator.innerHTML = batterySvg(0);
-        signalIndicator.innerHTML = signalSvg(0);
+        batteryIndicator.innerHTML = stripInlineSvgIds(batterySvg(0));
+        signalIndicator.innerHTML = stripInlineSvgIds(signalSvg(0));
         batteryIndicator.style.display = 'none';
         signalIndicator.style.display = 'none';
 
@@ -367,8 +373,8 @@ export default class UI {
             signalIndicator.style.display = 'grid';
             raftName.style.display = 'grid';
             raftName.textContent = truncateString(raft.getFriendlyName());
-            batteryIndicator.innerHTML = batterySvg(raft.getBatteryStrength());
-            signalIndicator.innerHTML = signalSvg(raft.getRSSI());
+            batteryIndicator.innerHTML = stripInlineSvgIds(batterySvg(raft.getBatteryStrength()));
+            signalIndicator.innerHTML = stripInlineSvgIds(signalSvg(raft.getRSSI()));
         }, 300);
 
         // Add the raft to the cog manager and wire it with blocks
@@ -453,8 +459,8 @@ export default class UI {
             signalIndicator.style.display = 'grid';
             raftName.style.display = 'grid';
             raftName.textContent = truncateString(raft.getFriendlyName());
-            batteryIndicator.innerHTML = batterySvg(raft.getBatteryStrength());
-            signalIndicator.innerHTML = signalSvg(raft.getRSSI());
+            batteryIndicator.innerHTML = stripInlineSvgIds(batterySvg(raft.getBatteryStrength()));
+            signalIndicator.innerHTML = stripInlineSvgIds(signalSvg(raft.getRSSI()));
         }, 300);
 
         // Add the raft to the marty manager and wire it with blocks
@@ -1725,15 +1731,15 @@ export default class UI {
 
         // sprite icon
         var spriteSvgDiv = newHTML('div', 'spriteModeIcon', mm);
-        spriteSvgDiv.innerHTML = spriteSvg;
+        spriteSvgDiv.innerHTML = stripInlineSvgIds(spriteSvg);
 
         // toggle icon
         var toggleDiv = newHTML('div', 'martyModeToggle spriteToggleOn', mm);
-        toggleDiv.innerHTML = spriteToggleOn;
+        toggleDiv.innerHTML = stripInlineSvgIds(spriteToggleOn);
 
         // Marty icon
         var martySvgDiv = newHTML('div', 'martyModeIcon', mm);
-        martySvgDiv.innerHTML = martyDeselectedSvg;
+        martySvgDiv.innerHTML = stripInlineSvgIds(martyDeselectedSvg);
     }
     /*MartyMode*/
     static renderCorrectMartyModeIcon() {
@@ -1742,14 +1748,14 @@ export default class UI {
         var martyIcon = gn('martyMode').getElementsByClassName('martyModeIcon')[0];
 
         if (ScratchJr.isMartyModeEnabled) {
-            spriteIcon.innerHTML = spriteDeselectedSvg;
-            martyIcon.innerHTML = martySvg;
-            toggleDiv.innerHTML = martyToggleOn;
+            spriteIcon.innerHTML = stripInlineSvgIds(spriteDeselectedSvg);
+            martyIcon.innerHTML = stripInlineSvgIds(martySvg);
+            toggleDiv.innerHTML = stripInlineSvgIds(martyToggleOn);
 
         } else {
-            spriteIcon.innerHTML = spriteSvg;
-            martyIcon.innerHTML = martyDeselectedSvg;
-            toggleDiv.innerHTML = spriteToggleOn;
+            spriteIcon.innerHTML = stripInlineSvgIds(spriteSvg);
+            martyIcon.innerHTML = stripInlineSvgIds(martyDeselectedSvg);
+            toggleDiv.innerHTML = stripInlineSvgIds(spriteToggleOn);
         }
         setPressedState(gn('martyMode'), ScratchJr.isMartyModeEnabled);
     }
