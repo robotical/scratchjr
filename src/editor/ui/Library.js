@@ -196,22 +196,37 @@ export default class Library {
         if (data.length < 1) {
             return;
         }
-        var order = data[0].order;
-        var key = order ? order.split(',')[1] : '';
+        var key = null;
         for (var i = 0; i < data.length; i++) {
-            order = data[i].order;
+            var order = data[i].order;
             var key2 = order ? order.split(',')[1] : '';
-            if (key2 != key) {
-                Library.addHR(div);
-                key = key2;
-            }
             if ('separator' in data[i]) {
                 Library.addHR(div);
             } else {
+                if (type == 'costumes') {
+                    if (key === null) {
+                        key = key2;
+                    }
+                    if (key2 != key) {
+                        Library.addHR(div);
+                        key = key2;
+                    }
+                } else if (key2 && (key2 != key)) {
+                    if (key !== null) {
+                        Library.addHR(div);
+                    }
+                    Library.addSectionHeader(div, key2);
+                    key = key2;
+                }
                 Library.addLocalThumbChoose(div, data[i], 120 * scaleMultiplier,
                     90 * scaleMultiplier, Library.selectAsset);
             }
         }
+    }
+
+    static addSectionHeader (div, label) {
+        var header = newHTML('h2', 'library-section-title', div);
+        header.textContent = label.replace(/^\d+\s*/, '');
     }
 
     static addAssetThumbChoose (parent, aa, w, h, fcn) {
