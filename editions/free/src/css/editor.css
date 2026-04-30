@@ -351,6 +351,10 @@ div.frame {
     outline-offset: 4px;
 }
 
+#blockspalette .paletteblock:focus-visible{
+    outline: none;
+}
+
 #blockspalette .yellow { background: #FFE75A;}    /* #ffe100;}{ background: #FFFA5A;} */
 #blockspalette .blue { background: #4B8CC2;}
 #blockspalette .pink { background: #CD7CD1;}
@@ -544,13 +548,11 @@ z-index: 5;
 }
 
 #scriptscontainer .keyboard-script-strip:focus-visible {
-    outline-offset: 6px;
-    border-radius: 12px;
+    outline: none;
 }
 
 #scriptscontainer .keyboard-script-strip[aria-pressed="true"]:not(:focus-visible) {
-    box-shadow: 0 0 0 3px rgba(15, 95, 255, 0.35);
-    border-radius: 12px;
+    box-shadow: none;
 }
 
 .watermark {

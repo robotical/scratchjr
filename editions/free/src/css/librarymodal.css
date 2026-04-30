@@ -187,6 +187,18 @@ hr.bigdivide{
     box-shadow: inset 0 ${4 * scaleMultiplier}px ${4 * scaleMultiplier}px -${4 * scaleMultiplier}px rgba(166, 168, 171, 1);
 }
 
+.library-section-title {
+    display: block;
+    clear: both;
+    margin: ${css_vh(2.08)} ${css_vh(0.65)} ${css_vh(0.65)};
+    color: #315F7B;
+    font-family: 'Lato Regular';
+    font-size: ${css_vh(3.13)};
+    font-weight: 700;
+    line-height: ${css_vh(3.65)};
+    text-shadow: 0 ${1 * scaleMultiplier}px #fff;
+}
+
 .assetbox {
     display: inline-block;
     vertical-align: top;
