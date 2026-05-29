@@ -625,11 +625,17 @@ export default class Page {
     }
 
     martyBirdsEyeSpriteAdded(spr) {
-        var me = spr.div.parentNode.owner;
-        me.update(spr);
-        ScratchJr.getSprite().unselect();
-        ScratchJr.onHold = false;
-        spr.shown = false;
+        try {
+            var me = spr.div.parentNode.owner;
+            me.update(spr);
+            var currentSprite = ScratchJr.getSprite();
+            if (currentSprite && currentSprite !== spr) {
+                currentSprite.unselect();
+            }
+            spr.shown = false;
+        } finally {
+            ScratchJr.onHold = false;
+        }
     }
 
     pageAdded(spr) {
