@@ -247,6 +247,59 @@
     margin: 0px ${css_vh(2.34)} 0px;
 }
 
+#library.marty-mode-library .addsprite {
+    display: none;
+}
+
+.marty-mode-card {
+    background: url('../assets/ui/viewOn.png') no-repeat left top;
+    background-size: 100%;
+    position: relative;
+    display: inline-block;
+    width: ${css_vh(29.95)};
+    height: ${css_vh(10.16)};
+    margin: 0px;
+    margin-bottom: ${css_vh(-0.39)};
+    padding: 0px;
+}
+
+.marty-mode-card-icon {
+    position: absolute;
+    top: ${css_vh(0.65)};
+    left: ${css_vh(1.04)};
+    width: ${css_vh(8.33)};
+    height: ${css_vh(8.33)};
+    margin: ${css_vh(0.00)};
+    padding: ${css_vh(0.00)};
+    overflow: hidden;
+}
+
+.marty-mode-card-canvas,
+.marty-mode-card-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.marty-mode-card-label {
+    position: absolute;
+    text-align: center;
+    top: ${css_vh(3.91)};
+    left: ${css_vh(8.46)};
+    margin: 0px;
+    padding: 0px;
+    line-height: ${css_vh(2.60)};
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-family: 'Lato Regular';
+    font-weight: bold;
+    font-size: ${css_vh(1.69)};
+    width: ${css_vh(13.54)};
+    cursor: default;
+    color: #F9A737;
+}
+
 
 /* sprites thumbnails */
 .spritethumb {

@@ -72,6 +72,16 @@ function stripInlineSvgIds(svgMarkup) {
     return svgMarkup.replace(SVG_ID_ATTRIBUTE_RE, '');
 }
 
+function getMartySensorAvailabilityFromRaft(raft) {
+    const connectedSensors = raft?.publishedDataAnalyser?.connectedSensors;
+    return {
+        colour: !!connectedSensors?.colourSensor,
+        obstacle: !!connectedSensors?.objectSensor,
+        light: !!connectedSensors?.lightSensor,
+        noise: !!connectedSensors?.noiseSensor
+    };
+}
+
 export default class UI {
     static get infoBoxOpen() {
         return infoBoxOpen;
@@ -289,12 +299,7 @@ export default class UI {
                     // When sensor availability is known, call UI.updateMartySensorAvailability(raft, availability)
 
                     setTimeout(() => {
-                        UI.updateMartySensorAvailability(raft, {
-                            colour: raft.publishedDataAnalyser.connectedSensors.colourSensor,
-                            obstacle: raft.publishedDataAnalyser.connectedSensors.objectSensor,
-                            light: raft.publishedDataAnalyser.connectedSensors.lightSensor,
-                            noise: raft.publishedDataAnalyser.connectedSensors.noiseSensor
-                        });
+                        UI.updateMartySensorAvailability(raft, getMartySensorAvailabilityFromRaft(raft));
                     }, 3000);
                     UI.setupMartyConnectionButton(connectButton, raft);
                     // turn off the verified subscription to avoid memory leaks
@@ -321,6 +326,27 @@ export default class UI {
             return;
         }
         manager.setMartySensorAvailability(martyId, availability);
+    }
+
+    static setMartyModeEnabled(enabled, options = {}) {
+        if (ScratchJr.isMartyModeEnabled === enabled) {
+            return;
+        }
+        if (!ScratchJr.stage?.currentPage) {
+            return;
+        }
+
+        if (options.playSound) {
+            ScratchAudio.sndFX('tap.wav');
+        }
+        ScratchJr.isMartyModeEnabled = enabled;
+        UI.renderCorrectMartyModeIcon();
+        Trace.clear();
+    }
+
+    static switchToMartyModeAfterConnection(raft) {
+        UI.updateMartySensorAvailability(raft, getMartySensorAvailabilityFromRaft(raft));
+        UI.setMartyModeEnabled(true);
     }
 
     static showConnIssueOverlay(button) {
@@ -399,7 +425,8 @@ export default class UI {
         connIssueResolvedSubs.subscribe(() => UI.hideConnIssueOverlay(button));
 
         // Set up a subscription to the raft disconnected event
-        raftDisconnectedSubscriptionHelper(raft).subscribe(() => {
+        const disconnectedSubs = raftDisconnectedSubscriptionHelper(raft);
+        disconnectedSubs.subscribe(() => {
             // When raft is disconnected, update the UI and remove the raft
             button.classList.remove('connectButtonConnected');
             window.cogManager.removeCog(raft);
@@ -424,7 +451,7 @@ export default class UI {
             }, 1000);
 
             // Unsubscribe from the disconnected event to avoid memory leaks
-            raftDisconnectedSubscriptionHelper(raft).unsubscribe();
+            disconnectedSubs.unsubscribe();
 
             UI.hideConnIssueOverlay(button);
             // Unsubscribe from the issue detected event to avoid memory leaks
@@ -447,6 +474,15 @@ export default class UI {
         connectButtonContainer.classList.remove('notConnectedButtonContainer');
         connectButtonContainer.classList.add('connectedButtonContainer');
 
+        // Store the old onClick function to restore it later
+        const oldOnClick = button.onclick;
+
+        // Set the new onClick function before Marty-specific setup. Sensor and block metadata can arrive late.
+        button.onclick = () => {
+            window.applicationManager.disconnectGeneric(raft);
+        };
+        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' + raft.getFriendlyName());
+
         martySignalAndBatteryInterval = setInterval(() => {
             if (!raft) {
                 return;
@@ -463,31 +499,24 @@ export default class UI {
             signalIndicator.innerHTML = stripInlineSvgIds(signalSvg(raft.getRSSI()));
         }, 300);
 
-        // Add the raft to the marty manager and wire it with blocks
-        window.martyManager.addMarty(raft);
-        window.martyManager.wireMartyWithBlocks(raft.id);
+        if (window.martyManager) {
+            try {
+                // Add the raft to the marty manager and wire it with blocks
+                window.martyManager.addMarty(raft);
+                window.martyManager.wireMartyWithBlocks(raft.id);
+            } catch (error) {
+                console.warn('Unable to wire Marty blocks after connection.', error);
+            }
+        }
 
-        UI.updateMartySensorAvailability(raft, {
-            colour: raft.publishedDataAnalyser.connectedSensors.colourSensor,
-            obstacle: raft.publishedDataAnalyser.connectedSensors.objectSensor,
-            light: raft.publishedDataAnalyser.connectedSensors.lightSensor,
-            noise: raft.publishedDataAnalyser.connectedSensors.noiseSensor
-        });
-
-        // Store the old onClick function to restore it later
-        const oldOnClick = button.onclick;
-
-        // Set the new onClick function to disconnect the raft
-        button.onclick = () => {
-            window.applicationManager.disconnectGeneric(raft);
-        };
-        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' + raft.getFriendlyName());
+        UI.switchToMartyModeAfterConnection(raft);
 
         // Set up a subscription to the raft disconnected event
-        raftDisconnectedSubscriptionHelper(raft).subscribe(() => {
+        const disconnectedSubs = raftDisconnectedSubscriptionHelper(raft);
+        disconnectedSubs.subscribe(() => {
             // When raft is disconnected, update the UI and remove the raft
             button.classList.remove('connectButtonConnected');
-            window.martyManager.removeMarty(raft);
+            window.martyManager?.removeMarty?.(raft);
 
             // clear the interval to avoid memory leaks
             clearInterval(martySignalAndBatteryInterval);
@@ -508,7 +537,7 @@ export default class UI {
             }, 1000);
 
             // Unsubscribe from the disconnected event to avoid memory leaks
-            raftDisconnectedSubscriptionHelper(raft).unsubscribe();
+            disconnectedSubs.unsubscribe();
 
             // Restore the old onClick function
             button.onclick = oldOnClick;
@@ -1242,6 +1271,7 @@ export default class UI {
             ns.onclick = UI.addSprite;
             ns.setAttribute('id', 'addsprite');
         }
+        UI.updateSpriteLibraryForMartyMode({ refreshSprites: false });
     }
 
     static mascotData(page) {
@@ -1743,9 +1773,14 @@ export default class UI {
     }
     /*MartyMode*/
     static renderCorrectMartyModeIcon() {
-        var toggleDiv = gn('martyMode').getElementsByClassName('martyModeToggle')[0];
-        var spriteIcon = gn('martyMode').getElementsByClassName('spriteModeIcon')[0];
-        var martyIcon = gn('martyMode').getElementsByClassName('martyModeIcon')[0];
+        UI.updateSpriteLibraryForMartyMode();
+        const martyModeButton = gn('martyMode');
+        if (!martyModeButton) {
+            return;
+        }
+        var toggleDiv = martyModeButton.getElementsByClassName('martyModeToggle')[0];
+        var spriteIcon = martyModeButton.getElementsByClassName('spriteModeIcon')[0];
+        var martyIcon = martyModeButton.getElementsByClassName('martyModeIcon')[0];
 
         if (ScratchJr.isMartyModeEnabled) {
             spriteIcon.innerHTML = stripInlineSvgIds(spriteDeselectedSvg);
@@ -1757,24 +1792,37 @@ export default class UI {
             martyIcon.innerHTML = stripInlineSvgIds(martyDeselectedSvg);
             toggleDiv.innerHTML = stripInlineSvgIds(spriteToggleOn);
         }
-        setPressedState(gn('martyMode'), ScratchJr.isMartyModeEnabled);
+        setPressedState(martyModeButton, ScratchJr.isMartyModeEnabled);
     }
 
     /*MartyMode*/
     static toggleMartyMode() {
         const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
-        if (connectedMarty && connectedMarty.publishedDataAnalyser) {
-            UI.updateMartySensorAvailability(connectedMarty, {
-                colour: connectedMarty.publishedDataAnalyser.connectedSensors.colourSensor,
-                obstacle: connectedMarty.publishedDataAnalyser.connectedSensors.objectSensor,
-                light: connectedMarty.publishedDataAnalyser.connectedSensors.lightSensor,
-                noise: connectedMarty.publishedDataAnalyser.connectedSensors.noiseSensor
-            });
+        if (connectedMarty) {
+            UI.updateMartySensorAvailability(connectedMarty, getMartySensorAvailabilityFromRaft(connectedMarty));
         }
-        ScratchAudio.sndFX('tap.wav');
-        ScratchJr.isMartyModeEnabled = !ScratchJr.isMartyModeEnabled;
-        UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
-        Trace.clear();
+        UI.setMartyModeEnabled(!ScratchJr.isMartyModeEnabled, { playSound: true });
+    }
+
+    static updateSpriteLibraryForMartyMode(options = {}) {
+        const library = gn('library');
+        if (library) {
+            library.className = ScratchJr.isMartyModeEnabled ? 'thumbpanel marty-mode-library' : 'thumbpanel';
+        }
+
+        const addSpriteButton = gn('addsprite');
+        if (addSpriteButton) {
+            const isMartyMode = ScratchJr.isMartyModeEnabled;
+            addSpriteButton.style.display = isMartyMode ? 'none' : 'inline-block';
+            addSpriteButton.disabled = isMartyMode;
+            addSpriteButton.setAttribute('aria-hidden', isMartyMode ? 'true' : 'false');
+        }
+
+        const spriteContainer = gn('spritecc');
+        if (options.refreshSprites === false || !spriteContainer || !ScratchJr.stage?.currentPage) {
+            return;
+        }
+        Thumbs.updateSprites();
     }
 
     //////////////////////////////////////
@@ -1799,6 +1847,13 @@ export default class UI {
     }
 
     static addSprite(e) {
+        if (ScratchJr.isMartyModeEnabled) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            return;
+        }
         if (ScratchJr.onHold) {
             return;
         }

@@ -21,7 +21,7 @@ import {
 } from '../../utils/accessibility';
 import {
     frame, gn, localx, newHTML, newButton, scaleMultiplier, getIdFor,
-    isTablet, newImage, localy, setProps
+    isTablet, newImage, localy, setProps, setCanvasSize
 } from '../../utils/lib';
 
 let caret = undefined;
@@ -642,6 +642,11 @@ export default class Thumbs {
         while (costumes.childElementCount > 0) {
             costumes.removeChild(costumes.childNodes[0]);
         }
+        if (ScratchJr.isMartyModeEnabled) {
+            Thumbs.createMartyModeCard(costumes);
+            UI.needsScroll();
+            return;
+        }
         var sprites = JSON.parse(ScratchJr.stage.currentPage.sprites);
         for (var i = 0; i < sprites.length; i++) {
             var s = gn(sprites[i]);
@@ -669,6 +674,10 @@ export default class Thumbs {
         if (!spr) {
             return;
         }
+        if (ScratchJr.isMartyModeEnabled) {
+            Thumbs.updateSprites();
+            return;
+        }
         if (spr.thumbnail) {
             spr.updateSpriteThumb();
         } else {
@@ -680,6 +689,31 @@ export default class Thumbs {
             Thumbs.selectThisSprite(spr);
             UI.resetSpriteLibrary();
         }
+    }
+
+    static createMartyModeCard(parent) {
+        var card = newHTML('div', 'marty-mode-card', parent);
+        card.setAttribute('id', 'martyModeSidebarCard');
+        card.setAttribute('role', 'img');
+        card.setAttribute('aria-label', 'Marty Mode');
+
+        var icon = newHTML('div', 'marty-mode-card-icon', card);
+        var martyBirdsEyeSprite = ScratchJr.stage?.currentPage?.getMartyBirdsEyeSprite?.();
+        if (martyBirdsEyeSprite && typeof martyBirdsEyeSprite.drawMyImage === 'function') {
+            var canvas = newHTML('canvas', 'marty-mode-card-canvas', icon);
+            setCanvasSize(canvas, 64, 64);
+            martyBirdsEyeSprite.drawMyImage(canvas, canvas.width, canvas.height);
+            martyBirdsEyeSprite.thumbnail = card;
+            card.owner = martyBirdsEyeSprite.id;
+        } else {
+            var image = newHTML('img', 'marty-mode-card-image', icon);
+            image.setAttribute('src', './svglibrary/MartyBirdsEye.svg');
+            image.setAttribute('alt', '');
+        }
+
+        var label = newHTML('p', 'marty-mode-card-label', card);
+        label.textContent = 'Marty Mode';
+        return card;
     }
 
     /////////////////////////////////////////////
