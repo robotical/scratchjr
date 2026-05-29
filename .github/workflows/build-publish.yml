@@ -10,23 +10,27 @@ on:
         required: false
         default: 'mv2app'
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build-publish:
     environment: NPM_TOKEN_NIK
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.branch || 'mv2app' }}
           path: .
-      - name: Use Node.js '16.x'
-        uses: actions/setup-node@v3
+      - name: Use Node.js 22.14.0
+        uses: actions/setup-node@v6
         with:
-          node-version: '16.x'
+          node-version: 22.14.0
           registry-url: 'https://registry.npmjs.org'
+      - name: Use npm 11 for trusted publishing
+        run: npm install -g npm@11.15.0
       - run: npm install
       - run: npm run build-prod:copy
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_NIK }}
+      - run: npm publish --access public
