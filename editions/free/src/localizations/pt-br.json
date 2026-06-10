@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Pausa o script por um período de tempo especificado (em batidas).",
   "BLOCK_DESC_SET_TEMPO": "Defina o tempo para X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Altera o andamento da música para o número especificado de batidas por minuto.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Tocar som 'Pop'",
   "BLOCK_PLAY_NOTE": "Nota de reprodução",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Nota de reprodução",

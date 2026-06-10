@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Sætter scriptet på pause i et bestemt tidsrum (i beats).",
   "BLOCK_DESC_SET_TEMPO": "Indstil tempoet til X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Ændrer musikkens tempo til det angivne antal slag pr. minut.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Afspil 'Pop'-lyd",
   "BLOCK_PLAY_NOTE": "Spil note",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Spil note",

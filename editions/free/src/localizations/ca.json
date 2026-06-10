@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Atura el guió durant un període de temps especificat (en ritmes).",
   "BLOCK_DESC_SET_TEMPO": "Estableix el tempo a X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Canvia el tempo de la música al nombre especificat de pulsacions per minut.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Reprodueix el so \"Pop\".",
   "BLOCK_PLAY_NOTE": "Jugar nota",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Jugar nota",

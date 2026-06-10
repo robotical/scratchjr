@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Pozastaví skript na zadanou dobu (v taktech).",
   "BLOCK_DESC_SET_TEMPO": "Nastavte tempo na X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Změní tempo hudby na zadaný počet úderů za minutu.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Přehrát zvuk „Pop“",
   "BLOCK_PLAY_NOTE": "Přehrát notu",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Přehrát notu",

@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Поставя на пауза скрипта за определен период от време (в тактове).",
   "BLOCK_DESC_SET_TEMPO": "Задайте темпото на X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Променя темпото на музиката до определения брой тактове в минута.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Възпроизвеждане на звук \"Pop\"",
   "BLOCK_PLAY_NOTE": "Пуснете нота",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Пуснете нота",

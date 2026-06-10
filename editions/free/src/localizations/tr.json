@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Komut dosyasını belirli bir süre (vuruş cinsinden) duraklatır.",
   "BLOCK_DESC_SET_TEMPO": "Tempoyu X bpm'ye ayarla",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Müziğin temposunu dakika başına belirtilen vuruş sayısına değiştirir.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Pop' sesini çal",
   "BLOCK_PLAY_NOTE": "Çalma notası",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Çalma notası",

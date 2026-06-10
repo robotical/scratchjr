@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "หยุดสคริปต์เป็นเวลาที่กำหนด (เป็นจังหวะ)",
   "BLOCK_DESC_SET_TEMPO": "ตั้งจังหวะเป็น X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "เปลี่ยนจังหวะของเพลงตามจำนวนจังหวะต่อนาทีที่ระบุ",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "เล่นเสียง 'ป็อป'",
   "BLOCK_PLAY_NOTE": "โน้ตการเล่น",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "โน้ตการเล่น",

@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Wstrzymuje skrypt na określony czas (w uderzeniach).",
   "BLOCK_DESC_SET_TEMPO": "Ustaw tempo na X uderzeń na minutę",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Zmienia tempo muzyki do określonej liczby uderzeń na minutę.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Odtwórz dźwięk „Pop”",
   "BLOCK_PLAY_NOTE": "Odtwórz notatkę",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Odtwórz notatkę",

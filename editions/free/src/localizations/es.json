@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Pausa el guión durante una cantidad de tiempo específica (en tiempos).",
   "BLOCK_DESC_SET_TEMPO": "Establezca el tempo en X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Cambia el tempo de la música al número especificado de pulsaciones por minuto.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Reproducir sonido 'Pop'",
   "BLOCK_PLAY_NOTE": "Nota de reproducción",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Nota de reproducción",

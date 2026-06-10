@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Hält das Skript für eine angegebene Zeit (in Beats) an.",
   "BLOCK_DESC_SET_TEMPO": "Tempo auf X bpm einstellen",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Ändert das Tempo der Musik auf die angegebene Anzahl von Schlägen pro Minute.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "„Pop“-Sound abspielen",
   "BLOCK_PLAY_NOTE": "Note spielen",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Note spielen",

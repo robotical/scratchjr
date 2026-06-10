@@ -12,6 +12,12 @@ export default class CogMusicBlocks {
         this.bpm = bpm;
     }
 
+    setVolumeToPercentage(percentage) {
+        const volume = Number(percentage);
+        const clampedVolume = Math.min(100, Math.max(0, isNaN(volume) ? 0 : volume));
+        this.cog.sendRestMessage(`audio/vol/${clampedVolume / 10}`);
+    }
+
     rest(beats) {
         const rtttl = `audio/rtttl/Rest:d=4,o=5,b=${this.bpm}:${(4 + 1) - beats}p`;
         const duration = calculateRTTTLDur(rtttl);
@@ -155,4 +161,3 @@ function calculateRTTTLDur(rtttl) {
 
     return totalDuration;
 }
-

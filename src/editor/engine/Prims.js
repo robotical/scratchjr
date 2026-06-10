@@ -91,6 +91,7 @@ export default class Prims {
         Prims.table.playnote = Prims.playNote;
         Prims.table.waitcrotchet = Prims.waitcrotchet;
         Prims.table.settempo = Prims.settempo;
+        Prims.table.setcogvolume = Prims.setCogVolume;
 
 
 
@@ -243,6 +244,15 @@ export default class Prims {
         const durationInSeconds = Prims.cogBlocks?.musicBlocks.playNote(note) / 1000;
         Prims.setTime(strip);
         strip.waitTimer = convertNumberToSeconds(durationInSeconds + 0.1); // add 0.1s to wait between consecutive notes
+        strip.thisblock = strip.thisblock.next;
+    }
+
+    static setCogVolume(strip) {
+        const volume = strip.thisblock.getArgValue();
+        console.log("setting Cog volume: ", volume)
+        Prims.cogBlocks?.musicBlocks.setVolumeToPercentage(volume);
+        Prims.setTime(strip);
+        strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
     }
 

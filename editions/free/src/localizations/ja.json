@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "指定された時間 (ビート単位) だけスクリプトを一時停止します。",
   "BLOCK_DESC_SET_TEMPO": "テンポをX bpmに設定",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "音楽のテンポを、指定した 1 分あたりの拍数に変更します。",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "「ポップ」音を再生する",
   "BLOCK_PLAY_NOTE": "音符を再生する",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "音符を再生する",

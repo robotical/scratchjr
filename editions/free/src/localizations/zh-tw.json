@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "暫停腳本指定的時間（以節拍為單位）。",
   "BLOCK_DESC_SET_TEMPO": "將節奏設定為 X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "將音樂的節奏改為每分鐘指定的節拍數。",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "播放“流行”聲音",
   "BLOCK_PLAY_NOTE": "播放註釋",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "播放註釋",

@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Παύση του σεναρίου για ένα καθορισμένο χρονικό διάστημα (σε beats).",
   "BLOCK_DESC_SET_TEMPO": "Ρυθμίστε το ρυθμό σε X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Αλλάζει το ρυθμό της μουσικής στον καθορισμένο αριθμό κτύπων ανά λεπτό.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Παίξτε ήχο \"Pop\".",
   "BLOCK_PLAY_NOTE": "Παίξτε νότα",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Παίξτε νότα",

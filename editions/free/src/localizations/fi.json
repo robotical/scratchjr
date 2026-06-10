@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Keskeyttää skriptin tietyksi ajaksi (iskuina).",
   "BLOCK_DESC_SET_TEMPO": "Aseta tempoksi X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Muuttaa musiikin tempoa määritettyyn iskujen määrään minuutissa.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Soita 'Pop'-ääni",
   "BLOCK_PLAY_NOTE": "Soita nuotti",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Soita nuotti",

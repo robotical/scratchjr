@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Призупиняє сценарій на певний час (у ударах).",
   "BLOCK_DESC_SET_TEMPO": "Встановіть темп на X уд/хв",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Змінює темп музики на задану кількість ударів на хвилину.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Відтворення звуку «Поп».",
   "BLOCK_PLAY_NOTE": "Зіграти ноту",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Зіграти ноту",

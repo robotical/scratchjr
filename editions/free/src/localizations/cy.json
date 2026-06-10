@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Yn seibio'r sgript am gyfnod penodol o amser (mewn curiadau).",
   "BLOCK_DESC_SET_TEMPO": "Gosod tempo i X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Yn newid tempo'r gerddoriaeth i'r nifer penodedig o guriadau y funud.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Chwarae sain 'Pop'",
   "BLOCK_PLAY_NOTE": "Chwarae nodyn",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Chwarae nodyn",

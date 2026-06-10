@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "지정된 시간(비트) 동안 스크립트를 일시 중지합니다.",
   "BLOCK_DESC_SET_TEMPO": "템포를 X bpm로 설정하세요",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "음악의 템포를 분당 지정된 박자 수로 변경합니다.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "팝' 사운드 재생",
   "BLOCK_PLAY_NOTE": "플레이 노트",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "플레이 노트",

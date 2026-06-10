@@ -88,6 +88,8 @@
   "BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION": "Pausar skriptet under en viss tid (i beats).",
   "BLOCK_DESC_SET_TEMPO": "Ställ in tempot till X bpm",
   "BLOCK_DESC_SET_TEMPO_DESCRIPTION": "Ändrar musikens tempo till det angivna antalet slag per minut.",
+  "BLOCK_DESC_SET_COG_VOLUME": "Set volume to X%",
+  "BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION": "Sets Cog sound volume.",
   "BLOCK_PLAY_POP_SOUND": "Spela \"pop\"-ljud",
   "BLOCK_PLAY_NOTE": "Spela not",
   "BLOCK_PLAY_NOTE_DESCRIPTION": "Spela not",

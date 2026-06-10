@@ -284,7 +284,7 @@ export default class BlockSpecs {
     static setupPalettesDefCog() {
         return [['tiltany', 'onsteercog', 'ontouchcog', 'onshake', 'onobjectsensed', 'onlight'],
         ['setpattern', 'selectcolour', 'clearcolours'],
-        ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote', 'waitcrotchet', 'settempo']];
+        ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote', 'waitcrotchet', 'settempo', 'setcogvolume']];
     }
 
     static setupPalettesDefMarty() {
@@ -432,6 +432,8 @@ export default class BlockSpecs {
                 BlockSpecs.limeCmd, 'n', 1, BlockSpecs.limeCmdH, 1, 4, BlockSpecs.cmdS],
             'settempo': ['settempo', BlockSpecs.getImageFrom('assets/blockicons/tempo', 'svg'),
                 BlockSpecs.limeCmd, 'n', 60, BlockSpecs.limeCmdH, 1, 240, BlockSpecs.cmdS],
+            'setcogvolume': ['setcogvolume', BlockSpecs.getImageFrom('assets/blockicons/CogVolume', 'svg'),
+                BlockSpecs.limeCmd, 'n', 100, BlockSpecs.limeCmdH, 0, 100, BlockSpecs.cmdS],
 
             /* Marty Blocks */
             'martycoloursensed': ['martycoloursensed', coloursensedshapes,
@@ -560,6 +562,7 @@ export default class BlockSpecs {
             'playnote': Localization.localize('BLOCK_PLAY_NOTE'),
             'waitcrotchet': Localization.localize('BLOCK_DESC_WAIT_CROTCHET'),
             'settempo': Localization.localize('BLOCK_DESC_SET_TEMPO'),
+            'setcogvolume': Localization.localize('BLOCK_DESC_SET_COG_VOLUME'),
             'pop': Localization.localize('BLOCK_PLAY_POP_SOUND'),
             'endstack': Localization.localize('BLOCK_DESC_END'),
             'stopall': Localization.localize('BLOCK_DESC_STOP', {
