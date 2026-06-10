@@ -323,12 +323,33 @@ export default class ScriptsPane {
     }
 
     static setDragBackgroundEvents(fcnmove, fcnup) {
+        window.ontouchmove = function (evt) {
+            fcnmove(evt);
+        };
+        window.ontouchend = function (evt) {
+            fcnup(evt);
+        };
+        window.ontouchleave = function (evt) {
+            fcnup(evt);
+        };
+        window.ontouchcancel = function (evt) {
+            fcnup(evt);
+        };
         window.onpointermove = function (evt) {
             fcnmove(evt);
-        }
+        };
         window.onpointerup = function (evt) {
             fcnup(evt);
-        }
+        };
+        window.onpointercancel = function (evt) {
+            fcnup(evt);
+        };
+        window.onmousemove = function (evt) {
+            fcnmove(evt);
+        };
+        window.onmouseup = function (evt) {
+            fcnup(evt);
+        };
     }
 
     static dragMove(e) {
