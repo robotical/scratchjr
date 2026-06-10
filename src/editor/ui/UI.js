@@ -66,6 +66,9 @@ let martySignalAndBatteryInterval = null;
 let connectionLostButton1Interval = null;
 let connectionLostButton2Interval = null;
 
+const DISCONNECT_CONTEXT_REMOVAL_POLL_MS = 250;
+const DISCONNECT_CONTEXT_REMOVAL_TIMEOUT_MS = 30000;
+
 const SVG_ID_ATTRIBUTE_RE = /\s+id="[^"]*"/g;
 
 function stripInlineSvgIds(svgMarkup) {
@@ -378,6 +381,72 @@ export default class UI {
         }
     }
 
+    static isRaftInConnectionContext(raft) {
+        const raftId = typeof raft === 'string' ? raft : (raft && raft.id);
+        const applicationManager = typeof window !== 'undefined' ? window.applicationManager : null;
+        if (!applicationManager || !raftId) {
+            return false;
+        }
+        const connectedRaftsContext = applicationManager.connectedRaftsContext;
+        if (!Array.isArray(connectedRaftsContext)) {
+            return Boolean(applicationManager.connectedRafts && applicationManager.connectedRafts[raftId]);
+        }
+        return connectedRaftsContext.some(connectedRaft => connectedRaft && connectedRaft.id === raftId);
+    }
+
+    static waitForRaftRemovalFromConnectionContext(raft, startedInContext = UI.isRaftInConnectionContext(raft)) {
+        if (!startedInContext) {
+            return Promise.resolve(false);
+        }
+        if (!UI.isRaftInConnectionContext(raft)) {
+            return Promise.resolve(true);
+        }
+        const startedAt = Date.now();
+        return new Promise(resolve => {
+            const pollConnectionContext = () => {
+                if (!UI.isRaftInConnectionContext(raft)) {
+                    resolve(true);
+                    return;
+                }
+                if (Date.now() - startedAt >= DISCONNECT_CONTEXT_REMOVAL_TIMEOUT_MS) {
+                    resolve(false);
+                    return;
+                }
+                setTimeout(pollConnectionContext, DISCONNECT_CONTEXT_REMOVAL_POLL_MS);
+            };
+            setTimeout(pollConnectionContext, DISCONNECT_CONTEXT_REMOVAL_POLL_MS);
+        });
+    }
+
+    static disconnectRaftAndClearWhenConfirmed(raft, onConfirmedDisconnect) {
+        const applicationManager = typeof window !== 'undefined' ? window.applicationManager : null;
+        if (!applicationManager || typeof applicationManager.disconnectGeneric !== 'function') {
+            return false;
+        }
+        const startedInContext = UI.isRaftInConnectionContext(raft);
+        const disconnectResult = applicationManager.disconnectGeneric(raft);
+        UI.waitForRaftRemovalFromConnectionContext(raft, startedInContext).then(didConfirmDisconnect => {
+            if (didConfirmDisconnect && typeof onConfirmedDisconnect === 'function') {
+                onConfirmedDisconnect();
+            }
+        });
+        return disconnectResult;
+    }
+
+    static resetConnectionButtonVisuals(button) {
+        const iconButtonContainer = button.querySelector('.iconButtonContainer');
+        iconButtonContainer.classList.remove('connectedButtonContainer');
+        iconButtonContainer.classList.add('notConnectedButtonContainer');
+
+        const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
+        const signalIndicator = button.querySelector('.signalIndicatorContainer');
+        const raftName = button.querySelector('.raftNameConnectButton');
+        batteryIndicator.style.display = 'none';
+        signalIndicator.style.display = 'none';
+        raftName.style.display = 'none';
+        raftName.textContent = '';
+    }
+
     static setupCogConnectionButton(button, raft) {
         // Add the connected class to the button
         button.classList.add('connectButtonConnected');
@@ -409,24 +478,14 @@ export default class UI {
 
         // Store the old onClick function to restore it later
         const oldOnClick = button.onclick;
+        let didHandleDisconnect = false;
 
-        // Set the new onClick function to disconnect the raft
-        button.onclick = () => {
-            window.applicationManager.disconnectGeneric(raft);
-        };
-        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' + raft.getFriendlyName());
+        const handleDisconnected = () => {
+            if (didHandleDisconnect) {
+                return;
+            }
+            didHandleDisconnect = true;
 
-        // Set up a subscription to the raft issue detected event
-        const connIssueSubs = createRaftConnectionIssueDetectedHelper(raft);
-        connIssueSubs.subscribe(() => UI.showConnIssueOverlay(button));
-
-        // Set up a subscription to the connection issue resolved event
-        const connIssueResolvedSubs = createRaftConnectionIssueResolvedHelper(raft);
-        connIssueResolvedSubs.subscribe(() => UI.hideConnIssueOverlay(button));
-
-        // Set up a subscription to the raft disconnected event
-        const disconnectedSubs = raftDisconnectedSubscriptionHelper(raft);
-        disconnectedSubs.subscribe(() => {
             // When raft is disconnected, update the UI and remove the raft
             button.classList.remove('connectButtonConnected');
             window.cogManager.removeCog(raft);
@@ -436,18 +495,7 @@ export default class UI {
 
             setTimeout(() => {
                 // change the button back to the default state
-                const iconButtonContainer = button.querySelector('.iconButtonContainer');
-                iconButtonContainer.classList.remove('connectedButtonContainer');
-                iconButtonContainer.classList.add('notConnectedButtonContainer');
-
-                // hide the battery and signal indicators
-                const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
-                const signalIndicator = button.querySelector('.signalIndicatorContainer');
-                const raftName = button.querySelector('.raftNameConnectButton');
-                raftName.style.display = 'none';
-                raftName.textContent = '';
-                batteryIndicator.style.display = 'none';
-                signalIndicator.style.display = 'none';
+                UI.resetConnectionButtonVisuals(button);
             }, 1000);
 
             // Unsubscribe from the disconnected event to avoid memory leaks
@@ -462,7 +510,25 @@ export default class UI {
             // Restore the old onClick function
             button.onclick = oldOnClick;
             button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' Cog');
-        });
+        };
+
+        // Set the new onClick function to disconnect the raft
+        button.onclick = () => {
+            UI.disconnectRaftAndClearWhenConfirmed(raft, handleDisconnected);
+        };
+        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' + raft.getFriendlyName());
+
+        // Set up a subscription to the raft issue detected event
+        const connIssueSubs = createRaftConnectionIssueDetectedHelper(raft);
+        connIssueSubs.subscribe(() => UI.showConnIssueOverlay(button));
+
+        // Set up a subscription to the connection issue resolved event
+        const connIssueResolvedSubs = createRaftConnectionIssueResolvedHelper(raft);
+        connIssueResolvedSubs.subscribe(() => UI.hideConnIssueOverlay(button));
+
+        // Set up a subscription to the raft disconnected event
+        const disconnectedSubs = raftDisconnectedSubscriptionHelper(raft);
+        disconnectedSubs.subscribe(handleDisconnected);
     }
 
     static setupMartyConnectionButton(button, raft) {
@@ -476,10 +542,36 @@ export default class UI {
 
         // Store the old onClick function to restore it later
         const oldOnClick = button.onclick;
+        let didHandleDisconnect = false;
+
+        const handleDisconnected = () => {
+            if (didHandleDisconnect) {
+                return;
+            }
+            didHandleDisconnect = true;
+
+            // When raft is disconnected, update the UI and remove the raft
+            button.classList.remove('connectButtonConnected');
+            window.martyManager?.removeMarty?.(raft);
+
+            // clear the interval to avoid memory leaks
+            clearInterval(martySignalAndBatteryInterval);
+            setTimeout(() => {
+                // change the button back to the default state
+                UI.resetConnectionButtonVisuals(button);
+            }, 1000);
+
+            // Unsubscribe from the disconnected event to avoid memory leaks
+            disconnectedSubs.unsubscribe();
+
+            // Restore the old onClick function
+            button.onclick = oldOnClick;
+            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' Marty');
+        };
 
         // Set the new onClick function before Marty-specific setup. Sensor and block metadata can arrive late.
         button.onclick = () => {
-            window.applicationManager.disconnectGeneric(raft);
+            UI.disconnectRaftAndClearWhenConfirmed(raft, handleDisconnected);
         };
         button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' + raft.getFriendlyName());
 
@@ -513,36 +605,7 @@ export default class UI {
 
         // Set up a subscription to the raft disconnected event
         const disconnectedSubs = raftDisconnectedSubscriptionHelper(raft);
-        disconnectedSubs.subscribe(() => {
-            // When raft is disconnected, update the UI and remove the raft
-            button.classList.remove('connectButtonConnected');
-            window.martyManager?.removeMarty?.(raft);
-
-            // clear the interval to avoid memory leaks
-            clearInterval(martySignalAndBatteryInterval);
-            setTimeout(() => {
-                // change the button back to the default state
-                const iconButtonContainer = button.querySelector('.iconButtonContainer');
-                iconButtonContainer.classList.remove('connectedButtonContainer');
-                iconButtonContainer.classList.add('notConnectedButtonContainer');
-
-                // hide the battery and signal indicators
-                const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
-                const signalIndicator = button.querySelector('.signalIndicatorContainer');
-                const raftName = button.querySelector('.raftNameConnectButton');
-                batteryIndicator.style.display = 'none';
-                signalIndicator.style.display = 'none';
-                raftName.style.display = 'none';
-                raftName.textContent = '';
-            }, 1000);
-
-            // Unsubscribe from the disconnected event to avoid memory leaks
-            disconnectedSubs.unsubscribe();
-
-            // Restore the old onClick function
-            button.onclick = oldOnClick;
-            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' Marty');
-        });
+        disconnectedSubs.subscribe(handleDisconnected);
     }
 
     static leftPanel(div) {

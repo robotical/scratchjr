@@ -197,6 +197,51 @@ describe('Marty connection UI', () => {
         expect(button.classList.contains('connectButtonConnected')).toBe(false);
         expect(button.querySelector('.iconButtonContainer').classList.contains('notConnectedButtonContainer')).toBe(true);
     });
+
+    it('clears the Marty button after confirmed host-context removal without waiting for the RAFT event', async () => {
+        const button = createConnectionButton();
+        const oldOnClick = vi.fn();
+        button.onclick = oldOnClick;
+        const raft = createMartyRaft();
+        window.applicationManager.connectedRaftsContext = [{ id: raft.id }];
+        window.applicationManager.disconnectGeneric = vi.fn(() => {
+            window.applicationManager.connectedRaftsContext = [];
+        });
+
+        UI.setupMartyConnectionButton(button, raft);
+
+        button.onclick();
+        await Promise.resolve();
+        vi.advanceTimersByTime(1000);
+
+        expect(window.applicationManager.disconnectGeneric).toHaveBeenCalledWith(raft);
+        expect(window.martyManager.removeMarty).toHaveBeenCalledWith(raft);
+        expect(button.onclick).toBe(oldOnClick);
+        expect(button.classList.contains('connectButtonConnected')).toBe(false);
+        expect(button.querySelector('.iconButtonContainer').classList.contains('notConnectedButtonContainer')).toBe(true);
+        expect(raft.__disconnectedUnsubscribed).toBe(true);
+    });
+
+    it('keeps the Marty button connected when the disconnect confirmation is cancelled', async () => {
+        const button = createConnectionButton();
+        const oldOnClick = vi.fn();
+        button.onclick = oldOnClick;
+        const raft = createMartyRaft();
+        window.applicationManager.connectedRaftsContext = [{ id: raft.id }];
+        window.applicationManager.disconnectGeneric = vi.fn();
+
+        UI.setupMartyConnectionButton(button, raft);
+
+        button.onclick();
+        vi.advanceTimersByTime(31000);
+        await Promise.resolve();
+
+        expect(window.applicationManager.disconnectGeneric).toHaveBeenCalledWith(raft);
+        expect(window.martyManager.removeMarty).not.toHaveBeenCalled();
+        expect(button.onclick).not.toBe(oldOnClick);
+        expect(button.classList.contains('connectButtonConnected')).toBe(true);
+        expect(button.querySelector('.iconButtonContainer').classList.contains('connectedButtonContainer')).toBe(true);
+    });
 });
 
 function createMartyRaft() {
