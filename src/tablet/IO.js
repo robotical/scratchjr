@@ -127,14 +127,34 @@ export default class IO {
             for (var i = 0; i < images.length; i++) {
                 var dataurl = images[i].getAttribute('xlink:href');
                 var svgimg = document.createElement('img');
-                svgimg.src = dataurl;
-                if (!svgimg.complete) {
-                    svgimg.onload = function () {
-                        readToLad();
-                    };
-                } else {
+                let imageDone = false;
+                let imageReadyChecks = 0;
+                var handleImageDone = function () {
+                    if (imageDone) {
+                        return;
+                    }
+                    imageDone = true;
                     readToLad();
-                }
+                };
+                var waitForImageReady = function () {
+                    if (imageDone) {
+                        return;
+                    }
+                    if (svgimg.naturalWidth || svgimg.width) {
+                        handleImageDone();
+                        return;
+                    }
+                    if (imageReadyChecks < 300) {
+                        imageReadyChecks++;
+                        window.setTimeout(waitForImageReady, 16);
+                        return;
+                    }
+                    handleImageDone();
+                };
+                svgimg.onload = handleImageDone;
+                svgimg.onerror = handleImageDone;
+                svgimg.src = dataurl;
+                window.setTimeout(waitForImageReady, 16);
             }
 
             function readToLad () {

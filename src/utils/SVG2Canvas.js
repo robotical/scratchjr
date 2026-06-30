@@ -55,7 +55,9 @@ export default class SVG2Canvas {
 
     static drawInCanvas(spr) {
         svgerror = false;
-        setCanvasSize(spr.outline, spr.originalImg.width, spr.originalImg.height);
+        var w = spr.originalImg.width || spr.img.naturalWidth || spr.img.width;
+        var h = spr.originalImg.height || spr.img.naturalHeight || spr.img.height;
+        setCanvasSize(spr.outline, w, h);
         var ctx = spr.outline.getContext('2d');
         if (spr.name.includes('Marty')) {
             ctx.drawImage(spr.img, 0, 0); // using the srpite image instead of the svg because our Marty svg has an image in it

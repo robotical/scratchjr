@@ -130,12 +130,49 @@ export default class Sprite {
 
     setCostume(dataurl, fcn) {
         var img = document.createElement('img');
+        var sprite = this;
+        var finished = false;
+        var finish = function () {
+            if (finished) {
+                return;
+            }
+            finished = true;
+            sprite.displaySprite(fcn);
+        };
+        var fail = function () {
+            if (finished) {
+                return;
+            }
+            finished = true;
+            console.log('Error loading image for sprite ' + sprite.name);
+            if (fcn) {
+                fcn(sprite);
+            }
+        };
+        var readyChecks = 0;
+        var finishWhenReady = function () {
+            if (finished) {
+                return;
+            }
+            if (img.naturalWidth || img.width) {
+                finish();
+                return;
+            }
+            if (readyChecks < 300) {
+                readyChecks++;
+                window.setTimeout(finishWhenReady, 16);
+                return;
+            }
+            fail();
+        };
         img.ondragstart = function () {
             return false;
         };
         img.alt = '';
-        img.src = dataurl;
         this.img = img;
+        img.onload = finish;
+        img.onerror = fail;
+        img.src = dataurl;
         // Make a copy that is not affected by zoom transformation
         this.originalImg = img.cloneNode(false);
         setProps(this.img.style, {
@@ -144,17 +181,7 @@ export default class Sprite {
             top: '0px'
         });
         this.div.appendChild(img);
-        var sprite = this;
-        if (!img.complete) {
-            img.onload = function () {
-                sprite.displaySprite(fcn);
-            };
-            img.onerror = function () {
-                console.log('Error loading image for sprite ' + sprite.name);
-            };
-        } else {
-            sprite.displaySprite(fcn);
-        }
+        window.setTimeout(finishWhenReady, 16);
     }
 
     displaySprite(whenDone) {
@@ -171,11 +198,16 @@ export default class Sprite {
     }
 
     doRender(whenDone) {
-        this.drawBorder(); // canvas draw border
-        this.render();
-        SVG2Canvas.drawInCanvas(this); // canvas draws mask for pixel detection
-        this.readOnly = SVG2Canvas.svgerror;
-        this.watermark = SVGTools.getWatermark(this.svg, '#B3B3B3'); // svg for watermark
+        try {
+            this.drawBorder(); // canvas draw border
+            this.render();
+            SVG2Canvas.drawInCanvas(this); // canvas draws mask for pixel detection
+            this.readOnly = SVG2Canvas.svgerror;
+            this.watermark = SVGTools.getWatermark(this.svg, '#B3B3B3'); // svg for watermark
+        } catch (e) {
+            console.log('Error rendering sprite ' + this.name, e);
+            this.readOnly = true;
+        }
         if (whenDone) {
             whenDone(this);
         }

@@ -429,8 +429,14 @@ export default class Page {
         }
         var imgw = img.naturalWidth ? img.naturalWidth : img.width;
         var imgh = img.naturalHeight ? img.naturalHeight : img.height;
+        if (!imgw || !imgh) {
+            return;
+        }
         var sw = imgw * spr.scale;
         var sh = imgh * spr.scale;
+        if (!sw || !sh) {
+            return;
+        }
         ctx.save();
         var pt = {
             x: spr.cx * spr.scale * scale,
