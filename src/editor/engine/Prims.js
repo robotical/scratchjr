@@ -14,6 +14,7 @@ const intervalToSeconds = 31.25; // runtime tick is set at 32ms by Runtime.js. 3
 
 const lastCogEventTimestamps = {};
 const lastMartyEventTimestamps = {};
+const lastMicroBitEventTimestamps = {};
 const MARTY_EVENT_ARGUMENTS = {
     martycoloursensed: ['martycoloursensedred', 'martycoloursensedgreen', 'martycoloursensedblue', 'martycoloursensedpurple', 'martycoloursensedyellow', 'martycoloursensednone'],
     martyobstaclesensed: ['martyobstaclesensedobstaclesensed', 'martyobstaclesensedobstaclenotsensed'],
@@ -21,6 +22,21 @@ const MARTY_EVENT_ARGUMENTS = {
     martynoisesensed: ['martynoisesensednoisesensed', 'martynoisesensednonoisesensed'],
 };
 const MARTY_EVENT_BLOCK_TYPES = Object.keys(MARTY_EVENT_ARGUMENTS);
+const MICROBIT_EVENT_ARGUMENTS = {
+    microbitbuttonpressed: ['microbitbuttona', 'microbitbuttonb', 'microbitbuttonany'],
+    microbitgesture: ['microbitgesturemoved', 'microbitgestureshaken', 'microbitgesturejumped'],
+    microbitpinconnected: ['microbitpin0', 'microbitpin1', 'microbitpin2'],
+    microbittilted: ['microbittiltany', 'microbittiltright', 'microbittiltleft', 'microbittiltbackward', 'microbittiltforward']
+};
+const MICROBIT_EVENT_BLOCK_TYPES = Object.keys(MICROBIT_EVENT_ARGUMENTS);
+const MICROBIT_EVENT_ALIASES = {
+    tilt_any: 'microbittiltany',
+    tiltright: 'microbittiltright',
+    tiltleft: 'microbittiltleft',
+    tiltbackward: 'microbittiltbackward',
+    tiltforward: 'microbittiltforward'
+};
+const normalizeMicroBitEvent = event => MICROBIT_EVENT_ALIASES[event] || event;
 export default class Prims {
     static get hopList() {
         return hopList;
@@ -92,6 +108,16 @@ export default class Prims {
         Prims.table.waitcrotchet = Prims.waitcrotchet;
         Prims.table.settempo = Prims.settempo;
         Prims.table.setcogvolume = Prims.setCogVolume;
+
+        /* micro:bit Prims */
+        Prims.table.microbitbuttonpressed = Prims.Ignore;
+        Prims.table.microbitgesture = Prims.Ignore;
+        Prims.table.microbitpinconnected = Prims.Ignore;
+        Prims.table.microbittilted = Prims.Ignore;
+        Prims.table.microbitdisplayheart = Prims.microBitDisplayHeart;
+        Prims.table.microbitdisplayhappy = Prims.microBitDisplayHappy;
+        Prims.table.microbitdisplaytext = Prims.microBitDisplayText;
+        Prims.table.microbitdisplayclear = Prims.microBitDisplayClear;
 
 
 
@@ -325,6 +351,35 @@ export default class Prims {
         Prims.setTime(strip);
         strip.waitTimer = tinterval * 1;
         strip.thisblock = strip.thisblock.next;
+    }
+
+    static finishMicroBitCommand(strip, seconds = 0.2) {
+        Prims.setTime(strip);
+        strip.waitTimer = convertNumberToSeconds(seconds);
+        strip.thisblock = strip.thisblock.next;
+    }
+
+    static microBitDisplayHeart(strip) {
+        Prims.microBitBlocks?.displaySymbol('microbitdisplayheart');
+        Prims.finishMicroBitCommand(strip);
+    }
+
+    static microBitDisplayHappy(strip) {
+        Prims.microBitBlocks?.displaySymbol('microbitdisplayhappy');
+        Prims.finishMicroBitCommand(strip);
+    }
+
+    static microBitDisplayText(strip) {
+        const text = strip.thisblock.getArgValue();
+        Prims.microBitBlocks?.displayText(text);
+        const safeTextLength = String(text || '').substring(0, 19).length;
+        const seconds = Math.max(0.2, 0.12 * ((6 * safeTextLength) + 6));
+        Prims.finishMicroBitCommand(strip, seconds);
+    }
+
+    static microBitDisplayClear(strip) {
+        Prims.microBitBlocks?.clearDisplay();
+        Prims.finishMicroBitCommand(strip);
     }
 
     static Say(strip) {
@@ -1649,6 +1704,43 @@ export default class Prims {
         }
     }
 
+    static OnMicroBitEvent(event) {
+        const normalizedEvent = normalizeMicroBitEvent(event);
+        const now = Date.now();
+        if (
+            lastMicroBitEventTimestamps[normalizedEvent] &&
+            now - lastMicroBitEventTimestamps[normalizedEvent] < 150
+        ) {
+            return;
+        }
+
+        lastMicroBitEventTimestamps[normalizedEvent] = now;
+
+        var pair;
+        var receivers = [];
+
+        var findReceivers = function (block, s) {
+            const allowedEvents = MICROBIT_EVENT_ARGUMENTS[block.blocktype];
+            if (!allowedEvents || allowedEvents.indexOf(normalizedEvent) === -1) {
+                return;
+            }
+            if (normalizeMicroBitEvent(block.getArgValue()) === normalizedEvent) {
+                receivers.push([s, block]);
+            }
+        };
+
+        Prims.applyToAllStrips(MICROBIT_EVENT_BLOCK_TYPES, findReceivers);
+        var newthreads = [];
+        for (var i in receivers) {
+            pair = receivers[i];
+            const isScriptRunningForThatBlock = ScratchJr.runtime.isScriptRunningForThatBlock(pair[1]);
+            if (isScriptRunningForThatBlock) {
+                continue;
+            }
+            newthreads.push(ScratchJr.runtime.restartThread(pair[0], pair[1], true));
+        }
+    }
+
 
     static Message(strip) {
         var b = strip.thisblock;
@@ -1724,6 +1816,10 @@ export default class Prims {
 
 window.cogEvent = function (event) {
     Prims.OnCogEvent(event);
+}
+
+window.microBitEvent = function (event) {
+    Prims.OnMicroBitEvent(event);
 }
 
 

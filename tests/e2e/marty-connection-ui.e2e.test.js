@@ -65,6 +65,7 @@ vi.mock('@/utils/accessibility', () => ({
     setSelectedState: vi.fn()
 }));
 vi.mock('@/html-svgs/cog', () => ({ cogSvg: '<svg></svg>' }));
+vi.mock('@/html-svgs/microbit', () => ({ microBitSvg: '<svg></svg>' }));
 vi.mock('@/html-svgs/sprite', () => ({ spriteSvg: '<svg></svg>' }));
 vi.mock('@/html-svgs/marty', () => ({ martySvg: '<svg></svg>' }));
 vi.mock('@/html-svgs/sprite-deselected', () => ({ spriteDeselectedSvg: '<svg></svg>' }));
@@ -126,6 +127,11 @@ describe('Marty connection UI', () => {
                 }),
                 removeMarty: vi.fn(),
                 setMartySensorAvailability: vi.fn()
+            },
+            microBitManager: {
+                addMicroBit: vi.fn(),
+                wireMicroBitWithBlocks: vi.fn(),
+                removeMicroBit: vi.fn()
             }
         };
         warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -242,6 +248,37 @@ describe('Marty connection UI', () => {
         expect(button.classList.contains('connectButtonConnected')).toBe(true);
         expect(button.querySelector('.iconButtonContainer').classList.contains('connectedButtonContainer')).toBe(true);
     });
+
+    it('uses a friendly message when the micro:bit chooser is cancelled', () => {
+        const message = UI.getMicroBitConnectionErrorMessage(
+            new DOMException('User cancelled the requestDevice() chooser.', 'NotFoundError')
+        );
+
+        expect(message).toBe('No micro:bit was selected. Click Connect again when you are ready.');
+    });
+
+    it('registers micro:bit blocks and restores the button after direct disconnect', () => {
+        const button = createConnectionButton();
+        const oldOnClick = vi.fn();
+        button.onclick = oldOnClick;
+        const microBit = createMicroBit();
+
+        UI.setupMicroBitConnectionButton(button, microBit);
+
+        expect(window.microBitManager.addMicroBit).toHaveBeenCalledWith(microBit);
+        expect(window.microBitManager.wireMicroBitWithBlocks).toHaveBeenCalledWith('microbit-1');
+        expect(button.classList.contains('connectButtonConnected')).toBe(true);
+
+        button.onclick();
+        vi.advanceTimersByTime(1000);
+
+        expect(microBit.disconnect).toHaveBeenCalled();
+        expect(window.microBitManager.removeMicroBit).toHaveBeenCalledWith(microBit);
+        expect(button.onclick).toBe(oldOnClick);
+        expect(button.classList.contains('connectButtonConnected')).toBe(false);
+        expect(button.querySelector('.iconButtonContainer').classList.contains('notConnectedButtonContainer')).toBe(true);
+        expect(microBit.__disconnectUnsubscribed).toBe(true);
+    });
 });
 
 function createMartyRaft() {
@@ -263,6 +300,25 @@ function createConnectionButton() {
     button.children['.signalIndicatorContainer'] = new FakeElement(['signalIndicatorContainer']);
     button.children['.raftNameConnectButton'] = new FakeElement(['raftNameConnectButton']);
     return button;
+}
+
+function createMicroBit() {
+    const microBit = {
+        id: 'microbit-1',
+        getFriendlyName: () => 'micro:bit One',
+        disconnect: vi.fn(() => {
+            if (microBit.__disconnectCallback) {
+                microBit.__disconnectCallback(microBit);
+            }
+        }),
+        addDisconnectListener: vi.fn(callback => {
+            microBit.__disconnectCallback = callback;
+            return () => {
+                microBit.__disconnectUnsubscribed = true;
+            };
+        })
+    };
+    return microBit;
 }
 
 class FakeElement {

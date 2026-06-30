@@ -1,0 +1,38 @@
+export const microBitSvg = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="micro:bit">
+  <g transform="translate(48 48) scale(2.1) translate(-42.5 -33)">
+    <rect x="27" y="18" width="31" height="27" rx="3" fill="#231f20" opacity="0.16"/>
+    <rect x="26" y="17" width="31" height="27" rx="3" fill="#414757"/>
+    <path d="M26 25v-5c0-1.65 1.35-3 3-3h5z" fill="#4c97ff"/>
+    <path d="M49 17h5c1.65 0 3 1.35 3 3v5z" fill="#4c97ff"/>
+    <path d="M26 37l6 7h-3c-1.65 0-3-1.35-3-3z" fill="#4c97ff"/>
+    <path d="M57 37v4c0 1.65-1.35 3-3 3h-3z" fill="#4c97ff"/>
+    <rect x="30.5" y="27" width="5" height="5" rx="0.8" fill="#e6e7e8" stroke="#7c87a5" stroke-width="0.75"/>
+    <rect x="49.5" y="27" width="5" height="5" rx="0.8" fill="#e6e7e8" stroke="#7c87a5" stroke-width="0.75"/>
+    <circle cx="33" cy="29.5" r="1.05" fill="#414757"/>
+    <circle cx="52" cy="29.5" r="1.05" fill="#414757"/>
+    <g fill="#e6e7e8">
+      <rect x="38" y="25" width="1.8" height="1.8" rx="0.25"/>
+      <rect x="42" y="25" width="1.8" height="1.8" rx="0.25"/>
+      <rect x="46" y="25" width="1.8" height="1.8" rx="0.25"/>
+      <rect x="38" y="29" width="1.8" height="1.8" rx="0.25"/>
+      <rect x="42" y="29" width="1.8" height="1.8" rx="0.25"/>
+      <rect x="46" y="29" width="1.8" height="1.8" rx="0.25"/>
+      <rect x="38" y="33" width="1.8" height="1.8" rx="0.25"/>
+      <rect x="42" y="33" width="1.8" height="1.8" rx="0.25"/>
+      <rect x="46" y="33" width="1.8" height="1.8" rx="0.25"/>
+    </g>
+    <g fill="#ffbf00">
+      <rect x="28" y="41" width="2.5" height="4.5"/>
+      <rect x="32" y="41" width="2.5" height="4.5"/>
+      <rect x="36" y="41" width="2.5" height="4.5"/>
+      <rect x="40" y="41" width="2.5" height="4.5"/>
+      <rect x="44" y="41" width="2.5" height="4.5"/>
+      <rect x="48" y="41" width="2.5" height="4.5"/>
+      <rect x="52" y="41" width="2.5" height="4.5"/>
+    </g>
+    <path d="M39 21h7" stroke="#4c97ff" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="40.2" cy="21" r="0.8" fill="#e6e7e8"/>
+    <circle cx="44.8" cy="21" r="0.8" fill="#e6e7e8"/>
+  </g>
+</svg>`;

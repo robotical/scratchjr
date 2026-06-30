@@ -630,7 +630,7 @@ export default class Scripts {
             if ((list[n].prev == null) && !list[n].isReporter) {
                 res.push(list[n]);
             }
-            if ((list[n].isReporter) && (list[n].daddy = null)) {
+            if ((list[n].isReporter) && (list[n].daddy == null)) {
                 res.push(list[n]);
             }
         }
@@ -798,6 +798,62 @@ export default class Scripts {
             b.div.parentNode.removeChild(b.div);
         }
         this.refreshKeyboardAccessibility();
+    }
+
+    deleteBlocksWhere (predicate) {
+        var blocks = this.getBlocks().filter(function (block) {
+            return predicate(block);
+        });
+        var removed = 0;
+
+        for (var i = 0; i < blocks.length; i++) {
+            var block = blocks[i];
+            if (!block || !block.div || block.div.parentNode != this.sc) {
+                continue;
+            }
+            ScratchJr.runtime.stopThreadBlock(block.findFirst());
+            this.removeBlockAndReconnect(block);
+            removed++;
+        }
+
+        if (removed > 0) {
+            this.redisplay();
+            this.refreshKeyboardAccessibility();
+            if (ScriptsPane.scroll) {
+                ScriptsPane.scroll.adjustCanvas();
+                ScriptsPane.scroll.refresh();
+                ScriptsPane.scroll.fitToScreen();
+            }
+        }
+
+        return removed;
+    }
+
+    removeBlockAndReconnect (block) {
+        var previous = block.prev;
+        var next = block.next;
+
+        if (previous) {
+            var dock = previous.getMyDockNum(block);
+            if (dock > -1) {
+                previous.setMyDock(dock, next);
+            }
+        }
+        if (next) {
+            next.prev = previous || null;
+        }
+
+        block.prev = null;
+        block.next = null;
+        if (block.div.parentNode) {
+            block.div.parentNode.removeChild(block.div);
+        }
+
+        if (previous) {
+            this.layout(previous.findFirst());
+        } else if (next) {
+            this.layout(next.findFirst());
+        }
     }
 
     recreateStrip (list) {

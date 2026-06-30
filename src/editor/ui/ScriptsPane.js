@@ -150,7 +150,7 @@ export default class ScriptsPane {
         var b = Events.dragcanvas.owner;
         b.detachBlock();
         //	b.lift();
-        if (Events.dragcanvas.isReporter) {
+        if (Events.dragcanvas.owner && Events.dragcanvas.owner.isReporter) {
             return;
         }
         ScratchJr.getActiveScript().owner.prepareCaret(b);

@@ -4,13 +4,13 @@
     position: absolute;
     margin: 0px;
     padding: 0px;
-    top: ${css_vh(0.13)};
+    top: ${css_vh(15.40)};
     left: ${css_vh(1.69)};
     background:  url('../assets/ui/fliplogo.svg');
     background-size: cover;
     background-position: right;
-    width: ${css_vh(8.20)};
-    height: ${css_vh(8.20)};
+    width: ${css_vh(5.60)};
+    height: ${css_vh(5.60)};
 }
 
 /* Styles for the connection buttons area */
@@ -18,7 +18,7 @@
     box-sizing: border-box;
     position: absolute;
     top: ${css_vh(2)};
-    left: ${css_vh(10.94)};
+    left: ${css_vh(1.69)};
     font-family: Lato Regular;
 
     display: flex;
@@ -29,18 +29,24 @@
     border-radius: 10px;
     border: 3px solid #F4AD46;
 
-    width: ${css_vh(25)};
+    width: ${css_vh(22.8)};
     height: ${css_vh(12)};
 
-    padding: 8px 5px;
-    column-gap: 8px;
+    padding: 8px 4px;
+    column-gap: 5px;
+}
+
+.connectionButtonsArea.extensionEnabled {
+    width: ${css_vh(34)};
 }
 
 /* Styles for each connect button */
 .connectButton {
+    flex: 1 1 0;
+    min-width: 0;
     align-self: center;
     justify-self: center;
-    width: 100%;
+    width: auto;
     height: 100%;
     background: white;
     border-radius: 10px;
@@ -51,6 +57,51 @@
     flex-direction: column;
     cursor: pointer;
     padding-top: 2px;
+}
+
+.extensionAddButton {
+    position: absolute;
+    right: -${css_vh(1.45)};
+    bottom: -${css_vh(1.45)};
+    z-index: 5;
+    width: ${css_vh(5)};
+    height: ${css_vh(5)};
+    background: transparent;
+    border: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.extensionAddIcon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: ${css_vh(3.6)};
+    height: ${css_vh(3.6)};
+    border-radius: 50%;
+    background: #5D9CC8;
+    border: ${css_vh(0.32)} solid #fff;
+    box-shadow: 0 ${css_vh(0.26)} ${css_vh(0.52)} rgba(0, 0, 0, 0.28);
+    color: white;
+    font-family: 'Lato Regular';
+    font-size: ${css_vh(3.35)};
+    font-weight: bold;
+    line-height: 1;
+    text-shadow: 0 1px #244a64;
+}
+
+.extensionAddButton:focus-visible .extensionAddIcon {
+    outline: 3px solid #133C46;
+    outline-offset: 2px;
+}
+
+.extensionAddButton:active .extensionAddIcon {
+    background: #3F7EA9;
+    transform: translateY(${css_vh(0.13)});
 }
 
 .connectButtonConnected {
@@ -125,6 +176,10 @@
     column-gap: ${css_vh(1)};
 }
 
+.connectButtonConnected .batteryAndSignalContainer {
+    margin-bottom: ${css_vh(0.35)};
+}
+
 .batteryIndicatorContainer {
     display: grid;
     width: 50%;
@@ -149,6 +204,11 @@
 .connectIcon {
     display: grid;
     width: ${css_vh(4.2)}; 
+}
+
+#cogConnectionButton .connectIcon,
+#martyConnectionButton .connectIcon {
+    margin-bottom: ${css_vh(0.55)};
 }
 
 /* .connectText media query for smaller screens */
@@ -210,7 +270,8 @@
     display: inline-block;
     margin: 0px;
     padding: 0px;
-    top: ${css_vh(15)};
+    top: ${css_vh(14.75)};
+    left: ${css_vh(7.55)};
     width: ${css_vh(33.85)};
     overflow-x: hidden;
 }

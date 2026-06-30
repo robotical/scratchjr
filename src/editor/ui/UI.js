@@ -37,6 +37,7 @@ import {
     setSelectedState
 } from '../../utils/accessibility';
 import { cogSvg } from '../../html-svgs/cog';
+import { microBitSvg } from '../../html-svgs/microbit';
 import { spriteSvg } from '../../html-svgs/sprite';
 import { martySvg } from '../../html-svgs/marty';
 import { spriteDeselectedSvg } from "../../html-svgs/sprite-deselected";
@@ -68,6 +69,13 @@ let connectionLostButton2Interval = null;
 
 const DISCONNECT_CONTEXT_REMOVAL_POLL_MS = 250;
 const DISCONNECT_CONTEXT_REMOVAL_TIMEOUT_MS = 30000;
+const MICROBIT_HOST_CONNECT_METHODS = [
+    'connectGenericMicroBit',
+    'connectGenericMicrobit',
+    'connectMicroBit',
+    'connectMicrobit'
+];
+const MICROBIT_EXTENSION_BLOCK_PREFIX = 'microbit';
 
 const SVG_ID_ATTRIBUTE_RE = /\s+id="[^"]*"/g;
 
@@ -207,7 +215,7 @@ export default class UI {
         var aspect = getDocumentWidth() / getDocumentHeight();
         if (aspect > 1.45) {
             // Nudge sprite list right a bit and the pages list left a bit
-            gn('library').style.left = '3vw';
+            gn('library').style.left = '7.55vh';
             gn('pages').style.right = '1vw';
         }
     }
@@ -268,6 +276,7 @@ export default class UI {
 
     static createConnectionButtons(leftPanel) {
         const connectionButtonsArea = newHTML('div', 'connectionButtonsArea', leftPanel);
+        connectionButtonsArea.setAttribute('id', 'connectionButtonsArea');
 
         /* COG */
         const cogButotn = UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', 'cogConnectionButton', (connectButton) => {
@@ -317,6 +326,416 @@ export default class UI {
             UI.setupMartyConnectionButton(martyButton, connectedMarty);
         }
         /* END MARTY */
+
+        const extensionAddButton = UI.createExtensionAddButton(connectionButtonsArea);
+
+        /* MICROBIT */
+        const microBitButton = UI.createConnectButton(
+            connectionButtonsArea,
+            microBitSvg,
+            'micro:bit',
+            'microBitConnectionButton',
+            UI.connectMicroBit
+        );
+
+        const connectedMicroBit = window.microBitManager?.getActiveMicroBit?.();
+        if (connectedMicroBit) {
+            ScratchJr.isMicroBitExtensionEnabled = true;
+            UI.setupMicroBitConnectionButton(microBitButton, connectedMicroBit);
+        }
+        UI.updateMicroBitExtensionControls();
+        /* END MICROBIT */
+    }
+
+    static createExtensionAddButton(parent) {
+        const addButton = newButton('extensionAddButton', parent, {
+            ariaLabel: 'Manage extensions'
+        });
+        addButton.setAttribute('id', 'addExtensionButton');
+        const icon = newHTML('span', 'extensionAddIcon', addButton);
+        icon.textContent = '+';
+        icon.setAttribute('aria-hidden', 'true');
+        addButton.onclick = () => {
+            ScratchAudio.sndFX('tap.wav');
+            UI.openExtensionsLibrary();
+        };
+        return addButton;
+    }
+
+    static createExtensionsLibrary() {
+        const dialog = newHTML('div', 'extensionsLibrary fade', frame);
+        dialog.setAttribute('id', 'extensionsLibrary');
+
+        const closeButton = newButton('extensionsLibraryClose', dialog, {
+            ariaLabel: Localization.localize('A11Y_CLOSE')
+        });
+        closeButton.onclick = UI.closeExtensionsLibrary;
+
+        const title = newHTML('div', 'extensionsLibraryTitle', dialog);
+        title.setAttribute('id', 'extensionsLibraryTitle');
+        title.textContent = 'Extensions';
+
+        const cards = newHTML('div', 'extensionsLibraryCards', dialog);
+        const microBitCard = newButton('extensionsLibraryCard', cards, {
+            ariaLabel: 'Add micro:bit extension'
+        });
+        microBitCard.setAttribute('id', 'microBitExtensionCard');
+
+        const iconWrap = newHTML('div', 'extensionsLibraryCardIcon', microBitCard);
+        iconWrap.innerHTML = stripInlineSvgIds(microBitSvg);
+        const textWrap = newHTML('div', 'extensionsLibraryCardText', microBitCard);
+        const cardTitle = newHTML('div', 'extensionsLibraryCardTitle', textWrap);
+        cardTitle.setAttribute('id', 'microBitExtensionCardTitle');
+        cardTitle.textContent = 'micro:bit';
+        const cardDescription = newHTML('div', 'extensionsLibraryCardDescription', textWrap);
+        cardDescription.setAttribute('id', 'microBitExtensionCardDescription');
+        cardDescription.textContent = 'Adds micro:bit blocks and connection.';
+        const action = newHTML('div', 'extensionsLibraryCardAction', microBitCard);
+        action.setAttribute('id', 'microBitExtensionCardAction');
+        action.textContent = '+';
+        action.setAttribute('aria-hidden', 'true');
+
+        const removeWarning = newHTML('div', 'extensionsLibraryWarning', dialog);
+        removeWarning.setAttribute('id', 'microBitExtensionRemoveWarning');
+        removeWarning.setAttribute('aria-live', 'polite');
+        const warningTitle = newHTML('div', 'extensionsLibraryWarningTitle', removeWarning);
+        warningTitle.textContent = 'Remove micro:bit extension?';
+        const warningText = newHTML('div', 'extensionsLibraryWarningText', removeWarning);
+        warningText.textContent = 'All micro:bit blocks used in this project will be deleted from the editor.';
+        const warningActions = newHTML('div', 'extensionsLibraryWarningActions', removeWarning);
+        const cancelRemove = newButton('extensionsLibrarySecondaryButton', warningActions, {
+            id: 'microBitExtensionRemoveCancel',
+            textContent: 'Cancel'
+        });
+        const confirmRemove = newButton('extensionsLibraryDangerButton', warningActions, {
+            id: 'microBitExtensionRemoveConfirm',
+            textContent: 'Remove'
+        });
+        cancelRemove.onclick = () => {
+            ScratchAudio.sndFX('tap.wav');
+            UI.hideMicroBitExtensionRemoveWarning();
+        };
+        confirmRemove.onclick = () => {
+            ScratchAudio.sndFX('tap.wav');
+            UI.disableMicroBitExtension();
+            UI.closeExtensionsLibrary(null, { playSound: false });
+        };
+
+        microBitCard.onclick = () => {
+            ScratchAudio.sndFX('tap.wav');
+            if (ScratchJr.isMicroBitExtensionEnabled) {
+                UI.showMicroBitExtensionRemoveWarning();
+                return;
+            }
+            UI.enableMicroBitExtension();
+            UI.closeExtensionsLibrary(null, { playSound: false, restoreFocus: false });
+            setTimeout(() => {
+                const microBitButton = gn('microBitConnectionButton');
+                if (microBitButton) {
+                    microBitButton.focus();
+                }
+            }, 0);
+        };
+
+        registerDialog(dialog, {
+            labelledBy: 'extensionsLibraryTitle',
+            initialFocus: function () {
+                return microBitCard;
+            },
+            scope: frame,
+            onRequestClose: UI.closeExtensionsLibrary
+        });
+
+        return dialog;
+    }
+
+    static openExtensionsLibrary() {
+        let dialog = gn('extensionsLibrary');
+        if (!dialog) {
+            dialog = UI.createExtensionsLibrary();
+        }
+        UI.updateExtensionsLibraryState();
+
+        const backdrop = gn('backdrop');
+        if (backdrop) {
+            backdrop.setAttribute('class', 'modal-backdrop fade in');
+            setProps(backdrop.style, {
+                display: 'block'
+            });
+        }
+
+        dialog.className = 'extensionsLibrary fade in';
+        openDialog(dialog);
+    }
+
+    static closeExtensionsLibrary(event, options = {}) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const dialog = gn('extensionsLibrary');
+        if (!dialog) {
+            return;
+        }
+        if (options.playSound !== false) {
+            ScratchAudio.sndFX('exittap.wav');
+        }
+        UI.hideMicroBitExtensionRemoveWarning({ focusCard: false });
+        dialog.className = 'extensionsLibrary fade';
+        closeDialog(dialog, {
+            restoreFocus: options.restoreFocus !== false
+        });
+
+        const backdrop = gn('backdrop');
+        if (backdrop) {
+            backdrop.setAttribute('class', 'modal-backdrop fade');
+            setProps(backdrop.style, {
+                display: 'none'
+            });
+        }
+    }
+
+    static updateExtensionsLibraryState() {
+        const card = gn('microBitExtensionCard');
+        if (!card) {
+            return;
+        }
+        const isLoaded = ScratchJr.isMicroBitExtensionEnabled;
+        const description = gn('microBitExtensionCardDescription');
+        const action = gn('microBitExtensionCardAction');
+
+        card.classList.toggle('loaded', isLoaded);
+        card.setAttribute('aria-label', isLoaded ? 'Remove micro:bit extension' : 'Add micro:bit extension');
+        if (description) {
+            description.textContent = isLoaded ?
+                'micro:bit blocks are available. Select to remove.' :
+                'Adds micro:bit blocks and connection.';
+        }
+        if (action) {
+            action.textContent = isLoaded ? '-' : '+';
+        }
+        if (!isLoaded) {
+            UI.hideMicroBitExtensionRemoveWarning({ focusCard: false });
+        }
+    }
+
+    static showMicroBitExtensionRemoveWarning() {
+        const warning = gn('microBitExtensionRemoveWarning');
+        if (!warning) {
+            return;
+        }
+        warning.classList.add('show');
+        const confirmButton = gn('microBitExtensionRemoveConfirm');
+        if (confirmButton) {
+            confirmButton.focus();
+        }
+    }
+
+    static hideMicroBitExtensionRemoveWarning(options = {}) {
+        const warning = gn('microBitExtensionRemoveWarning');
+        if (!warning) {
+            return;
+        }
+        warning.classList.remove('show');
+        if (options.focusCard !== false) {
+            const card = gn('microBitExtensionCard');
+            if (card) {
+                card.focus();
+            }
+        }
+    }
+
+    static enableMicroBitExtension(options = {}) {
+        ScratchJr.isMicroBitExtensionEnabled = true;
+        UI.updateMicroBitExtensionControls();
+        UI.updateExtensionsLibraryState();
+        if (Palette.parent) {
+            Palette.recreateRightCategory();
+            if (options.selectCategory !== false) {
+                UI.selectMicroBitStartCategory();
+            }
+        }
+    }
+
+    static disableMicroBitExtension() {
+        UI.removeMicroBitBlocksFromProject();
+        UI.disconnectMicroBitForExtensionUnload();
+
+        ScratchJr.isMicroBitExtensionEnabled = false;
+        UI.updateMicroBitExtensionControls();
+        UI.updateExtensionsLibraryState();
+        if (Palette.parent) {
+            Palette.recreateRightCategory();
+            UI.selectFirstRightCategory();
+        }
+    }
+
+    static removeMicroBitBlocksFromProject() {
+        const pages = ScratchJr.stage?.pages || [];
+        let removedCount = 0;
+        for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
+            const page = pages[pageIndex];
+            let removedFromPage = 0;
+            const spriteIds = page && typeof page.getSprites === 'function' ? page.getSprites() : [];
+            for (let spriteIndex = 0; spriteIndex < spriteIds.length; spriteIndex++) {
+                const spriteId = spriteIds[spriteIndex];
+                const scriptsElement = gn(spriteId + '_scripts');
+                const scripts = scriptsElement?.owner;
+                if (!scripts || typeof scripts.deleteBlocksWhere !== 'function') {
+                    continue;
+                }
+                const removedFromSprite = scripts.deleteBlocksWhere(block =>
+                    block && typeof block.blocktype === 'string' &&
+                    block.blocktype.indexOf(MICROBIT_EXTENSION_BLOCK_PREFIX) === 0
+                );
+                if (removedFromSprite > 0) {
+                    removedCount += removedFromSprite;
+                    removedFromPage += removedFromSprite;
+                    Undo.record({
+                        action: 'scripts',
+                        where: page.id,
+                        who: spriteId
+                    });
+                }
+            }
+            if (removedFromPage > 0 && page && typeof page.updateThumb === 'function') {
+                page.updateThumb();
+            }
+        }
+        if (removedCount > 0) {
+            ScratchJr.storyStart('UI.removeMicroBitBlocksFromProject');
+        }
+        return removedCount;
+    }
+
+    static disconnectMicroBitForExtensionUnload() {
+        const microBit = window.microBitManager?.getActiveMicroBit?.();
+        if (!microBit) {
+            return;
+        }
+        if (microBit.__mbjrHostManaged && window.applicationManager?.disconnectGeneric) {
+            window.applicationManager.disconnectGeneric(microBit);
+        } else if (typeof microBit.disconnect === 'function') {
+            microBit.disconnect();
+        }
+        window.microBitManager?.removeMicroBit?.(microBit);
+
+        const button = gn('microBitConnectionButton');
+        if (button) {
+            button.classList.remove('connectButtonConnected');
+            UI.resetConnectionButtonVisuals(button);
+            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' micro:bit');
+        }
+    }
+
+    static selectMicroBitStartCategory() {
+        const leftSelectors = gn('selectors');
+        const rightSelectors = gn('selectorsright');
+        if (!leftSelectors || !rightSelectors || !BlockSpecs.categoriesMicroBit?.length) {
+            return;
+        }
+        const leftCategoriesLength = ScratchJr.isMartyModeEnabled ?
+            BlockSpecs.categoriesMarty.length :
+            BlockSpecs.categories.length;
+        Palette.selectCategory(leftCategoriesLength + BlockSpecs.categoriesCog.length);
+    }
+
+    static selectFirstRightCategory() {
+        const leftSelectors = gn('selectors');
+        const rightSelectors = gn('selectorsright');
+        if (!leftSelectors || !rightSelectors) {
+            return;
+        }
+        const leftCategoriesLength = ScratchJr.isMartyModeEnabled ?
+            BlockSpecs.categoriesMarty.length :
+            BlockSpecs.categories.length;
+        Palette.selectCategory(leftCategoriesLength);
+    }
+
+    static updateMicroBitExtensionControls() {
+        const enabled = ScratchJr.isMicroBitExtensionEnabled;
+        const connectionButtonsArea = gn('connectionButtonsArea');
+        const addButton = gn('addExtensionButton');
+        const microBitButton = gn('microBitConnectionButton');
+
+        if (connectionButtonsArea) {
+            connectionButtonsArea.classList.toggle('extensionEnabled', enabled);
+        }
+        if (addButton) {
+            addButton.style.display = 'flex';
+            addButton.disabled = false;
+            addButton.setAttribute('aria-hidden', 'false');
+            addButton.setAttribute('aria-label', 'Manage extensions');
+        }
+        if (microBitButton) {
+            microBitButton.style.display = enabled ? '' : 'none';
+            microBitButton.disabled = !enabled;
+            microBitButton.setAttribute('aria-hidden', enabled ? 'false' : 'true');
+        }
+    }
+
+    static getHostMicroBitConnectFunction() {
+        const applicationManager = typeof window !== 'undefined' ? window.applicationManager : null;
+        if (!applicationManager) {
+            return null;
+        }
+        for (let i = 0; i < MICROBIT_HOST_CONNECT_METHODS.length; i++) {
+            const methodName = MICROBIT_HOST_CONNECT_METHODS[i];
+            if (typeof applicationManager[methodName] === 'function') {
+                return applicationManager[methodName].bind(applicationManager);
+            }
+        }
+        return null;
+    }
+
+    static connectMicroBit(connectButton) {
+        const hostConnect = UI.getHostMicroBitConnectFunction();
+        if (hostConnect) {
+            hostConnect((microBit) => {
+                if (!microBit) {
+                    return;
+                }
+                microBit.__mbjrHostManaged = true;
+                UI.setupMicroBitConnectionButton(connectButton, microBit);
+            });
+            return;
+        }
+
+        const manager = window.microBitManager;
+        if (!manager || typeof manager.createAndConnectMicroBit !== 'function') {
+            UI.showMicroBitConnectionError(connectButton, new Error('micro:bit connection is not available.'));
+            return;
+        }
+
+        manager.createAndConnectMicroBit()
+            .then(microBit => {
+                UI.setupMicroBitConnectionButton(connectButton, microBit);
+            })
+            .catch(error => {
+                UI.showMicroBitConnectionError(connectButton, error);
+            });
+    }
+
+    static getMicroBitConnectionErrorMessage(error) {
+        const message = error && error.message ? error.message : '';
+        const errorName = error && error.name ? error.name : '';
+        if (errorName == 'NotFoundError' || /cancelled|canceled|requestDevice\(\) chooser/i.test(message)) {
+            return 'No micro:bit was selected. Click Connect again when you are ready.';
+        }
+        if (/web bluetooth is not available|not available in this browser/i.test(message)) {
+            return 'micro:bit connection is not available in this browser. Try a browser that supports Web Bluetooth.';
+        }
+        return 'Could not connect to the micro:bit. Check that it is powered on and nearby, then try again.';
+    }
+
+    static showMicroBitConnectionError(button, error) {
+        const message = UI.getMicroBitConnectionErrorMessage(error);
+        if (window.applicationManager?.toaster?.warn) {
+            window.applicationManager.toaster.warn(message);
+            return;
+        }
+        console.warn(message, error);
+        Alert.open(frame, button, message, '#d62222', 3000);
     }
 
     static updateMartySensorAvailability(martyOrId, availability) {
@@ -606,6 +1025,80 @@ export default class UI {
         // Set up a subscription to the raft disconnected event
         const disconnectedSubs = raftDisconnectedSubscriptionHelper(raft);
         disconnectedSubs.subscribe(handleDisconnected);
+    }
+
+    static setupMicroBitConnectionButton(button, microBit) {
+        ScratchJr.isMicroBitExtensionEnabled = true;
+        UI.updateMicroBitExtensionControls();
+
+        button.classList.add('connectButtonConnected');
+
+        const connectButtonContainer = button.querySelector('.iconButtonContainer');
+        connectButtonContainer.classList.remove('notConnectedButtonContainer');
+        connectButtonContainer.classList.add('connectedButtonContainer');
+
+        const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
+        const signalIndicator = button.querySelector('.signalIndicatorContainer');
+        const raftName = button.querySelector('.raftNameConnectButton');
+        batteryIndicator.style.display = 'none';
+        signalIndicator.style.display = 'none';
+        raftName.style.display = 'grid';
+        raftName.textContent = truncateString(
+            typeof microBit.getFriendlyName === 'function' ? microBit.getFriendlyName() : 'micro:bit'
+        );
+
+        const oldOnClick = button.onclick;
+        let didHandleDisconnect = false;
+        let unsubscribeDisconnect = null;
+
+        const handleDisconnected = () => {
+            if (didHandleDisconnect) {
+                return;
+            }
+            didHandleDisconnect = true;
+
+            button.classList.remove('connectButtonConnected');
+            window.microBitManager?.removeMicroBit?.(microBit);
+
+            setTimeout(() => {
+                UI.resetConnectionButtonVisuals(button);
+            }, 1000);
+
+            if (unsubscribeDisconnect) {
+                unsubscribeDisconnect();
+                unsubscribeDisconnect = null;
+            }
+
+            button.onclick = oldOnClick;
+            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' micro:bit');
+        };
+
+        button.onclick = () => {
+            if (microBit.__mbjrHostManaged && window.applicationManager?.disconnectGeneric) {
+                UI.disconnectRaftAndClearWhenConfirmed(microBit, handleDisconnected);
+                return;
+            }
+            if (typeof microBit.disconnect === 'function') {
+                microBit.disconnect();
+            } else {
+                handleDisconnected();
+            }
+        };
+        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' +
+            (typeof microBit.getFriendlyName === 'function' ? microBit.getFriendlyName() : 'micro:bit'));
+
+        if (window.microBitManager) {
+            try {
+                window.microBitManager.addMicroBit(microBit);
+                window.microBitManager.wireMicroBitWithBlocks(microBit.id);
+            } catch (error) {
+                console.warn('Unable to wire micro:bit blocks after connection.', error);
+            }
+        }
+
+        if (typeof microBit.addDisconnectListener === 'function') {
+            unsubscribeDisconnect = microBit.addDisconnectListener(handleDisconnected);
+        }
     }
 
     static leftPanel(div) {
@@ -1665,6 +2158,7 @@ export default class UI {
             // Send stop commands to all connected rafts
             window.martyManager.stopAllMartys();
             window.cogManager.stopAllCogs();
+            window.microBitManager?.stopAllMicroBits?.();
         }
     }
 

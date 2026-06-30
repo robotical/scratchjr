@@ -307,7 +307,7 @@ div.frame {
     right: 0;
     margin: ${css_vh(0)};
     z-index: 60;
-    width: ${180 * scaleMultiplier}px;
+    width: ${300 * scaleMultiplier}px;
     height: ${64 * scaleMultiplier}px;
     overflow: hidden;
 }
@@ -640,6 +640,213 @@ z-index: 5;
 }
 
 .halign.down { background: url('../assets/ui/arrowdown.svg'); background-size: 100%; }
+
+/* extensions library */
+.extensionsLibrary {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: ${css_vh(52)};
+    min-height: ${css_vh(28)};
+    transform: translate(-50%, -50%);
+    z-index: 12000;
+    box-sizing: border-box;
+    padding: ${css_vh(3.2)} ${css_vh(3.4)} ${css_vh(3.6)};
+    border: 3px solid #F4AD46;
+    border-radius: 16px;
+    background: #FEDF8F;
+    box-shadow: 0 ${css_vh(0.65)} ${css_vh(2.2)} rgba(0, 0, 0, 0.32);
+    font-family: 'Lato Regular';
+}
+
+.extensionsLibrary.fade {
+    display: none;
+    opacity: 0;
+}
+
+.extensionsLibrary.fade.in {
+    display: block;
+    opacity: 1;
+}
+
+.extensionsLibraryClose {
+    position: absolute;
+    right: ${css_vh(1.1)};
+    top: ${css_vh(1.1)};
+    width: ${css_vh(4.3)};
+    height: ${css_vh(4.3)};
+    border: 0;
+    padding: 0;
+    background: url('../assets/ui/closeit.svg') no-repeat center center;
+    background-size: 100%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.extensionsLibraryClose:focus-visible,
+.extensionsLibraryCard:focus-visible {
+    outline: 3px solid #133C46;
+    outline-offset: 3px;
+}
+
+.extensionsLibraryTitle {
+    color: #315F7B;
+    font-size: ${css_vh(3.4)};
+    font-weight: bold;
+    line-height: ${css_vh(4)};
+    text-align: center;
+    text-shadow: 0 ${css_vh(0.13)} #fff;
+}
+
+.extensionsLibraryCards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: ${css_vh(1.6)};
+    margin-top: ${css_vh(2.5)};
+}
+
+.extensionsLibraryCard {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: ${css_vh(9)} 1fr ${css_vh(4)};
+    column-gap: ${css_vh(1.8)};
+    align-items: center;
+    width: 100%;
+    min-height: ${css_vh(11)};
+    padding: ${css_vh(1.2)} ${css_vh(1.4)};
+    border: 3px solid #F4AD46;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Lato Regular';
+    -webkit-tap-highlight-color: transparent;
+}
+
+.extensionsLibraryCard:active {
+    background: #FFF5D9;
+}
+
+.extensionsLibraryCard.loaded {
+    background: #F6FBFF;
+    border-color: #5D9CC8;
+}
+
+.extensionsLibraryCardIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: ${css_vh(8)};
+    height: ${css_vh(8)};
+    border-radius: 50%;
+    background: #F9CF37;
+}
+
+.extensionsLibraryCardIcon svg {
+    width: ${css_vh(6.3)};
+    height: ${css_vh(6.3)};
+}
+
+.extensionsLibraryCardText {
+    min-width: 0;
+}
+
+.extensionsLibraryCardTitle {
+    color: #315F7B;
+    font-size: ${css_vh(2.6)};
+    font-weight: bold;
+    line-height: ${css_vh(3.1)};
+}
+
+.extensionsLibraryCardDescription {
+    margin-top: ${css_vh(0.35)};
+    color: #416E86;
+    font-size: ${css_vh(1.7)};
+    line-height: ${css_vh(2.3)};
+}
+
+.extensionsLibraryCardAction {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: end;
+    width: ${css_vh(3.6)};
+    height: ${css_vh(3.6)};
+    border-radius: 50%;
+    background: #5D9CC8;
+    color: #fff;
+    font-size: ${css_vh(3.2)};
+    font-weight: bold;
+    line-height: 1;
+    text-shadow: 0 1px #244a64;
+}
+
+.extensionsLibraryCard.loaded .extensionsLibraryCardAction {
+    background: #E43D44;
+}
+
+.extensionsLibraryWarning {
+    display: none;
+    margin-top: ${css_vh(2)};
+    padding: ${css_vh(1.35)} ${css_vh(1.5)};
+    border-radius: 10px;
+    border: 2px solid #D47F25;
+    background: #FFF5D9;
+}
+
+.extensionsLibraryWarning.show {
+    display: block;
+}
+
+.extensionsLibraryWarningTitle {
+    color: #315F7B;
+    font-size: ${css_vh(2.25)};
+    font-weight: bold;
+    line-height: ${css_vh(2.8)};
+}
+
+.extensionsLibraryWarningText {
+    margin-top: ${css_vh(0.55)};
+    color: #416E86;
+    font-size: ${css_vh(1.65)};
+    line-height: ${css_vh(2.25)};
+}
+
+.extensionsLibraryWarningActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: ${css_vh(1)};
+    margin-top: ${css_vh(1.35)};
+}
+
+.extensionsLibrarySecondaryButton,
+.extensionsLibraryDangerButton {
+    min-width: ${css_vh(8.2)};
+    min-height: ${css_vh(3.7)};
+    border-radius: 10px;
+    border: 2px solid #315F7B;
+    color: #fff;
+    font-family: 'Lato Regular';
+    font-size: ${css_vh(1.75)};
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.extensionsLibrarySecondaryButton {
+    background: #5D9CC8;
+}
+
+.extensionsLibraryDangerButton {
+    border-color: #9E1F28;
+    background: #E43D44;
+}
+
+.extensionsLibrarySecondaryButton:focus-visible,
+.extensionsLibraryDangerButton:focus-visible {
+    outline: 3px solid #133C46;
+    outline-offset: 3px;
+}
 
 /* parental gate */
 .parentalgate {

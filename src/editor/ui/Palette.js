@@ -58,7 +58,9 @@ const CATEGORY_LABELS = {
     'marty-stop': 'BLOCKS_END_BLOCKS',
     'cog-start': 'BLOCKS_TRIGGERING_BLOCKS',
     'cog-looks': 'BLOCKS_LOOKS_BLOCKS',
-    'cog-sound': 'BLOCKS_SOUND_BLOCKS'
+    'cog-sound': 'BLOCKS_SOUND_BLOCKS',
+    'microbit-start': 'BLOCKS_TRIGGERING_BLOCKS',
+    'microbit-looks': 'BLOCKS_LOOKS_BLOCKS'
 };
 
 export default class Palette {
@@ -134,6 +136,20 @@ export default class Palette {
         newHTML('div', 'withstyle', pc);
     }
 
+    static getRightCategories() {
+        if (!ScratchJr.isMicroBitExtensionEnabled) {
+            return BlockSpecs.categoriesCog;
+        }
+        return BlockSpecs.categoriesCog.concat(BlockSpecs.categoriesMicroBit || []);
+    }
+
+    static getRightPalettes() {
+        if (!ScratchJr.isMicroBitExtensionEnabled) {
+            return BlockSpecs.palettesCog;
+        }
+        return BlockSpecs.palettesCog.concat(BlockSpecs.palettesMicroBit || []);
+    }
+
     static createCategorySelectors(parent) {
         var sel = newHTML('div', 'categoryselector', parent);
         sel.setAttribute('id', 'selectors');
@@ -161,8 +177,9 @@ export default class Palette {
         var widthPx = 54 * scaleMultiplier;
         /*MartyMode*/
         const leftCategoriesLength = ScratchJr.isMartyModeEnabled ? BlockSpecs.categoriesMarty.length : BlockSpecs.categories.length;
-        for (var i = 0; i < BlockSpecs.categoriesCog.length; i++) {
-            Palette.createSelector(sel, leftCategoriesLength + i, leftPx + i * widthPx, 0, BlockSpecs.categoriesCog[i]);
+        const rightCategories = Palette.getRightCategories();
+        for (var i = 0; i < rightCategories.length; i++) {
+            Palette.createSelector(sel, leftCategoriesLength + i, leftPx + i * widthPx, 0, rightCategories[i]);
         }
     }
 
@@ -652,7 +669,7 @@ export default class Palette {
             return;
         }
         /*MartyMode*/
-        let pallets = isRightCategories ? BlockSpecs.palettesCog : BlockSpecs.palettes;
+        let pallets = isRightCategories ? Palette.getRightPalettes() : BlockSpecs.palettes;
         if (!isRightCategories && ScratchJr.isMartyModeEnabled) {
             pallets = BlockSpecs.palettesMarty;
         }
@@ -686,7 +703,7 @@ export default class Palette {
             }
         }
         dx += 30;
-        let categoriesLength = isRightCategories ? BlockSpecs.categoriesCog.length : BlockSpecs.categories.length;
+        let categoriesLength = isRightCategories ? Palette.getRightCategories().length : BlockSpecs.categories.length;
         /*MartyMode*/
         if (!isRightCategories && ScratchJr.isMartyModeEnabled) {
             categoriesLength = BlockSpecs.categoriesMarty.length;

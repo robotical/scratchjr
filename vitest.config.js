@@ -1,7 +1,6 @@
 const path = require('path');
-const { defineConfig } = require('vitest/config');
 
-module.exports = defineConfig({
+module.exports = {
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src')
@@ -12,4 +11,4 @@ module.exports = defineConfig({
         include: ['tests/**/*.test.js'],
         fileParallelism: false
     }
-});
+};

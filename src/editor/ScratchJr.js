@@ -25,6 +25,7 @@ import {
 } from '../utils/lib';
 import CogManager from "../cog/CogManager";
 import MartyManager from '../marty/MartyManager';
+import MicroBitManager from '../microbit/MicroBitManager';
 import ApplicationManagerMock from "../utils/ApplicationManagerMock";
 import Thumbs from './ui/Thumbs';
 import Trace from "./ui/Trace";
@@ -72,6 +73,7 @@ let autoSaveSetInterval = null;
 
 /*MartyMode*/
 let isMartyModeEnabled = false;
+let isMicroBitExtensionEnabled = false;
 
 let onBackButtonCallback = [];
 
@@ -202,6 +204,14 @@ export default class ScratchJr {
     /*MartyMode*/
     static get isMartyModeEnabled() {
         return isMartyModeEnabled;
+    }
+
+    static get isMicroBitExtensionEnabled() {
+        return isMicroBitExtensionEnabled;
+    }
+
+    static set isMicroBitExtensionEnabled(newIsMicroBitExtensionEnabled) {
+        isMicroBitExtensionEnabled = newIsMicroBitExtensionEnabled;
     }
 
     static get BIRDS_EYE_SPRITE_NAME() {
@@ -1226,4 +1236,5 @@ export default class ScratchJr {
 window.ScratchJr = ScratchJr;
 window.cogManager = new CogManager();
 window.martyManager = new MartyManager();
+window.microBitManager = new MicroBitManager();
 window.applicationManagerMock = new ApplicationManagerMock();

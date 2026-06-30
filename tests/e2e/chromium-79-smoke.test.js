@@ -123,6 +123,187 @@ describe("Chromium 79 smoke test", () => {
   );
 
   it(
+    "hides micro:bit controls until the extension is added",
+    async () => {
+      const { browser, page, errors } = await openPage("/editor.html?mode=edit");
+
+      try {
+        await page.waitForSelector("#addExtensionButton", { timeout: 30_000 });
+
+        const initialState = await page.evaluate(() => {
+          const addButton = document.getElementById("addExtensionButton");
+          const microBitButton = document.getElementById("microBitConnectionButton");
+          return {
+            addButtonDisplay: window.getComputedStyle(addButton).display,
+            addButtonAriaHidden: addButton.getAttribute("aria-hidden"),
+            addButtonDisabled: addButton.disabled,
+            microBitButtonDisplay: window.getComputedStyle(microBitButton).display,
+            microBitButtonAriaHidden: microBitButton.getAttribute("aria-hidden"),
+            microBitButtonDisabled: microBitButton.disabled,
+            rightCategoryIds: Array.from(document.querySelectorAll("#selectorsright .category-selector-button")).map(
+              (button) => button.id
+            ),
+            extensionEnabled: document.getElementById("connectionButtonsArea").classList.contains("extensionEnabled"),
+          };
+        });
+
+        expect(initialState).toEqual({
+          addButtonDisplay: "flex",
+          addButtonAriaHidden: "false",
+          addButtonDisabled: false,
+          microBitButtonDisplay: "none",
+          microBitButtonAriaHidden: "true",
+          microBitButtonDisabled: true,
+          rightCategoryIds: ["cog-start", "cog-looks", "cog-sound"],
+          extensionEnabled: false,
+        });
+
+        await page.click("#addExtensionButton");
+        await page.waitForSelector("#extensionsLibrary.fade.in", { timeout: 30_000 });
+        const libraryState = await page.evaluate(() => ({
+          title: document.getElementById("extensionsLibraryTitle").textContent.trim(),
+          hasMicroBitCard: Boolean(document.getElementById("microBitExtensionCard")),
+          microBitCardAction: document.getElementById("microBitExtensionCardAction").textContent.trim(),
+          microBitStillHidden:
+            window.getComputedStyle(document.getElementById("microBitConnectionButton")).display === "none",
+        }));
+
+        expect(libraryState).toEqual({
+          title: "Extensions",
+          hasMicroBitCard: true,
+          microBitCardAction: "+",
+          microBitStillHidden: true,
+        });
+
+        await page.click("#microBitExtensionCard");
+        await page.waitForFunction(
+          () => {
+            const microBitButton = document.getElementById("microBitConnectionButton");
+            const library = document.getElementById("extensionsLibrary");
+            return microBitButton
+              && window.getComputedStyle(microBitButton).display !== "none"
+              && library
+              && !library.classList.contains("in");
+          },
+          { timeout: 30_000 }
+        );
+
+        const enabledState = await page.evaluate(() => {
+          const addButton = document.getElementById("addExtensionButton");
+          const microBitButton = document.getElementById("microBitConnectionButton");
+          return {
+            addButtonDisplay: window.getComputedStyle(addButton).display,
+            addButtonAriaHidden: addButton.getAttribute("aria-hidden"),
+            addButtonDisabled: addButton.disabled,
+            microBitButtonDisplay: window.getComputedStyle(microBitButton).display,
+            microBitButtonAriaHidden: microBitButton.getAttribute("aria-hidden"),
+            microBitButtonDisabled: microBitButton.disabled,
+            rightCategoryIds: Array.from(document.querySelectorAll("#selectorsright .category-selector-button")).map(
+              (button) => button.id
+            ),
+            selectedRightCategoryIds: Array.from(
+              document.querySelectorAll('#selectorsright .category-selector-button[aria-pressed="true"]')
+            ).map((button) => button.id),
+            paletteBlockTypes: Array.from(document.querySelectorAll("#palette > div")).map(
+              (block) => block.owner && block.owner.blocktype
+            ),
+            extensionEnabled: document.getElementById("connectionButtonsArea").classList.contains("extensionEnabled"),
+          };
+        });
+
+        expect(enabledState).toEqual({
+          addButtonDisplay: "flex",
+          addButtonAriaHidden: "false",
+          addButtonDisabled: false,
+          microBitButtonDisplay: "flex",
+          microBitButtonAriaHidden: "false",
+          microBitButtonDisabled: false,
+          rightCategoryIds: ["cog-start", "cog-looks", "cog-sound", "microbit-start", "microbit-looks"],
+          selectedRightCategoryIds: ["microbit-start"],
+          paletteBlockTypes: [
+            "microbitbuttonpressed",
+            "microbitgesture",
+            "microbitpinconnected",
+            "microbittilted",
+          ],
+          extensionEnabled: true,
+        });
+
+        const blocksAfterInsert = await page.evaluate(() => {
+          const scripts = window.ScratchJr.getActiveScript().owner;
+          scripts.insertKeyboardBlock(null, [["microbitdisplayclear", "null", 20, 20]]);
+          return window.ScratchJr.getBlocks().map((block) => block.blocktype);
+        });
+        expect(blocksAfterInsert).toContain("microbitdisplayclear");
+
+        await page.click("#addExtensionButton");
+        await page.waitForSelector("#extensionsLibrary.fade.in", { timeout: 30_000 });
+        const loadedLibraryState = await page.evaluate(() => ({
+          microBitCardAction: document.getElementById("microBitExtensionCardAction").textContent.trim(),
+          microBitCardLoaded: document.getElementById("microBitExtensionCard").classList.contains("loaded"),
+        }));
+        expect(loadedLibraryState).toEqual({
+          microBitCardAction: "-",
+          microBitCardLoaded: true,
+        });
+
+        await page.click("#microBitExtensionCard");
+        await page.waitForSelector("#microBitExtensionRemoveWarning.show", { timeout: 30_000 });
+        await page.click("#microBitExtensionRemoveCancel");
+        await page.waitForFunction(
+          () => !document.getElementById("microBitExtensionRemoveWarning").classList.contains("show"),
+          { timeout: 30_000 }
+        );
+        const cancelUnloadState = await page.evaluate(() => ({
+          microBitButtonDisplay: window.getComputedStyle(document.getElementById("microBitConnectionButton")).display,
+          hasMicroBitBlock: window.ScratchJr.getBlocks().some((block) => block.blocktype === "microbitdisplayclear"),
+        }));
+        expect(cancelUnloadState).toEqual({
+          microBitButtonDisplay: "flex",
+          hasMicroBitBlock: true,
+        });
+
+        await page.click("#microBitExtensionCard");
+        await page.waitForSelector("#microBitExtensionRemoveWarning.show", { timeout: 30_000 });
+        await page.click("#microBitExtensionRemoveConfirm");
+        await page.waitForFunction(
+          () => window.getComputedStyle(document.getElementById("microBitConnectionButton")).display === "none"
+            && !document.querySelector("#selectorsright #microbit-start")
+            && !document.getElementById("extensionsLibrary").classList.contains("in"),
+          { timeout: 30_000 }
+        );
+        const unloadedState = await page.evaluate(() => ({
+          addButtonDisplay: window.getComputedStyle(document.getElementById("addExtensionButton")).display,
+          microBitButtonDisplay: window.getComputedStyle(document.getElementById("microBitConnectionButton")).display,
+          extensionsLibraryOpen: document.getElementById("extensionsLibrary").classList.contains("in"),
+          microBitCardAction: document.getElementById("microBitExtensionCardAction").textContent.trim(),
+          microBitCardLoaded: document.getElementById("microBitExtensionCard").classList.contains("loaded"),
+          rightCategoryIds: Array.from(document.querySelectorAll("#selectorsright .category-selector-button")).map(
+            (button) => button.id
+          ),
+          hasMicroBitBlock: window.ScratchJr.getBlocks().some((block) => block.blocktype.indexOf("microbit") === 0),
+          extensionEnabled: document.getElementById("connectionButtonsArea").classList.contains("extensionEnabled"),
+        }));
+        expect(unloadedState).toEqual({
+          addButtonDisplay: "flex",
+          microBitButtonDisplay: "none",
+          extensionsLibraryOpen: false,
+          microBitCardAction: "+",
+          microBitCardLoaded: false,
+          rightCategoryIds: ["cog-start", "cog-looks", "cog-sound"],
+          hasMicroBitBlock: false,
+          extensionEnabled: false,
+        });
+
+        expect(errors).toEqual([]);
+      } finally {
+        await browser.close();
+      }
+    },
+    60_000
+  );
+
+  it(
     "opens tutorials from the book tab and returns there from tutorial mode",
     async () => {
       const { browser, page, errors } = await openPage("/home.html?place=book&submenu=tutorials");

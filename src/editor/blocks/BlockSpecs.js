@@ -34,6 +34,10 @@ const martyobstaclesensedshapes = ['martyobstaclesensedobstaclesensed', 'martyob
 const martylightsensedshapes = ['martylightsensedlow', 'martylightsensedmid', 'martylightsensedhigh'];
 const martynoisesensedshapes = ['martynoisesensednoisesensed', 'martynoisesensednonoisesensed'];
 const noteshapes = ['notec', 'notecsharp', 'noted', 'notedsharp', 'notee', 'notef', 'notefsharp', 'noteg', 'notegsharp', 'notea', 'noteasharp', 'noteb'];
+const microbitbuttonshapes = ['microbitbuttona', 'microbitbuttonb', 'microbitbuttonany'];
+const microbitgestureshapes = ['microbitgesturemoved', 'microbitgestureshaken', 'microbitgesturejumped'];
+const microbittiltshapes = ['microbittiltany', 'microbittiltright', 'microbittiltleft', 'microbittiltbackward', 'microbittiltforward'];
+const microbitpinshapes = ['microbitpin0', 'microbitpin1', 'microbitpin2'];
 
 let getshapes = ['LetterGet_Orange', 'LetterGet_Red', 'LetterGet_Yellow', 'LetterGet_Green',
     'LetterGet_Blue', 'LetterGet_Purple'];
@@ -66,10 +70,12 @@ export default class BlockSpecs {
     static palettes = [];
     static palettesCog = [];
     static palettesMarty = [];
+    static palettesMicroBit = [];
 
     static categories = [];
     static categoriesCog = [];
     static categoriesMarty = [];
+    static categoriesMicroBit = [];
 
     static initBlocks() {
         loadassets = new Object();
@@ -79,10 +85,12 @@ export default class BlockSpecs {
         BlockSpecs.palettes = BlockSpecs.setupPalettesDef();
         BlockSpecs.palettesCog = BlockSpecs.setupPalettesDefCog();
         BlockSpecs.palettesMarty = BlockSpecs.setupPalettesDefMarty();
+        BlockSpecs.palettesMicroBit = BlockSpecs.setupPalettesDefMicroBit();
 
         BlockSpecs.categories = BlockSpecs.setupCategories();
         BlockSpecs.categoriesCog = BlockSpecs.setupCategoriesCog();
         BlockSpecs.categoriesMarty = BlockSpecs.setupCategoriesMarty();
+        BlockSpecs.categoriesMicroBit = BlockSpecs.setupCategoriesMicroBit();
 
         if (window.Settings.edition == 'PBS') {
             BlockSpecs.canvasMask = BlockSpecs.getImageFrom('assets/ui/canvasmask', 'svg');
@@ -231,6 +239,23 @@ export default class BlockSpecs {
         );
     }
 
+    static setupCategoriesMicroBit() {
+        return new Array(
+            [
+                BlockSpecs.getImageFrom('assets/categories/MicroBitStartOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/MicroBitStartOff', 'svg'),
+                window.Settings.categoryStartColor,
+                'microbit-start'
+            ],
+            [
+                BlockSpecs.getImageFrom('assets/categories/MicroBitLooksOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/MicroBitLooksOff', 'svg'),
+                window.Settings.categoryLooksColor,
+                'microbit-looks'
+            ]
+        );
+    }
+
     static setupCategories() {
         return new Array(
             [
@@ -296,10 +321,17 @@ export default class BlockSpecs {
         ['endstack', 'forever']];
     }
 
+    static setupPalettesDefMicroBit() {
+        return [
+            ['microbitbuttonpressed', 'microbitgesture', 'microbitpinconnected', 'microbittilted'],
+            ['microbitdisplayheart', 'microbitdisplayhappy', 'microbitdisplaytext', 'microbitdisplayclear']
+        ];
+    }
+
     ///////////////////////////////
     // Data Structure
     //
-    // name - blocktype, icon or datastructure, blockshape, argtype, initial value, highlight, min, max, shadow
+    // name - blocktype, icon or datastructure, blockshape, argtype, initial value, highlight, min, max, shadow, menu colour
     //
     // arg types:
     // null
@@ -435,6 +467,24 @@ export default class BlockSpecs {
             'setcogvolume': ['setcogvolume', BlockSpecs.getImageFrom('assets/blockicons/CogVolume', 'svg'),
                 BlockSpecs.limeCmd, 'n', 100, BlockSpecs.limeCmdH, 0, 100, BlockSpecs.cmdS],
 
+            /* micro:bit Blocks */
+            'microbitbuttonpressed': ['microbitbuttonpressed', microbitbuttonshapes,
+                BlockSpecs.yellowStart, 'm', 'microbitbuttona', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'microbitgesture': ['microbitgesture', microbitgestureshapes,
+                BlockSpecs.yellowStart, 'm', 'microbitgestureshaken', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'microbitpinconnected': ['microbitpinconnected', microbitpinshapes,
+                BlockSpecs.yellowStart, 'm', 'microbitpin0', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'microbittilted': ['microbittilted', microbittiltshapes,
+                BlockSpecs.yellowStart, 'm', 'microbittiltany', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'microbitdisplayheart': ['microbitdisplayheart', BlockSpecs.getImageFrom('assets/blockicons/microbitdisplayheart', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'microbitdisplayhappy': ['microbitdisplayhappy', BlockSpecs.getImageFrom('assets/blockicons/microbitdisplayhappy', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'microbitdisplaytext': ['microbitdisplaytext', BlockSpecs.getImageFrom('assets/blockicons/microbitdisplaytext', 'svg'),
+                BlockSpecs.pinkCmd, 't', 'Hi', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'microbitdisplayclear': ['microbitdisplayclear', BlockSpecs.getImageFrom('assets/blockicons/microbitdisplayclear', 'svg'),
+                BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+
             /* Marty Blocks */
             'martycoloursensed': ['martycoloursensed', coloursensedshapes,
                 BlockSpecs.yellowStart, 'm', 'martycoloursensedblue', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
@@ -518,6 +568,10 @@ export default class BlockSpecs {
             'onshake': Localization.localize('BLOCK_DESC_ON_MOVE'),
             'onobjectsensed': Localization.localize('BLOCK_DESC_ON_OBJECT_SENSED'),
             'onlight': Localization.localize('BLOCK_DESC_ON_LIGHT'),
+            'microbitbuttonpressed': Localization.localize('BLOCK_DESC_MICROBIT_ON_BUTTON'),
+            'microbitgesture': Localization.localize('BLOCK_DESC_MICROBIT_ON_GESTURE'),
+            'microbitpinconnected': Localization.localize('BLOCK_DESC_MICROBIT_ON_PIN'),
+            'microbittilted': Localization.localize('BLOCK_DESC_MICROBIT_ON_TILT'),
             'onclick': Localization.localize('BLOCK_DESC_ON_TAP', {
                 CHARACTER_NAME: spr.name
             }),
@@ -563,6 +617,10 @@ export default class BlockSpecs {
             'waitcrotchet': Localization.localize('BLOCK_DESC_WAIT_CROTCHET'),
             'settempo': Localization.localize('BLOCK_DESC_SET_TEMPO'),
             'setcogvolume': Localization.localize('BLOCK_DESC_SET_COG_VOLUME'),
+            'microbitdisplayheart': Localization.localize('BLOCK_DESC_MICROBIT_DISPLAY_HEART'),
+            'microbitdisplayhappy': Localization.localize('BLOCK_DESC_MICROBIT_DISPLAY_HAPPY'),
+            'microbitdisplaytext': Localization.localize('BLOCK_DESC_MICROBIT_DISPLAY_TEXT'),
+            'microbitdisplayclear': Localization.localize('BLOCK_DESC_MICROBIT_CLEAR_DISPLAY'),
             'pop': Localization.localize('BLOCK_PLAY_POP_SOUND'),
             'endstack': Localization.localize('BLOCK_DESC_END'),
             'stopall': Localization.localize('BLOCK_DESC_STOP', {

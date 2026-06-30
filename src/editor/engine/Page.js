@@ -203,6 +203,32 @@ export default class Page {
 
     setBackgroundImage(url, fcn) {
         var img = document.createElement('img');
+        var me = this;
+        var finished = false;
+        var loadImgTimeLimit = null;
+        var finishLoad = function (loaded) {
+            if (finished) {
+                return;
+            }
+            finished = true;
+            if (loadImgTimeLimit) {
+                clearTimeout(loadImgTimeLimit);
+            }
+            if (!loaded) {
+                me.clearBackground();
+            } else if (gn('backdrop').className == 'modal-backdrop fade in') {
+                Project.setProgress(Project.getMediaLoadRatio(70));
+            }
+            if (fcn) {
+                fcn();
+            }
+        };
+        img.onload = function () {
+            finishLoad(true);
+        };
+        img.onerror = function () {
+            finishLoad(false);
+        };
         img.src = url;
         this.bkg.originalImg = img.cloneNode(false);
         this.bkg.appendChild(img);
@@ -215,31 +241,14 @@ export default class Page {
         });
         this.bkg.img = img;
         if (!img.complete) {
-            const loadImgTimeLimit = setTimeout(() => {
+            loadImgTimeLimit = setTimeout(() => {
                 // if the bckground img doesnt load within 
                 // 5 seconds it means that it doesnt exist
                 // so we move on with empty image
-                if (!img.complete) {
-                    this.clearBackground();
-                    fcn();
-                }
-                clearTimeout(loadImgTimeLimit);
+                finishLoad(false);
             }, 5000);
-            img.onload = function () {
-                if (gn('backdrop').className == 'modal-backdrop fade in') {
-                    Project.setProgress(Project.getMediaLoadRatio(70));
-                }
-                if (fcn) {
-                    fcn();
-                }
-            };
         } else {
-            if (gn('backdrop').className == 'modal-backdrop fade in') {
-                Project.setProgress(Project.getMediaLoadRatio(70));
-            }
-            if (fcn) {
-                fcn();
-            }
+            finishLoad(img.naturalWidth !== 0 || img.naturalHeight !== 0);
         }
     }
 

@@ -1166,5 +1166,13 @@
   "A11Y_COPY_TO_PAGE": "Copy to page {PAGE}",
   "A11Y_DELETE_PAGE": "Delete page {PAGE}",
   "A11Y_MOVE_PAGE_EARLIER": "Move page {PAGE} earlier",
-  "A11Y_MOVE_PAGE_LATER": "Move page {PAGE} later"
+  "A11Y_MOVE_PAGE_LATER": "Move page {PAGE} later",
+  "BLOCK_DESC_MICROBIT_ON_BUTTON": "Starts when a micro:bit button is pressed.",
+  "BLOCK_DESC_MICROBIT_ON_GESTURE": "Starts when the micro:bit moves, shakes, or jumps.",
+  "BLOCK_DESC_MICROBIT_ON_PIN": "Starts when a micro:bit pin is connected.",
+  "BLOCK_DESC_MICROBIT_ON_TILT": "Starts when the micro:bit is tilted.",
+  "BLOCK_DESC_MICROBIT_DISPLAY_HEART": "Shows a heart on the micro:bit display.",
+  "BLOCK_DESC_MICROBIT_DISPLAY_HAPPY": "Shows a happy face on the micro:bit display.",
+  "BLOCK_DESC_MICROBIT_DISPLAY_TEXT": "Shows text on the micro:bit display.",
+  "BLOCK_DESC_MICROBIT_CLEAR_DISPLAY": "Clears the micro:bit display."
 }
