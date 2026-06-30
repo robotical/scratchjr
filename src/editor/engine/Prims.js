@@ -23,13 +23,13 @@ const MARTY_EVENT_ARGUMENTS = {
 };
 const MARTY_EVENT_BLOCK_TYPES = Object.keys(MARTY_EVENT_ARGUMENTS);
 const MICROBIT_EVENT_ARGUMENTS = {
-    microbitbuttonpressed: ['microbitbuttona', 'microbitbuttonb', 'microbitbuttonany'],
+    microbitbuttonpressed: ['microbitbuttona', 'microbitbuttonb', 'microbitbuttonab'],
     microbitgesture: ['microbitgesturemoved', 'microbitgestureshaken', 'microbitgesturejumped'],
-    microbitpinconnected: ['microbitpin0', 'microbitpin1', 'microbitpin2'],
     microbittilted: ['microbittiltany', 'microbittiltright', 'microbittiltleft', 'microbittiltbackward', 'microbittiltforward']
 };
 const MICROBIT_EVENT_BLOCK_TYPES = Object.keys(MICROBIT_EVENT_ARGUMENTS);
 const MICROBIT_EVENT_ALIASES = {
+    microbitbuttonany: 'microbitbuttonab',
     tilt_any: 'microbittiltany',
     tiltright: 'microbittiltright',
     tiltleft: 'microbittiltleft',
@@ -112,7 +112,6 @@ export default class Prims {
         /* micro:bit Prims */
         Prims.table.microbitbuttonpressed = Prims.Ignore;
         Prims.table.microbitgesture = Prims.Ignore;
-        Prims.table.microbitpinconnected = Prims.Ignore;
         Prims.table.microbittilted = Prims.Ignore;
         Prims.table.microbitdisplayheart = Prims.microBitDisplayHeart;
         Prims.table.microbitdisplayhappy = Prims.microBitDisplayHappy;

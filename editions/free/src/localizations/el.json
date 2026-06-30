@@ -1169,7 +1169,6 @@
   "A11Y_MOVE_PAGE_LATER": "Move page {PAGE} later",
   "BLOCK_DESC_MICROBIT_ON_BUTTON": "Starts when a micro:bit button is pressed.",
   "BLOCK_DESC_MICROBIT_ON_GESTURE": "Starts when the micro:bit moves, shakes, or jumps.",
-  "BLOCK_DESC_MICROBIT_ON_PIN": "Starts when a micro:bit pin is connected.",
   "BLOCK_DESC_MICROBIT_ON_TILT": "Starts when the micro:bit is tilted.",
   "BLOCK_DESC_MICROBIT_DISPLAY_HEART": "Shows a heart on the micro:bit display.",
   "BLOCK_DESC_MICROBIT_DISPLAY_HAPPY": "Shows a happy face on the micro:bit display.",

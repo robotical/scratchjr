@@ -2,22 +2,15 @@ import Prims from '../editor/engine/Prims';
 import {microBitMatrixPatternToMatrix} from './MicroBitMatrixPattern';
 
 const TILT_THRESHOLD = 15;
-
-const BUTTON_EVENTS = [
-    {event: 'microbitbuttona', currentKey: 'buttonA'},
-    {event: 'microbitbuttonb', currentKey: 'buttonB'}
-];
+const BUTTON_COMBO_WINDOW_MS = 120;
+const BUTTON_A_EVENT = 'microbitbuttona';
+const BUTTON_B_EVENT = 'microbitbuttonb';
+const BUTTON_COMBO_EVENT = 'microbitbuttonab';
 
 const GESTURE_EVENTS = [
     {event: 'microbitgesturemoved', bit: 2},
     {event: 'microbitgestureshaken', bit: 0},
     {event: 'microbitgesturejumped', bit: 1}
-];
-
-const PIN_EVENTS = [
-    {event: 'microbitpin0', index: 0},
-    {event: 'microbitpin1', index: 1},
-    {event: 'microbitpin2', index: 2}
 ];
 
 const SYMBOLS = {
@@ -78,6 +71,8 @@ export default class MicroBitBlocks {
     constructor (microBit) {
         this.microBit = microBit;
         this.unsubscribeSensorListener = null;
+        this.pendingButtonEvents = {};
+        this.buttonComboActive = false;
 
         this.handleSensorUpdate = this.handleSensorUpdate.bind(this);
         if (this.microBit && typeof this.microBit.addSensorListener === 'function') {
@@ -90,6 +85,7 @@ export default class MicroBitBlocks {
             this.unsubscribeSensorListener();
             this.unsubscribeSensorListener = null;
         }
+        this.clearPendingButtonEvents();
         this.microBit = null;
     }
 
@@ -146,29 +142,38 @@ export default class MicroBitBlocks {
     handleSensorUpdate (current, previous) {
         this.emitButtonEvents(current, previous);
         this.emitGestureEvents(current, previous);
-        this.emitPinEvents(current, previous);
         this.emitTiltEvents(current);
     }
 
     emitButtonEvents (current, previous) {
-        BUTTON_EVENTS.forEach(({event, currentKey}) => {
-            const isPressed = sensorIsOn(current[currentKey]);
-            const wasPressed = sensorIsOn(previous[currentKey]);
-            if (isPressed && !wasPressed) {
-                Prims.OnMicroBitEvent(event);
-                Prims.OnMicroBitEvent('microbitbuttonany');
-            }
-        });
-    }
+        const buttonAPressed = sensorIsOn(current.buttonA);
+        const buttonBPressed = sensorIsOn(current.buttonB);
+        const buttonAWasPressed = sensorIsOn(previous.buttonA);
+        const buttonBWasPressed = sensorIsOn(previous.buttonB);
+        const buttonARising = buttonAPressed && !buttonAWasPressed;
+        const buttonBRising = buttonBPressed && !buttonBWasPressed;
 
-    emitPinEvents (current, previous) {
-        PIN_EVENTS.forEach(({event, index}) => {
-            const isConnected = sensorIsOn((current.touchPins || [])[index]);
-            const wasConnected = sensorIsOn((previous.touchPins || [])[index]);
-            if (isConnected && !wasConnected) {
-                Prims.OnMicroBitEvent(event);
-            }
-        });
+        if (!buttonAPressed || !buttonBPressed) {
+            this.buttonComboActive = false;
+        }
+
+        if (buttonAPressed && buttonBPressed && (buttonARising || buttonBRising || !this.buttonComboActive)) {
+            this.emitButtonComboEvent();
+            return;
+        }
+
+        if (buttonARising) {
+            this.scheduleButtonEvent(BUTTON_A_EVENT);
+        }
+        if (buttonBRising) {
+            this.scheduleButtonEvent(BUTTON_B_EVENT);
+        }
+        if (!buttonAPressed) {
+            this.clearPendingButtonEvent(BUTTON_A_EVENT);
+        }
+        if (!buttonBPressed) {
+            this.clearPendingButtonEvent(BUTTON_B_EVENT);
+        }
     }
 
     emitGestureEvents (current, previous) {
@@ -209,5 +214,35 @@ export default class MicroBitBlocks {
             events.add('microbittiltbackward');
         }
         return events;
+    }
+
+    scheduleButtonEvent (event) {
+        this.clearPendingButtonEvent(event);
+        this.pendingButtonEvents[event] = setTimeout(() => {
+            delete this.pendingButtonEvents[event];
+            Prims.OnMicroBitEvent(event);
+        }, BUTTON_COMBO_WINDOW_MS);
+    }
+
+    emitButtonComboEvent () {
+        this.clearPendingButtonEvents();
+        if (this.buttonComboActive) {
+            return;
+        }
+        this.buttonComboActive = true;
+        Prims.OnMicroBitEvent(BUTTON_COMBO_EVENT);
+    }
+
+    clearPendingButtonEvent (event) {
+        const timeoutId = this.pendingButtonEvents[event];
+        if (!timeoutId) {
+            return;
+        }
+        clearTimeout(timeoutId);
+        delete this.pendingButtonEvents[event];
+    }
+
+    clearPendingButtonEvents () {
+        Object.keys(this.pendingButtonEvents).forEach(event => this.clearPendingButtonEvent(event));
     }
 }

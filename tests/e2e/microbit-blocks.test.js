@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockPrims } = vi.hoisted(() => ({
     mockPrims: {
@@ -18,10 +18,12 @@ describe('MicroBitBlocks', () => {
     let MicroBitBlocks;
     let Prims;
     let sensorListener;
+    let blocks;
 
     beforeEach(async () => {
         vi.clearAllMocks();
         sensorListener = null;
+        blocks = null;
         const [blocksModule, primsModule] = await Promise.all([
             import('@/microbit/MicroBitBlocks.js'),
             import('@/editor/engine/Prims')
@@ -30,20 +32,64 @@ describe('MicroBitBlocks', () => {
         Prims = primsModule.default;
     });
 
-    it('emits button events on button press transitions', () => {
-        new MicroBitBlocks(createMicroBit());
+    afterEach(() => {
+        if (blocks) {
+            blocks.destroy();
+        }
+        vi.useRealTimers();
+    });
+
+    it('emits individual button events after the combo window', () => {
+        vi.useFakeTimers();
+        blocks = new MicroBitBlocks(createMicroBit());
 
         sensorListener(
             createSensors({buttonA: 1}),
             createSensors({buttonA: 0})
         );
 
+        expect(Prims.OnMicroBitEvent).not.toHaveBeenCalled();
+
+        vi.advanceTimersByTime(120);
+
         expect(Prims.OnMicroBitEvent).toHaveBeenCalledWith('microbitbuttona');
-        expect(Prims.OnMicroBitEvent).toHaveBeenCalledWith('microbitbuttonany');
+        expect(Prims.OnMicroBitEvent).not.toHaveBeenCalledWith('microbitbuttonab');
+    });
+
+    it('emits A+B button events when both buttons are pressed together', () => {
+        blocks = new MicroBitBlocks(createMicroBit());
+
+        sensorListener(
+            createSensors({buttonA: 1, buttonB: 1}),
+            createSensors({buttonA: 0, buttonB: 0})
+        );
+
+        expect(Prims.OnMicroBitEvent).toHaveBeenCalledWith('microbitbuttonab');
+        expect(Prims.OnMicroBitEvent).not.toHaveBeenCalledWith('microbitbuttona');
+        expect(Prims.OnMicroBitEvent).not.toHaveBeenCalledWith('microbitbuttonb');
+    });
+
+    it('promotes a near-simultaneous second button press to A+B', () => {
+        vi.useFakeTimers();
+        blocks = new MicroBitBlocks(createMicroBit());
+
+        sensorListener(
+            createSensors({buttonA: 1}),
+            createSensors({buttonA: 0})
+        );
+        vi.advanceTimersByTime(60);
+        sensorListener(
+            createSensors({buttonA: 1, buttonB: 1}),
+            createSensors({buttonA: 1, buttonB: 0})
+        );
+        vi.advanceTimersByTime(120);
+
+        expect(Prims.OnMicroBitEvent).toHaveBeenCalledTimes(1);
+        expect(Prims.OnMicroBitEvent).toHaveBeenCalledWith('microbitbuttonab');
     });
 
     it('emits gesture events on gesture bit transitions', () => {
-        new MicroBitBlocks(createMicroBit());
+        blocks = new MicroBitBlocks(createMicroBit());
 
         sensorListener(
             createSensors({gestureState: 1}),
@@ -54,7 +100,7 @@ describe('MicroBitBlocks', () => {
     });
 
     it('emits tilt events on every tilted sensor update', () => {
-        new MicroBitBlocks(createMicroBit());
+        blocks = new MicroBitBlocks(createMicroBit());
 
         sensorListener(
             createSensors({tiltX: -180}),
@@ -70,20 +116,9 @@ describe('MicroBitBlocks', () => {
         expect(Prims.OnMicroBitEvent).toHaveBeenCalledTimes(4);
     });
 
-    it('emits pin connected events on touch pin transitions', () => {
-        new MicroBitBlocks(createMicroBit());
-
-        sensorListener(
-            createSensors({touchPins: [0, 1, 0]}),
-            createSensors({touchPins: [0, 0, 0]})
-        );
-
-        expect(Prims.OnMicroBitEvent).toHaveBeenCalledWith('microbitpin1');
-    });
-
     it('sends matrix rows for display symbols', () => {
         const microBit = createMicroBit();
-        const blocks = new MicroBitBlocks(microBit);
+        blocks = new MicroBitBlocks(microBit);
 
         blocks.displaySymbol('microbitdisplayheart');
 
@@ -92,7 +127,7 @@ describe('MicroBitBlocks', () => {
 
     it('sends matrix rows for custom display patterns', () => {
         const microBit = createMicroBit();
-        const blocks = new MicroBitBlocks(microBit);
+        blocks = new MicroBitBlocks(microBit);
 
         blocks.displayPattern('10000/01000/00100/00010/00001');
 

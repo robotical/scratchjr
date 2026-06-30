@@ -5,23 +5,22 @@
   <path d="M56 11h5c3.3 0 6 2.7 6 6v3z" fill="#4c97ff"/>
   <path d="M17 41l8 9h-2c-3.3 0-6-2.7-6-6z" fill="#4c97ff"/>
   <path d="M67 41v3c0 3.3-2.7 6-6 6h-3z" fill="#4c97ff"/>
-  <circle cx="29" cy="24" r="6.3" fill="#35c1df" stroke="#0b7e96"/>
-  <circle cx="56" cy="24" r="6.3" fill="#35c1df" stroke="#0b7e96"/>
+  <circle cx="29" cy="24" r="6.3" fill="#35c1df" stroke="#0b7e96" stroke-width="1"/>
+  <circle cx="56" cy="24" r="6.3" fill="#35c1df" stroke="#0b7e96" stroke-width="1"/>
   <circle cx="29" cy="24" r="2.2" fill="#414757"/>
   <circle cx="56" cy="24" r="2.2" fill="#414757"/>
   <g fill="#e6e7e8">
-    <rect x="36.5" y="28" width="2.2" height="2.2" rx="0.3"/>
-    <rect x="41.8" y="28" width="2.2" height="2.2" rx="0.3"/>
-    <rect x="47.1" y="28" width="2.2" height="2.2" rx="0.3"/>
-    <rect x="36.5" y="33" width="2.2" height="2.2" rx="0.3"/>
-    <rect x="41.8" y="33" width="2.2" height="2.2" rx="0.3"/>
-    <rect x="47.1" y="33" width="2.2" height="2.2" rx="0.3"/>
-    <rect x="36.5" y="38" width="2.2" height="2.2" rx="0.3"/>
-    <rect x="41.8" y="38" width="2.2" height="2.2" rx="0.3"/>
-    <rect x="47.1" y="38" width="2.2" height="2.2" rx="0.3"/>
+    <rect x="36.5" y="21" width="2.2" height="2.2" rx="0.3"/>
+    <rect x="41.8" y="21" width="2.2" height="2.2" rx="0.3"/>
+    <rect x="47.1" y="21" width="2.2" height="2.2" rx="0.3"/>
+    <rect x="36.5" y="26" width="2.2" height="2.2" rx="0.3"/>
+    <rect x="41.8" y="26" width="2.2" height="2.2" rx="0.3"/>
+    <rect x="47.1" y="26" width="2.2" height="2.2" rx="0.3"/>
+    <rect x="36.5" y="31" width="2.2" height="2.2" rx="0.3"/>
+    <rect x="41.8" y="31" width="2.2" height="2.2" rx="0.3"/>
+    <rect x="47.1" y="31" width="2.2" height="2.2" rx="0.3"/>
   </g>
-  <text x="29" y="43" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#35c1df">A</text>
-  <text x="56" y="43" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#35c1df">B</text>
+  <text x="42.5" y="49" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="#35c1df">A + B</text>
   <g fill="#ffbf00">
     <rect x="24" y="49" width="3" height="5"/>
     <rect x="29" y="49" width="3" height="5"/>

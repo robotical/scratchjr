@@ -35,10 +35,9 @@ const martyobstaclesensedshapes = ['martyobstaclesensedobstaclesensed', 'martyob
 const martylightsensedshapes = ['martylightsensedlow', 'martylightsensedmid', 'martylightsensedhigh'];
 const martynoisesensedshapes = ['martynoisesensednoisesensed', 'martynoisesensednonoisesensed'];
 const noteshapes = ['notec', 'notecsharp', 'noted', 'notedsharp', 'notee', 'notef', 'notefsharp', 'noteg', 'notegsharp', 'notea', 'noteasharp', 'noteb'];
-const microbitbuttonshapes = ['microbitbuttona', 'microbitbuttonb', 'microbitbuttonany'];
+const microbitbuttonshapes = ['microbitbuttona', 'microbitbuttonb', 'microbitbuttonab'];
 const microbitgestureshapes = ['microbitgesturemoved', 'microbitgestureshaken', 'microbitgesturejumped'];
 const microbittiltshapes = ['microbittiltany', 'microbittiltright', 'microbittiltleft', 'microbittiltbackward', 'microbittiltforward'];
-const microbitpinshapes = ['microbitpin0', 'microbitpin1', 'microbitpin2'];
 
 let getshapes = ['LetterGet_Orange', 'LetterGet_Red', 'LetterGet_Yellow', 'LetterGet_Green',
     'LetterGet_Blue', 'LetterGet_Purple'];
@@ -324,7 +323,7 @@ export default class BlockSpecs {
 
     static setupPalettesDefMicroBit() {
         return [
-            ['microbitbuttonpressed', 'microbitgesture', 'microbitpinconnected', 'microbittilted'],
+            ['microbitbuttonpressed', 'microbitgesture', 'microbittilted'],
             ['microbitdisplayheart', 'microbitdisplayhappy', 'microbitdisplaycustom', 'microbitdisplaytext', 'microbitdisplayclear']
         ];
     }
@@ -474,8 +473,6 @@ export default class BlockSpecs {
                 BlockSpecs.yellowStart, 'm', 'microbitbuttona', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'microbitgesture': ['microbitgesture', microbitgestureshapes,
                 BlockSpecs.yellowStart, 'm', 'microbitgestureshaken', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
-            'microbitpinconnected': ['microbitpinconnected', microbitpinshapes,
-                BlockSpecs.yellowStart, 'm', 'microbitpin0', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'microbittilted': ['microbittilted', microbittiltshapes,
                 BlockSpecs.yellowStart, 'm', 'microbittiltany', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'microbitdisplayheart': ['microbitdisplayheart', BlockSpecs.getImageFrom('assets/blockicons/microbitdisplayheart', 'svg'),
@@ -574,7 +571,6 @@ export default class BlockSpecs {
             'onlight': Localization.localize('BLOCK_DESC_ON_LIGHT'),
             'microbitbuttonpressed': Localization.localize('BLOCK_DESC_MICROBIT_ON_BUTTON'),
             'microbitgesture': Localization.localize('BLOCK_DESC_MICROBIT_ON_GESTURE'),
-            'microbitpinconnected': Localization.localize('BLOCK_DESC_MICROBIT_ON_PIN'),
             'microbittilted': Localization.localize('BLOCK_DESC_MICROBIT_ON_TILT'),
             'onclick': Localization.localize('BLOCK_DESC_ON_TAP', {
                 CHARACTER_NAME: spr.name
