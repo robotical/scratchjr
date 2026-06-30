@@ -4,9 +4,14 @@ import Menu from './Menu';
 import Undo from '../ui/Undo';
 import {setCanvasSize, setProps, writeText, scaleMultiplier,
     newHTML, newDiv, newCanvas, getStringSize, isTablet,
-    newP, globalx, globaly,
+    newP, globalx, globaly, frame,
     addCol} from '../../utils/lib';
 import Localization from '../../utils/Localization';
+import {
+    microBitMatrixPatternToRows,
+    normalizeMicroBitMatrixPattern,
+    toggleMicroBitMatrixCell as toggleMicroBitMatrixPatternCell
+} from '../../microbit/MicroBitMatrixPattern';
 
 /*
 Argument types
@@ -14,6 +19,7 @@ Argument types
 n: numbers
 t: text
 m: regular menu with icons
+u: micro:bit 5x5 display editor
 s: text for soundblock
 r: number for recorded sound block
 p: page icons
@@ -46,6 +52,10 @@ export default class BlockArg {
             this.numperrow = 3;
             this.icon = this.getIconFrom(block.spec[4], block.spec[1]);
             this.div = this.addImageMenu(this.closePictureMenu);
+            break;
+        case 'u':
+            this.argValue = normalizeMicroBitMatrixPattern(block.spec[4]);
+            this.div = this.addMicroBitMatrixMenu();
             break;
         case 'd':
             this.argValue = block.spec[4];
@@ -355,6 +365,26 @@ export default class BlockArg {
         return this.daddy.blockicon;
     }
 
+    addMicroBitMatrixMenu () {
+        this.drawMicroBitMatrixChoice(this.daddy.blockicon);
+        this.button = this.addPressButton();
+        if (!this.daddy.inpalette) {
+            var ba = this;
+            if (isTablet) {
+                ba.button.ontouchstart = function (evt) {
+                    ba.pressMicroBitMatrixEditor(evt);
+                };
+            } else {
+                ba.button.onpointerdown = function (evt) {
+                    ba.pressMicroBitMatrixEditor(evt);
+                };
+            }
+            this.button.parentNode.height += this.button.height / 2;
+            setCanvasSize(this.button.parentNode, this.button.parentNode.width, this.button.parentNode.height);
+        }
+        return this.daddy.blockicon;
+    }
+
     drawChoice (cnv) {
         var ctx = cnv.getContext('2d');
         ctx.clearRect(0, 0, cnv.width, cnv.height);
@@ -372,6 +402,95 @@ export default class BlockArg {
                 icon.height * scale * window.devicePixelRatio);
         }
         return cnv;
+    }
+
+    drawMicroBitMatrixChoice (cnv) {
+        var ctx = cnv.getContext('2d');
+        ctx.clearRect(0, 0, cnv.width, cnv.height);
+        var scale = this.daddy.scale * window.devicePixelRatio;
+        ctx.save();
+        ctx.scale(scale, scale);
+        this.drawMicroBitBoard(ctx, microBitMatrixPatternToRows(this.argValue), 20, 10, 43, 42);
+        ctx.restore();
+        return cnv;
+    }
+
+    drawMicroBitBoard (ctx, rows, x, y, w, h) {
+        ctx.save();
+        ctx.globalAlpha = 0.16;
+        this.roundedRect(ctx, x + 1, y + 1, w, h, 7);
+        ctx.fillStyle = '#231F20';
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        this.roundedRect(ctx, x, y, w, h, 7);
+        ctx.fillStyle = '#414757';
+        ctx.fill();
+
+        ctx.fillStyle = '#4C97FF';
+        ctx.beginPath();
+        ctx.moveTo(x, y + 9);
+        ctx.lineTo(x, y + 6);
+        ctx.quadraticCurveTo(x, y, x + 6, y);
+        ctx.lineTo(x + 11, y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x + w - 11, y);
+        ctx.lineTo(x + w - 6, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + 6);
+        ctx.lineTo(x + w, y + 9);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x, y + h - 9);
+        ctx.lineTo(x + 8, y + h);
+        ctx.lineTo(x + 6, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x + w, y + h - 9);
+        ctx.lineTo(x + w - 9, y + h);
+        ctx.lineTo(x + w - 6, y + h);
+        ctx.quadraticCurveTo(x + w, y + h, x + w, y + h - 6);
+        ctx.closePath();
+        ctx.fill();
+
+        var startX = x + 9;
+        var startY = y + 8;
+        var step = 6;
+        var cell = 3.8;
+        for (var row = 0; row < 5; row++) {
+            for (var col = 0; col < 5; col++) {
+                var enabled = rows[row] && rows[row][col] === '1';
+                this.roundedRect(ctx, startX + (col * step), startY + (row * step), cell, cell, 0.8);
+                ctx.fillStyle = enabled ? '#35C1DF' : '#7C87A5';
+                ctx.globalAlpha = enabled ? 1 : 0.35;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        ctx.fillStyle = '#FFBF00';
+        for (var pin = 0; pin < 7; pin++) {
+            ctx.fillRect(x + 6 + (pin * 5), y + h - 1, 3, 5);
+        }
+        ctx.restore();
+    }
+
+    roundedRect (ctx, x, y, w, h, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + w - radius, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+        ctx.lineTo(x + w, y + h - radius);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+        ctx.lineTo(x + radius, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
     }
 
     addPressButton () {
@@ -417,6 +536,94 @@ export default class BlockArg {
             return;
         }
         Menu.openDropDown(this.daddy.div, fcn);
+    }
+
+    pressMicroBitMatrixEditor (e) {
+        if (isTablet && e.touches && (e.touches.length > 1)) {
+            return;
+        }
+        if (ScratchJr.onHold) {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        ScratchJr.unfocus(e);
+        Menu.closeMyOpenMenu();
+
+        var w = 180;
+        var h = 180;
+        var scaledWidth = w * scaleMultiplier;
+        var scaledHeight = h * scaleMultiplier;
+        var dx = globalx(this.daddy.div) + (this.daddy.div.offsetWidth - scaledWidth) / 2;
+        var dy = globaly(this.daddy.div) + this.daddy.div.offsetHeight - (8 * scaleMultiplier);
+        dx = Math.max(5, Math.min(dx, frame.offsetWidth - scaledWidth - 5));
+        dy = Math.max(5, Math.min(dy, frame.offsetHeight - scaledHeight - 5));
+
+        var mu = newDiv(frame, dx, dy, w, h, {
+            position: 'absolute',
+            zIndex: 100000,
+            webkitTransform: 'translate(' + (-w / 2) + 'px,' + (-h / 2) + 'px) ' +
+                'scale(' + scaleMultiplier + ', ' + scaleMultiplier + ') ' +
+                'translate(' + (w / 2) + 'px, ' + (h / 2) + 'px)'
+        });
+        mu.setAttribute('class', 'microbitMatrixMenu menustyle purple');
+        mu.active = this.button;
+        var grid = newHTML('div', 'microbitMatrixGrid', mu);
+        for (var i = 0; i < 25; i++) {
+            this.addMicroBitMatrixCell(grid, i);
+        }
+        this.syncMicroBitMatrixCells(grid);
+        Menu.openMenu = mu;
+    }
+
+    addMicroBitMatrixCell (grid, index) {
+        var cell = newHTML('div', 'microbitMatrixCell', grid);
+        cell.setAttribute('role', 'button');
+        cell.setAttribute('tabindex', '0');
+        cell.setAttribute('aria-label', 'micro:bit LED ' + (index + 1));
+        cell.owner = this;
+        var toggle = (evt) => {
+            evt.preventDefault();
+            evt.stopPropagation();
+            this.toggleMicroBitMatrixCell(index);
+            this.syncMicroBitMatrixCells(grid);
+        };
+        if (isTablet) {
+            cell.ontouchstart = toggle;
+        } else {
+            cell.onpointerdown = toggle;
+        }
+        cell.onkeydown = (evt) => {
+            if (evt.key == 'Enter' || evt.key == ' ') {
+                toggle(evt);
+            }
+        };
+    }
+
+    toggleMicroBitMatrixCell (index) {
+        var value = this.argValue;
+        this.argValue = toggleMicroBitMatrixPatternCell(this.argValue, index);
+        this.drawMicroBitMatrixChoice(this.daddy.blockicon);
+        if (this.argValue != value) {
+            var spr = this.daddy.div.parentNode.owner.spr;
+            var action = {
+                action: 'scripts',
+                where: spr.div.parentNode.owner.id,
+                who: spr.id
+            };
+            Undo.record(action);
+            ScratchJr.storyStart('BlockArg.prototype.toggleMicroBitMatrixCell');
+        }
+    }
+
+    syncMicroBitMatrixCells (grid) {
+        var pattern = normalizeMicroBitMatrixPattern(this.argValue).replace(/\//g, '');
+        var cells = grid.childNodes;
+        for (var i = 0; i < cells.length; i++) {
+            var enabled = pattern[i] === '1';
+            cells[i].className = enabled ? 'microbitMatrixCell on' : 'microbitMatrixCell';
+            cells[i].setAttribute('aria-pressed', enabled ? 'true' : 'false');
+        }
     }
 
     closePictureMenu (e, mu, b, c) {

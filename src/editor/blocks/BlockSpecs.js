@@ -1,6 +1,7 @@
 import Localization from '../../utils/Localization';
 import IO from '../../tablet/IO';
 import { LINEAR_GRADIENT_COLOUR } from '../engine/Prims';
+import {DEFAULT_MICROBIT_MATRIX_PATTERN} from '../../microbit/MicroBitMatrixPattern';
 
 let loadCount = 0;
 
@@ -324,7 +325,7 @@ export default class BlockSpecs {
     static setupPalettesDefMicroBit() {
         return [
             ['microbitbuttonpressed', 'microbitgesture', 'microbitpinconnected', 'microbittilted'],
-            ['microbitdisplayheart', 'microbitdisplayhappy', 'microbitdisplaytext', 'microbitdisplayclear']
+            ['microbitdisplayheart', 'microbitdisplayhappy', 'microbitdisplaycustom', 'microbitdisplaytext', 'microbitdisplayclear']
         ];
     }
 
@@ -340,6 +341,7 @@ export default class BlockSpecs {
     // m  --> image menu with argvalue equal to name;
     // d --> image menu with argvalue equal to number;
     // c -- > color drop down
+    // u --> micro:bit 5x5 display editor
     // s --> sound name
     // p --> page icon
     //
@@ -482,6 +484,8 @@ export default class BlockSpecs {
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'microbitdisplaytext': ['microbitdisplaytext', BlockSpecs.getImageFrom('assets/blockicons/microbitdisplaytext', 'svg'),
                 BlockSpecs.pinkCmd, 't', 'Hi', BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
+            'microbitdisplaycustom': ['microbitdisplaycustom', null,
+                BlockSpecs.pinkCmd, 'u', DEFAULT_MICROBIT_MATRIX_PATTERN, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS, 'purple'],
             'microbitdisplayclear': ['microbitdisplayclear', BlockSpecs.getImageFrom('assets/blockicons/microbitdisplayclear', 'svg'),
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
 
@@ -620,6 +624,7 @@ export default class BlockSpecs {
             'microbitdisplayheart': Localization.localize('BLOCK_DESC_MICROBIT_DISPLAY_HEART'),
             'microbitdisplayhappy': Localization.localize('BLOCK_DESC_MICROBIT_DISPLAY_HAPPY'),
             'microbitdisplaytext': Localization.localize('BLOCK_DESC_MICROBIT_DISPLAY_TEXT'),
+            'microbitdisplaycustom': Localization.localize('BLOCK_DESC_MICROBIT_DISPLAY_CUSTOM'),
             'microbitdisplayclear': Localization.localize('BLOCK_DESC_MICROBIT_CLEAR_DISPLAY'),
             'pop': Localization.localize('BLOCK_PLAY_POP_SOUND'),
             'endstack': Localization.localize('BLOCK_DESC_END'),

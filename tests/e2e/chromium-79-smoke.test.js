@@ -229,6 +229,52 @@ describe("Chromium 79 smoke test", () => {
           extensionEnabled: true,
         });
 
+        await page.click("#microbit-looks");
+        await page.waitForFunction(
+          () => Array.from(document.querySelectorAll("#palette > div")).some(
+            (block) => block.owner && block.owner.blocktype === "microbitdisplaycustom"
+          ),
+          { timeout: 30_000 }
+        );
+        const looksPaletteBlockTypes = await page.evaluate(() =>
+          Array.from(document.querySelectorAll("#palette > div")).map((block) => block.owner && block.owner.blocktype)
+        );
+        expect(looksPaletteBlockTypes).toEqual([
+          "microbitdisplayheart",
+          "microbitdisplayhappy",
+          "microbitdisplaycustom",
+          "microbitdisplaytext",
+          "microbitdisplayclear",
+        ]);
+
+        const customMatrixState = await page.evaluate(() => {
+          const scripts = window.ScratchJr.getActiveScript().owner;
+          const block = scripts.insertKeyboardBlock(null, [[
+            "microbitdisplaycustom",
+            "00000/00000/00000/00000/00000",
+            50,
+            50,
+          ]]);
+          block.arg.pressMicroBitMatrixEditor({
+            preventDefault() {},
+            stopPropagation() {},
+          });
+          const cells = Array.from(document.querySelectorAll(".microbitMatrixCell"));
+          cells[12].dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, cancelable: true }));
+          return {
+            argValue: block.getArgValue(),
+            cellCount: cells.length,
+            menuOpen: Boolean(document.querySelector(".microbitMatrixMenu")),
+            activeCells: Array.from(document.querySelectorAll(".microbitMatrixCell.on")).length,
+          };
+        });
+        expect(customMatrixState).toEqual({
+          argValue: "00000/00000/00100/00000/00000",
+          cellCount: 25,
+          menuOpen: true,
+          activeCells: 1,
+        });
+
         const blocksAfterInsert = await page.evaluate(() => {
           const scripts = window.ScratchJr.getActiveScript().owner;
           scripts.insertKeyboardBlock(null, [["microbitdisplayclear", "null", 20, 20]]);

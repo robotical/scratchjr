@@ -90,6 +90,15 @@ describe('MicroBitBlocks', () => {
         expect(microBit.displayMatrix).toHaveBeenCalledWith(new Uint8Array([10, 31, 31, 14, 4]));
     });
 
+    it('sends matrix rows for custom display patterns', () => {
+        const microBit = createMicroBit();
+        const blocks = new MicroBitBlocks(microBit);
+
+        blocks.displayPattern('10000/01000/00100/00010/00001');
+
+        expect(microBit.displayMatrix).toHaveBeenCalledWith(new Uint8Array([1, 2, 4, 8, 16]));
+    });
+
     function createMicroBit(sensors = createSensors()) {
         return {
             sensors,

@@ -117,6 +117,7 @@ export default class Prims {
         Prims.table.microbitdisplayheart = Prims.microBitDisplayHeart;
         Prims.table.microbitdisplayhappy = Prims.microBitDisplayHappy;
         Prims.table.microbitdisplaytext = Prims.microBitDisplayText;
+        Prims.table.microbitdisplaycustom = Prims.microBitDisplayCustom;
         Prims.table.microbitdisplayclear = Prims.microBitDisplayClear;
 
 
@@ -375,6 +376,11 @@ export default class Prims {
         const safeTextLength = String(text || '').substring(0, 19).length;
         const seconds = Math.max(0.2, 0.12 * ((6 * safeTextLength) + 6));
         Prims.finishMicroBitCommand(strip, seconds);
+    }
+
+    static microBitDisplayCustom(strip) {
+        Prims.microBitBlocks?.displayPattern(strip.thisblock.getArgValue());
+        Prims.finishMicroBitCommand(strip);
     }
 
     static microBitDisplayClear(strip) {

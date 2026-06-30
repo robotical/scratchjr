@@ -1,4 +1,5 @@
 import Prims from '../editor/engine/Prims';
+import {microBitMatrixPatternToMatrix} from './MicroBitMatrixPattern';
 
 const TILT_THRESHOLD = 15;
 
@@ -115,6 +116,13 @@ export default class MicroBitBlocks {
             return;
         }
         this.microBit.displayMatrix(rowsToMatrix(rows));
+    }
+
+    displayPattern (pattern) {
+        if (!this.isConnected() || typeof this.microBit.displayMatrix !== 'function') {
+            return;
+        }
+        this.microBit.displayMatrix(microBitMatrixPatternToMatrix(pattern));
     }
 
     clearDisplay () {
