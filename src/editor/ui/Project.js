@@ -22,6 +22,12 @@ let loadIcon = undefined;
 let error = false;
 let projectbarsize = 66;
 let mediaCountBase = 1;
+let pendingEditorMode = null;
+
+const EDITOR_MODE_MARTY = 'marty';
+const EDITOR_MODE_SPRITE = 'sprite';
+const MICROBIT_EXTENSION_ID = 'microbit';
+const MICROBIT_EXTENSION_BLOCK_PREFIX = 'microbit';
 
 export default class Project {
     static get metadata () {
@@ -127,7 +133,7 @@ export default class Project {
             Project.setProgress(100);
             Project.liftCurtain();
             ScratchJr.stage.currentPage.update();
-            Project.setModeFromConnectedMarty();
+            Project.applyLoadedEditorMode();
             ScratchJr.changed = false;
             ScratchJr.storyStarted = false;
             UI.needsScroll();
@@ -285,6 +291,8 @@ export default class Project {
     static loadData (data, fcn) {
         try {
             data = (typeof data === 'string') ? JSON.parse(data) : data;
+            Project.applyLoadedExtensionState(data);
+            pendingEditorMode = Project.getEditorModeFromProjectData(data);
             mediaCount = 0;
             Project.loadme(data, fcn);
             error = false;
@@ -310,6 +318,106 @@ export default class Project {
             Project.liftCurtain();
             error = true;
         }
+    }
+
+    static applyLoadedExtensionState (data) {
+        const shouldEnableMicroBitExtension =
+            Project.getEnabledExtensionsFromProjectData(data).indexOf(MICROBIT_EXTENSION_ID) > -1 ||
+            !!window.microBitManager?.getActiveMicroBit?.();
+
+        if (shouldEnableMicroBitExtension) {
+            UI.enableMicroBitExtension({selectCategory: false});
+            return;
+        }
+
+        ScratchJr.isMicroBitExtensionEnabled = false;
+        UI.updateMicroBitExtensionControls();
+        UI.updateExtensionsLibraryState();
+        if (Palette.parent) {
+            Palette.recreateRightCategory();
+        }
+    }
+
+    static getEnabledExtensionsFromProjectData (data) {
+        const enabledExtensions = Array.isArray(data?.enabledExtensions) ? data.enabledExtensions.slice() : [];
+        if (
+            enabledExtensions.indexOf(MICROBIT_EXTENSION_ID) < 0 &&
+            Project.projectUsesBlockPrefix(data, MICROBIT_EXTENSION_BLOCK_PREFIX)
+        ) {
+            enabledExtensions.push(MICROBIT_EXTENSION_ID);
+        }
+        return enabledExtensions;
+    }
+
+    static projectUsesBlockPrefix (data, blockPrefix) {
+        if (!data || !Array.isArray(data.pages)) {
+            return false;
+        }
+        for (var pageIndex = 0; pageIndex < data.pages.length; pageIndex++) {
+            const page = data[data.pages[pageIndex]];
+            if (!page || !Array.isArray(page.sprites)) {
+                continue;
+            }
+            for (var spriteIndex = 0; spriteIndex < page.sprites.length; spriteIndex++) {
+                const sprite = page[page.sprites[spriteIndex]];
+                if (!sprite || !Array.isArray(sprite.scripts)) {
+                    continue;
+                }
+                for (var scriptIndex = 0; scriptIndex < sprite.scripts.length; scriptIndex++) {
+                    if (Project.stripUsesBlockPrefix(sprite.scripts[scriptIndex], blockPrefix)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    static stripUsesBlockPrefix (strip, blockPrefix) {
+        if (!Array.isArray(strip)) {
+            return false;
+        }
+        for (var blockIndex = 0; blockIndex < strip.length; blockIndex++) {
+            const block = strip[blockIndex];
+            if (!Array.isArray(block)) {
+                continue;
+            }
+            if (typeof block[0] === 'string' && block[0].indexOf(blockPrefix) === 0) {
+                return true;
+            }
+            for (var argIndex = 1; argIndex < block.length; argIndex++) {
+                if (Project.stripUsesBlockPrefix(block[argIndex], blockPrefix)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    static getEditorModeFromProjectData (data) {
+        if (data?.editorMode == EDITOR_MODE_MARTY || data?.editorMode == EDITOR_MODE_SPRITE) {
+            return data.editorMode;
+        }
+        const currentPage = data && data.currentPage ? data[data.currentPage] : null;
+        if (!currentPage || !currentPage.lastSprite) {
+            return null;
+        }
+        return currentPage.lastSprite.indexOf(ScratchJr.BIRDS_EYE_SPRITE_NAME) > -1 ?
+            EDITOR_MODE_MARTY :
+            EDITOR_MODE_SPRITE;
+    }
+
+    static applyLoadedEditorMode () {
+        if (!pendingEditorMode) {
+            Project.setModeFromConnectedMarty();
+            return;
+        }
+        const shouldEnableMartyMode = pendingEditorMode == EDITOR_MODE_MARTY;
+        pendingEditorMode = null;
+        if (ScratchJr.isMartyModeEnabled !== shouldEnableMartyMode) {
+            ScratchJr.isMartyModeEnabled = shouldEnableMartyMode;
+        }
+        UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
     }
 
     static setModeFromConnectedMarty () {
@@ -517,6 +625,8 @@ export default class Project {
         var obj = {};
         obj.pages = ScratchJr.stage.getPagesID();
         obj.currentPage = pageid;
+        obj.editorMode = ScratchJr.isMartyModeEnabled ? EDITOR_MODE_MARTY : EDITOR_MODE_SPRITE;
+        obj.enabledExtensions = ScratchJr.isMicroBitExtensionEnabled ? [MICROBIT_EXTENSION_ID] : [];
         for (var i = 0; i < ScratchJr.stage.pages.length; i++) {
             obj[ScratchJr.stage.pages[i].id] = ScratchJr.stage.pages[i].encodePage();
         }

@@ -14,7 +14,9 @@ export default class WebappInterface {
 
   static async database_stmt(json) {
     const db = await dataStoreInstance.getDatabaseManager();
-    return db.stmt(json);
+    const result = db.stmt(json);
+    await db.save();
+    return result;
   }
 
   static io_registersound(dir, name) {
@@ -61,7 +63,9 @@ export default class WebappInterface {
   static async database_stmt(json) {
     console.log("database_stmt", json);
     const db = await dataStoreInstance.getDatabaseManager();
-    return db.stmt(json);
+    const result = db.stmt(json);
+    await db.save();
+    return result;
   }
 
   static io_stopsound(name) {

@@ -137,8 +137,13 @@ export default class DatabaseManager {
   async save() {
     const data = this.db.export();
     const buffer = data.buffer;
-    this.saveToDeviceLocalStorage(buffer);
-    writeFile(this.databaseFilename, buffer);
+    const saveOperations = [writeFile(this.databaseFilename, buffer)];
+    const deviceLocalStorageSave = this.saveToDeviceLocalStorage(buffer);
+    if (deviceLocalStorageSave) {
+      saveOperations.push(deviceLocalStorageSave);
+    }
+    this.lastSavePromise = Promise.all(saveOperations);
+    await this.lastSavePromise;
   }
 
   saveToDeviceLocalStorage(buffer) {
