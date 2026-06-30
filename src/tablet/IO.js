@@ -384,6 +384,11 @@ export default class IO {
 
                     // Sprite image
                     collectAsset('characters', sprite.md5);
+                    if (sprite.animationFrames && sprite.animationFrames.length > 1) {
+                        for (var frame = 0; frame < sprite.animationFrames.length; frame++) {
+                            collectAsset('characters', sprite.animationFrames[frame]);
+                        }
+                    }
 
                     // Sprite's recorded sounds
                     for (var snd = 0; snd < sprite.sounds.length; snd++) {

@@ -676,6 +676,9 @@ export default class Stage {
         var sprite = ScratchJr.getSprite();
         ScratchAudio.sndFX('cut.wav');
         list.splice(n, 1);
+        if (typeof spr.stopAnimation === 'function') {
+            spr.stopAnimation();
+        }
         spr.div.parentNode.removeChild(spr.div);
         if (sc) {
             sc.parentNode.removeChild(sc);
@@ -755,6 +758,9 @@ export default class Stage {
             var sc = gn(name + '_scripts');
             if (sc) {
                 sc.parentNode.removeChild(sc);
+            }
+            if (sprite && sprite.owner && typeof sprite.owner.stopAnimation === 'function') {
+                sprite.owner.stopAnimation();
             }
             sprite.parentNode.removeChild(sprite);
         }

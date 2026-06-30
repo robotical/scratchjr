@@ -699,6 +699,10 @@ export default class Page {
         sprAttr.id = getIdFor(cname);
         sprAttr.name = cname;
         sprAttr.md5 = md5;
+        if (MediaLib.keys[md5] && MediaLib.keys[md5].animationFrames) {
+            sprAttr.animationFrames = MediaLib.keys[md5].animationFrames.slice(0);
+            sprAttr.animationFrameRate = MediaLib.keys[md5].animationFrameRate;
+        }
         new Sprite(sprAttr, fcn || this.spriteAdded);
     }
 

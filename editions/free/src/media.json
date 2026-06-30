@@ -73,6 +73,18 @@
       "tags": ["characters", "07 weather"]
     },
     {
+      "md5": "BeeSprite1.svg",
+      "width": 512,
+      "height": 512,
+      "ext": "svg",
+      "name": "Bee",
+      "scale": 0.35,
+      "order": "characters,07 weather",
+      "tags": ["characters", "07 weather"],
+      "animationFrames": ["BeeSprite1.svg", "BeeSprite2.svg", "BeeSprite3.svg"],
+      "animationFrameRate": 4
+    },
+    {
       "md5": "Sprites_Marty.svg",
       "width": 80,
       "height": 101,

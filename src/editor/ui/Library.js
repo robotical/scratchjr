@@ -302,6 +302,7 @@ export default class Library {
         // Cached downsized-thumbnails are in pnglibrary
         var pngPath = MediaLib.path.replace('svg', 'png');
         img.src = pngPath + IO.getFilename(md5) + '.png';
+        Library.animateLocalThumb(img, data);
 
         // tb.ontouchstart = function (evt) {
         //     fcn(evt, tb);
@@ -319,6 +320,26 @@ export default class Library {
             };
         }
         return tb;
+    }
+
+    static animateLocalThumb (img, data) {
+        if (!data.animationFrames || data.animationFrames.length < 2) {
+            return;
+        }
+        var frameSources = data.animationFrames.map(function (frameMd5) {
+            return MediaLib.path + frameMd5;
+        });
+        var frameIndex = 0;
+        var frameRate = Number(data.animationFrameRate || 4);
+        var frameInterval = Math.max(100, Math.round(1000 / frameRate));
+        var interval = window.setInterval(function () {
+            if (!document.body.contains(img)) {
+                window.clearInterval(interval);
+                return;
+            }
+            frameIndex = (frameIndex + 1) % frameSources.length;
+            img.src = frameSources[frameIndex];
+        }, frameInterval);
     }
 
     static userAssetThumbnail (img, cnv, sizew, sizeh) {

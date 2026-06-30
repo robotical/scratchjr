@@ -63,6 +63,7 @@ export default class Sprite {
         if (Localization.isSampleLocalizedKey(this.name) && ScratchJr.isSampleOrStarter()) {
             this.name = Localization.localize('SAMPLE_TEXT_' + this.name);
         }
+        this.normalizeAnimationMetadata();
         for (var i = 0; i < this.sounds.length; i++) {
             var sound = this.sounds[i];
             if (sound.indexOf('/') > -1) {
@@ -83,39 +84,142 @@ export default class Sprite {
         page.div.appendChild(this.div);
         this.div.style.visibility = 'hidden';
         this.getAsset(gotImage); // sets the SVG and the image
-        function gotImage(dataurl) {
-            me.setCostume(dataurl, fcn);
+        function gotImage (dataurl) {
+            me.setCostume(dataurl, function (spr) {
+                spr.loadAnimationFrames();
+                if (fcn) {
+                    fcn(spr);
+                }
+            });
         }
     }
 
-    getAsset(whenDone) {
-        var md5 = this.md5;
+    getAsset (whenDone) {
         var spr = this;
+        Sprite.loadAssetData(this.md5, function (dataurl, str, filename) {
+            spr.md5 = filename;
+            spr.setSVG(str);
+            whenDone(dataurl);
+        });
+    }
+
+    static loadAssetData (md5, whenDone) {
+        var originalMd5 = md5;
         md5 = (MediaLib.keys[md5]) ? MediaLib.path + md5 : md5;
         if (md5.indexOf('/') > -1) {
             IO.requestFromServer(md5, doNext);
         } else {
             OS.getmedia(md5, nextStep);
         }
-        function nextStep(base64) {
+        function nextStep (base64) {
             doNext(atob(base64));
         }
-        function doNext(str) {
-            if (MediaLib.keys[spr.md5] || spr.md5.indexOf('/') > -1) {
+        function doNext (str) {
+            var filename = originalMd5;
+            if (MediaLib.keys[originalMd5] || originalMd5.indexOf('/') > -1) {
                 // duplicate asset in library or sample
                 // in case this asset is removed from library or sample
                 // we can still use this asset and open the project in the future
-                var name = IO.getFilenameWithExt(spr.md5);
-                OS.duplicateAsset(md5, name);
-                // use the duplicated one next time.
-                spr.md5 = name;
+                filename = IO.getFilenameWithExt(originalMd5);
+                OS.duplicateAsset(md5, filename);
             }
             str = str.replace(/>\s*</g, '><');
-            spr.setSVG(str);
             IO.getImagesInSVG(str, function () {
-                var base64 = IO.getImageDataURL(spr.md5, btoa(str));
-                whenDone(base64);
+                var base64 = IO.getImageDataURL(filename, btoa(str));
+                whenDone(base64, str, filename);
             });
+        }
+    }
+
+    normalizeAnimationMetadata () {
+        var mediaKey = MediaLib.keys[this.md5];
+        var frames = this.animationFrames || (mediaKey && mediaKey.animationFrames);
+        if (!frames || frames.length < 2) {
+            this.animationFrames = undefined;
+            this.animationFrameRate = undefined;
+            return;
+        }
+        this.animationFrames = frames.slice(0);
+        if (this.animationFrames.indexOf(this.md5) < 0) {
+            this.animationFrames.unshift(this.md5);
+        }
+        var rate = Number(this.animationFrameRate || (mediaKey && mediaKey.animationFrameRate) || 4);
+        this.animationFrameRate = rate > 0 ? rate : 4;
+    }
+
+    loadAnimationFrames () {
+        this.stopAnimation();
+        if (!this.animationFrames || this.animationFrames.length < 2 || !this.img) {
+            return;
+        }
+        var spr = this;
+        var frames = this.animationFrames.slice(0);
+        var frameDataUrls = [];
+        var savedFrameNames = [];
+        var framesLeft = frames.length;
+
+        for (var i = 0; i < frames.length; i++) {
+            loadFrame(i);
+        }
+
+        function loadFrame (index) {
+            var frameMd5 = frames[index];
+            if (frameMd5 == spr.md5) {
+                frameDataUrls[index] = spr.img.src;
+                savedFrameNames[index] = spr.md5;
+                finishFrameLoad();
+                return;
+            }
+            Sprite.loadAssetData(frameMd5, function (dataurl, str, filename) {
+                frameDataUrls[index] = dataurl;
+                savedFrameNames[index] = filename;
+                finishFrameLoad();
+            });
+        }
+
+        function finishFrameLoad () {
+            framesLeft--;
+            if (framesLeft > 0) {
+                return;
+            }
+            if (frameDataUrls.length < 2 || frameDataUrls.indexOf(undefined) > -1) {
+                return;
+            }
+            if (!spr.div || !spr.div.parentNode) {
+                return;
+            }
+            spr.animationFrameDataUrls = frameDataUrls;
+            spr.animationFrames = savedFrameNames;
+            spr.startAnimation();
+        }
+    }
+
+    startAnimation () {
+        this.stopAnimation();
+        if (!this.animationFrameDataUrls || this.animationFrameDataUrls.length < 2) {
+            return;
+        }
+        var spr = this;
+        var frameInterval = Math.max(100, Math.round(1000 / this.animationFrameRate));
+        this.animationFrameIndex = 0;
+        this.animationIntervalId = window.setInterval(function () {
+            if (!spr.img || !spr.div || !spr.div.parentNode) {
+                spr.stopAnimation();
+                return;
+            }
+            spr.animationFrameIndex = (spr.animationFrameIndex + 1) % spr.animationFrameDataUrls.length;
+            var frameDataUrl = spr.animationFrameDataUrls[spr.animationFrameIndex];
+            spr.img.src = frameDataUrl;
+            if (spr.originalImg) {
+                spr.originalImg.src = frameDataUrl;
+            }
+        }, frameInterval);
+    }
+
+    stopAnimation () {
+        if (this.animationIntervalId) {
+            window.clearInterval(this.animationIntervalId);
+            this.animationIntervalId = undefined;
         }
     }
 
@@ -1239,6 +1343,10 @@ export default class Sprite {
         data.homescale = this.homescale;
         data.homeshown = this.homeshown;
         data.homeflip = this.homeflip;
+        if (this.animationFrames && this.animationFrames.length > 1) {
+            data.animationFrames = this.animationFrames;
+            data.animationFrameRate = this.animationFrameRate;
+        }
         return data;
     }
 
