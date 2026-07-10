@@ -108,26 +108,17 @@ async function prepareSourcePage(page) {
   );
 }
 
-async function activateDuplicatePageAction(page) {
-  const result = await page.evaluate(() => {
-    const candidates = Array.from(
-      document.querySelectorAll("#pages button, #pages [role=\"button\"], #pages [aria-label]")
-    );
-    const action = candidates.find((element) => {
-      const label = [
-        element.getAttribute("aria-label"),
-        element.getAttribute("title"),
-        element.textContent,
-      ].filter(Boolean).join(" ");
-      return /(duplicate|copy)/i.test(label) && /(page|scene)/i.test(label);
-    });
+async function activateDuplicatePageAction(page, requestedPageId) {
+  const result = await page.evaluate((pageId) => {
+    const targetPageId = pageId || window.ScratchJr.stage.currentPage.id;
+    const action = document.querySelector(`#pageactions .duplicatepage[data-owner="${targetPageId}"]`);
 
     if (!action) {
       return {
         activated: false,
-        pageActions: candidates.map((element) => ({
+        pageActions: Array.from(document.querySelectorAll("#pageactions .duplicatepage")).map((element) => ({
           id: element.id || null,
-          className: element.className || null,
+          owner: element.getAttribute("data-owner"),
           label: element.getAttribute("aria-label") || element.getAttribute("title") || element.textContent || "",
         })),
       };
@@ -143,7 +134,7 @@ async function activateDuplicatePageAction(page) {
       view: window,
     }));
     return { activated: true };
-  });
+  }, requestedPageId);
 
   if (!result.activated) {
     throw new Error(`No enabled accessible duplicate-page action found in the page strip: ${JSON.stringify(result)}`);
@@ -189,7 +180,21 @@ describe("duplicate page", () => {
         expect(sourceState.pageData.md5).toBe(BACKGROUND_MD5);
         expect(pageHasBlock(sourceState.pageData, SCRIPT_BLOCK_TYPE)).toBe(true);
 
-        await activateDuplicatePageAction(page);
+        const pageActionState = await page.evaluate((sourcePageId) => {
+          const action = document.querySelector(`#pageactions .duplicatepage[data-owner="${sourcePageId}"]`);
+          return {
+            actionCount: document.querySelectorAll("#pageactions .duplicatepage").length,
+            isNestedInPageThumb: Boolean(action && action.closest(".pagethumb")),
+            label: action && action.getAttribute("aria-label"),
+          };
+        }, sourceState.pageId);
+        expect(pageActionState).toEqual({
+          actionCount: sourceState.pageCount,
+          isNestedInPageThumb: false,
+          label: "Duplicate page 1",
+        });
+
+        await activateDuplicatePageAction(page, sourceState.pageId);
 
         await page.waitForFunction(
           (beforeCount, sourcePageId) => window.ScratchJr.stage.pages.length === beforeCount + 1
@@ -259,20 +264,146 @@ describe("duplicate page", () => {
         }
 
         const limitState = await page.evaluate(() => {
-          const duplicateButton = document.getElementById("duplicatepage");
+          const duplicateButtons = Array.from(document.querySelectorAll("#pageactions .duplicatepage"));
           return {
             pageCount: window.ScratchJr.stage.pages.length,
-            disabled: duplicateButton.disabled,
-            ariaDisabled: duplicateButton.getAttribute("aria-disabled"),
+            buttonCount: duplicateButtons.length,
+            disabled: duplicateButtons.every((button) => button.disabled),
+            ariaDisabled: duplicateButtons.every((button) => button.getAttribute("aria-disabled") === "true"),
             canDuplicate: window.ScratchJr.stage.canDuplicatePage(window.ScratchJr.stage.currentPage.id),
           };
         });
         expect(limitState).toEqual({
           pageCount: 4,
+          buttonCount: 4,
           disabled: true,
-          ariaDisabled: "true",
+          ariaDisabled: true,
           canDuplicate: false,
         });
+        expect(errors).toEqual([]);
+      } finally {
+        await browser.close();
+      }
+    },
+    60_000
+  );
+
+  it(
+    "duplicates the page attached to the clicked action when another page is selected",
+    async () => {
+      const { browser, page, errors } = await openPage("/editor.html?mode=edit");
+
+      try {
+        await waitForEditorReady(page);
+        await prepareSourcePage(page);
+
+        const sourcePageId = await page.evaluate(() => window.ScratchJr.stage.currentPage.id);
+        await activateDuplicatePageAction(page, sourcePageId);
+        await waitForPageDuplication(page, 1);
+
+        const selectedPageId = await page.evaluate(() => new Promise((resolve) => {
+          const selectedPage = window.ScratchJr.stage.currentPage;
+          selectedPage.setBackground("none", () => {
+            selectedPage.updateThumb();
+            resolve(selectedPage.id);
+          });
+        }));
+
+        await activateDuplicatePageAction(page, sourcePageId);
+        await waitForPageDuplication(page, 2);
+
+        const targetedState = await page.evaluate(({ sourceId, previousSelectedId }) => {
+          const sourceIndex = window.ScratchJr.stage.pages.findIndex((stagePage) => stagePage.id === sourceId);
+          const targetedDuplicate = window.ScratchJr.stage.pages[sourceIndex + 1];
+          const previousSelectedIndex = window.ScratchJr.stage.pages.findIndex(
+            (stagePage) => stagePage.id === previousSelectedId
+          );
+          return {
+            currentPageId: window.ScratchJr.stage.currentPage.id,
+            targetedDuplicateId: targetedDuplicate.id,
+            targetedDuplicateData: targetedDuplicate.encodePage(),
+            previousSelectedIndex,
+          };
+        }, { sourceId: sourcePageId, previousSelectedId: selectedPageId });
+
+        expect(targetedState.currentPageId).toBe(targetedState.targetedDuplicateId);
+        expect(targetedState.targetedDuplicateId).not.toBe(selectedPageId);
+        expect(targetedState.targetedDuplicateData.md5).toBe(BACKGROUND_MD5);
+        expect(pageHasBlock(targetedState.targetedDuplicateData, SCRIPT_BLOCK_TYPE)).toBe(true);
+        expect(targetedState.previousSelectedIndex).toBe(2);
+        expect(errors).toEqual([]);
+      } finally {
+        await browser.close();
+      }
+    },
+    60_000
+  );
+
+  it(
+    "always shows the duplicate glyph and hides the action during long-press delete mode",
+    async () => {
+      const { browser, page, errors } = await openPage("/editor.html?mode=edit");
+
+      try {
+        await waitForEditorReady(page);
+        const pageId = await page.evaluate(() => window.ScratchJr.stage.currentPage.id);
+        await activateDuplicatePageAction(page, pageId);
+        await waitForPageDuplication(page, 1);
+        const restingState = await page.evaluate((currentPageId) => {
+          const action = document.querySelector(
+            `#pageactions .duplicatepage[data-owner="${currentPageId}"]`
+          );
+          const icon = action.querySelector(".duplicatepageicon");
+          const backSquare = window.getComputedStyle(icon, "::before");
+          const frontSquare = window.getComputedStyle(icon, "::after");
+          return {
+            actionVisibility: window.getComputedStyle(action).visibility,
+            backContent: backSquare.content,
+            frontContent: frontSquare.content,
+            backZIndex: backSquare.zIndex,
+            frontZIndex: frontSquare.zIndex,
+          };
+        }, pageId);
+
+        expect(restingState.actionVisibility).toBe("visible");
+        expect(restingState.backContent).not.toBe("none");
+        expect(restingState.frontContent).not.toBe("none");
+        expect(restingState.backZIndex).not.toBe("-1");
+        expect(restingState.frontZIndex).not.toBe("-1");
+
+        await page.evaluate((currentPageId) => new Promise((resolve) => {
+          const thumb = document.querySelector(`.pagethumb[data-owner="${currentPageId}"]`);
+          const bounds = thumb.getBoundingClientRect();
+          thumb.dispatchEvent(new PointerEvent("pointerdown", {
+            bubbles: true,
+            cancelable: true,
+            clientX: bounds.left + (bounds.width / 2),
+            clientY: bounds.top + (bounds.height / 2),
+            pointerId: 1,
+            pointerType: "mouse",
+            isPrimary: true,
+          }));
+          window.setTimeout(resolve, 600);
+        }), pageId);
+        await page.waitForFunction((currentPageId) => {
+          const thumb = document.querySelector(`.pagethumb[data-owner="${currentPageId}"]`);
+          const action = document.querySelector(
+            `#pageactions .duplicatepage[data-owner="${currentPageId}"]`
+          );
+          return thumb.classList.contains("shakeme")
+            && window.getComputedStyle(action).visibility === "hidden"
+            && window.getComputedStyle(thumb.querySelector(".deletethumb")).visibility === "visible";
+        }, { timeout: 5_000 }, pageId);
+
+        await page.evaluate(() => window.ScratchJr.clearSelection());
+        await page.waitForFunction((currentPageId) => {
+          const thumb = document.querySelector(`.pagethumb[data-owner="${currentPageId}"]`);
+          const action = document.querySelector(
+            `#pageactions .duplicatepage[data-owner="${currentPageId}"]`
+          );
+          return !thumb.classList.contains("shakeme")
+            && window.getComputedStyle(action).visibility === "visible";
+        }, { timeout: 5_000 }, pageId);
         expect(errors).toEqual([]);
       } finally {
         await browser.close();

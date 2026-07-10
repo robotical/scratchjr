@@ -27,6 +27,10 @@ import {
 let caret = undefined;
 
 export default class Thumbs {
+    static getPageList() {
+        return gn('pagelist') || gn('pagecc');
+    }
+
     static getVisibleFocusableChildren(containerId) {
         var container = gn(containerId);
         if (!container) {
@@ -170,7 +174,7 @@ export default class Thumbs {
                 return;
             }
         }
-        moveFocusByKey(event, Thumbs.getVisibleFocusableChildren('pagecc'), currentTarget, {
+        moveFocusByKey(event, Thumbs.getVisibleFocusableChildren('pagelist'), currentTarget, {
             horizontal: true,
             vertical: true
         });
@@ -197,9 +201,13 @@ export default class Thumbs {
     }
 
     static updatePages() {
-        var pthumbs = gn('pagecc');
+        var pthumbs = Thumbs.getPageList();
+        var pageActions = gn('pageactions');
         while (pthumbs.childElementCount > 0) {
             pthumbs.removeChild(pthumbs.childNodes[0]);
+        }
+        while (pageActions && pageActions.childElementCount > 0) {
+            pageActions.removeChild(pageActions.childNodes[0]);
         }
         var prev = undefined;
         for (var i = 0; i < ScratchJr.stage.pages.length; i++) {
@@ -216,9 +224,10 @@ export default class Thumbs {
                 Thumbs.unhighlighPage(th);
             }
             ScriptsPane.updateScriptsPageBlocks(JSON.parse(page.sprites));
+            Thumbs.addDuplicatePageButton(pageActions, page);
             prev = th;
         }
-        Thumbs.updateDuplicatePageButton();
+        Thumbs.updateDuplicatePageButtons();
         if ((ScratchJr.stage.pages.length > 3) || !ScratchJr.isEditable()) {
             return;
         }
@@ -227,18 +236,55 @@ export default class Thumbs {
         th.next = ep;
     }
 
-    static updateDuplicatePageButton() {
-        var button = gn('duplicatepage');
-        var currentPage = ScratchJr.stage && ScratchJr.stage.currentPage;
-        if (!button || !currentPage) {
+    static addDuplicatePageButton(container, page) {
+        if (!container || !page || !ScratchJr.isEditable()) {
             return;
         }
-        var label = Thumbs.getDuplicatePageLabel(currentPage.num);
-        var enabled = ScratchJr.isEditable() && ScratchJr.stage.canDuplicatePage(currentPage.id);
-        button.disabled = !enabled;
-        button.setAttribute('aria-disabled', enabled ? 'false' : 'true');
-        button.setAttribute('aria-label', label);
-        button.setAttribute('title', label);
+        var row = newHTML('div', 'pageactionrow', container);
+        row.setAttribute('data-owner', page.id);
+        if (ScratchJr.shaking && ScratchJr.shaking.owner == page.id) {
+            row.setAttribute('class', 'pageactionrow delete-mode');
+        }
+        var label = Thumbs.getDuplicatePageLabel(page.num);
+        var button = newButton('duplicatepage', row, {
+            ariaLabel: label,
+            title: label
+        });
+        button.setAttribute('data-owner', page.id);
+        button.setAttribute('aria-controls', page.id);
+        button.onclick = function (event) {
+            Thumbs.duplicatePageAction(event, button.getAttribute('data-owner'));
+        };
+        var icon = newHTML('span', 'duplicatepageicon', button);
+        icon.setAttribute('aria-hidden', 'true');
+    }
+
+    static updateDuplicatePageButtons() {
+        var buttons = document.querySelectorAll('#pageactions .duplicatepage');
+        var pageIds = ScratchJr.stage ? ScratchJr.stage.getPagesID() : [];
+        for (var i = 0; i < buttons.length; i++) {
+            var button = buttons[i];
+            var pageId = button.getAttribute('data-owner');
+            var pageNumber = pageIds.indexOf(pageId) + 1;
+            var label = Thumbs.getDuplicatePageLabel(pageNumber);
+            var enabled = ScratchJr.isEditable() && ScratchJr.stage.canDuplicatePage(pageId);
+            button.disabled = !enabled;
+            button.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+            button.setAttribute('aria-label', label);
+            button.setAttribute('title', label);
+        }
+    }
+
+    static setDuplicatePageDeleteMode(pageId, enabled) {
+        var row = document.querySelector('#pageactions .pageactionrow[data-owner="' + pageId + '"]');
+        if (!row) {
+            return;
+        }
+        if (enabled) {
+            row.classList.add('delete-mode');
+        } else {
+            row.classList.remove('delete-mode');
+        }
     }
 
     static getObjectFor(div, id) {
@@ -288,7 +334,7 @@ export default class Thumbs {
         if (!tb) {
             return;
         }
-        if (!ScratchJr.isEditable() || (gn('pagecc').childElementCount < 3)) {
+        if (!ScratchJr.isEditable() || (Thumbs.getPageList().childElementCount < 3)) {
             Thumbs.clickOnPage(e, tb.owner);
         } else {
             Events.startDrag(e, tb, Thumbs.prepareToDragPage, Thumbs.dropPage, Thumbs.draggingPage,
@@ -315,7 +361,7 @@ export default class Thumbs {
         setProps(Events.dragcanvas.style, mstyle);
         Events.move3D(Events.dragcanvas, mx, my);
         frame.appendChild(Events.dragcanvas);
-        caret = newHTML('div', 'pagethumb caret', gn('pagecc'));
+        caret = newHTML('div', 'pagethumb caret', Thumbs.getPageList());
         caret.prev = Events.dragthumbnail.prev;
         caret.next = Events.dragthumbnail.next;
         if (Events.dragthumbnail.prev) {
@@ -330,7 +376,7 @@ export default class Thumbs {
 
     static layoutPages() {
         var thispage = Thumbs.findFirst();
-        var p = gn('pagecc');
+        var p = Thumbs.getPageList();
         while (thispage) {
             p.appendChild(thispage);
             thispage = thispage.next;
@@ -338,7 +384,7 @@ export default class Thumbs {
     }
 
     static findFirst() {
-        var kid = gn('pagecc').childNodes[0];
+        var kid = Thumbs.getPageList().childNodes[0];
         while (kid.prev) {
             kid = kid.prev;
         }
@@ -346,7 +392,7 @@ export default class Thumbs {
     }
 
     static findLast() {
-        var kid = gn('pagecc').childNodes[0];
+        var kid = Thumbs.getPageList().childNodes[0];
         while (kid.next) {
             kid = kid.next;
         }
@@ -400,19 +446,21 @@ export default class Thumbs {
     static insertCaret(el) {
         var pos = Thumbs.getPagePos(el.top);
         Thumbs.positionMe(pos, caret);
-        gn('pagecc').appendChild(caret);
+        Thumbs.getPageList().appendChild(caret);
     }
 
     static getPagePos(dy) {
-        var delta = gn('pagecc').childNodes[1].offsetTop - gn('pagecc').childNodes[0].offsetTop;
-        var pos = Math.floor(localy(gn('pagecc'), dy + (delta / 2)) / delta);
+        var pageList = Thumbs.getPageList();
+        var delta = pageList.childNodes[1].offsetTop - pageList.childNodes[0].offsetTop;
+        var pos = Math.floor(localy(pageList, dy + (delta / 2)) / delta);
         pos = Math.max(0, pos);
         var max = Thumbs.getPageOrder().length;
         return Math.min(max, pos);
     }
 
     static positionMe(pos, elem) {
-        var beforewho = pos >= gn('pagecc').childElementCount ? undefined : gn('pagecc').childNodes[pos];
+        var pageList = Thumbs.getPageList();
+        var beforewho = pos >= pageList.childElementCount ? undefined : pageList.childNodes[pos];
         if (!beforewho) {
             var last = Thumbs.findLast();
             last.next = elem;
@@ -496,7 +544,7 @@ export default class Thumbs {
 
     static clickOnPage(e, pagename) {
         ScratchJr.unfocus(e);
-        var pthumbs = gn('pagecc');
+        var pthumbs = Thumbs.getPageList();
         for (var i = 0; i < pthumbs.childElementCount; i++) {
             var thumb = pthumbs.childNodes[i];
             if (thumb.id == 'emptypage') {
@@ -554,17 +602,17 @@ export default class Thumbs {
         Thumbs.focusWhenAvailable('#pagecc .pagethumb[aria-current="page"]', '#pagecc .pagethumb');
     }
 
-    static duplicateCurrentPageAction(event) {
+    static duplicatePageAction(event, pageId) {
         if (event) {
             event.preventDefault();
             event.stopPropagation();
         }
-        var sourcePage = ScratchJr.stage.currentPage;
-        if (!sourcePage || !ScratchJr.isEditable()) {
+        if (!pageId || !ScratchJr.isEditable()) {
             return;
         }
-        var started = ScratchJr.stage.duplicatePage(sourcePage.id, function (newPageId) {
-            Thumbs.focusWhenAvailable('.pagethumb[data-owner="' + newPageId + '"]', '#duplicatepage');
+        var started = ScratchJr.stage.duplicatePage(pageId, function (newPageId) {
+            Thumbs.focusWhenAvailable('.pagethumb[data-owner="' + newPageId + '"]',
+                '.duplicatepage[data-owner="' + pageId + '"]');
         });
         if (started) {
             OS.analyticsEvent('editor', 'duplicate_scene');
@@ -578,7 +626,7 @@ export default class Thumbs {
             return;
         }
         var currentSprite = ScratchJr.getSprite();
-        var thumb = Thumbs.getObjectFor(gn('pagecc'), pageId);
+        var thumb = Thumbs.getObjectFor(Thumbs.getPageList(), pageId);
         if (!thumb) {
             return;
         }
@@ -603,6 +651,7 @@ export default class Thumbs {
     static startPageShaking(tb) {
         ScratchJr.shaking = tb;
         ScratchJr.stopShaking = Thumbs.stopPageShaking;
+        Thumbs.setDuplicatePageDeleteMode(tb.owner, true);
         var cc = tb.getAttribute('class');
         tb.setAttribute('class', cc + ' shakeme');
         tb.childNodes[tb.childElementCount - 1].style.visibility = 'visible';
@@ -610,6 +659,7 @@ export default class Thumbs {
 
 
     static stopPageShaking(b) {
+        Thumbs.setDuplicatePageDeleteMode(b.owner, false);
         ScratchJr.shaking = undefined;
         ScratchJr.stopShaking = undefined;
         var cc = b.getAttribute('class');
@@ -889,15 +939,16 @@ export default class Thumbs {
             Thumbs.removePagesCaret();
             return;
         }
-        var thumb = Palette.getHittedThumb(el, gn('pagecc'), window.devicePixelRatio);
+        var pageList = Thumbs.getPageList();
+        var thumb = Palette.getHittedThumb(el, pageList, window.devicePixelRatio);
         if (thumb && !thumb.owner) {
             thumb = undefined;
         }
         if (thumb) {
             Thumbs.overpage(thumb);
         }
-        for (var i = 0; i < gn('pagecc').childElementCount; i++) {
-            var spr = gn('pagecc').childNodes[i];
+        for (var i = 0; i < pageList.childElementCount; i++) {
+            var spr = pageList.childNodes[i];
             if (!spr.owner) {
                 continue;
             }
@@ -913,8 +964,9 @@ export default class Thumbs {
     }
 
     static removePagesCaret() {
-        for (var i = 0; i < gn('pagecc').childElementCount; i++) {
-            var spr = gn('pagecc').childNodes[i];
+        var pageList = Thumbs.getPageList();
+        for (var i = 0; i < pageList.childElementCount; i++) {
+            var spr = pageList.childNodes[i];
             if (!spr.owner) {
                 continue;
             }
@@ -931,7 +983,7 @@ export default class Thumbs {
         e.preventDefault();
         switch (Palette.getLandingPlace(el, e, window.devicePixelRatio)) {
             case 'pages':
-                var thumb = Palette.getHittedThumb(el, gn('pagecc'), window.devicePixelRatio);
+                var thumb = Palette.getHittedThumb(el, Thumbs.getPageList(), window.devicePixelRatio);
                 if (thumb && thumb.id != 'emptypage') {
                     ScratchJr.stage.copySprite(el, thumb);
                 }

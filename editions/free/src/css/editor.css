@@ -111,32 +111,60 @@ div.frame {
     height: ${css_vh(37.29)};
 }
 
+.pagelist {
+    position: relative;
+    width: ${css_vh(21.09)};
+}
+
+.pageactions {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: ${css_vh(21.09)};
+    z-index: 7;
+    pointer-events: none;
+}
+
+.pageactionrow {
+    position: relative;
+    width: ${145 * scaleMultiplier}px;
+    height: ${109 * scaleMultiplier}px;
+    margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0.13)};
+    pointer-events: none;
+}
+
 .duplicatepage {
     appearance: none;
     position: absolute;
-    top: ${css_vh(40.4)};
-    left: ${css_vh(7.8)};
-    width: ${css_vh(5.47)};
-    height: ${css_vh(5.47)};
+    top: 0;
+    left: 0;
+    width: ${28 * scaleMultiplier}px;
+    height: ${28 * scaleMultiplier}px;
     padding: 0;
-    border: ${css_vh(0.26)} solid #515050;
+    border: 0;
     border-radius: 50%;
-    background: #ffffff;
-    color: #515050;
+    background: url('../assets/ui/numOn.svg') no-repeat center;
+    background-size: 100% 100%;
+    color: #ffffff;
     cursor: pointer;
+    pointer-events: auto;
 }
 
 .duplicatepage:hover:not(:disabled) {
-    background: #f2f2f2;
+    filter: brightness(1.08);
 }
 
 .duplicatepage:active:not(:disabled) {
-    background: #dedede;
+    transform: scale(0.94);
 }
 
 .duplicatepage:disabled {
-    opacity: 0.38;
+    opacity: 0.32;
     cursor: default;
+}
+
+.pageactionrow.delete-mode .duplicatepage {
+    visibility: hidden;
 }
 
 .duplicatepageicon,
@@ -144,32 +172,34 @@ div.frame {
 .duplicatepageicon::after {
     box-sizing: border-box;
     position: absolute;
-    width: ${css_vh(2.34)};
-    height: ${css_vh(2.34)};
-    border: ${css_vh(0.26)} solid currentColor;
-    border-radius: ${css_vh(0.26)};
 }
 
 .duplicatepageicon {
-    top: ${css_vh(1.43)};
-    left: ${css_vh(1.43)};
-    border: 0;
+    top: ${7 * scaleMultiplier}px;
+    left: ${7 * scaleMultiplier}px;
+    width: ${14 * scaleMultiplier}px;
+    height: ${13 * scaleMultiplier}px;
+    z-index: 1;
 }
 
 .duplicatepageicon::before,
 .duplicatepageicon::after {
     content: '';
+    width: ${11 * scaleMultiplier}px;
+    height: ${10 * scaleMultiplier}px;
+    border: ${1.5 * scaleMultiplier}px solid currentColor;
+    border-radius: ${1.5 * scaleMultiplier}px;
 }
 
 .duplicatepageicon::before {
-    top: ${css_vh(-0.52)};
-    left: ${css_vh(-0.52)};
+    top: 0;
+    left: 0;
 }
 
 .duplicatepageicon::after {
-    top: 0;
-    left: 0;
-    background: inherit;
+    top: ${3 * scaleMultiplier}px;
+    left: ${3 * scaleMultiplier}px;
+    background: #F9A737;
 }
 
 .pagethumb {

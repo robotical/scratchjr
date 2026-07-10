@@ -276,6 +276,7 @@ export default class Stage {
 
         var sourceIndex = this.getPagesID().indexOf(pageId);
         var sourcePage = this.pages[sourceIndex];
+        var visiblePage = this.currentPage;
         var oldPageIds = this.getPagesID();
         var data = this.duplicatePageData(sourcePage);
         var newPageId = getIdFor('page');
@@ -286,14 +287,14 @@ export default class Stage {
         this.duplicatingPage = true;
         ScratchJr.onHold = true;
         ScratchJr.stopStrips();
-        var sourceScript = sourcePage.currentSpriteName ? gn(sourcePage.currentSpriteName + '_scripts') : undefined;
-        if (sourceScript) {
-            sourceScript.owner.deactivate();
+        var visibleScript = visiblePage.currentSpriteName ? gn(visiblePage.currentSpriteName + '_scripts') : undefined;
+        if (visibleScript) {
+            visibleScript.owner.deactivate();
         }
-        sourcePage.div.style.visibility = 'hidden';
-        sourcePage.setPageSprites('hidden');
+        visiblePage.div.style.visibility = 'hidden';
+        visiblePage.setPageSprites('hidden');
         ScratchAudio.sndFX('copy.wav');
-        Thumbs.updateDuplicatePageButton();
+        Thumbs.updateDuplicatePageButtons();
 
         var complete = function () {
             if (completed || !duplicatePage) {
@@ -332,10 +333,10 @@ export default class Stage {
         } catch (error) {
             this.duplicatingPage = false;
             ScratchJr.onHold = false;
-            this.setViewPage(sourcePage);
-            sourcePage.setPageSprites('visible');
+            this.setViewPage(visiblePage);
+            visiblePage.setPageSprites('visible');
             Thumbs.updatePages();
-            Thumbs.updateDuplicatePageButton();
+            Thumbs.updateDuplicatePageButtons();
             throw error;
         }
         return true;

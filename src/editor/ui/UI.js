@@ -2311,16 +2311,10 @@ export default class UI {
         ndiv.setAttribute('id', 'pagecc');
         ndiv.setAttribute('role', 'group');
         ndiv.setAttribute('aria-label', UI.getGuideControlLabel('INTERFACE_GUIDE_PAGES'));
-
-        var duplicatePageLabel = Thumbs.getDuplicatePageLabel(1);
-        var duplicatePage = newButton('duplicatepage', tb, {
-            id: 'duplicatepage',
-            ariaLabel: duplicatePageLabel,
-            title: duplicatePageLabel
-        });
-        duplicatePage.onclick = Thumbs.duplicateCurrentPageAction;
-        var duplicatePageIcon = newHTML('span', 'duplicatepageicon', duplicatePage);
-        duplicatePageIcon.setAttribute('aria-hidden', 'true');
+        var pageList = newHTML('div', 'pagelist', ndiv);
+        pageList.setAttribute('id', 'pagelist');
+        var pageActions = newHTML('div', 'pageactions', ndiv);
+        pageActions.setAttribute('id', 'pageactions');
 
         UI.addMartyModeButton(rp);
     }
@@ -2725,9 +2719,13 @@ export default class UI {
         while (costumes.childElementCount > 0) {
             costumes.removeChild(costumes.childNodes[0]);
         }
-        var pthumbs = gn('pagecc');
+        var pthumbs = Thumbs.getPageList();
         while (pthumbs.childElementCount > 0) {
             pthumbs.removeChild(pthumbs.childNodes[0]);
+        }
+        var pageActions = gn('pageactions');
+        while (pageActions && pageActions.childElementCount > 0) {
+            pageActions.removeChild(pageActions.childNodes[0]);
         }
     }
 }
