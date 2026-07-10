@@ -36,6 +36,20 @@ export default class Scripts {
         this.refreshKeyboardAccessibility();
     }
 
+    activateForEditing () {
+        this.activate();
+        var script = this;
+        if (isTablet) {
+            this.sc.parentNode.ontouchstart = function (evt) {
+                script.scriptsMouseDown(evt);
+            };
+        } else {
+            this.sc.parentNode.onpointerdown = function (evt) {
+                script.scriptsMouseDown(evt);
+            };
+        }
+    }
+
     deactivate () {
         setProps(this.sc.style, {
             visibility: 'hidden'

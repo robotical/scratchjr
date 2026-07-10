@@ -77,22 +77,6 @@ export default class ScriptsPane {
             return;
         }
         ScratchJr.stage.currentPage.setCurrentSprite(gn(sprname).owner);
-        currentsc.owner.activate();
-        // currentsc.parentNode.ontouchstart = function (evt) {
-        //     currentsc.owner.scriptsMouseDown(evt);
-        // };
-        // currentsc.parentNode.onmousedown = function (evt) {
-        //     currentsc.owner.scriptsMouseDown(evt);
-        // };
-        if (isTablet) {
-            currentsc.parentNode.ontouchstart = function (evt) {
-                currentsc.owner.scriptsMouseDown(evt);
-            };
-        } else {
-            currentsc.parentNode.onpointerdown = function (evt) {
-                currentsc.owner.scriptsMouseDown(evt);
-            }
-        };
         scroll.update();
     }
 

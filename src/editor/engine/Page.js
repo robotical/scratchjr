@@ -99,8 +99,13 @@ export default class Page {
     }
 
     setCurrentSprite(spr) { // set the sprite and toggles UI if no sprite is available
-        if (ScratchJr.getSprite()) {
-            ScratchJr.getSprite().unselect();
+        var currentSprite = ScratchJr.getSprite();
+        if (currentSprite) {
+            currentSprite.unselect();
+            var currentScript = gn(currentSprite.id + '_scripts');
+            if (currentScript) {
+                currentScript.owner.deactivate();
+            }
         }
         if (spr) {
             this.currentSpriteName = spr.id;
@@ -113,6 +118,10 @@ export default class Page {
             gn('scripts').style.display = ScratchJr.inFullscreen ? 'none' : 'block';
             gn('palette').style.display = 'block';
             spr.activate();
+            var script = gn(spr.id + '_scripts');
+            if (script) {
+                script.owner.activateForEditing();
+            }
         } else {
             this.currentSpriteName = undefined;
             Palette.hide();
