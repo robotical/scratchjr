@@ -2067,7 +2067,9 @@ export default class UI {
     }
 
     static isSpritePaintEditable(sprite) {
-        return Boolean(sprite) && (!sprite.animationFrames || sprite.animationFrames.length < 2);
+        var isMartySprite = Boolean(sprite && sprite.id && sprite.id.includes('Marty'));
+        return Boolean(sprite) && !isMartySprite &&
+            (!sprite.animationFrames || sprite.animationFrames.length < 2);
     }
 
     ///////////////////////////////

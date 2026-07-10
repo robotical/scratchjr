@@ -72,7 +72,94 @@ async function openEditor() {
   return { browser, page, errors };
 }
 
-describe("animated sprite paint editing", () => {
+async function dragBlockToScripts(page, categorySelector, blockSelector, blockType) {
+  const blockCount = await page.evaluate(() => window.ScratchJr.getBlocks().length);
+  await page.click(categorySelector);
+  await page.waitForSelector(blockSelector, { visible: true });
+
+  const source = await page.$eval(blockSelector, (node) => {
+    const rect = node.getBoundingClientRect();
+    return {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    };
+  });
+  const target = await page.$eval("#scripts", (node) => {
+    const rect = node.getBoundingClientRect();
+    return {
+      x: rect.left + Math.min(220, rect.width / 2),
+      y: rect.top + Math.min(170, rect.height / 2),
+    };
+  });
+
+  await page.mouse.move(source.x, source.y);
+  await page.mouse.down();
+  await page.mouse.move(target.x, target.y, { steps: 12 });
+  await page.mouse.up();
+
+  await page.waitForFunction(
+    (before, type) => window.ScratchJr.getBlocks().length > before
+      && window.ScratchJr.getBlocks().some((block) => block.blocktype === type),
+    { timeout: 30_000 },
+    blockCount,
+    blockType
+  );
+}
+
+async function getSelectedSpritePaintState(page) {
+  return page.evaluate(() => {
+    const sprite = window.ScratchJr && window.ScratchJr.getSprite();
+    const thumb = sprite && sprite.thumbnail;
+    const brush = thumb && thumb.querySelector(".brush");
+    if (!sprite || !thumb || !brush) {
+      throw new Error("Selected sprite paint controls were not found");
+    }
+    return {
+      md5: sprite.md5,
+      thumbClass: thumb.className,
+      brushDisplay: window.getComputedStyle(brush).display,
+      blockTypes: window.ScratchJr.getBlocks().map((block) => block.blocktype),
+    };
+  });
+}
+
+describe("sprite paint editing availability", () => {
+  it(
+    "keeps Marty paint editing disabled after dropping a block",
+    async () => {
+      const { browser, page, errors } = await openEditor();
+
+      try {
+        const beforeDrop = await getSelectedSpritePaintState(page);
+        expect(beforeDrop.md5).toBe("Sprites_Marty.svg");
+        expect(beforeDrop.thumbClass).toContain("martynoneditable");
+        expect(beforeDrop.brushDisplay).toBe("none");
+
+        await dragBlockToScripts(page, "#sprite-motion", "#forward_block", "forward");
+
+        const afterDrop = await getSelectedSpritePaintState(page);
+        expect(afterDrop.thumbClass).toContain("martynoneditable");
+        expect(afterDrop.brushDisplay).toBe("none");
+        expect(afterDrop.blockTypes).toContain("forward");
+
+        const paintFrameVisible = await page.evaluate(() => {
+          const brush = window.ScratchJr.getSprite().thumbnail.querySelector(".brush");
+          brush.dispatchEvent(new PointerEvent("pointerdown", {
+            bubbles: true,
+            cancelable: true,
+            pointerType: "mouse",
+          }));
+          return window.getComputedStyle(document.getElementById("paintframe")).display !== "none";
+        });
+        expect(paintFrameVisible).toBe(false);
+        expect(errors).toEqual([]);
+      } finally {
+        await browser.close();
+      }
+    },
+    60_000
+  );
+
   it(
     "disables paint editing for the animated bee in the library and sprite panel",
     async () => {
@@ -231,7 +318,8 @@ describe("animated sprite paint editing", () => {
         expect(layoutState.selectedBackgroundSize).toBe("100% 100%");
         expect(layoutState.name.right).toBeLessThanOrEqual(layoutState.brush.left + 0.5);
         expect(layoutState.brush.left).toBeGreaterThanOrEqual(layoutState.selected.left);
-        expect(layoutState.brush.right).toBeLessThanOrEqual(layoutState.selected.right + 0.5);
+        expect(layoutState.selected.right - layoutState.brush.right)
+          .toBeGreaterThanOrEqual(layoutState.brush.width * 0.1);
         expect(layoutState.brush.top).toBeGreaterThanOrEqual(layoutState.selected.top);
         expect(layoutState.brush.bottom).toBeLessThanOrEqual(layoutState.selected.bottom);
 

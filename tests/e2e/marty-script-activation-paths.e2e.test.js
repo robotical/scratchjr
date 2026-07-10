@@ -249,6 +249,77 @@ describe("Marty script activation paths", () => {
         }
     });
 
+    it("keeps the Marty mode sidebar card and full label stable after block drops", async () => {
+        const { browser, page, errors } = await openPage("/editor.html?mode=edit");
+        try {
+            await waitForEditorReady(page);
+            const spriteCardLayout = await page.evaluate(() => {
+                const card = document.querySelector("#spritecc .spritethumb[aria-pressed=\"true\"]");
+                const label = card && card.querySelector(".sname");
+                if (!card || !label) {
+                    throw new Error("Selected sprite card layout was not found");
+                }
+                return {
+                    cardWidth: card.getBoundingClientRect().width,
+                    labelWidth: label.getBoundingClientRect().width
+                };
+            });
+
+            await setMartyMode(page, true);
+            const getMartyCardLayout = () => page.evaluate(() => {
+                const card = document.getElementById("martyModeSidebarCard");
+                const label = card && card.querySelector(".marty-mode-card-label");
+                if (!card || !label) {
+                    throw new Error("Marty mode sidebar card layout was not found");
+                }
+                const cardStyle = window.getComputedStyle(card);
+                const labelStyle = window.getComputedStyle(label);
+                const cardRect = card.getBoundingClientRect();
+                const labelRect = label.getBoundingClientRect();
+                return {
+                    className: card.className,
+                    cardWidth: cardRect.width,
+                    cardLeft: cardRect.left,
+                    cardRight: cardRect.right,
+                    labelText: label.textContent,
+                    labelWidth: labelRect.width,
+                    labelLeft: labelRect.left,
+                    labelRight: labelRect.right,
+                    labelClientWidth: label.clientWidth,
+                    labelScrollWidth: label.scrollWidth,
+                    hasBrush: Boolean(card.querySelector(".brush")),
+                    backgroundImage: cardStyle.backgroundImage,
+                    backgroundSize: cardStyle.backgroundSize,
+                    overflow: labelStyle.overflow,
+                    textOverflow: labelStyle.textOverflow,
+                    whiteSpace: labelStyle.whiteSpace
+                };
+            });
+            const martyCardLayout = await getMartyCardLayout();
+
+            expect(martyCardLayout.cardWidth).toBeCloseTo(spriteCardLayout.cardWidth, 1);
+            expect(martyCardLayout.labelWidth).toBeGreaterThan(spriteCardLayout.labelWidth);
+            expect(martyCardLayout.labelLeft).toBeGreaterThanOrEqual(martyCardLayout.cardLeft);
+            expect(martyCardLayout.labelRight).toBeLessThanOrEqual(martyCardLayout.cardRight);
+            expect(martyCardLayout.labelText).toBe("Marty Mode");
+            expect(martyCardLayout.hasBrush).toBe(false);
+            expect(martyCardLayout.backgroundImage).toContain("viewOnCompactWideLabel.png");
+            expect(martyCardLayout.backgroundSize).toBe("100% 100%");
+            expect(martyCardLayout).toMatchObject({
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap"
+            });
+            expect(martyCardLayout.labelScrollWidth).toBeLessThanOrEqual(martyCardLayout.labelClientWidth);
+
+            await dragMartyBlock(page);
+            expect(await getMartyCardLayout()).toEqual(martyCardLayout);
+            expect(errors).toEqual([]);
+        } finally {
+            await browser.close();
+        }
+    }, 60000);
+
     it("activates the script after duplicating a page in Marty mode", async () => {
         const { browser, page, errors } = await openPage("/editor.html?mode=edit");
         try {

@@ -25,6 +25,8 @@ import {
 } from '../../utils/lib';
 
 let caret = undefined;
+const MARTY_MODE_SIDEBAR_CARD_ID = 'martyModeSidebarCard';
+const MARTY_MODE_SIDEBAR_CARD_CLASS = 'marty-mode-card';
 
 export default class Thumbs {
     static getPageList() {
@@ -780,8 +782,8 @@ export default class Thumbs {
     }
 
     static createMartyModeCard(parent) {
-        var card = newHTML('div', 'marty-mode-card', parent);
-        card.setAttribute('id', 'martyModeSidebarCard');
+        var card = newHTML('div', MARTY_MODE_SIDEBAR_CARD_CLASS, parent);
+        card.setAttribute('id', MARTY_MODE_SIDEBAR_CARD_ID);
         card.setAttribute('role', 'img');
         card.setAttribute('aria-label', 'Marty Mode');
 
@@ -1009,14 +1011,25 @@ export default class Thumbs {
         Thumbs.clickOnSprite(e, el);
     }
 
-    static highlighSprite(spr) {
-        if (spr.owner.includes('Marty')) { // we don't want to make Marty editable as our svg is can't be edited
-            spr.setAttribute('class', 'spritethumb on martynoneditable');
-        } else if (!Thumbs.isSpritePaintEditable(spr)) {
-            spr.setAttribute('class', 'spritethumb on paintnoneditable');
-        } else {
-            spr.setAttribute('class', ScratchJr.isEditable() ? 'spritethumb on' : 'spritethumb noneditable');
+    static getHighlightedSpriteClass(spr, isTarget = false) {
+        if (Thumbs.isMartyModeCard(spr)) {
+            return MARTY_MODE_SIDEBAR_CARD_CLASS;
         }
+        var targetClass = isTarget ? ' target' : '';
+        if (spr.owner.includes('Marty')) { // we don't want to make Marty editable as our svg can't be edited
+            return 'spritethumb on' + targetClass + ' martynoneditable';
+        }
+        if (!Thumbs.isSpritePaintEditable(spr)) {
+            return 'spritethumb on' + targetClass + ' paintnoneditable';
+        }
+        if (isTarget) {
+            return 'spritethumb on target';
+        }
+        return ScratchJr.isEditable() ? 'spritethumb on' : 'spritethumb noneditable';
+    }
+
+    static highlighSprite(spr) {
+        spr.setAttribute('class', Thumbs.getHighlightedSpriteClass(spr));
         setPressedState(spr, true);
         ScriptsPane.setActiveScript(spr.owner);
         Palette.reset();
@@ -1035,21 +1048,18 @@ export default class Thumbs {
     }
 
     static quickHighlight(spr) {
-        if (spr.owner == ScratchJr.stage.currentPage.currentSpriteName) {
-            spr.className = Thumbs.isSpritePaintEditable(spr) ?
-                'spritethumb on target' : 'spritethumb on target paintnoneditable';
+        if (Thumbs.isMartyModeCard(spr) ||
+            (spr.owner == ScratchJr.stage.currentPage.currentSpriteName)) {
+            spr.className = Thumbs.getHighlightedSpriteClass(spr, true);
         } else {
             spr.className = 'spritethumb off target';
         }
     }
 
     static quickRestore(spr) {
-        if (spr.owner == ScratchJr.stage.currentPage.currentSpriteName) {
-            if (!Thumbs.isSpritePaintEditable(spr)) {
-                spr.className = 'spritethumb on paintnoneditable';
-            } else {
-                spr.className = ScratchJr.isEditable() ? 'spritethumb on' : 'spritethumb noneditable';
-            }
+        if (Thumbs.isMartyModeCard(spr) ||
+            (spr.owner == ScratchJr.stage.currentPage.currentSpriteName)) {
+            spr.className = Thumbs.getHighlightedSpriteClass(spr);
         } else {
             spr.className = 'spritethumb off';
         }
@@ -1058,5 +1068,9 @@ export default class Thumbs {
     static isSpritePaintEditable(spr) {
         var spriteNode = spr && gn(spr.owner);
         return UI.isSpritePaintEditable(spriteNode && spriteNode.owner);
+    }
+
+    static isMartyModeCard(spr) {
+        return Boolean(spr && spr.id == MARTY_MODE_SIDEBAR_CARD_ID);
     }
 }
