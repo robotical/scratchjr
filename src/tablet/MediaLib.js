@@ -106,6 +106,9 @@ export default class MediaLib {
 
     static getKeyForAsset (asset) {
         var key = {width: asset.width, height: asset.height, name: asset.name};
+        if (asset.watermarkMode) {
+            key.watermarkMode = asset.watermarkMode;
+        }
         if (asset.animationFrames && asset.animationFrames.length > 1) {
             key.animationFrames = asset.animationFrames.slice(0);
             key.animationFrameRate = asset.animationFrameRate;
@@ -121,6 +124,9 @@ export default class MediaLib {
             var frameMd5 = asset.animationFrames[i];
             if (!keys[frameMd5]) {
                 keys[frameMd5] = {width: asset.width, height: asset.height, name: asset.name};
+                if (asset.watermarkMode) {
+                    keys[frameMd5].watermarkMode = asset.watermarkMode;
+                }
             }
         }
     }

@@ -1138,10 +1138,13 @@ export default class Sprite {
         while (div.childElementCount > 0) {
             div.removeChild(div.childNodes[0]);
         }
-        var img = this.getSVGimage(this.watermark);
-        var hasImageWatermark = this.watermark && this.watermark.getElementsByTagName('image').length > 0;
+        var mediaKey = MediaLib.keys[this.md5];
+        var useSourceGrayscale = mediaKey && mediaKey.watermarkMode == 'source-grayscale';
+        var watermarkSource = useSourceGrayscale ? this.svg : this.watermark;
+        var img = this.getSVGimage(watermarkSource);
+        var hasImageWatermark = watermarkSource && watermarkSource.getElementsByTagName('image').length > 0;
         /*MartyMode*/
-        if (this.name === ScratchJr.BIRDS_EYE_SPRITE_NAME || hasImageWatermark) {
+        if (this.name === ScratchJr.BIRDS_EYE_SPRITE_NAME || hasImageWatermark || useSourceGrayscale) {
             img.style.filter = 'grayscale(100%)';
         }
         div.appendChild(img);

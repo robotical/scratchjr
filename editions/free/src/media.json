@@ -117,6 +117,7 @@
       "height": 321.28673,
       "ext": "svg",
       "name": "Octopus-Pink",
+      "watermarkMode": "source-grayscale",
       "order": "characters,07 weather",
       "tags":["characters", "07 weather"]
     },
@@ -126,6 +127,7 @@
       "height": 321.28673,
       "ext": "svg",
       "name": "Raccoon",
+      "watermarkMode": "source-grayscale",
       "order": "characters,07 weather",
       "tags":["characters", "07 weather"]
     },
@@ -144,6 +146,7 @@
       "height": 321.28673,
       "ext": "svg",
       "name": "Unicorn",
+      "watermarkMode": "source-grayscale",
       "order": "characters,07 weather",
       "tags": ["characters", "07 weather"]
     },
