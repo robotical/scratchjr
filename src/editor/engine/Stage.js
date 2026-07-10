@@ -688,16 +688,14 @@ export default class Stage {
         if (sprite && (sprite.id == spr.id)) {
             var sprites = page.getSprites();
             /*MartyMode*/
-            // if there are sprites other than Marty's bird's eye sprite, set the current sprite to the first sprite
-            // otherwise, enable Marty mode
-            const allSpritesBesidesMartyBirdsEye = sprites.filter(sprite => !sprite.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME));
-            if (allSpritesBesidesMartyBirdsEye.length > 0) {
-                page.setCurrentSprite(gn(allSpritesBesidesMartyBirdsEye[0]).owner);
+            // Select another normal sprite if one remains; otherwise preserve the current editor mode.
+            const normalSpriteIds = sprites.filter(sprite => !sprite.includes(ScratchJr.BIRDS_EYE_SPRITE_NAME));
+            if (normalSpriteIds.length > 0) {
+                page.setCurrentSprite(gn(normalSpriteIds[0]).owner);
+            } else if (ScratchJr.isMartyModeEnabled) {
+                page.setCurrentSprite(page.getMartyBirdsEyeSprite());
             } else {
-                if (!ScratchJr.isMartyModeEnabled) {
-                    ScratchJr.isMartyModeEnabled = true;
-                    UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
-                }
+                page.setCurrentSprite(undefined);
             }
         }
     }
