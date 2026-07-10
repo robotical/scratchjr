@@ -1139,8 +1139,9 @@ export default class Sprite {
             div.removeChild(div.childNodes[0]);
         }
         var img = this.getSVGimage(this.watermark);
+        var hasImageWatermark = this.watermark && this.watermark.getElementsByTagName('image').length > 0;
         /*MartyMode*/
-        if (this.name === ScratchJr.BIRDS_EYE_SPRITE_NAME) {
+        if (this.name === ScratchJr.BIRDS_EYE_SPRITE_NAME || hasImageWatermark) {
             img.style.filter = 'grayscale(100%)';
         }
         div.appendChild(img);
