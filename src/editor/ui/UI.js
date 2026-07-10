@@ -2190,8 +2190,10 @@ export default class UI {
     }
 
     static createTopBarClicky(p, str, mstyle, fcn) {
+        var label = UI.getControlAriaLabel(str);
         var toggle = newButton(mstyle, p, {
-            ariaLabel: UI.getControlAriaLabel(str)
+            ariaLabel: label,
+            title: label
         });
         toggle.onclick = fcn;
         toggle.setAttribute('id', str);

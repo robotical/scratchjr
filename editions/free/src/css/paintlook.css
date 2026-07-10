@@ -89,6 +89,29 @@ spriteform.off {visibility: hidden; };
     background-size: 100%;
 }
 
+.paintcancel {
+    float: right;
+    display: block;
+    margin: ${css_vh(0.65)} ${css_vh(0.65)} ${css_vh(0.00)};
+    padding: ${css_vh(0.00)};
+    width: ${css_vh(8.46)};
+    height: ${css_vh(8.46)};
+    background: url('../assets/paint/cancel.svg');
+    background-size: 100%;
+    -webkit-user-select: none;
+    z-index: 1000;
+}
+
+.paintcancel:active {
+    background: url('../assets/paint/cancelPressed.svg');
+    background-size: 100%;
+}
+
+.paintcancel:focus-visible {
+    outline: 3px solid #133C46;
+    outline-offset: 2px;
+}
+
 /* camera */
 
 .phototopbar {

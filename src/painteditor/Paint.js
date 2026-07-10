@@ -16,7 +16,7 @@ import Camera from './Camera';
 import Events from '../utils/Events';
 import Transform from './Transform';
 import Vector from '../geom/Vector';
-import { gn, newHTML, setCanvasSize, isTablet, getIdFor, isAndroid, setProps, hitRect, frame } from '../utils/lib';
+import { gn, newButton, newHTML, setCanvasSize, isTablet, getIdFor, isAndroid, setProps, hitRect, frame } from '../utils/lib';
 
 // Originally several files (Paint.js, PaintIO.js, PaintLayout.js)
 // were all contributing utility functions to the Paint object.
@@ -620,6 +620,7 @@ export default class Paint {
     static topbar() {
         var pt = newHTML('div', 'paintop', paintFrame);
         Paint.checkMark(pt);
+        Paint.cancelButton(pt);
         PaintUndo.setup(pt); // plug here the undo
         Paint.nameOfcostume(pt);
     }
@@ -634,6 +635,36 @@ export default class Paint {
         } else {
             clicky.onpointerdown = Paint.backToProject;
         }
+    }
+
+    static cancelButton(pt) {
+        var label = Localization.localizeOptional('Cancel');
+        var clicky = newButton('paintcancel', pt, {
+            id: 'cancelcheck',
+            ariaLabel: label,
+            title: label
+        });
+        clicky.onpointerdown = function (e) {
+            e.stopPropagation();
+        };
+        clicky.ontouchstart = function (e) {
+            e.stopPropagation();
+        };
+        clicky.onclick = Paint.cancelEdit;
+    }
+
+    static cancelEdit(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (saving) {
+            return;
+        }
+        Path.quitEditMode();
+        Camera.close();
+        ScratchJr.unfocus();
+        ScratchAudio.sndFX('tap.wav');
+        Paint.close();
+        ScratchJr.onBackButtonCallback.pop();
     }
 
     static nameOfcostume(p) {

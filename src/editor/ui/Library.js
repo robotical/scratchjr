@@ -57,6 +57,8 @@ export default class Library {
         libFrame.focus();
         selectedOne = undefined;
         clickThumb = undefined;
+        pendingSelectId = type == 'backgrounds' && ScratchJr.stage && ScratchJr.stage.currentPage ?
+            (ScratchJr.stage.currentPage.md5 || 'none') : undefined;
         gn('okbut').onclick = (type == 'costumes') ? Library.closeSpriteSelection : Library.closeBkgSelection;
         Library.clean();
         Library.createScrollPanel();

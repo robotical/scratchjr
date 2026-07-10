@@ -153,6 +153,14 @@ async function expectNamedControls(page, selectors) {
     expect(missing).toEqual([]);
 }
 
+async function activateSkipLink(page, targetId) {
+    await page.focus('#skip-link');
+    await page.keyboard.press('Enter');
+    await page.waitForFunction((expectedTargetId) => {
+        return document.activeElement && document.activeElement.id === expectedTargetId;
+    }, { timeout: 5_000 }, targetId);
+}
+
 beforeEach(async () => {
     server = spawn('python3', ['-m', 'http.server', `${PORT}`, '--directory', 'editions/free/src'], {
         stdio: 'ignore'
@@ -217,6 +225,8 @@ describe('Accessibility shell audit', () => {
 
             await tabToSelector(page, '#hometab');
             expectVisibleFocusIndicator(await getFocusStyles(page, '#hometab'));
+
+            await activateSkipLink(page, 'wrapc');
 
             await new Promise((resolve) => setTimeout(resolve, 1200));
             await page.click('#booktab');
@@ -288,6 +298,8 @@ describe('Accessibility shell audit', () => {
                 await tabToSelector(page, guideCase.focusSelector);
                 expectVisibleFocusIndicator(await getFocusStyles(page, guideCase.focusSelector));
 
+                await activateSkipLink(page, 'content');
+
                 expectNoAxeViolations(await runAxe(page));
                 expect(errors).toEqual([]);
                 await page.close();
@@ -343,6 +355,8 @@ describe('Accessibility shell audit', () => {
             expect(await page.$eval('#scripts', (element) => element.getAttribute('aria-label'))).toBe('Programming Area');
             expect(await page.$eval('#scriptscontainer', (element) => element.getAttribute('role'))).toBe('list');
             expect(await page.$eval('#scriptscontainer', (element) => element.getAttribute('aria-label'))).toBe('Programming Script');
+
+            await activateSkipLink(page, 'frame');
 
             await expectNamedControls(page, [
                 '#projectinfo',
@@ -551,8 +565,10 @@ describe('Accessibility shell audit', () => {
             });
             expect(await page.evaluate(() => document.activeElement.id)).toBe('projectinfo');
 
-            const editorUrl = page.url();
-            await page.goto(`${editorUrl}&tutorial=cog-jrblocks-1`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+            const editorUrl = new URL(page.url());
+            editorUrl.searchParams.set('tutorial', 'cog-jrblocks-1');
+            editorUrl.hash = '';
+            await page.goto(editorUrl.toString(), { waitUntil: 'domcontentloaded', timeout: 30_000 });
             await page.waitForSelector('#tutorialMenuBar', { timeout: 40_000 });
             await page.waitForSelector('#nextStep', { timeout: 30_000 });
 
