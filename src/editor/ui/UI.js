@@ -2308,6 +2308,16 @@ export default class UI {
         ndiv.setAttribute('role', 'group');
         ndiv.setAttribute('aria-label', UI.getGuideControlLabel('INTERFACE_GUIDE_PAGES'));
 
+        var duplicatePageLabel = Thumbs.getDuplicatePageLabel(1);
+        var duplicatePage = newButton('duplicatepage', tb, {
+            id: 'duplicatepage',
+            ariaLabel: duplicatePageLabel,
+            title: duplicatePageLabel
+        });
+        duplicatePage.onclick = Thumbs.duplicateCurrentPageAction;
+        var duplicatePageIcon = newHTML('span', 'duplicatepageicon', duplicatePage);
+        duplicatePageIcon.setAttribute('aria-hidden', 'true');
+
         UI.addMartyModeButton(rp);
     }
 

@@ -111,6 +111,67 @@ div.frame {
     height: ${css_vh(37.29)};
 }
 
+.duplicatepage {
+    appearance: none;
+    position: absolute;
+    top: ${css_vh(40.4)};
+    left: ${css_vh(7.8)};
+    width: ${css_vh(5.47)};
+    height: ${css_vh(5.47)};
+    padding: 0;
+    border: ${css_vh(0.26)} solid #515050;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #515050;
+    cursor: pointer;
+}
+
+.duplicatepage:hover:not(:disabled) {
+    background: #f2f2f2;
+}
+
+.duplicatepage:active:not(:disabled) {
+    background: #dedede;
+}
+
+.duplicatepage:disabled {
+    opacity: 0.38;
+    cursor: default;
+}
+
+.duplicatepageicon,
+.duplicatepageicon::before,
+.duplicatepageicon::after {
+    box-sizing: border-box;
+    position: absolute;
+    width: ${css_vh(2.34)};
+    height: ${css_vh(2.34)};
+    border: ${css_vh(0.26)} solid currentColor;
+    border-radius: ${css_vh(0.26)};
+}
+
+.duplicatepageicon {
+    top: ${css_vh(1.43)};
+    left: ${css_vh(1.43)};
+    border: 0;
+}
+
+.duplicatepageicon::before,
+.duplicatepageicon::after {
+    content: '';
+}
+
+.duplicatepageicon::before {
+    top: ${css_vh(-0.52)};
+    left: ${css_vh(-0.52)};
+}
+
+.duplicatepageicon::after {
+    top: 0;
+    left: 0;
+    background: inherit;
+}
+
 .pagethumb {
     background: none;
     position: relative;

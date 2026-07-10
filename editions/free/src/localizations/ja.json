@@ -1165,6 +1165,7 @@
   "A11Y_ADD_PAGE": "Add page",
   "A11Y_COPY_TO_PAGE": "Copy to page {PAGE}",
   "A11Y_DELETE_PAGE": "Delete page {PAGE}",
+  "A11Y_DUPLICATE_PAGE": "Duplicate page {PAGE}",
   "A11Y_MOVE_PAGE_EARLIER": "Move page {PAGE} earlier",
   "A11Y_MOVE_PAGE_LATER": "Move page {PAGE} later",
   "BLOCK_DESC_MICROBIT_ON_BUTTON": "Starts when a micro:bit button is pressed.",

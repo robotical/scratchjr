@@ -90,6 +90,12 @@ export default class Thumbs {
         });
     }
 
+    static getDuplicatePageLabel(pageNumber) {
+        return Localization.localize('A11Y_DUPLICATE_PAGE', {
+            PAGE: pageNumber
+        });
+    }
+
     static decoratePageThumb(tb, page) {
         if (!tb) {
             return;
@@ -212,12 +218,27 @@ export default class Thumbs {
             ScriptsPane.updateScriptsPageBlocks(JSON.parse(page.sprites));
             prev = th;
         }
+        Thumbs.updateDuplicatePageButton();
         if ((ScratchJr.stage.pages.length > 3) || !ScratchJr.isEditable()) {
             return;
         }
         var ep = Thumbs.emptyPage(pthumbs);
         ep.prev = prev;
         th.next = ep;
+    }
+
+    static updateDuplicatePageButton() {
+        var button = gn('duplicatepage');
+        var currentPage = ScratchJr.stage && ScratchJr.stage.currentPage;
+        if (!button || !currentPage) {
+            return;
+        }
+        var label = Thumbs.getDuplicatePageLabel(currentPage.num);
+        var enabled = ScratchJr.isEditable() && ScratchJr.stage.canDuplicatePage(currentPage.id);
+        button.disabled = !enabled;
+        button.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+        button.setAttribute('aria-label', label);
+        button.setAttribute('title', label);
     }
 
     static getObjectFor(div, id) {
@@ -531,6 +552,23 @@ export default class Thumbs {
         OS.analyticsEvent('editor', 'delete_scene');
         ScratchJr.stage.deletePage(pageId);
         Thumbs.focusWhenAvailable('#pagecc .pagethumb[aria-current="page"]', '#pagecc .pagethumb');
+    }
+
+    static duplicateCurrentPageAction(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        var sourcePage = ScratchJr.stage.currentPage;
+        if (!sourcePage || !ScratchJr.isEditable()) {
+            return;
+        }
+        var started = ScratchJr.stage.duplicatePage(sourcePage.id, function (newPageId) {
+            Thumbs.focusWhenAvailable('.pagethumb[data-owner="' + newPageId + '"]', '#duplicatepage');
+        });
+        if (started) {
+            OS.analyticsEvent('editor', 'duplicate_scene');
+        }
     }
 
     static copyCurrentSpriteToPage(event, pageId) {

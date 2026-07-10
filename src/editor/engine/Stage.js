@@ -224,6 +224,123 @@ export default class Stage {
         Project.recreateObject(page, name, data, whenDone, page.id == stg.currentPage.id);
     }
 
+    canDuplicatePage(pageId) {
+        return !this.duplicatingPage &&
+            this.pages.length < 4 &&
+            this.getPagesID().indexOf(pageId) > -1;
+    }
+
+    duplicatePageData(page) {
+        var sourceData = page.encodePage();
+        var data = JSON.parse(JSON.stringify(sourceData));
+        var idMap = {};
+        var reservedIds = {};
+
+        for (var i = 0; i < sourceData.sprites.length; i++) {
+            var oldId = sourceData.sprites[i];
+            var parts = oldId.split(' ');
+            if ((parts.length > 1) && /^\d+$/.test(parts[parts.length - 1])) {
+                parts.pop();
+            }
+            var baseName = parts.join(' ') || 'Sprite';
+            var suffix = 1;
+            var newId = baseName + ' ' + suffix;
+            while (gn(newId) || reservedIds[newId]) {
+                suffix++;
+                newId = baseName + ' ' + suffix;
+            }
+            reservedIds[newId] = true;
+            idMap[oldId] = newId;
+        }
+
+        data.sprites = sourceData.sprites.map(function (oldId) {
+            var newId = idMap[oldId];
+            var spriteData = data[oldId];
+            delete data[oldId];
+            spriteData.id = newId;
+            data[newId] = spriteData;
+            return newId;
+        });
+        data.layers = sourceData.layers.map(function (oldId) {
+            return idMap[oldId];
+        });
+        data.lastSprite = idMap[sourceData.lastSprite];
+        data.num = page.num + 1;
+        return data;
+    }
+
+    duplicatePage(pageId, whenDone) {
+        if (!this.canDuplicatePage(pageId)) {
+            return false;
+        }
+
+        var sourceIndex = this.getPagesID().indexOf(pageId);
+        var sourcePage = this.pages[sourceIndex];
+        var oldPageIds = this.getPagesID();
+        var data = this.duplicatePageData(sourcePage);
+        var newPageId = getIdFor('page');
+        var duplicatePage;
+        var completed = false;
+        var me = this;
+
+        this.duplicatingPage = true;
+        ScratchJr.onHold = true;
+        ScratchJr.stopStrips();
+        var sourceScript = sourcePage.currentSpriteName ? gn(sourcePage.currentSpriteName + '_scripts') : undefined;
+        if (sourceScript) {
+            sourceScript.owner.deactivate();
+        }
+        sourcePage.div.style.visibility = 'hidden';
+        sourcePage.setPageSprites('hidden');
+        ScratchAudio.sndFX('copy.wav');
+        Thumbs.updateDuplicatePageButton();
+
+        var complete = function () {
+            if (completed || !duplicatePage) {
+                return;
+            }
+            completed = true;
+            me.duplicatingPage = false;
+            ScratchJr.onHold = false;
+            me.renumberPageBlocks(oldPageIds);
+            me.setPage(duplicatePage, false);
+            if (Palette.numcat == 5) {
+                Palette.selectCategory(5);
+            }
+            Undo.record({
+                action: 'addpage',
+                where: newPageId,
+                who: newPageId
+            });
+            ScratchJr.storyStart('Stage.prototype.duplicatePage');
+            if (whenDone) {
+                whenDone(newPageId);
+            }
+        };
+
+        try {
+            Project.recreatePage(newPageId, data, function () {
+                window.setTimeout(complete, 0);
+            });
+            duplicatePage = gn(newPageId).owner;
+            this.pages.splice(this.pages.indexOf(duplicatePage), 1);
+            this.pages.splice(sourceIndex + 1, 0, duplicatePage);
+
+            if ((!data.md5 || data.md5 == 'undefined') && data.sprites.length == 0) {
+                window.setTimeout(complete, 0);
+            }
+        } catch (error) {
+            this.duplicatingPage = false;
+            ScratchJr.onHold = false;
+            this.setViewPage(sourcePage);
+            sourcePage.setPageSprites('visible');
+            Thumbs.updatePages();
+            Thumbs.updateDuplicatePageButton();
+            throw error;
+        }
+        return true;
+    }
+
 
     //Delete page
 
