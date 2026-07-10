@@ -378,6 +378,7 @@ describe('Accessibility shell audit', () => {
                 const motionButton = document.getElementById('sprite-motion');
                 return motionButton && motionButton.getAttribute('aria-pressed') === 'true';
             }, { timeout: 5_000 });
+            expect((await getFocusStyles(page, '#sprite-motion')).outlineStyle).toBe('none');
             await page.waitForSelector('#forward_block[role="button"]', { timeout: 30_000 });
 
             await expectNamedControls(page, ['#forward_block', '#back_block']);

@@ -390,6 +390,11 @@ div.frame {
     outline-offset: 4px;
 }
 
+#blockspalette .categoryselector button[aria-pressed="true"]:focus,
+#blockspalette .categoryselectorright button[aria-pressed="true"]:focus{
+    outline: none;
+}
+
 #blockspalette .categoryselectorright{
     display: inline-block;
     word-spacing: -1;
