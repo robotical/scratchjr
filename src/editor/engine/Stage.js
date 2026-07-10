@@ -150,8 +150,8 @@ export default class Stage {
                     UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
                 }
             }
-            spr.activate();
         }
+        this.currentPage.setCurrentSprite(ScratchJr.getSprite());
         if (isOn) {
             this.loadPageThreads();
         }
@@ -408,6 +408,7 @@ export default class Stage {
         this.currentPage = page;
         this.currentPage.div.style.visibility = 'visible';
         this.currentPage.setPageSprites('visible');
+        this.currentPage.setCurrentSprite(ScratchJr.getSprite());
     }
 
     removePageBlocks(str) {

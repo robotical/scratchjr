@@ -370,13 +370,13 @@ export default class Undo {
 
     static loadPage(pageid) {
         var pages = ScratchJr.stage.getPagesID();
+        var page;
         if (pages.indexOf(pageid) < 0) {
-            ScratchJr.stage.currentPage = ScratchJr.stage.pages[0];
+            page = ScratchJr.stage.pages[0];
         } else {
-            ScratchJr.stage.currentPage = ScratchJr.stage.getPage(pageid);
+            page = ScratchJr.stage.getPage(pageid);
         }
-        ScratchJr.stage.currentPage.div.style.visibility = 'visible';
-        ScratchJr.stage.currentPage.setPageSprites('visible');
+        ScratchJr.stage.setViewPage(page);
         tryCounter = 100;
         if (Project.mediaCount > 0) {
             setTimeout(function () {

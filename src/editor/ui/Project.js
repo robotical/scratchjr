@@ -269,12 +269,13 @@ export default class Project {
     static setLoadPage (pageid, whenDone) {
         ScratchJr.log('setLoadPage', ScratchJr.getTime(), 'sec');
         var pages = ScratchJr.stage.getPagesID();
+        var page;
         if (pages.indexOf(pageid) < 0) {
-            ScratchJr.stage.currentPage = ScratchJr.stage.pages[0];
+            page = ScratchJr.stage.pages[0];
         } else {
-            ScratchJr.stage.currentPage = ScratchJr.stage.getPage(pageid);
+            page = ScratchJr.stage.getPage(pageid);
         }
-        ScratchJr.stage.currentPage.div.style.visibility = 'visible';
+        ScratchJr.stage.setViewPage(page);
         var list = ScratchJr.stage.pages;
         for (var i = 0; i < list.length; i++) {
             if (ScratchJr.stage.currentPage == list[i]) {

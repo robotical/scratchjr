@@ -98,8 +98,13 @@ const selectMotionCategory = async page => {
     await page.waitForSelector("#forward_block", { visible: true });
 };
 
-const dragForwardBlockToCanvas = async page => {
-    const source = await page.$eval("#forward_block", node => {
+const selectMartyMotionCategory = async page => {
+    await page.click("#marty-motion");
+    await page.waitForSelector("#martyStepForward_block", { visible: true });
+};
+
+const dragBlockToCanvas = async (page, selector) => {
+    const source = await page.$eval(selector, node => {
         const rect = node.getBoundingClientRect();
         return {
             x: rect.left + rect.width / 2,
@@ -118,6 +123,20 @@ const dragForwardBlockToCanvas = async page => {
     await page.mouse.down();
     await page.mouse.move(target.x, target.y, { steps: 12 });
     await page.mouse.up();
+};
+
+const enableMartyMode = async page => {
+    const enabled = await page.evaluate(() => ScratchJr.isMartyModeEnabled);
+    if (!enabled) {
+        await page.click("#martyMode");
+    }
+
+    await page.waitForFunction(() =>
+        ScratchJr.isMartyModeEnabled &&
+        ScratchJr.stage.currentPage.currentSpriteName &&
+        ScratchJr.stage.currentPage.currentSpriteName.indexOf(ScratchJr.BIRDS_EYE_SPRITE_NAME) > -1 &&
+        ScratchJr.getActiveScript()
+    );
 };
 
 const clickSpriteThumb = async (page, spriteId) => {
@@ -173,7 +192,7 @@ describe("Blocks Jr hidden block drop regression", () => {
             await clickSpriteThumb(page, martyId);
             await setCurrentSprite(page, octopusId);
             await selectMotionCategory(page);
-            await dragForwardBlockToCanvas(page);
+            await dragBlockToCanvas(page, "#forward_block");
 
             await page.waitForFunction(id => {
                 const script = document.getElementById(`${id}_scripts`);
@@ -186,6 +205,55 @@ describe("Blocks Jr hidden block drop regression", () => {
             expect(state.blockTypes).toContain("forward");
             expect(state.scriptVisibility).toBe("visible");
             expect(state.visibleBlockTypes).toContain("forward");
+            expect(errors).toEqual([]);
+        } finally {
+            await browser.close();
+        }
+    }, 60000);
+
+    it("keeps Marty blocks visible after adding a page and returning to page 1", async () => {
+        const { browser, page, errors } = await openEditor();
+
+        try {
+            await enableMartyMode(page);
+            const pageOne = await page.evaluate(() => ({
+                pageId: ScratchJr.stage.currentPage.id,
+                spriteId: ScratchJr.stage.currentPage.currentSpriteName,
+                pageCount: ScratchJr.stage.pages.length
+            }));
+
+            await page.click("#emptypage");
+            await page.waitForFunction((pageId, pageCount) =>
+                ScratchJr.stage.pages.length === pageCount + 1 &&
+                ScratchJr.stage.currentPage.id !== pageId &&
+                ScratchJr.isMartyModeEnabled &&
+                ScratchJr.stage.currentPage.currentSpriteName &&
+                ScratchJr.stage.currentPage.currentSpriteName.indexOf(ScratchJr.BIRDS_EYE_SPRITE_NAME) > -1 &&
+                !ScratchJr.onHold &&
+                ScratchJr.getActiveScript(),
+            {}, pageOne.pageId, pageOne.pageCount);
+
+            await page.click(`.pagethumb[data-owner="${pageOne.pageId}"]`);
+            await page.waitForFunction((pageId, spriteId) =>
+                ScratchJr.stage.currentPage.id === pageId &&
+                ScratchJr.stage.currentPage.currentSpriteName === spriteId &&
+                ScratchJr.isMartyModeEnabled &&
+                ScratchJr.getActiveScript().id === `${spriteId}_scripts`,
+            {}, pageOne.pageId, pageOne.spriteId);
+
+            await selectMartyMotionCategory(page);
+            await dragBlockToCanvas(page, "#martyStepForward_block");
+            await page.waitForFunction(spriteId => {
+                const script = document.getElementById(`${spriteId}_scripts`);
+                return script.owner.getBlocks().some(block => block.blocktype === "martyStepForward");
+            }, {}, pageOne.spriteId);
+
+            const state = await getSpriteScriptState(page, pageOne.spriteId);
+            expect(state.currentSpriteName).toBe(pageOne.spriteId);
+            expect(state.activeScriptId).toBe(`${pageOne.spriteId}_scripts`);
+            expect(state.blockTypes).toContain("martyStepForward");
+            expect(state.scriptVisibility).toBe("visible");
+            expect(state.visibleBlockTypes).toContain("martyStepForward");
             expect(errors).toEqual([]);
         } finally {
             await browser.close();
