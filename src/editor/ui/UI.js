@@ -2059,11 +2059,15 @@ export default class UI {
     static putInPaintEditor(e) {
         ScratchJr.unfocus(e);
         var s = ScratchJr.getSprite();
-        if (!s) {
+        if (!UI.isSpritePaintEditable(s)) {
             return;
         }
         ScratchJr.stopStrips();
         Paint.open(false, s.md5, s.id, s.name, s.defaultScale, Math.round(s.w), Math.round(s.h));
+    }
+
+    static isSpritePaintEditable(sprite) {
+        return Boolean(sprite) && (!sprite.animationFrames || sprite.animationFrames.length < 2);
     }
 
     ///////////////////////////////

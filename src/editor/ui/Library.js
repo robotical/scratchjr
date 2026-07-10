@@ -56,6 +56,7 @@ export default class Library {
         libFrame.className = 'libframe appear';
         libFrame.focus();
         selectedOne = undefined;
+        clickThumb = undefined;
         gn('okbut').onclick = (type == 'costumes') ? Library.closeSpriteSelection : Library.closeBkgSelection;
         Library.clean();
         Library.createScrollPanel();
@@ -76,6 +77,7 @@ export default class Library {
 
         gn('library_paintme').style.opacity = 1;
         gn('library_paintme').onclick = Library.editResource;
+        gn('library_paintme').setAttribute('aria-disabled', 'false');
 
         // Set the back button callback
         ScratchJr.onBackButtonCallback.push(function () {
@@ -283,6 +285,7 @@ export default class Library {
         tb.fieldname = data.name;
         tb.w = Number(data.width);
         tb.h = Number(data.height);
+        tb.paintEditable = !data.animationFrames || data.animationFrames.length < 2;
 
         /*MartyMode*/
         // if md5 is MartyBirdsEye.svg don't show
@@ -558,16 +561,7 @@ export default class Library {
         } else {
             Library.clearAllSelections();
 
-            // Disable paint editor for PNG sprites
-            var thumbID = tb.id;
-            var thumbType = thumbID.substr(thumbID.length - 3);
-            if (thumbType == 'png') {
-                gn('library_paintme').style.opacity = 0;
-                gn('library_paintme').onclick = null;
-            } else {
-                gn('library_paintme').style.opacity = 1;
-                gn('library_paintme').onclick = Library.editResource;
-            }
+            Library.updatePaintEditorAvailability(tb);
 
             tb.className = 'assetbox on';
             // to avoid double click
@@ -607,15 +601,7 @@ export default class Library {
             return;
         }
         Library.clearAllSelections();
-        var thumbID = tb.id;
-        var thumbType = thumbID.substr(thumbID.length - 3);
-        if (thumbType == 'png') {
-            gn('library_paintme').style.opacity = 0;
-            gn('library_paintme').onclick = null;
-        } else {
-            gn('library_paintme').style.opacity = 1;
-            gn('library_paintme').onclick = Library.editResource;
-        }
+        Library.updatePaintEditorAvailability(tb);
         tb.className = 'assetbox on';
         selectedOne = tb.id;
         clickThumb = tb;
@@ -640,7 +626,27 @@ export default class Library {
     // Object actions
     //////////////////////////////////////////
 
+    static isPaintEditable (tb) {
+        if (!tb) {
+            return true;
+        }
+        var thumbID = tb.id || '';
+        var thumbType = thumbID.substr(thumbID.length - 3).toLowerCase();
+        return thumbType != 'png' && tb.paintEditable !== false;
+    }
+
+    static updatePaintEditorAvailability (tb) {
+        var paintButton = gn('library_paintme');
+        var editable = Library.isPaintEditable(tb);
+        paintButton.style.opacity = editable ? 1 : 0;
+        paintButton.onclick = editable ? Library.editResource : null;
+        paintButton.setAttribute('aria-disabled', editable ? 'false' : 'true');
+    }
+
     static editResource (e) {
+        if (!Library.isPaintEditable(clickThumb)) {
+            return;
+        }
         Library.close(e);
         if (type != 'costumes') {
             Library.editBackground(e);

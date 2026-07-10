@@ -1,0 +1,218 @@
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import puppeteer from "puppeteer";
+import { spawn } from "child_process";
+import http from "http";
+
+const PORT = 3018;
+const HOST = `http://localhost:${PORT}`;
+
+let server;
+
+async function waitForServer(maxAttempts = 20) {
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const ok = await new Promise((resolve) => {
+      const req = http.get(`${HOST}/`, (res) => {
+        res.destroy();
+        resolve(true);
+      });
+      req.on("error", () => resolve(false));
+    });
+    if (ok) {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  throw new Error("Local server did not start in time");
+}
+
+beforeAll(async () => {
+  server = spawn("python3", ["-m", "http.server", `${PORT}`, "--directory", "editions/free/src"], {
+    stdio: "ignore",
+  });
+  await waitForServer();
+}, 30_000);
+
+afterAll(() => {
+  if (server) {
+    server.kill();
+  }
+});
+
+async function openEditor() {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox"],
+  });
+  const page = await browser.newPage();
+  const errors = [];
+
+  page.on("pageerror", (err) => errors.push(err.message || String(err)));
+  page.on("console", (msg) => {
+    if (msg.type() === "error") {
+      errors.push(msg.text());
+    }
+  });
+
+  await page.goto(`${HOST}/editor.html?mode=edit`, { waitUntil: "networkidle2", timeout: 30_000 });
+  await page.waitForFunction(
+    () => {
+      const backdrop = document.getElementById("backdrop");
+      return Boolean(
+        window.ScratchJr
+          && window.ScratchJr.stage
+          && window.ScratchJr.stage.currentPage
+          && backdrop
+          && window.getComputedStyle(backdrop).display === "none"
+          && !window.ScratchJr.onHold
+      );
+    },
+    { timeout: 30_000 }
+  );
+
+  return { browser, page, errors };
+}
+
+describe("animated sprite paint editing", () => {
+  it(
+    "disables paint editing for the animated bee in the library and sprite panel",
+    async () => {
+      const { browser, page, errors } = await openEditor();
+
+      try {
+        await page.click("#addsprite");
+        await page.waitForSelector("#libframe.appear #BeeSprite1\\.svg", { timeout: 30_000 });
+        await page.click("#BeeSprite1\\.svg");
+        await page.waitForFunction(
+          () => document.getElementById("library_paintme").getAttribute("aria-disabled") === "true",
+          { timeout: 30_000 }
+        );
+
+        const libraryState = await page.evaluate(() => {
+          const paintButton = document.getElementById("library_paintme");
+          return {
+            ariaDisabled: paintButton.getAttribute("aria-disabled"),
+            opacity: paintButton.style.opacity,
+            hasClickHandler: typeof paintButton.onclick === "function",
+          };
+        });
+
+        expect(libraryState).toEqual({
+          ariaDisabled: "true",
+          opacity: "0",
+          hasClickHandler: false,
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        await page.click("#BeeSprite1\\.svg");
+        await page.waitForFunction(
+          () => {
+            const sprite = window.ScratchJr && window.ScratchJr.getSprite();
+            return Boolean(sprite && sprite.animationFrames && sprite.animationFrames.length === 3);
+          },
+          { timeout: 30_000 }
+        );
+
+        const beeThumbId = await page.evaluate(() => window.ScratchJr.getSprite().thumbnail.id);
+        await page.click(`[id="${beeThumbId}"]`);
+        await page.waitForFunction(
+          () => window.ScratchJr.getSprite().thumbnail.className.includes("paintnoneditable"),
+          { timeout: 30_000 }
+        );
+
+        const spriteState = await page.evaluate(() => {
+          const sprite = window.ScratchJr.getSprite();
+          const thumb = sprite.thumbnail;
+          const brush = thumb.querySelector(".brush");
+          const paintFrame = document.getElementById("paintframe");
+          brush.dispatchEvent(new PointerEvent("pointerdown", {
+            bubbles: true,
+            cancelable: true,
+            pointerType: "mouse",
+          }));
+          return {
+            thumbClass: thumb.className,
+            brushDisplay: window.getComputedStyle(brush).display,
+            paintFrameVisible: window.getComputedStyle(paintFrame).display !== "none",
+          };
+        });
+
+        expect(spriteState.thumbClass).toContain("paintnoneditable");
+        expect(spriteState.brushDisplay).toBe("none");
+        expect(spriteState.paintFrameVisible).toBe(false);
+        expect(errors).toEqual([]);
+      } finally {
+        await browser.close();
+      }
+    },
+    60_000
+  );
+
+  it(
+    "keeps paint editing available for ordinary sprites",
+    async () => {
+      const { browser, page, errors } = await openEditor();
+
+      try {
+        await page.click("#addsprite");
+        await page.waitForSelector("#libframe.appear #Star\\.svg", { timeout: 30_000 });
+        await page.click("#Star\\.svg");
+        await page.waitForFunction(
+          () => {
+            const star = document.getElementById("Star.svg");
+            const paintButton = document.getElementById("library_paintme");
+            return Boolean(
+              star
+                && star.className.includes("on")
+                && paintButton.getAttribute("aria-disabled") === "false"
+                && typeof paintButton.onclick === "function"
+            );
+          },
+          { timeout: 30_000 }
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        await page.click("#Star\\.svg");
+        await page.waitForFunction(
+          () => {
+            const sprite = window.ScratchJr && window.ScratchJr.getSprite();
+            return Boolean(sprite && sprite.md5 === "Star.svg");
+          },
+          { timeout: 30_000 }
+        );
+
+        const starThumbId = await page.evaluate(() => window.ScratchJr.getSprite().thumbnail.id);
+        await page.click(`[id="${starThumbId}"]`);
+
+        const editableState = await page.evaluate(() => {
+          const sprite = window.ScratchJr.getSprite();
+          const thumb = sprite.thumbnail;
+          const brush = thumb.querySelector(".brush");
+          brush.dispatchEvent(new PointerEvent("pointerdown", {
+            bubbles: true,
+            cancelable: true,
+            pointerType: "mouse",
+          }));
+          return {
+            thumbClass: thumb.className,
+            brushDisplay: window.getComputedStyle(brush).display,
+          };
+        });
+
+        await page.waitForFunction(
+          () => {
+            const paintFrame = document.getElementById("paintframe");
+            return paintFrame && window.getComputedStyle(paintFrame).display !== "none";
+          },
+          { timeout: 30_000 }
+        );
+
+        expect(editableState.thumbClass).not.toContain("paintnoneditable");
+        expect(editableState.brushDisplay).not.toBe("none");
+        expect(errors).toEqual([]);
+      } finally {
+        await browser.close();
+      }
+    },
+    60_000
+  );
+});

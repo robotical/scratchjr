@@ -960,6 +960,8 @@ export default class Thumbs {
     static highlighSprite(spr) {
         if (spr.owner.includes('Marty')) { // we don't want to make Marty editable as our svg is can't be edited
             spr.setAttribute('class', 'spritethumb on martynoneditable');
+        } else if (!Thumbs.isSpritePaintEditable(spr)) {
+            spr.setAttribute('class', 'spritethumb on paintnoneditable');
         } else {
             spr.setAttribute('class', ScratchJr.isEditable() ? 'spritethumb on' : 'spritethumb noneditable');
         }
@@ -982,7 +984,8 @@ export default class Thumbs {
 
     static quickHighlight(spr) {
         if (spr.owner == ScratchJr.stage.currentPage.currentSpriteName) {
-            spr.className = 'spritethumb on target';
+            spr.className = Thumbs.isSpritePaintEditable(spr) ?
+                'spritethumb on target' : 'spritethumb on target paintnoneditable';
         } else {
             spr.className = 'spritethumb off target';
         }
@@ -990,9 +993,18 @@ export default class Thumbs {
 
     static quickRestore(spr) {
         if (spr.owner == ScratchJr.stage.currentPage.currentSpriteName) {
-            spr.className = ScratchJr.isEditable() ? 'spritethumb on' : 'spritethumb noneditable';
+            if (!Thumbs.isSpritePaintEditable(spr)) {
+                spr.className = 'spritethumb on paintnoneditable';
+            } else {
+                spr.className = ScratchJr.isEditable() ? 'spritethumb on' : 'spritethumb noneditable';
+            }
         } else {
             spr.className = 'spritethumb off';
         }
+    }
+
+    static isSpritePaintEditable(spr) {
+        var spriteNode = spr && gn(spr.owner);
+        return UI.isSpritePaintEditable(spriteNode && spriteNode.owner);
     }
 }
