@@ -1,5 +1,67 @@
 /* toolbar */
 
+button[data-tooltip]::before,
+button[data-tooltip]::after {
+    position: absolute;
+    left: 50%;
+    z-index: 13000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 120ms ease;
+}
+
+button[data-tooltip]::before {
+    content: '';
+    top: calc(100% + 6px);
+    width: 10px;
+    height: 10px;
+    border-top: 1px solid #8E8E8E;
+    border-left: 1px solid #8E8E8E;
+    background: #FFF0B7;
+    transform: translateX(-50%) rotate(45deg);
+}
+
+button[data-tooltip]::after {
+    content: attr(data-tooltip);
+    box-sizing: border-box;
+    top: calc(100% + 11px);
+    width: max-content;
+    max-width: 240px;
+    padding: 7px 10px;
+    border: 1px solid #8E8E8E;
+    border-radius: 4px;
+    background: linear-gradient(#FFF0B7, #FFC842);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+    color: #3D2800;
+    font-family: 'Lato Regular', sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 18px;
+    text-align: center;
+    white-space: normal;
+    transform: translateX(-50%);
+}
+
+button[data-tooltip]:hover::before,
+button[data-tooltip]:hover::after,
+button[data-tooltip]:focus::before,
+button[data-tooltip]:focus::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+#full.presentationmode[data-tooltip]::after {
+    left: 0;
+    transform: none;
+}
+
+#go.presentationmode[data-tooltip]::after {
+    right: 0;
+    left: auto;
+    transform: none;
+}
+
 .fullscreen#full {
     position: absolute;
     margin: 0px;

@@ -2192,9 +2192,9 @@ export default class UI {
     static createTopBarClicky(p, str, mstyle, fcn) {
         var label = UI.getControlAriaLabel(str);
         var toggle = newButton(mstyle, p, {
-            ariaLabel: label,
-            title: label
+            ariaLabel: label
         });
+        toggle.setAttribute('data-tooltip', label);
         toggle.onclick = fcn;
         toggle.setAttribute('id', str);
         if (str == 'grid' || str == 'traceBtn' || str == 'martyMode') {

@@ -71,7 +71,7 @@ async function openEditor() {
 
 describe("top toolbar tooltips", () => {
   it(
-    "exposes hover tooltip titles for the top-center editor icons",
+    "renders bounded app-owned tooltips for hover and keyboard focus",
     async () => {
       const { browser, page, errors } = await openEditor();
 
@@ -87,7 +87,7 @@ describe("top toolbar tooltips", () => {
           TOP_TOOLBAR_BUTTON_IDS
         );
 
-        const buttonsWithoutTooltips = await page.evaluate((buttonIds) => {
+        const invalidTooltips = await page.evaluate((buttonIds) => {
           return buttonIds
             .map((id) => {
               const button = document.getElementById(id);
@@ -95,13 +95,53 @@ describe("top toolbar tooltips", () => {
               return {
                 id,
                 ariaLabel: label,
-                title: button.getAttribute("title") || "",
+                nativeTitle: button.getAttribute("title"),
+                tooltip: button.getAttribute("data-tooltip") || "",
               };
             })
-            .filter((button) => button.title !== button.ariaLabel);
+            .filter(
+              (button) =>
+                button.nativeTitle !== null ||
+                button.tooltip !== button.ariaLabel
+            );
         }, TOP_TOOLBAR_BUTTON_IDS);
 
-        expect(buttonsWithoutTooltips).toEqual([]);
+        expect(invalidTooltips).toEqual([]);
+
+        await page.hover("#grid");
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        const hoverTooltip = await page.$eval("#grid", (button) => {
+          const style = window.getComputedStyle(button, "::after");
+          return {
+            content: style.content,
+            opacity: style.opacity,
+            visibility: style.visibility,
+            maxWidth: style.maxWidth,
+          };
+        });
+
+        expect(hoverTooltip.content).toContain("Grid");
+        expect(hoverTooltip.opacity).toBe("1");
+        expect(hoverTooltip.visibility).toBe("visible");
+        expect(hoverTooltip.maxWidth).toBe("240px");
+
+        await page.mouse.move(0, 0);
+        await page.focus("#traceBtn");
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        const focusedTooltip = await page.$eval("#traceBtn", (button) => {
+          const style = window.getComputedStyle(button, "::after");
+          return {
+            focused: document.activeElement === button,
+            opacity: style.opacity,
+            visibility: style.visibility,
+          };
+        });
+
+        expect(focusedTooltip.focused).toBe(true);
+        expect(focusedTooltip.opacity).toBe("1");
+        expect(focusedTooltip.visibility).toBe("visible");
         expect(errors).toEqual([]);
       } finally {
         await browser.close();
