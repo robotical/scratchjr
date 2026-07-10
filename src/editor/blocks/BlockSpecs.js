@@ -313,7 +313,7 @@ export default class BlockSpecs {
     }
 
     static setupPalettesDefMarty() {
-        return [['onflag', 'martycoloursensed', 'martyobstaclesensed', 'martylightsensed', 'martynoisesensed', 'onmessage', 'message', 'onclick', 'ontouch'],
+        return [['onflag', 'martycoloursensed', 'martyobstaclesensed', 'martylightsensed', 'martynoisesensed', 'onmessage', 'message'],
         ['martyGetReady', 'martyStepForward', 'martyStepBackward', 'martyStepRight', 'martyStepLeft', 'martyTurnRight', 'martyTurnLeft', 'martyDance', 'martyKickLeft', 'martyKickRight'],
         ['martyEyesExcited', 'martyEyesWide', 'martyEyesAngry', 'martyEyesNormal', 'martyEyesWiggle', 'martyWaveLeft', 'martyWaveRight', 'martyCelebrate', 'martyLedEyesP1', 'martyLedEyesP2', 'martyLedEyesColour'],
         ['martyConfusion', 'martyDisbelief', 'martyExcitement', 'martyNoway', 'martyNo', 'martyWhistle'],
