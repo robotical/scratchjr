@@ -148,7 +148,7 @@ describe("animated sprite paint editing", () => {
   );
 
   it(
-    "keeps paint editing available for ordinary sprites",
+    "keeps paint editing available and contained within ordinary sprite cards",
     async () => {
       const { browser, page, errors } = await openEditor();
 
@@ -182,6 +182,58 @@ describe("animated sprite paint editing", () => {
 
         const starThumbId = await page.evaluate(() => window.ScratchJr.getSprite().thumbnail.id);
         await page.click(`[id="${starThumbId}"]`);
+        await page.waitForFunction(
+          () => window.ScratchJr.getSprite().thumbnail.className.includes("on"),
+          { timeout: 30_000 }
+        );
+
+        const layoutState = await page.evaluate(() => {
+          const visibleThumbs = Array.from(document.querySelectorAll("#spritecc .spritethumb"))
+            .filter((thumb) => window.getComputedStyle(thumb).display !== "none");
+          const selectedThumb = visibleThumbs.find((thumb) => thumb.getAttribute("aria-pressed") === "true");
+          const unselectedThumb = visibleThumbs.find((thumb) => thumb.getAttribute("aria-pressed") === "false");
+          const addSpriteButton = document.getElementById("addsprite");
+          const name = selectedThumb && selectedThumb.querySelector(".sname");
+          const brush = selectedThumb && selectedThumb.querySelector(".brush");
+
+          if (!selectedThumb || !unselectedThumb || !addSpriteButton || !name || !brush) {
+            throw new Error("Sprite card layout controls were not found");
+          }
+
+          const rectFor = (element) => {
+            const rect = element.getBoundingClientRect();
+            return {
+              top: rect.top,
+              right: rect.right,
+              bottom: rect.bottom,
+              left: rect.left,
+              width: rect.width,
+              height: rect.height,
+            };
+          };
+          const selectedStyle = window.getComputedStyle(selectedThumb);
+
+          return {
+            selected: rectFor(selectedThumb),
+            unselected: rectFor(unselectedThumb),
+            addSprite: rectFor(addSpriteButton),
+            name: rectFor(name),
+            brush: rectFor(brush),
+            selectedBackgroundImage: selectedStyle.backgroundImage,
+            selectedBackgroundSize: selectedStyle.backgroundSize,
+          };
+        });
+
+        expect(layoutState.selected.width).toBeCloseTo(layoutState.unselected.width, 1);
+        expect(layoutState.selected.width).toBeCloseTo(layoutState.addSprite.width, 1);
+        expect(layoutState.selected.height).toBeCloseTo(layoutState.unselected.height, 1);
+        expect(layoutState.selectedBackgroundImage).toContain("viewOnCompact.png");
+        expect(layoutState.selectedBackgroundSize).toBe("100% 100%");
+        expect(layoutState.name.right).toBeLessThanOrEqual(layoutState.brush.left + 0.5);
+        expect(layoutState.brush.left).toBeGreaterThanOrEqual(layoutState.selected.left);
+        expect(layoutState.brush.right).toBeLessThanOrEqual(layoutState.selected.right + 0.5);
+        expect(layoutState.brush.top).toBeGreaterThanOrEqual(layoutState.selected.top);
+        expect(layoutState.brush.bottom).toBeLessThanOrEqual(layoutState.selected.bottom);
 
         const editableState = await page.evaluate(() => {
           const sprite = window.ScratchJr.getSprite();

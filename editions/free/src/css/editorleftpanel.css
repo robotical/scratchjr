@@ -368,7 +368,7 @@
     position: relative;
     display: inline-block;
     word-spacing: -1;
-    width: ${css_vh(29.95)};
+    width: ${css_vh(23.18)};
     height: ${css_vh(10.16)};
     margin: 0px;
     margin-bottom: ${css_vh(-0.39)};
@@ -391,24 +391,22 @@
 
 .spritethumb.off {
     background: url('../assets/ui/viewOff.png') no-repeat left top;
-    background-size: ${css_vh(23.18)};
+    background-size: 100% 100%;
 }
 
 .spritethumb.off.target {
     background: url('../assets/ui/viewOffTarget.png') no-repeat left top;
-    background-size: ${css_vh(23.18)};
+    background-size: 100% 100%;
 }
 
 .spritethumb.on.target {
-    background: url('../assets/ui/viewOnTarget.png') no-repeat left top;
-    background-size: 100%;
-    width: ${css_vh(29.95)};
+    background: url('../assets/ui/viewOnTargetCompact.png') no-repeat left top;
+    background-size: 100% 100%;
 }
 
 .spritethumb.on {
-    background: url('../assets/ui/viewOn.png') no-repeat left top;
-    background-size: 100%;
-    width: ${css_vh(29.95)};
+    background: url('../assets/ui/viewOnCompact.png') no-repeat left top;
+    background-size: 100% 100%;
 }
 
 .spritethumb.noneditable {
@@ -480,8 +478,8 @@
 .spritethumb.on .sname{
     color: #F9A737;
     top: ${css_vh(3.91)};
-    left: ${css_vh(9.24)};
-    width: ${css_vh(11.97)};
+    left: ${css_vh(9.11)};
+    width: ${css_vh(8.33)};
 }
 .spritethumb.noneditable .sname{
     color: #999;
@@ -491,14 +489,14 @@
 }
 
 .spritethumb .brush {
-    display: absolute;
+    display: block;
     position: absolute;
     background:  url('../assets/paint/paintbrush.svg');
-    background-size: ${css_vh(7.03)} ${css_vh(7.03)};
-    width: ${css_vh(7.03)};
-    height: ${css_vh(7.03)};
-    top: ${css_vh(1.30)};
-    left: ${css_vh(21.75)};
+    background-size: 100% 100%;
+    width: ${css_vh(5.73)};
+    height: ${css_vh(5.73)};
+    top: ${css_vh(2.21)};
+    left: ${css_vh(17.45)};
     margin: 0px;
     padding: 0px;
 }
