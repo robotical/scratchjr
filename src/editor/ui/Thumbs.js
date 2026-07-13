@@ -230,12 +230,32 @@ export default class Thumbs {
             prev = th;
         }
         Thumbs.updateDuplicatePageButtons();
+        Thumbs.keepCurrentPageVisible();
         if ((ScratchJr.stage.pages.length > 3) || !ScratchJr.isEditable()) {
             return;
         }
         var ep = Thumbs.emptyPage(pthumbs);
         ep.prev = prev;
         th.next = ep;
+    }
+
+    static keepCurrentPageVisible() {
+        window.setTimeout(function () {
+            var pageContainer = gn('pagecc');
+            var currentPage = pageContainer && pageContainer.querySelector('.pagethumb[aria-current="page"]');
+            if (!pageContainer || !currentPage) {
+                UI.updatePageScroll();
+                return;
+            }
+            if (currentPage.offsetTop < pageContainer.scrollTop) {
+                pageContainer.scrollTop = currentPage.offsetTop;
+            } else if ((currentPage.offsetTop + currentPage.offsetHeight) >
+                (pageContainer.scrollTop + pageContainer.clientHeight)) {
+                pageContainer.scrollTop = currentPage.offsetTop + currentPage.offsetHeight -
+                    pageContainer.clientHeight;
+            }
+            UI.updatePageScroll();
+        }, 0);
     }
 
     static addDuplicatePageButton(container, page) {

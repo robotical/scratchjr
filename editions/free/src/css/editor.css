@@ -111,6 +111,11 @@ div.frame {
     height: ${css_vh(37.29)};
 }
 
+.pages .scrollbar {
+    top: ${css_vh(2.60)};
+    height: ${css_vh(37.29)};
+}
+
 .pagelist {
     position: relative;
     width: ${css_vh(21.09)};

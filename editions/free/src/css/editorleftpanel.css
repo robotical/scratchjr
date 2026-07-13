@@ -241,18 +241,19 @@
 .scrollbar {
     display: none;
     position: absolute;
-    /* display: inline-block; */
     margin: 0px;
     padding: 0px;
     top: 0px;
-    left: ${css_vh(32.29)};
+    right: 0;
     width: ${css_vh(1.04)};
-    height: ${css_vh(40.63)};
+    height: ${css_vh(25.63)};
     background: rgba(255,255,255,0.5);
+    touch-action: none;
+    z-index: 8;
 }
 
 .scrollbar .sbthumb {
-    display: none;
+    display: block;
     position: absolute;
     margin: 0px;
     padding: 0px;
@@ -260,10 +261,15 @@
     height: 0px;
     background: #C9C9C9;
 }
-/* 
+
 .scrollbar.off { display: none;}
 
-.scrollbar.on {display: inline-block;} */
+.scrollbar.on {display: block;}
+
+.scrollbar:focus-visible {
+    outline: 3px solid #133C46;
+    outline-offset: 2px;
+}
 
 #library {
     position: absolute;

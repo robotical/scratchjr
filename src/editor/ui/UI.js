@@ -1806,6 +1806,7 @@ export default class UI {
         sprites.setAttribute('id', 'library');
         //scrolling area
         var p = newHTML('div', 'spritethumbs', sprites);
+        p.setAttribute('id', 'spriteScrollContainer');
         var div = newHTML('div', 'spritecc', p);
         div.setAttribute('id', 'spritecc');
         div.setAttribute('role', 'group');
@@ -1823,10 +1824,11 @@ export default class UI {
         sb.setAttribute('id', 'scrollbar');
         var sbthumb = newHTML('div', 'sbthumb', sb);
         sbthumb.setAttribute('id', 'sbthumb');
+        UI.configureScrollBar(p, sb, sbthumb);
 
         // new sprite
         if (ScratchJr.isEditable()) {
-            var ns = newButton('addsprite', sprites, {
+            var ns = newButton('addsprite', p, {
                 ariaLabel: Localization.localize('A11Y_CREATE') + ' ' + Localization.localize('LIBRARY_CHARACTER')
             });
             ns.onclick = UI.addSprite;
@@ -1869,68 +1871,169 @@ export default class UI {
     //////////////////////////////////////
 
     static needsScroll() {
-        var sc = gn('spritecc');
-        var p = sc.parentNode;
-        if (((sc.scrollHeight / p.offsetHeight) == 1) || (gn('spritecc').childElementCount == 0)) {
-            gn('scrollbar').setAttribute('class', 'scrollbar off');
-        } else {
-            gn('scrollbar').setAttribute('class', 'scrollbar on');
-            UI.updateSpriteScroll();
-        }
+        UI.updateScrollBar(gn('spritecc')?.parentNode, gn('scrollbar'), gn('sbthumb'));
     }
 
     static updateSpriteScroll() {
-        var sc = gn('spritecc');
-        var dy = sc.offsetTop;
-        var p = sc.parentNode;
-        var top = -dy / (sc.scrollHeight / p.offsetHeight);
-        var size = (p.offsetHeight / sc.scrollHeight) * p.offsetHeight;
-        var thumb = gn('sbthumb');
-        thumb.style.height = size + 'px';
-        thumb.style.top = top + 'px';
+        UI.needsScroll();
+    }
+
+    static updatePageScroll() {
+        UI.updateScrollBar(gn('pagecc'), gn('pagescrollbar'), gn('pagesbthumb'));
+    }
+
+    static updateScrollBar(container, scrollbar, thumb) {
+        if (!container || !scrollbar || !thumb) {
+            return;
+        }
+        var maxScroll = Math.max(0, container.scrollHeight - container.clientHeight);
+        if (maxScroll <= Math.max(1, scaleMultiplier)) {
+            scrollbar.setAttribute('class', 'scrollbar off');
+            scrollbar.setAttribute('aria-valuemax', '0');
+            scrollbar.setAttribute('aria-valuenow', '0');
+            thumb.style.height = '0px';
+            thumb.style.top = '0px';
+            return;
+        }
+        scrollbar.setAttribute('class', 'scrollbar on');
+        var thumbSize = (container.clientHeight / container.scrollHeight) * scrollbar.clientHeight;
+        var availableTrack = Math.max(0, scrollbar.clientHeight - thumbSize);
+        var thumbTop = availableTrack * (container.scrollTop / maxScroll);
+        thumb.style.height = thumbSize + 'px';
+        thumb.style.top = thumbTop + 'px';
+        scrollbar.setAttribute('aria-valuemax', Math.round(maxScroll).toString());
+        scrollbar.setAttribute('aria-valuenow', Math.round(container.scrollTop).toString());
+    }
+
+    static configureScrollBar(container, scrollbar, thumb) {
+        if (!container || !scrollbar || !thumb) {
+            return;
+        }
+        scrollbar.setAttribute('role', 'scrollbar');
+        scrollbar.setAttribute('tabindex', '0');
+        scrollbar.setAttribute('aria-orientation', 'vertical');
+        scrollbar.setAttribute('aria-controls', container.id);
+        scrollbar.setAttribute('aria-valuemin', '0');
+        var labelledContainer = container.getAttribute('aria-label') ? container :
+            container.querySelector('[aria-label]');
+        if (labelledContainer) {
+            scrollbar.setAttribute('aria-label', labelledContainer.getAttribute('aria-label'));
+        }
+
+        var update = function () {
+            UI.updateScrollBar(container, scrollbar, thumb);
+        };
+        container.addEventListener('scroll', update);
+        scrollbar.onkeydown = function (event) {
+            var amount = 0;
+            if ((event.key == 'ArrowDown') || (event.key == 'ArrowRight')) {
+                amount = 40 * scaleMultiplier;
+            } else if ((event.key == 'ArrowUp') || (event.key == 'ArrowLeft')) {
+                amount = -40 * scaleMultiplier;
+            } else if (event.key == 'PageDown') {
+                amount = container.clientHeight;
+            } else if (event.key == 'PageUp') {
+                amount = -container.clientHeight;
+            } else if (event.key == 'Home') {
+                container.scrollTop = 0;
+            } else if (event.key == 'End') {
+                container.scrollTop = container.scrollHeight;
+            } else {
+                return;
+            }
+            if (amount != 0) {
+                container.scrollTop += amount;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            update();
+        };
+        var startDrag = function (event) {
+            UI.startScrollBarDrag(event, container, scrollbar, thumb);
+        };
+        if (isTablet) {
+            scrollbar.ontouchstart = startDrag;
+        } else {
+            scrollbar.onpointerdown = startDrag;
+        }
+        if (window.MutationObserver) {
+            var observer = new MutationObserver(update);
+            observer.observe(container, { childList: true, subtree: true });
+        }
+        if (window.ResizeObserver) {
+            var resizeObserver = new ResizeObserver(update);
+            resizeObserver.observe(container);
+        }
+        window.setTimeout(update, 0);
+    }
+
+    static startScrollBarDrag(event, container, scrollbar, thumb) {
+        if (event.touches && (event.touches.length > 1)) {
+            return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        var point = Events.getTargetPoint(event);
+        var trackRect = scrollbar.getBoundingClientRect();
+        var thumbRect = thumb.getBoundingClientRect();
+        var grabOffset = event.target == thumb ? point.y - thumbRect.top : thumbRect.height / 2;
+        var move = function (moveEvent) {
+            if (moveEvent.cancelable) {
+                moveEvent.preventDefault();
+            }
+            var movePoint = Events.getTargetPoint(moveEvent);
+            var availableTrack = Math.max(0, scrollbar.clientHeight - thumb.offsetHeight);
+            var requestedTop = Math.max(0, Math.min(availableTrack,
+                movePoint.y - trackRect.top - grabOffset));
+            var maxScroll = Math.max(0, container.scrollHeight - container.clientHeight);
+            container.scrollTop = availableTrack == 0 ? 0 : (requestedTop / availableTrack) * maxScroll;
+            UI.updateScrollBar(container, scrollbar, thumb);
+        };
+        var stop = function () {
+            window.removeEventListener('pointermove', move);
+            window.removeEventListener('pointerup', stop);
+            window.removeEventListener('pointercancel', stop);
+            window.removeEventListener('touchmove', move);
+            window.removeEventListener('touchend', stop);
+            window.removeEventListener('touchcancel', stop);
+        };
+        if (event.touches) {
+            window.addEventListener('touchmove', move, { passive: false });
+            window.addEventListener('touchend', stop);
+            window.addEventListener('touchcancel', stop);
+        } else {
+            window.addEventListener('pointermove', move);
+            window.addEventListener('pointerup', stop);
+            window.addEventListener('pointercancel', stop);
+        }
+        move(event);
     }
 
     static scrollContents(dy) {
         var sc = gn('spritecc');
-        var valy = sc.offsetTop - dy;
-        if (valy > 0) {
-            valy = 0;
+        if (!sc || !sc.parentNode) {
+            return;
         }
-        var transition = {
-            duration: 0.5,
-            transition: 'ease-out',
-            style: {
-                top: valy + 'px'
-            }
-        };
-        CSSTransition(sc, transition);
+        sc.parentNode.scrollTop += dy;
     }
 
     static spriteInView(spr) {
         var sc = gn('spritecc');
         var parentOfSc = sc.parentNode;
-        if (parentOfSc) {
-            parentOfSc.scrollTop = parentOfSc.scrollHeight;
-        } else {
+        if (!parentOfSc) {
             console.warn('spriteInView: spritecc parent not found');
+            return;
         }
         var achild = spr.thumbnail;
         if (!achild) {
             return;
         }
-        var h = gn('spritecc').parentNode.offsetHeight;
-        var scroll = -gn('spritecc').offsetTop;
-        var dy = -gn('spritecc').offsetTop;
-        if ((achild.offsetTop + achild.offsetHeight + scroll) > h) {
-            dy = h - (achild.offsetTop + achild.offsetHeight);
+        if (achild.offsetTop < parentOfSc.scrollTop) {
+            parentOfSc.scrollTop = achild.offsetTop;
+        } else if ((achild.offsetTop + achild.offsetHeight) >
+            (parentOfSc.scrollTop + parentOfSc.clientHeight)) {
+            parentOfSc.scrollTop = achild.offsetTop + achild.offsetHeight - parentOfSc.clientHeight;
         }
-        if (achild.offsetTop <= scroll) {
-            dy = achild.offsetTop + scroll;
-        }
-        if (dy > 0) {
-            dy = 0;
-        }
-        // sc.style.top = dy + 'px'; // NT: this moves the whole division to the top making it impossible to scroll
         UI.needsScroll();
     }
 
@@ -2019,17 +2122,8 @@ export default class UI {
         var pt = Events.getTargetPoint(e);
         var deltay = Events.dragmousey - pt.y;
         Events.dragmousey = pt.y;
-        var sc = gn('spritecc');
-        var dy = sc.offsetTop;
-        dy -= deltay;
-        var p = sc.parentNode;
-        if (dy > 0) {
-            dy = 0;
-        }
-        if ((dy + sc.offsetHeight) < p.offsetHeight) {
-            dy = p.offsetHeight - sc.offsetHeight;
-        }
-        sc.style.top = dy + 'px';
+        var p = gn('spritecc').parentNode;
+        p.scrollTop += deltay;
         UI.updateSpriteScroll();
     }
 
@@ -2319,6 +2413,11 @@ export default class UI {
         pageList.setAttribute('id', 'pagelist');
         var pageActions = newHTML('div', 'pageactions', ndiv);
         pageActions.setAttribute('id', 'pageactions');
+        var sb = newHTML('div', 'scrollbar', tb);
+        sb.setAttribute('id', 'pagescrollbar');
+        var sbthumb = newHTML('div', 'sbthumb', sb);
+        sbthumb.setAttribute('id', 'pagesbthumb');
+        UI.configureScrollBar(ndiv, sb, sbthumb);
 
         UI.addMartyModeButton(rp);
     }
