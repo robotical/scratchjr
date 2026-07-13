@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+const { newHTMLMock } = vi.hoisted(() => ({
+    newHTMLMock: vi.fn()
+}));
+
 vi.mock('@/editor/ScratchJr', () => ({
     default: {
         isMartyModeEnabled: false,
@@ -42,7 +46,7 @@ vi.mock('@/utils/lib', () => ({
     gn: vi.fn(),
     CSSTransition: vi.fn(),
     localx: vi.fn(),
-    newHTML: vi.fn(),
+    newHTML: newHTMLMock,
     newButton: vi.fn(),
     scaleMultiplier: 1,
     fullscreenScaleMultiplier: 1,
@@ -75,18 +79,36 @@ vi.mock('@/html-svgs/sprite_toggle_on', () => ({ spriteToggleOn: '<svg></svg>' }
 vi.mock('@/html-svgs/battery-svg', () => ({ batterySvg: () => '<svg id="battery"></svg>' }));
 vi.mock('@/html-svgs/signal-svg', () => ({ signalSvg: () => '<svg id="signal"></svg>' }));
 vi.mock('@/utils/raft-subscription-helpers', () => ({
-    createRaftConnectionIssueDetectedHelper: () => ({
-        subscribe: vi.fn(),
-        unsubscribe: vi.fn()
+    createRaftConnectionIssueDetectedHelper: raft => ({
+        subscribe: vi.fn(callback => {
+            raft.__connectionIssueDetectedCallback = callback;
+        }),
+        unsubscribe: vi.fn(() => {
+            raft.__connectionIssueDetectedUnsubscribed = true;
+        })
     }),
-    createRaftConnectionIssueResolvedHelper: () => ({
-        subscribe: vi.fn(),
-        unsubscribe: vi.fn()
+    createRaftConnectionIssueResolvedHelper: raft => ({
+        subscribe: vi.fn(callback => {
+            raft.__connectionIssueResolvedCallback = callback;
+        }),
+        unsubscribe: vi.fn(() => {
+            raft.__connectionIssueResolvedUnsubscribed = true;
+        })
     }),
-    raftVerifiedSubscriptionHelper: () => ({
-        subscribe: vi.fn(),
-        unsubscribe: vi.fn()
-    }),
+    raftVerifiedSubscriptionHelper: raft => {
+        let callback;
+        return {
+            subscribe: vi.fn(nextCallback => {
+                callback = nextCallback;
+                raft.__verifiedCallbacks = raft.__verifiedCallbacks || [];
+                raft.__verifiedCallbacks.push(callback);
+            }),
+            unsubscribe: vi.fn(() => {
+                raft.__verifiedUnsubscribeCount = (raft.__verifiedUnsubscribeCount || 0) + 1;
+                raft.__verifiedCallbacks = (raft.__verifiedCallbacks || []).filter(item => item !== callback);
+            })
+        };
+    },
     raftDisconnectedSubscriptionHelper: raft => {
         const helper = {
             subscribe: vi.fn(callback => {
@@ -128,6 +150,11 @@ describe('Marty connection UI', () => {
                 removeMarty: vi.fn(),
                 setMartySensorAvailability: vi.fn()
             },
+            cogManager: {
+                addCog: vi.fn(),
+                wireCogWithBlocks: vi.fn(),
+                removeCog: vi.fn()
+            },
             microBitManager: {
                 addMicroBit: vi.fn(),
                 wireMicroBitWithBlocks: vi.fn(),
@@ -139,6 +166,13 @@ describe('Marty connection UI', () => {
             import('@/editor/ui/UI.js'),
             import('@/editor/ScratchJr')
         ]);
+        newHTMLMock.mockImplementation((type, className, parent) => {
+            const element = new FakeElement(className ? [className] : []);
+            if (parent) {
+                parent.appendChild(element);
+            }
+            return element;
+        });
         UI = uiModule.default;
         ScratchJr = scratchJrModule.default;
         ScratchJr.isMartyModeEnabled = false;
@@ -249,6 +283,102 @@ describe('Marty connection UI', () => {
         expect(button.querySelector('.iconButtonContainer').classList.contains('connectedButtonContainer')).toBe(true);
     });
 
+    it('uses one verified subscription instance and cleans it up after setup', () => {
+        const button = createConnectionButton();
+        const raft = createCogRaft();
+        const setupConnectionButton = vi.fn();
+
+        UI.setupConnectionButtonWhenVerified(button, raft, setupConnectionButton);
+
+        expect(raft.__verifiedCallbacks).toHaveLength(1);
+        const verifiedCallback = raft.__verifiedCallbacks[0];
+        raft.isVerified = true;
+        verifiedCallback();
+        verifiedCallback();
+
+        expect(setupConnectionButton).toHaveBeenCalledTimes(1);
+        expect(setupConnectionButton).toHaveBeenCalledWith(button, raft);
+        expect(raft.__verifiedUnsubscribeCount).toBe(1);
+        expect(raft.__verifiedCallbacks).toHaveLength(0);
+    });
+
+    it('sets up an already verified Cog even when its verified event was missed', () => {
+        const button = createConnectionButton();
+        const raft = createCogRaft();
+        const setupConnectionButton = vi.fn();
+        raft.isVerified = true;
+
+        UI.setupConnectionButtonWhenVerified(button, raft, setupConnectionButton);
+
+        expect(setupConnectionButton).toHaveBeenCalledWith(button, raft);
+        expect(raft.__verifiedUnsubscribeCount).toBe(1);
+        expect(raft.__verifiedCallbacks).toHaveLength(0);
+    });
+
+    it('reconciles an existing verified Cog after the host application manager is injected', () => {
+        const cogButton = createConnectionButton();
+        const martyButton = createConnectionButton();
+        const raft = createCogRaft();
+        raft.isVerified = true;
+        const setupCogSpy = vi.spyOn(UI, 'setupCogConnectionButton').mockImplementation(() => {});
+        window.applicationManager = undefined;
+
+        expect(UI.reconcileConnectionButtonsWhenApplicationManagerReady(cogButton, martyButton)).toBe(false);
+        window.applicationManager = {
+            getTheCurrentlySelectedDeviceOrFirstOfItsKind: vi.fn(type => type === 'Cog' ? raft : undefined)
+        };
+        vi.advanceTimersByTime(100);
+
+        expect(setupCogSpy).toHaveBeenCalledWith(cogButton, raft);
+        expect(raft.__verifiedUnsubscribeCount).toBe(1);
+        setupCogSpy.mockRestore();
+    });
+
+    it('disconnects and clears a stale Cog when the connection issue countdown expires', () => {
+        const button = createConnectionButton();
+        const raft = createCogRaft();
+        window.applicationManager.disconnectGeneric = vi.fn((disconnectedRaft, onDisconnected) => {
+            onDisconnected();
+        });
+
+        UI.setupCogConnectionButton(button, raft);
+        raft.__connectionIssueDetectedCallback();
+
+        expect(button.querySelector('.connIssueOverlay').textContent).toBe('A11Y_CONNECTION_LOST 60');
+        expect(button.style.pointerEvents).toBe('none');
+
+        vi.advanceTimersByTime(59000);
+        expect(window.applicationManager.disconnectGeneric).not.toHaveBeenCalled();
+        expect(button.querySelector('.connIssueOverlay').textContent).toBe('A11Y_CONNECTION_LOST 1');
+
+        vi.advanceTimersByTime(1000);
+
+        expect(window.applicationManager.disconnectGeneric).toHaveBeenCalledWith(raft, expect.any(Function), true);
+        expect(window.cogManager.removeCog).toHaveBeenCalledWith(raft);
+        expect(button.querySelector('.connIssueOverlay')).toBeNull();
+        expect(button.style.pointerEvents).toBe('auto');
+        expect(button.classList.contains('connectButtonConnected')).toBe(false);
+        expect(raft.__connectionIssueDetectedUnsubscribed).toBe(true);
+        expect(raft.__connectionIssueResolvedUnsubscribed).toBe(true);
+    });
+
+    it('cancels the Cog countdown when the connection issue resolves', () => {
+        const button = createConnectionButton();
+        const raft = createCogRaft();
+
+        UI.setupCogConnectionButton(button, raft);
+        raft.__connectionIssueDetectedCallback();
+        vi.advanceTimersByTime(30000);
+        raft.__connectionIssueResolvedCallback();
+        vi.advanceTimersByTime(31000);
+
+        expect(window.applicationManager.disconnectGeneric).not.toHaveBeenCalled();
+        expect(button.querySelector('.connIssueOverlay')).toBeNull();
+        expect(button.style.pointerEvents).toBe('auto');
+
+        raft.__disconnectCallback();
+    });
+
     it('uses a friendly message when the micro:bit chooser is cancelled', () => {
         const message = UI.getMicroBitConnectionErrorMessage(
             new DOMException('User cancelled the requestDevice() chooser.', 'NotFoundError')
@@ -293,6 +423,19 @@ function createMartyRaft() {
     };
 }
 
+function createCogRaft() {
+    return {
+        id: 'cog-1',
+        isVerified: false,
+        hasVerifiedConnection() {
+            return this.isVerified;
+        },
+        getFriendlyName: () => 'Cog One',
+        getBatteryStrength: () => 70,
+        getRSSI: () => -45
+    };
+}
+
 function createConnectionButton() {
     const button = new FakeElement();
     button.children['.iconButtonContainer'] = new FakeElement(['iconButtonContainer', 'notConnectedButtonContainer']);
@@ -325,6 +468,7 @@ class FakeElement {
     constructor(classes = []) {
         this.classList = new FakeClassList(classes);
         this.children = {};
+        this.childNodes = [];
         this.style = {};
         this.attributes = {};
         this.textContent = '';
@@ -333,7 +477,28 @@ class FakeElement {
     }
 
     querySelector(selector) {
-        return this.children[selector] || null;
+        if (this.children[selector]) {
+            return this.children[selector];
+        }
+        if (selector.startsWith('.')) {
+            const className = selector.slice(1);
+            return this.childNodes.find(child => child.classList.contains(className)) || null;
+        }
+        return null;
+    }
+
+    appendChild(child) {
+        if (!this.childNodes.includes(child)) {
+            this.childNodes.push(child);
+        }
+        child.parentNode = this;
+        return child;
+    }
+
+    removeChild(child) {
+        this.childNodes = this.childNodes.filter(item => item !== child);
+        child.parentNode = null;
+        return child;
     }
 
     setAttribute(name, value) {

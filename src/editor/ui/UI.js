@@ -64,11 +64,13 @@ const AIRDROPSHARE = 1;
 let cogSignalAndBatteryInterval = null;
 let martySignalAndBatteryInterval = null;
 
-let connectionLostButton1Interval = null;
-let connectionLostButton2Interval = null;
+const connectionIssueTimers = new WeakMap();
+const connectedRaftByButton = new WeakMap();
 
 const DISCONNECT_CONTEXT_REMOVAL_POLL_MS = 250;
 const DISCONNECT_CONTEXT_REMOVAL_TIMEOUT_MS = 30000;
+const APPLICATION_MANAGER_RECONCILE_POLL_MS = 100;
+const APPLICATION_MANAGER_RECONCILE_MAX_ATTEMPTS = 50;
 const MICROBIT_HOST_CONNECT_METHODS = [
     'connectGenericMicroBit',
     'connectGenericMicrobit',
@@ -279,52 +281,37 @@ export default class UI {
         connectionButtonsArea.setAttribute('id', 'connectionButtonsArea');
 
         /* COG */
-        const cogButotn = UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', 'cogConnectionButton', (connectButton) => {
-            window.applicationManager.connectGenericCog((raft) => {
-                // set subscription to raft events so we can update the UI when:
-                // - the raft is connected
-                // - the raft is disconnected
-                raftVerifiedSubscriptionHelper(raft).subscribe(() => {
-                    UI.setupCogConnectionButton(connectButton, raft);
-                    // turn off the verified subscription to avoid memory leaks
-                    raftVerifiedSubscriptionHelper(raft).unsubscribe();
-                })
-            })
+        const cogButton = UI.createConnectButton(connectionButtonsArea, cogSvg, 'Cog', 'cogConnectionButton', (connectButton) => {
+            const applicationManager = typeof window !== 'undefined' ? window.applicationManager : null;
+            if (!applicationManager || typeof applicationManager.connectGenericCog !== 'function') {
+                return;
+            }
+            applicationManager.connectGenericCog((raft) => {
+                UI.setupConnectionButtonWhenVerified(connectButton, raft, UI.setupCogConnectionButton);
+            });
         });
-
-
-        // check if we're alredy connected to a cog, and if so, update the UI button
-        const connectedCog = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Cog');
-        if (connectedCog) {
-
-            UI.setupCogConnectionButton(cogButotn, connectedCog);
-        }
         /* END COG */
         /* MARTY */
         const martyButton = UI.createConnectButton(connectionButtonsArea, martySvg, 'Marty', 'martyConnectionButton', (connectButton) => {
-            window.applicationManager.connectGenericMarty((raft) => {
-                // set subscription to raft events so we can update the UI when:
-                // - the raft is connected
-                // - the raft is disconnected
-                raftVerifiedSubscriptionHelper(raft).subscribe(() => {
+            const applicationManager = typeof window !== 'undefined' ? window.applicationManager : null;
+            if (!applicationManager || typeof applicationManager.connectGenericMarty !== 'function') {
+                return;
+            }
+            applicationManager.connectGenericMarty((raft) => {
+                UI.setupConnectionButtonWhenVerified(connectButton, raft, () => {
                     // Check which Marty's sensors are connected
                     // When sensor availability is known, call UI.updateMartySensorAvailability(raft, availability)
-
                     setTimeout(() => {
                         UI.updateMartySensorAvailability(raft, getMartySensorAvailabilityFromRaft(raft));
                     }, 3000);
                     UI.setupMartyConnectionButton(connectButton, raft);
-                    // turn off the verified subscription to avoid memory leaks
-                    raftVerifiedSubscriptionHelper(raft).unsubscribe();
                 });
-            })
+            });
         });
 
-        // check if we're alredy connected to a marty, and if so, update the UI button
-        const connectedMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
-        if (connectedMarty) {
-            UI.setupMartyConnectionButton(martyButton, connectedMarty);
-        }
+        // The host injects applicationManager after the Blocks Jr object has loaded. Reconcile once
+        // it is available so a connection established in the host is reflected without a refresh.
+        UI.reconcileConnectionButtonsWhenApplicationManagerReady(cogButton, martyButton);
         /* END MARTY */
 
         const extensionAddButton = UI.createExtensionAddButton(connectionButtonsArea);
@@ -345,6 +332,59 @@ export default class UI {
         }
         UI.updateMicroBitExtensionControls();
         /* END MICROBIT */
+    }
+
+    static setupConnectionButtonWhenVerified(button, raft, setupConnectionButton) {
+        if (!raft || typeof setupConnectionButton !== 'function') {
+            return null;
+        }
+
+        const verifiedSubscription = raftVerifiedSubscriptionHelper(raft);
+        let didSetupConnectionButton = false;
+        const setupOnce = () => {
+            if (didSetupConnectionButton) {
+                return;
+            }
+            didSetupConnectionButton = true;
+            verifiedSubscription.unsubscribe();
+            setupConnectionButton(button, raft);
+        };
+
+        // Subscribe before checking current state so verification cannot be missed between the two.
+        verifiedSubscription.subscribe(setupOnce);
+        const isAlreadyVerified = typeof raft.hasVerifiedConnection === 'function'
+            ? raft.hasVerifiedConnection()
+            : raft.isVerified === true;
+        if (isAlreadyVerified) {
+            setupOnce();
+        }
+        return verifiedSubscription;
+    }
+
+    static reconcileConnectionButtonsWhenApplicationManagerReady(cogButton, martyButton, attempt = 0) {
+        const applicationManager = typeof window !== 'undefined' ? window.applicationManager : null;
+        const canReadConnectedRafts = applicationManager &&
+            typeof applicationManager.getTheCurrentlySelectedDeviceOrFirstOfItsKind === 'function';
+
+        if (canReadConnectedRafts) {
+            const connectedCog = applicationManager.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Cog');
+            if (connectedCog) {
+                UI.setupConnectionButtonWhenVerified(cogButton, connectedCog, UI.setupCogConnectionButton);
+            }
+
+            const connectedMarty = applicationManager.getTheCurrentlySelectedDeviceOrFirstOfItsKind('Marty');
+            if (connectedMarty) {
+                UI.setupConnectionButtonWhenVerified(martyButton, connectedMarty, UI.setupMartyConnectionButton);
+            }
+            return true;
+        }
+
+        if (attempt < APPLICATION_MANAGER_RECONCILE_MAX_ATTEMPTS) {
+            setTimeout(() => {
+                UI.reconcileConnectionButtonsWhenApplicationManagerReady(cogButton, martyButton, attempt + 1);
+            }, APPLICATION_MANAGER_RECONCILE_POLL_MS);
+        }
+        return false;
     }
 
     static createExtensionAddButton(parent) {
@@ -772,32 +812,38 @@ export default class UI {
         UI.setMartyModeEnabled(true);
     }
 
-    static showConnIssueOverlay(button) {
+    static showConnIssueOverlay(button, onExpired) {
+        UI.hideConnIssueOverlay(button);
         button.style.pointerEvents = 'none';
         const overlay = newHTML('div', 'connIssueOverlay', button);
-        overlay.textContent = Localization.localize('A11Y_CONNECTION_LOST');
-        button.appendChild(overlay);
+        const connectionLostText = Localization.localize('A11Y_CONNECTION_LOST');
 
-        // in an interval countdown from 59 seconds to 0
-        let seconds = 59;
-        connectionLostButton1Interval = setInterval(() => {
-            if (seconds >= 0) {
-                overlay.textContent = `${Localization.localize('A11Y_CONNECTION_LOST')} ${seconds}`;
-                seconds--;
-            } else {
-                clearInterval(connectionLostButton1Interval);
-
+        let seconds = 60;
+        overlay.textContent = `${connectionLostText} ${seconds}`;
+        const countdownInterval = setInterval(() => {
+            seconds--;
+            overlay.textContent = `${connectionLostText} ${seconds}`;
+            if (seconds <= 0) {
+                clearInterval(countdownInterval);
+                connectionIssueTimers.delete(button);
+                if (typeof onExpired === 'function') {
+                    onExpired();
+                }
             }
         }, 1000);
+        connectionIssueTimers.set(button, countdownInterval);
     }
+
     static hideConnIssueOverlay(button) {
         button.style.pointerEvents = 'auto';
         const overlay = button.querySelector('.connIssueOverlay');
         if (overlay) {
             button.removeChild(overlay);
         }
-        if (connectionLostButton1Interval) {
-            clearInterval(connectionLostButton1Interval);
+        const countdownInterval = connectionIssueTimers.get(button);
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            connectionIssueTimers.delete(button);
         }
     }
 
@@ -868,6 +914,11 @@ export default class UI {
     }
 
     static setupCogConnectionButton(button, raft) {
+        if (connectedRaftByButton.get(button) === raft) {
+            return;
+        }
+        connectedRaftByButton.set(button, raft);
+
         // Add the connected class to the button
         button.classList.add('connectButtonConnected');
 
@@ -905,6 +956,9 @@ export default class UI {
                 return;
             }
             didHandleDisconnect = true;
+            if (connectedRaftByButton.get(button) === raft) {
+                connectedRaftByButton.delete(button);
+            }
 
             // When raft is disconnected, update the UI and remove the raft
             button.classList.remove('connectButtonConnected');
@@ -940,7 +994,14 @@ export default class UI {
 
         // Set up a subscription to the raft issue detected event
         const connIssueSubs = createRaftConnectionIssueDetectedHelper(raft);
-        connIssueSubs.subscribe(() => UI.showConnIssueOverlay(button));
+        connIssueSubs.subscribe(() => UI.showConnIssueOverlay(button, () => {
+            const applicationManager = typeof window !== 'undefined' ? window.applicationManager : null;
+            if (applicationManager && typeof applicationManager.disconnectGeneric === 'function') {
+                applicationManager.disconnectGeneric(raft, handleDisconnected, true);
+                return;
+            }
+            handleDisconnected();
+        }));
 
         // Set up a subscription to the connection issue resolved event
         const connIssueResolvedSubs = createRaftConnectionIssueResolvedHelper(raft);
@@ -952,6 +1013,11 @@ export default class UI {
     }
 
     static setupMartyConnectionButton(button, raft) {
+        if (connectedRaftByButton.get(button) === raft) {
+            return;
+        }
+        connectedRaftByButton.set(button, raft);
+
         // Add the connected class to the button
         button.classList.add('connectButtonConnected');
 
@@ -969,6 +1035,9 @@ export default class UI {
                 return;
             }
             didHandleDisconnect = true;
+            if (connectedRaftByButton.get(button) === raft) {
+                connectedRaftByButton.delete(button);
+            }
 
             // When raft is disconnected, update the UI and remove the raft
             button.classList.remove('connectButtonConnected');
