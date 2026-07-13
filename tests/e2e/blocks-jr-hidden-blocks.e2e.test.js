@@ -164,6 +164,14 @@ const getSpriteScriptState = async (page, spriteId) =>
         };
     }, spriteId);
 
+const getMartySensorPaletteState = page =>
+    page.evaluate(() => ({
+        colour: Boolean(document.getElementById("martycoloursensed_block")),
+        obstacle: Boolean(document.getElementById("martyobstaclesensed_block")),
+        light: Boolean(document.getElementById("martylightsensed_block")),
+        noise: Boolean(document.getElementById("martynoisesensed_block"))
+    }));
+
 describe("Blocks Jr hidden block drop regression", () => {
     beforeAll(async () => {
         server = spawn("python3", ["-m", "http.server", String(PORT), "--directory", "editions/free/src"], {
@@ -254,6 +262,82 @@ describe("Blocks Jr hidden block drop regression", () => {
             expect(state.blockTypes).toContain("martyStepForward");
             expect(state.scriptVisibility).toBe("visible");
             expect(state.visibleBlockTypes).toContain("martyStepForward");
+            expect(errors).toEqual([]);
+        } finally {
+            await browser.close();
+        }
+    }, 60000);
+
+    it("always shows standard Marty sensors and gates optional sensor blocks", async () => {
+        const { browser, page, errors } = await openEditor();
+
+        try {
+            await enableMartyMode(page);
+            await page.click("#marty-start");
+            await page.waitForSelector("#martycoloursensed_block", { visible: true });
+            await page.waitForSelector("#martyobstaclesensed_block", { visible: true });
+
+            const unpairedState = await getMartySensorPaletteState(page);
+            expect(unpairedState).toEqual({
+                colour: true,
+                obstacle: true,
+                light: false,
+                noise: false
+            });
+
+            await page.evaluate(() => {
+                window.sensorPolicyTestManager = window.martyManager;
+                window.martyManager = undefined;
+                window.Palette.selectCategory(window.Palette.numcat);
+            });
+            const managerUnavailableState = await getMartySensorPaletteState(page);
+            expect(managerUnavailableState).toEqual({
+                colour: true,
+                obstacle: true,
+                light: false,
+                noise: false
+            });
+
+            await page.evaluate(() => {
+                window.martyManager = window.sensorPolicyTestManager;
+                delete window.sensorPolicyTestManager;
+            });
+
+            await page.evaluate(() => {
+                window.martyManager.addMarty({ id: "sensor-policy-test" });
+                window.martyManager.setMartySensorAvailability("sensor-policy-test", {
+                    colour: false,
+                    obstacle: false,
+                    light: true,
+                    noise: false
+                });
+            });
+            await page.waitForSelector("#martylightsensed_block", { visible: true });
+
+            const lightSensorState = await getMartySensorPaletteState(page);
+            expect(lightSensorState).toEqual({
+                colour: true,
+                obstacle: true,
+                light: true,
+                noise: false
+            });
+
+            await page.evaluate(() => {
+                window.martyManager.setMartySensorAvailability("sensor-policy-test", {
+                    light: false,
+                    noise: true
+                });
+            });
+            await page.waitForSelector("#martynoisesensed_block", { visible: true });
+            await page.waitForFunction(() => !document.getElementById("martylightsensed_block"));
+
+            const noiseSensorState = await getMartySensorPaletteState(page);
+            expect(noiseSensorState).toEqual({
+                colour: true,
+                obstacle: true,
+                light: false,
+                noise: true
+            });
             expect(errors).toEqual([]);
         } finally {
             await browser.close();

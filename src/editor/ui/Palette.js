@@ -38,6 +38,13 @@ const MARTY_SENSOR_BLOCKS = new Set([
     'martylightsensed',
     'martynoisesensed'
 ]);
+const STANDARD_MARTY_SENSOR_BLOCKS = new Set([
+    'martycoloursensed',
+    'martyobstaclesensed'
+]);
+const applyDefaultMartySensorVisibility = blockNames => blockNames.filter((blockName) => {
+    return !MARTY_SENSOR_BLOCKS.has(blockName) || STANDARD_MARTY_SENSOR_BLOCKS.has(blockName);
+});
 const BLOCKS_WITH_ARGS = new Set(['playsnd', 'gotopage', 'playusersnd', 'setcolor', 'onmessage', 'message', 'setspeed']);
 const LOOP_BLOCKS = new Set(['repeat']);
 
@@ -722,11 +729,11 @@ export default class Palette {
     static applyMartySensorVisibility(blockNames) {
         const manager = window.martyManager;
         if (!manager || typeof manager.getVisibleMartySensorBlocks !== 'function') {
-            return blockNames;
+            return applyDefaultMartySensorVisibility(blockNames);
         }
         const visibleBlocks = manager.getVisibleMartySensorBlocks();
         if (!visibleBlocks || visibleBlocks.length === 0) {
-            return blockNames.filter((blockName) => !MARTY_SENSOR_BLOCKS.has(blockName));
+            return applyDefaultMartySensorVisibility(blockNames);
         }
         const visibleSet = new Set(visibleBlocks);
         return blockNames.filter((blockName) => {

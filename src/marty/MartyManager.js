@@ -59,14 +59,13 @@ class MartyManager {
 
     getVisibleMartySensorBlocks() {
         const availability = this.getActiveSensorAvailability();
-        const visibleBlocks = [];
+        // Colour and obstacle sensing are standard on every Marty, so their
+        // event blocks should also be available when programming offline.
+        const visibleBlocks = [
+            MartyManager.SENSOR_BLOCKS.colour,
+            MartyManager.SENSOR_BLOCKS.obstacle
+        ];
 
-        if (availability.colour) {
-            visibleBlocks.push(MartyManager.SENSOR_BLOCKS.colour);
-        }
-        if (availability.obstacle) {
-            visibleBlocks.push(MartyManager.SENSOR_BLOCKS.obstacle);
-        }
         if (availability.light) {
             visibleBlocks.push(MartyManager.SENSOR_BLOCKS.light);
         }
