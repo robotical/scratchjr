@@ -113,7 +113,11 @@ requireDecorativeAlt('editions/free/src/inapp/about.html', 'about-logo');
 requireDecorativeAlt('editions/free/src/inapp/about.html', 'about-marty');
 requireDecorativeAlt('editions/free/src/inapp/interface.html', 'ipad-project-view');
 requireDecorativeAlt('editions/free/src/inapp/paint.html', 'ipad-project-view');
-requireDecorativeAlt('editions/free/src/inapp/blocks.html', 'block-image');
+requireMatch(
+    'src/editor/blocks/BlockGuideRegistry.js',
+    /BLOCK_GUIDE_MODES[\s\S]*BLOCK_GUIDE_EXTENSION[\s\S]*getDocumentedBlockIds/,
+    'Expected the Blocks Guide to use a mode-based registry with extension coverage.'
+);
 
 requireMatch(
     'src/editor/ui/UI.js',

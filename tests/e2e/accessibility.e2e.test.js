@@ -283,9 +283,13 @@ describe('Accessibility shell audit', () => {
                 {
                     path: 'inapp/blocks.html',
                     title: 'Blocks Guide',
-                    focusSelector: '#skip-link',
-                    buttonSelectors: [],
-                    decorativeImageSelector: '.block-image'
+                    focusSelector: '#blocks-guide-tab-marty',
+                    buttonSelectors: [
+                        '#blocks-guide-tab-marty',
+                        '#blocks-guide-tab-sprite',
+                        '#blocks-guide-tab-cog'
+                    ],
+                    decorativeImageSelector: '.block-guide-icon'
                 }
             ];
 
@@ -367,6 +371,74 @@ describe('Accessibility shell audit', () => {
                     await page.click('#interface-button-extensions');
                     expect(await page.$eval('#interface-key-header', (element) => element.textContent)).toBe('3 | Extensions');
                     expect(await page.$eval('#interface-key-description', (element) => element.textContent)).toContain('micro:bit');
+                }
+
+                if (guideCase.path === 'inapp/blocks.html') {
+                    const inventory = await page.evaluate(() => {
+                        const modeCounts = {};
+                        document.querySelectorAll('[data-guide-mode-panel]').forEach((panel) => {
+                            modeCounts[panel.getAttribute('data-guide-mode-panel')] =
+                                panel.querySelectorAll('.block-guide-card').length;
+                        });
+                        return {
+                            activeMode: document.querySelector('[role="tab"][aria-selected="true"]')
+                                .getAttribute('data-guide-mode'),
+                            extensionCount: document.querySelectorAll(
+                                '#blocks-guide-extension .block-guide-card'
+                            ).length,
+                            modeCounts,
+                            missingCopy: document.body.textContent.includes('String missing:'),
+                            tabCount: document.querySelectorAll('[role="tab"]').length
+                        };
+                    });
+                    expect(inventory).toEqual({
+                        activeMode: 'marty',
+                        extensionCount: 8,
+                        modeCounts: {
+                            marty: 44,
+                            sprite: 31,
+                            cog: 19
+                        },
+                        missingCopy: false,
+                        tabCount: 3
+                    });
+
+                    await page.click('#blocks-guide-tab-sprite');
+                    expect(await page.$eval('#blocks-guide-panel-sprite', (panel) => panel.hidden)).toBe(false);
+                    expect(await page.$eval('#blocks-guide-panel-marty', (panel) => panel.hidden)).toBe(true);
+
+                    await page.focus('#blocks-guide-tab-sprite');
+                    await page.keyboard.press('ArrowRight');
+                    expect(await page.$eval('#blocks-guide-tab-cog', (tab) => tab.getAttribute('aria-selected'))).toBe('true');
+                    expect(await page.$eval('#blocks-guide-panel-cog', (panel) => panel.hidden)).toBe(false);
+
+                    for (const modeId of ['marty', 'sprite', 'cog']) {
+                        await page.evaluate(() => {
+                            window.scrollTo(0, document.documentElement.scrollHeight);
+                        });
+                        await page.click(`#blocks-guide-tab-${modeId}`);
+                        const selectedMode = await page.evaluate((expectedMode) => {
+                            const tab = document.querySelector(`[data-guide-mode="${expectedMode}"]`);
+                            const panel = document.querySelector(`[data-guide-mode-panel="${expectedMode}"]`);
+                            const firstCard = panel.querySelector('.block-guide-card');
+                            const tabsShell = document.querySelector('.blocks-guide-tabs-shell');
+                            const cardRect = firstCard.getBoundingClientRect();
+                            const tabsRect = tabsShell.getBoundingClientRect();
+                            return {
+                                activeMode: document.querySelector('[role="tab"][aria-selected="true"]')
+                                    .getAttribute('data-guide-mode'),
+                                firstCardVisible: cardRect.top < window.innerHeight && cardRect.bottom > tabsRect.bottom,
+                                panelHidden: panel.hidden,
+                                tabSelected: tab.getAttribute('aria-selected')
+                            };
+                        }, modeId);
+                        expect(selectedMode).toEqual({
+                            activeMode: modeId,
+                            firstCardVisible: true,
+                            panelHidden: false,
+                            tabSelected: 'true'
+                        });
+                    }
                 }
 
                 await activateSkipLink(page, 'content');

@@ -1,7 +1,8 @@
 import { gn, newHTML } from '../utils/lib';
-import { setMainLandmark, setSelectedState } from '../utils/accessibility';
+import { moveFocusByKey, setMainLandmark, setSelectedState } from '../utils/accessibility';
 import Localization from '../utils/Localization';
 import TutorialFetcher from '../tutorial/TutorialFetcher';
+import { BLOCK_GUIDE_EXTENSION, BLOCK_GUIDE_MODES } from '../editor/blocks/BlockGuideRegistry';
 
 function getNavigationHref(baseHref, fileName, query) {
     const cleanHref = baseHref.split('#')[0].split('?')[0];
@@ -238,146 +239,177 @@ export function inappPaintEditorGuide() {
 
 export function inappBlocksGuide() {
     setupGuidePage();
-    // Localized category names
-    gn('yellow-block-category-header').textContent = Localization.localize('BLOCKS_TRIGGERING_BLOCKS');
-    gn('blue-block-category-header').textContent = Localization.localize('BLOCKS_MOTION_BLOCKS');
-    gn('purple-block-category-header').textContent = Localization.localize('BLOCKS_LOOKS_BLOCKS');
-    gn('green-block-category-header').textContent = Localization.localize('BLOCKS_SOUND_BLOCKS');
-    gn('orange-block-category-header').textContent = Localization.localize('BLOCKS_CONTROL_BLOCKS');
-    gn('red-block-category-header').textContent = Localization.localize('BLOCKS_END_BLOCKS');
+    var localizeGuideText = function (key, fallback, formatting) {
+        var fallbackText = fallback || '';
+        if (formatting) {
+            Object.keys(formatting).forEach(function (formatKey) {
+                fallbackText = fallbackText.replace('{' + formatKey + '}', formatting[formatKey]);
+            });
+        }
+        if (!key) {
+            return fallbackText;
+        }
+        var localized = Localization.localizeOptional(key, formatting);
+        return localized === key ? fallbackText : localized;
+    };
 
-    var blockDescriptionKeys = [
-        'BLOCKS_GREEN_FLAG',
-        'BLOCKS_GREEN_FLAG_DESCRIPTION',
-        'BLOCKS_MOVE_RIGHT',
-        'BLOCKS_MOVE_RIGHT_DESCRIPTION',
-        'BLOCKS_MOVE_LEFT',
-        'BLOCKS_MOVE_LEFT_DESCRIPTION',
-        'BLOCKS_MOVE_UP',
-        'BLOCKS_MOVE_UP_DESCRIPTION',
-        'BLOCKS_MOVE_DOWN',
-        'BLOCKS_MOVE_DOWN_DESCRIPTION',
-        'BLOCKS_TURN_RIGHT',
-        'BLOCKS_TURN_RIGHT_DESCRIPTION',
-        'BLOCKS_TURN_LEFT',
-        'BLOCKS_TURN_LEFT_DESCRIPTION',
-        'BLOCK_KICK_RIGHT',
-        'BLOCK_KICK_RIGHT_DESCRIPTION',
-        'BLOCK_KICK_LEFT',
-        'BLOCK_KICK_LEFT_DESCRIPTION',
-        'BLOCK_MOVE_GETREADY',
-        'BLOCK_MOVE_GETREADY_DESCRIPTION',
-        'BLOCK_MOVE_DANCE',
-        'BLOCK_MOVE_DANCE_DESCRIPTION',
-        'BLOCK_EYES_EXCITED',
-        'BLOCK_EYES_EXCITED_DESCRIPTION',
-        'BLOCK_EYES_WIDE',
-        'BLOCK_EYES_WIDE_DESCRIPTION',
-        'BLOCK_EYES_ANGRY',
-        'BLOCK_EYES_ANGRY_DESCRIPTION',
-        'BLOCK_EYES_NORMAL',
-        'BLOCK_EYES_NORMAL_DESCRIPTION',
-        'BLOCK_EYES_WIGGLE',
-        'BLOCK_EYES_WIGGLE_DESCRIPTION',
-        'BLOCK_WAVE_LEFT',
-        'BLOCK_WAVE_LEFT_DESCRIPTION',
-        'BLOCK_WAVE_RIGHT',
-        'BLOCK_WAVE_RIGHT_DESCRIPTION',
-        'BLOCK_LED_EYES_P1',
-        'BLOCK_LED_EYES_P1_DESCRIPTION',
-        'BLOCK_LED_EYES_P2',
-        'BLOCK_LED_EYES_P2_DESCRIPTION',
-        'BLOCK_LED_EYES_Cog',
-        'BLOCK_LED_EYES_Cog_DESCRIPTION',
-        'BLOCK_LED_EYES_COLOUR',
-        'BLOCK_LED_EYES_COLOUR_DESCRIPTION',
-        'BLOCK_CELEBRATE',
-        'BLOCK_CELEBRATE_DESCRIPTION',
-        'BLOCK_PLAY_CONFUSION_SOUND',
-        'BLOCK_PLAY_CONFUSION_SOUND_DESCRIPTION',
-        'BLOCK_PLAY_DISBELIEF_SOUND',
-        'BLOCK_PLAY_DISBELIEF_SOUND_DESCRIPTION',
-        'BLOCK_PLAY_EXCITEMENT_SOUND',
-        'BLOCK_PLAY_EXCITEMENT_SOUND_DESCRIPTION',
-        'BLOCK_PLAY_NOWAY_SOUND',
-        'BLOCK_PLAY_NOWAY_SOUND_DESCRIPTION',
-        'BLOCK_PLAY_NO_SOUND',
-        'BLOCK_PLAY_NO_SOUND_DESCRIPTION',
-        'BLOCK_PLAY_WHISTLE_SOUND',
-        'BLOCK_PLAY_WHISTLE_SOUND_DESCRIPTION',
-        'BLOCK_DESC_WAIT_CROTCHET',
-        'BLOCK_DESC_WAIT_CROTCHET_DESCRIPTION',
-        'BLOCK_DESC_SET_TEMPO',
-        'BLOCK_DESC_SET_TEMPO_DESCRIPTION',
-        'BLOCK_DESC_SET_COG_VOLUME',
-        'BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION',
-        'BLOCKS_WAIT',
-        'BLOCKS_WAIT_DESCRIPTION',
-        'BLOCKS_STOP',
-        'BLOCKS_STOP_DESCRIPTION',
-        'BLOCKS_REPEAT',
-        'BLOCKS_REPEAT_DESCRIPTION',
-        'BLOCKS_END',
-        'BLOCKS_END_DESCRIPTION',
-        'BLOCKS_REPEAT_FOREVER',
-        'BLOCKS_REPEAT_FOREVER_DESCRIPTION',
-        'BLOCKS_ON_TILT',
-        'BLOCKS_ON_TILT_DESCRIPTION',
-        'BLOCK_DESC_ON_STEER',
-        'BLOCKS_ON_STEER_COG_DESCRIPTION',
-        'BLOCKS_ON_TOUCH_Cog',
-        'BLOCKS_ON_TOUCH_Cog_DESCRIPTION',
-        'BLOCKS_ON_MOVE',
-        'BLOCKS_ON_MOVE_DESCRIPTION',
-        'BLOCKS_ON_TAP',
-        'BLOCKS_ON_TAP_DESCRIPTION',
-        'BLOCKS_ON_TOUCH',
-        'BLOCKS_ON_TOUCH_DESCRIPTION',
-        'BLOCKS_ON_MESSAGE',
-        'BLOCKS_ON_MESSAGE_DESCRIPTION',
-        'BLOCKS_SEND_MESSAGE',
-        'BLOCKS_SEND_MESSAGE_DESCRIPTION',
-        'BLOCK_DESC_MARTY_ON_COLOUR_SENSED',
-        'BLOCK_DESC_MARTY_ON_COLOUR_SENSED_DESCRIPTION',
-        'BLOCK_DESC_MARTY_ON_OBSTACLE_SENSED',
-        'BLOCK_DESC_MARTY_ON_OBSTACLE_SENSED_DESCRIPTION',
-        'BLOCK_DESC_MARTY_ON_LIGHT_SENSED',
-        'BLOCK_DESC_MARTY_ON_LIGHT_SENSED_DESCRIPTION',
-        'BLOCK_DESC_MARTY_ON_NOISE_SENSED',
-        'BLOCK_DESC_MARTY_ON_NOISE_SENSED_DESCRIPTION',
-        'BLOCKS_HOP',
-        'BLOCKS_HOP_DESCRIPTION',
-        'BLOCKS_GO_HOME',
-        'BLOCKS_GO_HOME_DESCRIPTION',
-        'BLOCKS_SELECT_COLOUR',
-        'BLOCKS_SELECT_COLOUR_DESCRIPTION',
-        'BLOCKS_SET_PATTERN',
-        'BLOCKS_SET_PATTERN_DESCRIPTION',
-        'BLOCKS_SAY',  
-        'BLOCKS_SAY_DESCRIPTION',
-        'BLOCKS_GROW',
-        'BLOCKS_GROW_DESCRIPTION',
-        'BLOCKS_SHRINK',
-        'BLOCKS_SHRINK_DESCRIPTION',
-        'BLOCKS_HIDE',  
-        'BLOCKS_HIDE_DESCRIPTION',
-        'BLOCKS_SHOW',
-        'BLOCKS_SHOW_DESCRIPTION',
-        'BLOCKS_SET_SPEED',
-        'BLOCKS_SET_SPEED_DESCRIPTION',
-        'BLOCKS_GO_TO_PAGE',
-        'BLOCKS_GO_TO_PAGE_DESCRIPTION',
-    ];
+    var blockCountText = function (count) {
+        return localizeGuideText('BLOCK_GUIDE_BLOCK_COUNT', '{COUNT} blocks', {COUNT: count});
+    };
 
+    var renderBlockCard = function (block, category, parent, headingTag) {
+        var card = newHTML('article', 'block-guide-card', parent);
+        card.setAttribute('data-block-id', block.id);
 
+        var preview = newHTML('div',
+            'block-guide-preview blocks-guide-category-' + category.id, card);
+        preview.setAttribute('aria-hidden', 'true');
+        if (block.icon) {
+            var image = newHTML('img', 'block-guide-icon', preview);
+            image.src = block.icon;
+            image.alt = '';
+        } else {
+            var symbol = newHTML('span', 'block-guide-symbol', preview);
+            symbol.textContent = block.symbol || '?';
+        }
 
+        var copy = newHTML('div', 'block-guide-card-copy', card);
+        var title = newHTML(headingTag, '', copy);
+        var isEnglish = (Localization.currentLocale || 'en').split('-')[0] === 'en';
+        title.textContent = isEnglish ? block.title : localizeGuideText(block.titleKey, block.title);
+        var description = newHTML('p', '', copy);
+        description.textContent = isEnglish
+            ? block.description
+            : localizeGuideText(block.descriptionKey, block.description);
+        if (block.note) {
+            var note = newHTML('span', 'block-guide-note', copy);
+            note.textContent = isEnglish ? block.note : localizeGuideText(block.noteKey, block.note);
+        }
+    };
 
-    for (let i = 0; i < blockDescriptionKeys.length; i++) {
-        try {
-            gn(blockDescriptionKeys[i]).textContent = Localization.localize(blockDescriptionKeys[i]);
-        } catch (e) { console.log(e) }
-    }
-    markDecorativeImages('.block-image, .block-image-repeat');
+    var renderCategory = function (category, parent, options) {
+        var section = newHTML('section',
+            'blocks-guide-category blocks-guide-category-' + category.id, parent);
+        section.setAttribute('data-guide-category', category.id);
+
+        var heading = newHTML('div', 'blocks-guide-category-heading', section);
+        var dot = newHTML('span', 'blocks-guide-category-dot', heading);
+        dot.setAttribute('aria-hidden', 'true');
+        var title = newHTML(options.categoryHeadingTag, 'blocks-guide-category-title', heading);
+        title.textContent = localizeGuideText(category.titleKey, category.title);
+        var count = newHTML('span', 'blocks-guide-category-count', heading);
+        count.textContent = blockCountText(category.blocks.length);
+
+        var grid = newHTML('div', 'blocks-guide-card-grid', section);
+        category.blocks.forEach(function (item) {
+            renderBlockCard(item, category, grid, options.cardHeadingTag);
+        });
+    };
+
+    gn('blocks-guide-eyebrow').textContent = localizeGuideText(
+        'BLOCK_GUIDE_REFERENCE', 'Complete block reference');
+    gn('blocks-guide-title').textContent = Localization.localize('BLOCKS_GUIDE');
+    gn('blocks-guide-introduction').textContent = localizeGuideText(
+        'BLOCK_GUIDE_INTRODUCTION',
+        'Choose a programming target to see every block in the same categories and order used by the editor.');
+
+    ['M', 'S', 'C', '+'].forEach(function (label) {
+        var summaryBlock = newHTML('span', 'blocks-guide-summary-block', gn('blocks-guide-summary'));
+        summaryBlock.textContent = label;
+    });
+
+    var tabs = [];
+    var panels = [];
+    var tabsContainer = gn('blocks-guide-tabs');
+    tabsContainer.setAttribute('aria-label', localizeGuideText(
+        'BLOCK_GUIDE_MODE_SELECTOR', 'Choose a block group'));
+
+    BLOCK_GUIDE_MODES.forEach(function (mode) {
+        var tab = newHTML('button', 'blocks-guide-tab', tabsContainer);
+        tab.type = 'button';
+        tab.id = 'blocks-guide-tab-' + mode.id;
+        tab.setAttribute('role', 'tab');
+        tab.setAttribute('aria-controls', 'blocks-guide-panel-' + mode.id);
+        tab.setAttribute('data-guide-mode', mode.id);
+
+        var tabLabel = newHTML('span', 'blocks-guide-tab-label', tab);
+        var localizedModeTitle = localizeGuideText(mode.titleKey, mode.title);
+        tab.setAttribute('aria-label', localizedModeTitle);
+        tabLabel.textContent = localizedModeTitle;
+        var tabCount = newHTML('span', 'blocks-guide-tab-count', tab);
+        tabCount.textContent = mode.blockCount;
+
+        var panel = newHTML('section', 'blocks-guide-panel', gn('blocks-guide-panels'));
+        panel.id = 'blocks-guide-panel-' + mode.id;
+        panel.setAttribute('role', 'tabpanel');
+        panel.setAttribute('aria-labelledby', tab.id);
+        panel.setAttribute('data-guide-mode-panel', mode.id);
+
+        var modeHeader = newHTML('header', 'blocks-guide-mode-header', panel);
+        var modeHeaderCopy = newHTML('div', '', modeHeader);
+        var modeTitle = newHTML('h2', '', modeHeaderCopy);
+        modeTitle.textContent = localizeGuideText(mode.titleKey, mode.title);
+        var modeDescription = newHTML('p', '', modeHeaderCopy);
+        modeDescription.textContent = localizeGuideText(mode.descriptionKey, mode.description);
+        var modeTotal = newHTML('span', 'blocks-guide-mode-total', modeHeader);
+        modeTotal.textContent = blockCountText(mode.blockCount);
+
+        mode.categories.forEach(function (category) {
+            renderCategory(category, panel, {
+                categoryHeadingTag: 'h3',
+                cardHeadingTag: 'h4'
+            });
+        });
+
+        tabs.push(tab);
+        panels.push(panel);
+    });
+
+    var selectMode = function (modeId, scrollToSelection) {
+        var selectedPanel;
+        tabs.forEach(function (tab, index) {
+            var selected = tab.getAttribute('data-guide-mode') === modeId;
+            tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+            tab.tabIndex = selected ? 0 : -1;
+            panels[index].hidden = !selected;
+            if (selected) {
+                selectedPanel = panels[index];
+            }
+        });
+
+        if (scrollToSelection && selectedPanel) {
+            var tabsShell = gn('blocks-guide-tabs').parentNode;
+            var panelTop = window.pageYOffset + selectedPanel.getBoundingClientRect().top;
+            window.scrollTo(0, Math.max(0, panelTop - tabsShell.offsetHeight - 8));
+        }
+    };
+
+    tabs.forEach(function (tab) {
+        tab.onclick = function () {
+            selectMode(tab.getAttribute('data-guide-mode'), true);
+        };
+        tab.onkeydown = function (event) {
+            if (moveFocusByKey(event, tabs, tab, {horizontal: true, vertical: false})) {
+                selectMode(document.activeElement.getAttribute('data-guide-mode'), true);
+            }
+        };
+    });
+    selectMode(BLOCK_GUIDE_MODES[0].id);
+
+    var extension = gn('blocks-guide-extension');
+    var extensionTitle = newHTML('h2', '', extension);
+    extensionTitle.textContent = localizeGuideText(BLOCK_GUIDE_EXTENSION.titleKey, BLOCK_GUIDE_EXTENSION.title);
+    var extensionName = newHTML('h3', '', extension);
+    extensionName.textContent = localizeGuideText(BLOCK_GUIDE_EXTENSION.nameKey, BLOCK_GUIDE_EXTENSION.name);
+    var extensionDescription = newHTML('p', 'blocks-guide-extension-intro', extension);
+    extensionDescription.textContent = localizeGuideText(
+        BLOCK_GUIDE_EXTENSION.descriptionKey, BLOCK_GUIDE_EXTENSION.description);
+    BLOCK_GUIDE_EXTENSION.categories.forEach(function (category) {
+        renderCategory(category, extension, {
+            categoryHeadingTag: 'h4',
+            cardHeadingTag: 'h5'
+        });
+    });
 }
 
 export function inappTutorials() {

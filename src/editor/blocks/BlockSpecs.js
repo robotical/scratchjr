@@ -2,6 +2,13 @@ import Localization from '../../utils/Localization';
 import IO from '../../tablet/IO';
 import { LINEAR_GRADIENT_COLOUR } from '../engine/Prims';
 import {DEFAULT_MICROBIT_MATRIX_PATTERN} from '../../microbit/MicroBitMatrixPattern';
+import {
+    COG_PALETTES,
+    MARTY_PALETTES,
+    MICROBIT_PALETTES,
+    SPRITE_PALETTES,
+    clonePalettes
+} from './BlockPaletteRegistry';
 
 let loadCount = 0;
 
@@ -298,34 +305,19 @@ export default class BlockSpecs {
     }
 
     static setupPalettesDef() {
-        return [['onflag', 'onmessage', 'message', 'onclick', 'ontouch'],
-        [ 'up', 'down', 'forward', 'back', 'right', 'left', 'hop', 'home'],
-        ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'],
-        [],
-        ['wait', 'stopmine', 'setspeed', 'decreasecounter', 'startstopcounter', 'increasecounter', 'repeat'],
-        ['endstack', 'forever']];
+        return clonePalettes(SPRITE_PALETTES);
     }
 
     static setupPalettesDefCog() {
-        return [['tiltany', 'onsteercog', 'ontouchcog', 'onshake', 'onobjectsensed', 'onlight'],
-        ['setpattern', 'selectcolour', 'clearcolours'],
-        ['confusion', 'disbelief', 'excitement', 'noway', 'no', 'whistle', 'playnote', 'waitcrotchet', 'settempo', 'setcogvolume']];
+        return clonePalettes(COG_PALETTES);
     }
 
     static setupPalettesDefMarty() {
-        return [['onflag', 'martycoloursensed', 'martyobstaclesensed', 'martylightsensed', 'martynoisesensed', 'onmessage', 'message'],
-        ['martyGetReady', 'martyStepForward', 'martyStepBackward', 'martyStepRight', 'martyStepLeft', 'martyTurnRight', 'martyTurnLeft', 'martyDance', 'martyKickLeft', 'martyKickRight'],
-        ['martyEyesExcited', 'martyEyesWide', 'martyEyesAngry', 'martyEyesNormal', 'martyEyesWiggle', 'martyWaveLeft', 'martyWaveRight', 'martyCelebrate', 'martyLedEyesP1', 'martyLedEyesP2', 'martyLedEyesColour'],
-        ['martyConfusion', 'martyDisbelief', 'martyExcitement', 'martyNoway', 'martyNo', 'martyWhistle'],
-        ['wait', 'stopmine', 'setspeed', 'decreasecounter', 'startstopcounter', 'increasecounter',  'repeat'],
-        ['endstack', 'forever']];
+        return clonePalettes(MARTY_PALETTES);
     }
 
     static setupPalettesDefMicroBit() {
-        return [
-            ['microbitbuttonpressed', 'microbitgesture', 'microbittilted'],
-            ['microbitdisplayheart', 'microbitdisplayhappy', 'microbitdisplaycustom', 'microbitdisplaytext', 'microbitdisplayclear']
-        ];
+        return clonePalettes(MICROBIT_PALETTES);
     }
 
     ///////////////////////////////
