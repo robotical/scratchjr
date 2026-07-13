@@ -109,6 +109,8 @@ requireButtonIds('editions/free/src/home.html', [
 
 requireButtonClassCount('editions/free/src/inapp/interface.html', 'interface-button', 24);
 requireButtonClassCount('editions/free/src/inapp/paint.html', 'paint-button', 13);
+requireDecorativeAlt('editions/free/src/inapp/about.html', 'about-logo');
+requireDecorativeAlt('editions/free/src/inapp/about.html', 'about-marty');
 requireDecorativeAlt('editions/free/src/inapp/interface.html', 'ipad-project-view');
 requireDecorativeAlt('editions/free/src/inapp/paint.html', 'ipad-project-view');
 requireDecorativeAlt('editions/free/src/inapp/blocks.html', 'block-image');
@@ -150,6 +152,7 @@ requireMatch('editions/free/src/css/editor.css', /\.textinput:focus/, 'Expected 
     'editions/free/src/css/thumbs.css',
     'editions/free/src/css/tutorial.css',
     'editions/free/src/inapp/style/style.css',
+    'editions/free/src/inapp/style/about.css',
     'editions/free/src/inapp/style/interface.css',
     'editions/free/src/inapp/style/paint.css'
 ].forEach(requireFocusRecovery);

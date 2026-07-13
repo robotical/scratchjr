@@ -233,7 +233,7 @@ describe('Accessibility shell audit', () => {
             await new Promise((resolve) => setTimeout(resolve, 1200));
             await page.click('#booktab');
             await page.waitForSelector('iframe#htmlcontents', { timeout: 30_000 });
-            expect(await page.$eval('iframe#htmlcontents', (element) => element.getAttribute('title'))).toBe('About ScratchJr');
+            expect(await page.$eval('iframe#htmlcontents', (element) => element.getAttribute('title'))).toBe('About Blocks Jr');
 
             expectNoAxeViolations(await runAxe(page));
             expect(errors).toEqual([]);
@@ -252,6 +252,13 @@ describe('Accessibility shell audit', () => {
             });
 
             const guideCases = [
+                {
+                    path: 'inapp/about.html',
+                    title: 'About Blocks Jr',
+                    focusSelector: '#skip-link',
+                    buttonSelectors: [],
+                    decorativeImageSelector: '.about-hero-art img'
+                },
                 {
                     path: 'inapp/interface.html',
                     title: 'Interface Guide',
@@ -288,12 +295,14 @@ describe('Accessibility shell audit', () => {
                 await page.goto(`${HOST}/${guideCase.path}`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
                 await waitForTitle(page, guideCase.title);
                 await page.waitForSelector('#skip-link');
-                await page.waitForSelector('#content[role="main"]');
+                await page.waitForSelector('#content');
 
                 expect((await page.title()).includes(guideCase.title)).toBe(true);
                 expect(await page.$eval('html', (element) => element.lang)).toBe('en');
                 expect(await page.$eval('#skip-link', (element) => element.getAttribute('href'))).toBe('#content');
-                expect(await page.$eval('#content', (element) => element.getAttribute('role'))).toBe('main');
+                expect(await page.$eval('#content', (element) => {
+                    return element.tagName.toLowerCase() === 'main' || element.getAttribute('role') === 'main';
+                })).toBe(true);
 
                 if (guideCase.buttonSelectors.length > 0) {
                     await expectNamedControls(page, guideCase.buttonSelectors);

@@ -127,7 +127,7 @@ window.onload = () => {
       skipLinkTargetId = "maincontent";
       break;
     case "inappAbout":
-      // About ScratchJr in-app help frame
+      // About Blocks Jr in-app help frame
       preprocessAndLoadCss("style", "style/about.css");
       entryFunction = () => inappAbout();
       root = "../";

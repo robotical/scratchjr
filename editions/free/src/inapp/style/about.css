@@ -1,41 +1,353 @@
 @import url('../../css/font.css');
 
+:root {
+  color: #24434b;
+  font-family: 'Lato Regular', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 html {
   -webkit-user-select: none;
+  background: #f6f4ee;
 }
 
 body {
-  color: #595959;
-  font-family: 'Lato Regular';
-  padding: ${css_vh(2)} 6.05vw ${css_vh(2)};
-  margin: ${css_vh(2.6)} auto;
-  width: ${css_vw(87.89)};
-  height: auto;
-  margin-bottom: ${css_vh(10.4)};
+  margin: 0;
+  background:
+    radial-gradient(circle at 8% 8%, rgba(255, 218, 88, 0.2), transparent 23rem),
+    #f6f4ee;
+}
+
+.skip-link {
+  position: absolute;
+  top: -48px;
+  left: 12px;
+  z-index: 1000;
+  padding: 8px 12px;
+  border-radius: 7px;
+  background: #133c46;
+  color: #fff;
+  text-decoration: none;
+}
+
+.skip-link:focus,
+.skip-link:active {
+  top: 12px;
+}
+
+.about-page {
+  width: min(1040px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 34px 0 56px;
+}
+
+.about-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+  min-height: 288px;
+  overflow: hidden;
+  border: 1px solid rgba(26, 130, 153, 0.16);
+  border-radius: 30px;
+  background: linear-gradient(128deg, #e9fbfd 0%, #cceff3 58%, #a8e2eb 100%);
+  box-shadow: 0 18px 42px rgba(24, 75, 85, 0.12);
+}
+
+.about-hero::before {
+  content: '';
+  position: absolute;
+  right: -42px;
+  bottom: -84px;
+  width: 390px;
+  height: 210px;
+  border-radius: 50%;
+  background: rgba(255, 218, 88, 0.82);
+  transform: rotate(-7deg);
+}
+
+.about-hero-copy {
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  padding: 44px 16px 44px 48px;
+}
+
+.about-eyebrow {
+  display: inline-block;
+  margin: 0 0 12px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #fff;
+  color: #117f98;
+  font-family: 'Lato Bold', 'Lato Regular', Arial, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Lato Bold', 'Lato Regular', Arial, sans-serif;
+  font-weight: 700;
 }
 
 h1 {
-  font-size: ${css_vh(5.3)};
-  margin-bottom: ${css_vh(0.65)};
-  color: #f5a322;
+  max-width: 600px;
+  margin-bottom: 10px;
+  color: #153f49;
+  font-size: clamp(2.4rem, 5vw, 4.3rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
 }
 
-h2 {
-  font-size: ${css_vh(3.78)};
+.about-tagline {
+  max-width: 580px;
+  margin-bottom: 0;
+  color: #246b7b;
+  font-size: clamp(1.12rem, 2.2vw, 1.55rem);
+  line-height: 1.42;
 }
 
-.about-section-wrapper {
-  display: block;
-  margin-bottom: ${css_vh(1.3)};
+.about-hero-art {
+  position: relative;
+  z-index: 1;
+  min-height: 288px;
 }
 
-.title {
+.about-logo {
+  position: absolute;
+  top: 28px;
+  right: 34px;
+  width: min(230px, 78%);
+  filter: drop-shadow(0 10px 14px rgba(27, 101, 119, 0.17));
+  transform: rotate(2deg);
+}
+
+.about-marty {
+  position: absolute;
+  right: 48px;
+  bottom: 8px;
+  z-index: 2;
+  width: 112px;
+  image-rendering: auto;
+  filter: drop-shadow(0 9px 7px rgba(29, 70, 79, 0.22));
+  transform: rotate(-4deg);
+}
+
+.about-spark {
+  position: absolute;
+  z-index: 2;
+  width: 15px;
+  height: 15px;
+  border-radius: 5px;
+  background: #fff;
+  transform: rotate(45deg);
+}
+
+.about-spark-one {
+  top: 156px;
+  right: 35px;
+}
+
+.about-spark-two {
+  top: 198px;
+  right: 186px;
+  width: 10px;
+  height: 10px;
+  background: #2ca8c3;
+}
+
+.about-introduction,
+.about-features {
+  padding: 46px 34px 0;
+}
+
+.about-introduction {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.25fr);
+  gap: 48px;
+  align-items: start;
+}
+
+.about-introduction h2,
+.about-features > h2,
+.about-story-card h2 {
+  margin-bottom: 12px;
+  color: #173f49;
+  font-size: 1.65rem;
+  line-height: 1.2;
+}
+
+.about-introduction p {
+  margin-bottom: 0;
+  color: #50676d;
+  font-size: 1.08rem;
+}
+
+.about-features > h2 {
+  margin-bottom: 20px;
+}
+
+.about-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.about-feature-card {
+  min-height: 218px;
+  padding: 24px;
+  border-radius: 20px;
+  color: #173f49;
+}
+
+.about-feature-create {
+  background: #fff0bc;
+}
+
+.about-feature-code {
+  background: #dff3ff;
+}
+
+.about-feature-connect {
+  background: #def3e8;
+}
+
+.about-feature-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 22px;
+  place-items: center;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #177f98;
+  font-family: Arial, sans-serif;
+  font-size: 1.3rem;
   font-weight: bold;
-  margin-bottom: ${css_vh(1.3)};
-  color: #2898cd;
 }
 
-.description {
-  font-size: ${css_vh(2.85)};
-  margin-bottom: ${css_vh(1.3)};
+.about-feature-card h3 {
+  margin-bottom: 8px;
+  font-size: 1.3rem;
+}
+
+.about-feature-card p {
+  margin-bottom: 0;
+  color: #4d666c;
+  line-height: 1.48;
+}
+
+.about-story-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 46px 34px 0;
+}
+
+.about-story-card {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 18px;
+  padding: 26px;
+  border: 1px solid #e1e4dd;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.about-story-marker {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 16px;
+  background: #25a5c0;
+  color: #fff;
+  font-family: 'Lato Bold', 'Lato Regular', Arial, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.about-foundation .about-story-marker {
+  background: #f5a623;
+}
+
+.about-story-card p {
+  margin-bottom: 0;
+  color: #596d72;
+  font-size: 0.96rem;
+}
+
+@media (max-width: 760px) {
+  .about-page {
+    width: min(100% - 28px, 620px);
+    padding-top: 16px;
+  }
+
+  .about-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .about-hero-copy {
+    padding: 34px 28px 8px;
+  }
+
+  .about-hero-art {
+    min-height: 210px;
+  }
+
+  .about-logo {
+    top: 18px;
+    left: 28px;
+    right: auto;
+    width: 205px;
+  }
+
+  .about-marty {
+    right: 42px;
+    width: 100px;
+  }
+
+  .about-introduction,
+  .about-feature-grid,
+  .about-story-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-introduction,
+  .about-features,
+  .about-story-grid {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .about-introduction {
+    gap: 8px;
+  }
+
+  .about-feature-card {
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
 }

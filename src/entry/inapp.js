@@ -44,14 +44,28 @@ function markDecorativeImages(selector) {
 
 export function inappAbout() {
     setupGuidePage();
-    gn('aboutScratchjrTitle').textContent = Localization.localize('ABOUT_SCRATCHJR');
-    gn('aboutWhatIs').textContent = Localization.localize('ABOUT_WHAT_IS');
-    gn('aboutDescription').innerHTML = Localization.localize('ABOUT_DESCRIPTION');
-    gn('aboutWhyCreate').textContent = Localization.localize('ABOUT_WHY_CREATE');
-    gn('aboutWhyCreateDescription').innerHTML = Localization.localize('ABOUT_WHY_CREATE_DESCRIPTION');
-    gn('aboutWhoCreated').textContent = Localization.localize('ABOUT_WHO_CREATED');
-    gn('aboutWhoCreatedDescription').innerHTML = (
-        Localization.localize('ABOUT_WHO_CREATED_DESCRIPTION'));
+    var aboutContent = {
+        aboutBlocksJrTitle: 'ABOUT_SCRATCHJR',
+        aboutBlocksJrEyebrow: 'ABOUT_BLOCKS_JR_EYEBROW',
+        aboutBlocksJrTagline: 'ABOUT_BLOCKS_JR_TAGLINE',
+        aboutBlocksJrIntroductionTitle: 'ABOUT_BLOCKS_JR_INTRODUCTION_TITLE',
+        aboutBlocksJrIntroductionDescription: 'ABOUT_BLOCKS_JR_INTRODUCTION_DESCRIPTION',
+        aboutBlocksJrFeaturesTitle: 'ABOUT_BLOCKS_JR_FEATURES_TITLE',
+        aboutBlocksJrCreateTitle: 'ABOUT_BLOCKS_JR_CREATE_TITLE',
+        aboutBlocksJrCreateDescription: 'ABOUT_BLOCKS_JR_CREATE_DESCRIPTION',
+        aboutBlocksJrCodeTitle: 'ABOUT_BLOCKS_JR_CODE_TITLE',
+        aboutBlocksJrCodeDescription: 'ABOUT_BLOCKS_JR_CODE_DESCRIPTION',
+        aboutBlocksJrConnectTitle: 'ABOUT_BLOCKS_JR_CONNECT_TITLE',
+        aboutBlocksJrConnectDescription: 'ABOUT_BLOCKS_JR_CONNECT_DESCRIPTION',
+        aboutBlocksJrRoboticalTitle: 'ABOUT_BLOCKS_JR_ROBOTICAL_TITLE',
+        aboutBlocksJrRoboticalDescription: 'ABOUT_BLOCKS_JR_ROBOTICAL_DESCRIPTION',
+        aboutBlocksJrFoundationTitle: 'ABOUT_BLOCKS_JR_FOUNDATION_TITLE',
+        aboutBlocksJrFoundationDescription: 'ABOUT_BLOCKS_JR_FOUNDATION_DESCRIPTION'
+    };
+
+    Object.keys(aboutContent).forEach(function (elementId) {
+        gn(elementId).textContent = Localization.localize(aboutContent[elementId]);
+    });
 
     // PBS-only
     if (window.Settings.edition == 'PBS') {
