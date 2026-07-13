@@ -107,7 +107,7 @@ requireButtonIds('editions/free/src/home.html', [
     'privacytab'
 ]);
 
-requireButtonClassCount('editions/free/src/inapp/interface.html', 'interface-button', 16);
+requireButtonClassCount('editions/free/src/inapp/interface.html', 'interface-button', 24);
 requireButtonClassCount('editions/free/src/inapp/paint.html', 'paint-button', 13);
 requireDecorativeAlt('editions/free/src/inapp/interface.html', 'ipad-project-view');
 requireDecorativeAlt('editions/free/src/inapp/paint.html', 'ipad-project-view');

@@ -352,10 +352,6 @@ export default class UI {
             ariaLabel: 'Manage extensions'
         });
         addButton.setAttribute('id', 'addExtensionButton');
-        addButton.style.display = 'none';
-        addButton.disabled = true;
-        addButton.setAttribute('aria-hidden', 'true');
-        addButton.setAttribute('tabindex', '-1');
         const icon = newHTML('span', 'extensionAddIcon', addButton);
         icon.textContent = '+';
         icon.setAttribute('aria-hidden', 'true');
@@ -666,11 +662,11 @@ export default class UI {
             connectionButtonsArea.classList.toggle('extensionEnabled', enabled);
         }
         if (addButton) {
-            addButton.style.display = 'none';
-            addButton.disabled = true;
-            addButton.setAttribute('aria-hidden', 'true');
+            addButton.style.display = 'flex';
+            addButton.disabled = false;
+            addButton.setAttribute('aria-hidden', 'false');
             addButton.setAttribute('aria-label', 'Manage extensions');
-            addButton.setAttribute('tabindex', '-1');
+            addButton.removeAttribute('tabindex');
         }
         if (microBitButton) {
             microBitButton.style.display = enabled ? '' : 'none';

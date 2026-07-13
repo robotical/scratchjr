@@ -138,9 +138,11 @@ async function getFocusStyles(page, selector) {
 }
 
 function expectVisibleFocusIndicator(focusStyles) {
-    expect(focusStyles.outlineStyle).not.toBe('none');
-    expect(focusStyles.outlineWidth).toBeGreaterThan(0);
-    expect(focusStyles.outlineColor).not.toBe('rgba(0, 0, 0, 0)');
+    const hasVisibleOutline = focusStyles.outlineStyle !== 'none' &&
+        focusStyles.outlineWidth > 0 &&
+        focusStyles.outlineColor !== 'rgba(0, 0, 0, 0)';
+    const hasVisibleBoxShadow = focusStyles.boxShadow && focusStyles.boxShadow !== 'none';
+    expect(hasVisibleOutline || hasVisibleBoxShadow).toBe(true);
 }
 
 async function expectNamedControls(page, selectors) {
@@ -254,7 +256,14 @@ describe('Accessibility shell audit', () => {
                     path: 'inapp/interface.html',
                     title: 'Interface Guide',
                     focusSelector: '#interface-button-save',
-                    buttonSelectors: ['#interface-button-save', '#interface-button-stage', '#interface-button-green-flag'],
+                    buttonSelectors: [
+                        '#interface-button-save',
+                        '#interface-button-extensions',
+                        '#interface-button-stage',
+                        '#interface-button-green-flag',
+                        '#interface-button-duplicate-page',
+                        '#interface-button-zoom'
+                    ],
                     decorativeImageSelector: '.ipad-project-view'
                 },
                 {
@@ -297,6 +306,59 @@ describe('Accessibility shell audit', () => {
 
                 await tabToSelector(page, guideCase.focusSelector);
                 expectVisibleFocusIndicator(await getFocusStyles(page, guideCase.focusSelector));
+
+                if (guideCase.path === 'inapp/interface.html') {
+                    const buttonIds = await page.$$eval('.interface-button', (buttons) => {
+                        return buttons.map((button) => button.id);
+                    });
+                    expect(buttonIds).toHaveLength(24);
+                    expect(await page.$$eval('.interface-connector', (connectors) => connectors.length)).toBe(24);
+                    expect(await page.$eval('#interface-key-header', (element) => element.textContent)).toBe('1 | Save');
+
+                    for (let index = 0; index < buttonIds.length; index += 1) {
+                        const selector = `#${buttonIds[index]}`;
+                        await page.click(selector);
+                        const selectedFeature = await page.evaluate((buttonSelector) => {
+                            const button = document.querySelector(buttonSelector);
+                            const connector = document.querySelector(
+                                `.interface-connector[data-guide-key="${button.getAttribute('data-guide-key')}"]`
+                            );
+                            const number = button.querySelector('span');
+                            return {
+                                ariaCurrent: button.getAttribute('aria-current'),
+                                ariaLabel: button.getAttribute('aria-label'),
+                                buttonBackground: window.getComputedStyle(button).backgroundColor,
+                                connectorIsSelected: connector.classList.contains('interface-connector-selected'),
+                                connectorLineLength: connector.querySelector('line').getTotalLength(),
+                                description: document.querySelector('#interface-key-description').textContent,
+                                header: document.querySelector('#interface-key-header').textContent,
+                                numberColor: window.getComputedStyle(number).color,
+                                numberText: number.textContent,
+                                selectedConnectorCount: document.querySelectorAll(
+                                    '.interface-connector-selected'
+                                ).length,
+                                selectedCount: document.querySelectorAll('.interface-button[aria-current="page"]').length
+                            };
+                        }, selector);
+
+                        expect(selectedFeature.header).toBe(selectedFeature.ariaLabel);
+                        expect(selectedFeature.header.startsWith(`${index + 1} | `)).toBe(true);
+                        expect(selectedFeature.header).not.toContain('String missing:');
+                        expect(selectedFeature.description.trim().length).toBeGreaterThan(0);
+                        expect(selectedFeature.description).not.toContain('String missing:');
+                        expect(selectedFeature.ariaCurrent).toBe('page');
+                        expect(selectedFeature.numberText).toBe(String(index + 1));
+                        expect(selectedFeature.numberColor).not.toBe(selectedFeature.buttonBackground);
+                        expect(selectedFeature.connectorIsSelected).toBe(true);
+                        expect(selectedFeature.connectorLineLength).toBeGreaterThan(0);
+                        expect(selectedFeature.selectedConnectorCount).toBe(1);
+                        expect(selectedFeature.selectedCount).toBe(1);
+                    }
+
+                    await page.click('#interface-button-extensions');
+                    expect(await page.$eval('#interface-key-header', (element) => element.textContent)).toBe('3 | Extensions');
+                    expect(await page.$eval('#interface-key-description', (element) => element.textContent)).toContain('micro:bit');
+                }
 
                 await activateSkipLink(page, 'content');
 

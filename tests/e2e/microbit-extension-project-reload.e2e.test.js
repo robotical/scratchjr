@@ -119,12 +119,7 @@ async function enableMartyMode(page) {
 }
 
 async function enableMicroBitExtension(page) {
-  await page.$eval("#addExtensionButton", (button) => {
-    if (!button.disabled || window.getComputedStyle(button).display !== "none") {
-      throw new Error("Expected the extensions entry point to remain hidden and disabled");
-    }
-    button.onclick();
-  });
+  await page.click("#addExtensionButton");
   await page.waitForSelector("#extensionsLibrary.fade.in", { timeout: 30_000 });
   await page.click("#microBitExtensionCard");
   await page.waitForFunction(

@@ -108,13 +108,8 @@ async function assertTutorialOpened(page, tutorialId) {
   expect(tutorialState.tutorialTitle.length).toBeGreaterThan(0);
 }
 
-async function openHiddenExtensionsLibrary(page) {
-  await page.$eval("#addExtensionButton", (button) => {
-    if (!button.disabled || window.getComputedStyle(button).display !== "none") {
-      throw new Error("Expected the extensions entry point to remain hidden and disabled");
-    }
-    button.onclick();
-  });
+async function openExtensionsLibrary(page) {
+  await page.click("#addExtensionButton");
 }
 
 describe("Chromium 79 smoke test", () => {
@@ -132,7 +127,7 @@ describe("Chromium 79 smoke test", () => {
   );
 
   it(
-    "keeps the extension entry hidden and reveals micro:bit controls only while loaded",
+    "keeps the extension entry visible and reveals micro:bit controls only while loaded",
     async () => {
       const { browser, page, errors } = await openPage("/editor.html?mode=edit");
 
@@ -157,9 +152,9 @@ describe("Chromium 79 smoke test", () => {
         });
 
         expect(initialState).toEqual({
-          addButtonDisplay: "none",
-          addButtonAriaHidden: "true",
-          addButtonDisabled: true,
+          addButtonDisplay: "flex",
+          addButtonAriaHidden: "false",
+          addButtonDisabled: false,
           microBitButtonDisplay: "none",
           microBitButtonAriaHidden: "true",
           microBitButtonDisabled: true,
@@ -167,7 +162,7 @@ describe("Chromium 79 smoke test", () => {
           extensionEnabled: false,
         });
 
-        await openHiddenExtensionsLibrary(page);
+        await openExtensionsLibrary(page);
         await page.waitForSelector("#extensionsLibrary.fade.in", { timeout: 30_000 });
         const libraryState = await page.evaluate(() => ({
           title: document.getElementById("extensionsLibraryTitle").textContent.trim(),
@@ -221,9 +216,9 @@ describe("Chromium 79 smoke test", () => {
         });
 
         expect(enabledState).toEqual({
-          addButtonDisplay: "none",
-          addButtonAriaHidden: "true",
-          addButtonDisabled: true,
+          addButtonDisplay: "flex",
+          addButtonAriaHidden: "false",
+          addButtonDisabled: false,
           microBitButtonDisplay: "flex",
           microBitButtonAriaHidden: "false",
           microBitButtonDisabled: false,
@@ -290,7 +285,7 @@ describe("Chromium 79 smoke test", () => {
         });
         expect(blocksAfterInsert).toContain("microbitdisplayclear");
 
-        await openHiddenExtensionsLibrary(page);
+        await openExtensionsLibrary(page);
         await page.waitForSelector("#extensionsLibrary.fade.in", { timeout: 30_000 });
         const loadedLibraryState = await page.evaluate(() => ({
           microBitCardAction: document.getElementById("microBitExtensionCardAction").textContent.trim(),
@@ -339,7 +334,7 @@ describe("Chromium 79 smoke test", () => {
           extensionEnabled: document.getElementById("connectionButtonsArea").classList.contains("extensionEnabled"),
         }));
         expect(unloadedState).toEqual({
-          addButtonDisplay: "none",
+          addButtonDisplay: "flex",
           microBitButtonDisplay: "none",
           extensionsLibraryOpen: false,
           microBitCardAction: "+",

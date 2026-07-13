@@ -66,68 +66,97 @@ export function inappInterfaceGuide() {
     setupGuidePage();
     var interfaceKeyHeaderNode = gn('interface-key-header');
     var interfaceKeyDescriptionNode = gn('interface-key-description');
-
-    interfaceKeyHeaderNode.textContent = Localization.localize('INTERFACE_GUIDE_NEW_PROJECT', { N: 1 });
-    interfaceKeyDescriptionNode.textContent = Localization.localize('INTERFACE_GUIDE_NEW_PROJECT_DESCRIPTION');
+    gn('interface-guide-eyebrow').textContent = Localization.localize('INTERFACE_GUIDE');
+    gn('interface-guide-hint').textContent = Localization.localize('INTERFACE_GUIDE_SELECT_HINT');
 
     var interfaceKeys = [
-        'NEW_PROJECT',
-        'SAVED_PROJECT',
-        'SETTINGS',
-        'USER_GUIDES',
         'SAVE',
-        'MARTY_CONNECT',
-        'STAGE',
+        'DEVICE_CONNECTIONS',
+        'EXTENSIONS',
+        'SPRITES_AND_DEVICES',
         'PRESENTATION_MODE',
         'GRID',
+        'TRACE',
+        'CLEAR_TRACE',
         'CHANGE_BG',
         'ADD_TEXT',
         'RESET_CHAR',
         'GREEN_FLAG',
+        'STAGE',
+        'MARTY_MODE',
         'PAGES',
+        'DUPLICATE_PAGE',
         'PROJECT_INFO',
-        'UNDO_REDO',
+        'BLOCKS_CATEGORIES',
+        'DEVICE_BLOCK_CATEGORIES',
+        'BLOCKS_PALETTE',
         'PROGRAMMING_SCRIPT',
         'PROGRAMMING_AREA',
-        'BLOCKS_PALETTE',
-        'BLOCKS_CATEGORIES'
-        // 'CHARACTERS'
+        'UNDO_REDO',
+        'ZOOM'
     ];
 
-    var interfaceDescriptions = [];
+    var interfaceDescriptions = {};
     for (var i = 0; i < interfaceKeys.length; i++) {
         var key = interfaceKeys[i];
-        interfaceDescriptions.push([
+        interfaceDescriptions[key] = [
             Localization.localize('INTERFACE_GUIDE_' + key, { N: i + 1 }),
             Localization.localize('INTERFACE_GUIDE_' + key + '_DESCRIPTION')
-        ]);
+        ];
     }
 
-    var currentButton = document.getElementById('interface-button-save');
-    setSelectedState(currentButton, true);
+    var currentButton;
+
+    var setConnectorSelectedState = function (button, selected) {
+        var connector = document.querySelector(
+            '.interface-connector[data-guide-key="' + button.getAttribute('data-guide-key') + '"]'
+        );
+        if (connector) {
+            connector.classList.toggle('interface-connector-selected', selected);
+        }
+    };
+
+    var selectGuideFeature = function (button, playSound) {
+        if (!button) {
+            return;
+        }
+        var description = interfaceDescriptions[button.getAttribute('data-guide-key')];
+        if (!description) {
+            return;
+        }
+        interfaceKeyHeaderNode.textContent = description[0];
+        interfaceKeyDescriptionNode.textContent = description[1];
+        if (currentButton) {
+            currentButton.classList.remove('interface-button-selected');
+            setSelectedState(currentButton, false);
+            setConnectorSelectedState(currentButton, false);
+        }
+        currentButton = button;
+        currentButton.classList.add('interface-button-selected');
+        setSelectedState(currentButton, true);
+        setConnectorSelectedState(currentButton, true);
+        if (playSound) {
+            window.parent.ScratchAudio.sndFXWithVolume('keydown.wav', 0.3);
+        }
+    };
 
     var switchHelp = function (e) {
         var target = e.target.closest('.interface-button');
         if (target) {
-            var descriptionId = parseInt(target.textContent, 10) - 1;
-            interfaceKeyHeaderNode.textContent = interfaceDescriptions[descriptionId][0];
-            interfaceKeyDescriptionNode.textContent = interfaceDescriptions[descriptionId][1];
-            currentButton.className = 'interface-button';
-            setSelectedState(currentButton, false);
-            currentButton = target;
-            currentButton.className = currentButton.className + ' interface-button-selected';
-            setSelectedState(currentButton, true);
-            window.parent.ScratchAudio.sndFXWithVolume('keydown.wav', 0.3);
+            selectGuideFeature(target, true);
         }
     };
     document.addEventListener('click', switchHelp, false);
     const buttons = document.querySelectorAll('.interface-button');
-    buttons.forEach((button) => {
-        var descriptionId = parseInt(button.textContent, 10) - 1;
-        if (!isNaN(descriptionId) && interfaceDescriptions[descriptionId]) {
-            button.setAttribute('aria-label', interfaceDescriptions[descriptionId][0]);
+    buttons.forEach(function (button) {
+        var description = interfaceDescriptions[button.getAttribute('data-guide-key')];
+        if (description) {
+            button.setAttribute('aria-label', description[0]);
+            button.setAttribute('aria-controls', 'interface-key');
+            setSelectedState(button, false);
         }
     });
+    selectGuideFeature(document.getElementById('interface-button-save'), false);
     markDecorativeImages('.ipad-project-view');
 }
 
