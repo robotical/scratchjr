@@ -268,6 +268,16 @@ export default class UI {
         // Create button container 
         const iconButtonContainer = newHTML('div', 'iconButtonContainer notConnectedButtonContainer', connectButton);
 
+        // Pointer activation can leave :focus-visible stuck on embedded touch browsers.
+        // Track the input modality so pointer clicks do not retain a focus ring while
+        // keyboard activation keeps the standard accessible focus treatment.
+        const clearPointerFocus = () => connectButton.classList.remove('connectButtonPointerFocus');
+        connectButton.addEventListener('click', (event) => {
+            connectButton.classList.toggle('connectButtonPointerFocus', event.detail > 0);
+        });
+        connectButton.addEventListener('keydown', clearPointerFocus);
+        connectButton.addEventListener('blur', clearPointerFocus);
+
         // Action to perform when the button is clicked
         connectButton.onclick = () => {
             onClick(connectButton);
