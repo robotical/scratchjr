@@ -535,6 +535,7 @@ export default class ScratchJr {
                 // ignore
             }
         }
+        UI.updateTopBarControlLabel('go');
         if (ScratchJr.getSprite()) {
             if (isOff && !inFullscreen) {
                 ScratchJr.getSprite().select();

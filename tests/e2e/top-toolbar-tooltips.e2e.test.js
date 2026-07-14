@@ -108,6 +108,53 @@ describe("top toolbar tooltips", () => {
 
         expect(invalidTooltips).toEqual([]);
 
+        const initialActionLabels = await page.evaluate(() => ({
+          background: document.getElementById("setbkg").getAttribute("data-tooltip"),
+          run: document.getElementById("go").getAttribute("data-tooltip"),
+        }));
+        expect(initialActionLabels).toEqual({
+          background: "Change Background",
+          run: "Run project",
+        });
+
+        const runningActionLabels = await page.evaluate(() => {
+          const runtime = window.ScratchJr.runtime;
+          const previousThreads = runtime.threadsRunning;
+          runtime.threadsRunning = [{
+            isRunning: true,
+            firstBlock: { blocktype: "onflag" },
+          }];
+          window.ScratchJr.updateRunStopButtons();
+
+          const go = document.getElementById("go");
+          const labels = {
+            ariaLabel: go.getAttribute("aria-label"),
+            tooltip: go.getAttribute("data-tooltip"),
+          };
+
+          runtime.threadsRunning = previousThreads;
+          window.ScratchJr.updateRunStopButtons();
+          return labels;
+        });
+        expect(runningActionLabels).toEqual({
+          ariaLabel: "Stop project",
+          tooltip: "Stop project",
+        });
+
+        await page.click("#martyMode");
+        await page.waitForFunction(
+          () => document.getElementById("setbkg").getAttribute("data-tooltip") === "Change surface",
+          { timeout: 5_000 }
+        );
+        const martyBackgroundLabels = await page.$eval("#setbkg", (button) => ({
+          ariaLabel: button.getAttribute("aria-label"),
+          tooltip: button.getAttribute("data-tooltip"),
+        }));
+        expect(martyBackgroundLabels).toEqual({
+          ariaLabel: "Change surface",
+          tooltip: "Change surface",
+        });
+
         await page.hover("#grid");
         await new Promise((resolve) => setTimeout(resolve, 200));
 

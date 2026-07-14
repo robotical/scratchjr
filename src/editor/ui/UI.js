@@ -172,7 +172,9 @@ export default class UI {
             case 'addtext':
                 return UI.getGuideControlLabel('INTERFACE_GUIDE_ADD_TEXT');
             case 'setbkg':
-                return UI.getGuideControlLabel('INTERFACE_GUIDE_CHANGE_BG');
+                return ScratchJr.isMartyModeEnabled
+                    ? Localization.localize('A11Y_CHANGE_SURFACE')
+                    : UI.getGuideControlLabel('INTERFACE_GUIDE_CHANGE_BG');
             case 'grid':
                 return UI.getGuideControlLabel('INTERFACE_GUIDE_GRID');
             case 'traceBtn':
@@ -180,7 +182,9 @@ export default class UI {
             case 'traceClear':
                 return Localization.localize('A11Y_CLEAR_TRACE');
             case 'go':
-                return Localization.localize('A11Y_RUN_PROJECT');
+                return Localization.localize(ScratchJr.runtime && !ScratchJr.runtime.inactive()
+                    ? 'A11Y_STOP_PROJECT'
+                    : 'A11Y_RUN_PROJECT');
             case 'resetall':
                 return Localization.localize('A11Y_RESET_ALL_CHARACTERS');
             case 'full':
@@ -2376,6 +2380,17 @@ export default class UI {
         }
     }
 
+    static updateTopBarControlLabel(id) {
+        const control = gn(id);
+        const label = UI.getControlAriaLabel(id);
+        if (!control || !label || (control.getAttribute('aria-label') === label &&
+            control.getAttribute('data-tooltip') === label)) {
+            return;
+        }
+        control.setAttribute('aria-label', label);
+        control.setAttribute('data-tooltip', label);
+    }
+
     static fullscreenControls() {
         UI.nextpage = newButton('nextpage off', frame, {
             ariaLabel: UI.getControlAriaLabel('nextpage')
@@ -2541,6 +2556,7 @@ export default class UI {
             toggleDiv.innerHTML = stripInlineSvgIds(spriteToggleOn);
         }
         setPressedState(martyModeButton, ScratchJr.isMartyModeEnabled);
+        UI.updateTopBarControlLabel('setbkg');
     }
 
     /*MartyMode*/
