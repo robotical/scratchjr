@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "ตอนนี้มาดูที่ Marty กัน เราต้องเปิดใช้งานโหมด Marty เพื่อดูบล็อค Marty คลิกที่ปุ่มโหมด Marty",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "เมื่ออยู่ในโหมด Marty ให้ลากบล็อก 'on message' จากหมวดหมู่ Marty Start ไปยังพื้นที่สคริปต์ บล็อกนี้จะคอยฟังข้อความที่ส่งโดย Cog",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "ตอนนี้เรามาเลือกบล็อกการเคลื่อนไหวของ Marty กัน คลิกที่หมวดหมู่การเคลื่อนไหวในบล็อกของ Marty",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "ใกล้จะเสร็จแล้ว! ลากบล็อก 'Marty Dance' ไปยังพื้นที่สคริปต์ บล็อกนี้จะทำให้ Marty เต้นเมื่อได้รับข้อความ",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "ใกล้จะเสร็จแล้ว! ลากบล็อก 'Marty Dance' ไปต่อใต้บล็อก 'on touch cog' Marty จะเต้นเมื่อกดปุ่มของ Cog",
   "COG_AND_MARTY_TUTORIAL_END": "เยี่ยมมาก! คุณได้เขียนโค้ด Cog และ Marty ให้โต้ตอบกันได้สำเร็จแล้ว ตอนนี้คลิกปุ่มของ Cog เพื่อดู Marty เต้น!",
   "COG_JRBLOCKS1_TITLE": "1. แต่งเพลง",
   "COG_JRBLOCKS1_STEP_1_TEXT": "มาทำให้ Cog เล่นเพลงกันเถอะ!",

@@ -33,7 +33,7 @@ type TutorialStep = {
     instructionActions: Action[];
     hintActions?: Action[];
     buttons: ("previous" | "next" | "hint")[]; 
-    expectedCode: string[]; // e.g: ["onmessage=>martyDance"] each element of the array corresponds to a script. each script is a series of blocks connected with =>
+    expectedCode: string[]; // e.g: ["ontouchcog=>martyDance"] each element of the array corresponds to a script. each script is a series of blocks connected with =>
     presenter: "marty"; // or any other sprite
 };
 
@@ -112,7 +112,7 @@ const cogAndMartyTutorial: Tutorial = {
             expectedCode: [],
             presenter: "marty"
         },
-        /* STEP 2 -- go to cog event blocks */
+        /* STEP 2 -- enter Marty mode and go to Cog event blocks */
         {
             instructionActions: [
                 {
@@ -122,6 +122,9 @@ const cogAndMartyTutorial: Tutorial = {
             ],
             nextStepActions: [
                 {
+                    type: "ShowMartyMode",
+                },
+                {
                     type: "HighlightElement",
                     elementId: "cog-start",
                     hexColor: "#855cd659",
@@ -130,10 +133,10 @@ const cogAndMartyTutorial: Tutorial = {
             ],
             hintActions: [],
             buttons: ["previous", "next"],
-            expectedCode: ["ontouchcog_block", "message_block"],
+            expectedCode: [],
             presenter: "marty"
         },
-        /* STEP 3 -- add ontouchcog block */
+        /* STEP 3 -- add ontouchcog block to Marty's script */
         {
             instructionActions: [
                 {
@@ -142,6 +145,9 @@ const cogAndMartyTutorial: Tutorial = {
                 }
             ],
             nextStepActions: [
+                {
+                    type: "ShowMartyMode",
+                },
                 {
                     type: "ShowCategory",
                     category: "cog-start"
@@ -152,6 +158,9 @@ const cogAndMartyTutorial: Tutorial = {
                 },
             ],
             hintActions: [
+                {
+                    type: "ShowMartyMode",
+                },
                 {
                     type: "ShowCategory",
                     category: "cog-start"
@@ -169,128 +178,7 @@ const cogAndMartyTutorial: Tutorial = {
             expectedCode: ["ontouchcog"],
             presenter: "marty"
         },
-        /* STEP 4 -- go to sprite event blocks */
-        {
-            instructionActions: [
-                {
-                    type: "ShowInstructorText",
-                    text: "Great! Now let's move to the Sprite blocks, which are on the left side of the screen."
-                }
-            ],
-            nextStepActions: [
-                {
-                    type: "HighlightElement",
-                    elementId: "sprite-start",
-                    hexColor: "#855cd659",
-                    onClickAction: "NextStep"
-                },
-            ],
-            hintActions: [],
-            buttons: ["previous", "next"],
-            expectedCode: [],
-            presenter: "marty"
-        },
-        /* STEP 5 -- add message block after the ontouchcog block */
-        {
-            instructionActions: [
-                {
-                    type: "ShowInstructorText",
-                    text: "Now drag the 'message' block from the Sprite Start category to the script area. This block will send a message to Marty when the sprite is clicked"
-                }
-            ],
-            nextStepActions: [
-                {
-                    type: "ShowCategory",
-                    category: "sprite-start"
-                },
-                {
-                    type: "HighlightBlocks",
-                    blocks: ["message_block"]
-                },
-            ],
-            hintActions: [
-                {
-                    type: "ShowCategory",
-                    category: "sprite-start"
-                },
-                {
-                    type: "HighlightBlocks",
-                    blocks: ["message_block"]
-                },
-                {
-                    type: "DragBlockToScriptArea",
-                    block: "message_block",
-                }
-            ],
-            buttons: ["previous", "next", "hint"],
-            expectedCode: ["ontouchcog=>message"],
-            presenter: "marty"
-        },
-        /* STEP 6 -- go to marty mode */
-        {
-            instructionActions: [
-                {
-                    type: "ShowInstructorText",
-                    text: "Now let's move to Marty. We need to enable Marty Mode to see the Marty blocks. Click on the Marty Mode button."
-                }
-            ],
-            nextStepActions: [
-                {
-                    type: "HighlightElement",
-                    elementId: "martyMode",
-                    hexColor: "#855cd659",
-                    onClickAction: "NextStep"
-                }
-            ],
-            hintActions: [
-            ],
-            buttons: ["previous", "next"],
-            expectedCode: [],
-            presenter: "marty"
-        },
-        /* STEP 7 -- add onmessage block */
-        {
-            instructionActions: [
-                {
-                    type: "ShowInstructorText",
-                    text: "Once in Marty Mode, drag the 'on message' block from the Marty Start category to the script area. This block will listen for the message sent by Cog"
-                }
-            ],
-            nextStepActions: [
-                {
-                    type: "ShowMartyMode",
-                },
-                {
-                    type: "ShowCategory",
-                    category: "marty-start"
-                },
-                {
-                    type: "HighlightBlocks",
-                    blocks: ["onmessage_block"]
-                }
-            ],
-            hintActions: [
-                {
-                    type: "ShowMartyMode",
-                },
-                {
-                    type: "ShowCategory",
-                    category: "marty-start"
-                },
-                {
-                    type: "HighlightBlocks",
-                    blocks: ["onmessage_block"]
-                },
-                {
-                    type: "DragBlockToScriptArea",
-                    block: "onmessage_block",
-                }
-            ],
-            buttons: ["previous", "next", "hint"],
-            expectedCode: ["onmessage"],
-            presenter: "marty"
-        },
-        /* STEP 8 -- go to marty motion blocks */
+        /* STEP 4 -- go to marty motion blocks */
         {
             instructionActions: [
                 {
@@ -316,12 +204,12 @@ const cogAndMartyTutorial: Tutorial = {
             expectedCode: [],
             presenter: "marty"
         },
-        /* STEP 9 -- add marty dance block */
+        /* STEP 5 -- add marty dance block after the Cog trigger */
         {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "We're almost there! Drag the 'marty dance' block to the script area. This block will make Marty dance when the message is received"
+                    text: "We're almost there! Drag the 'Marty Dance' block beneath the 'on touch cog' block. Marty will dance when Cog's button is pressed."
                 }
             ],
             nextStepActions: [
@@ -355,15 +243,15 @@ const cogAndMartyTutorial: Tutorial = {
                 }
             ],
             buttons: ["previous", "next", "hint"],
-            expectedCode: ["onmessage=>martyDance"],
+            expectedCode: ["ontouchcog=>martyDance"],
             presenter: "marty"
         },
-        /* STEP 10 -- end */
+        /* STEP 6 -- end */
         {
             instructionActions: [
                 {
                     type: "ShowInstructorText",
-                    text: "Great job! You have successfully coded Cog and Marty to interact with each other. No click Cog's button to see Marty dance!"
+                    text: "Great job! You have successfully coded Cog and Marty to interact with each other. Now click Cog's button to see Marty dance!"
                 }
             ],
             nextStepActions: [],

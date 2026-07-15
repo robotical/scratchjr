@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "では、Marty に移りましょう。Marty ブロックを表示するには、Marty モードを有効にする必要があります。Marty モードボタンをクリックしてください。",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "Martyモードになったら、「Marty Start」カテゴリから「on message」ブロックをスクリプトエリアにドラッグします。このブロックはCogから送信されるメッセージをリッスンします。",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "では、Martyのモーションブロックを選択しましょう。Martyブロックの「モーション」カテゴリをクリックします。",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "もうすぐです！「Marty Dance」ブロックをスクリプトエリアにドラッグしてください。このブロックは、メッセージを受信したときにMartyを踊らせます。",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "もうすぐです！「Marty Dance」ブロックを「on touch cog」ブロックの下につなげてください。Cog のボタンを押すと Marty が踊ります。",
   "COG_AND_MARTY_TUTORIAL_END": "よくできました！CogとMartyが相互にやり取りするコードが完成しました。CogのボタンをクリックしてMartyのダンスを見てみましょう！",
   "COG_JRBLOCKS1_TITLE": "1. 曲を作る",
   "COG_JRBLOCKS1_STEP_1_TEXT": "Cog に曲を演奏させましょう!",

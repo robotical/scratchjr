@@ -4,6 +4,7 @@ import { readOutLoudSvg } from "../../html-svgs/readoutloud-svg";
 import { gn, newHTML, stripHtml } from "../../utils/lib";
 import { closeDialog, openDialog, registerDialog } from "../../utils/accessibility";
 import Localization from "../../utils/Localization";
+import goToLink from "../../utils/goToLink";
 import ScratchJr from "../ScratchJr";
 import Palette from "./Palette";
 import UI from "./UI";
@@ -161,12 +162,6 @@ export default class TutorialUI {
     static closeTutorial() {
         const urlParams = new URLSearchParams(window.location.search);
         const tutorialId = urlParams.get('tutorial');
-
-        if (tutorialId) {
-            window.location.href = 'home.html?place=book&submenu=tutorials';
-            return;
-        }
-
         const tutorialReturnPlace = urlParams.get('tutorialReturnPlace');
         const tutorialReturnSubmenu = urlParams.get('tutorialReturnSubmenu');
 
@@ -177,7 +172,12 @@ export default class TutorialUI {
             if (tutorialReturnSubmenu) {
                 params.set('submenu', tutorialReturnSubmenu);
             }
-            window.location.href = `home.html?${params.toString()}`;
+            goToLink(`home.html?${params.toString()}`);
+            return;
+        }
+
+        if (tutorialId) {
+            goToLink('home.html?place=book&submenu=tutorials');
             return;
         }
 
@@ -186,7 +186,7 @@ export default class TutorialUI {
             return;
         }
 
-        window.location.href = 'home.html?place=home';
+        goToLink('home.html?place=home');
     }
 
     /* Progress Bar */

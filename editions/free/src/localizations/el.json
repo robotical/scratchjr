@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "Τώρα ας περάσουμε στον Μάρτυ. Πρέπει να ενεργοποιήσουμε τη λειτουργία Marty για να δούμε τα μπλοκ Marty. Κάντε κλικ στο κουμπί Marty Mode.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "Μόλις μπείτε στη λειτουργία Marty, σύρετε το μπλοκ \"on message\" από την κατηγορία Marty Start στην περιοχή του σεναρίου. Αυτό το μπλοκ θα ακούσει το μήνυμα που αποστέλλεται από το Cog.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "Τώρα, ας επιλέξουμε τα μπλοκ κίνησης του Marty. Κάντε κλικ στην κατηγορία Κίνηση των μπλοκ Marty.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Είμαστε σχεδόν εκεί! Σύρετε το μπλοκ \"Marty Dance\" στην περιοχή του σεναρίου. Αυτό το μπλοκ θα κάνει τον Marty να χορέψει όταν ληφθεί το μήνυμα.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Είμαστε σχεδόν εκεί! Σύρετε το μπλοκ \"Marty Dance\" κάτω από το μπλοκ \"on touch cog\". Ο Marty θα χορέψει όταν πατηθεί το κουμπί του Cog.",
   "COG_AND_MARTY_TUTORIAL_END": "Μεγάλη δουλειά! Έχετε κωδικοποιήσει με επιτυχία τον Cog και τον Marty για να αλληλεπιδρούν μεταξύ τους. Τώρα κάντε κλικ στο κουμπί του Cog για να δείτε τον Marty να χορεύει!",
   "COG_JRBLOCKS1_TITLE": "1. Κάντε μια μελωδία",
   "COG_JRBLOCKS1_STEP_1_TEXT": "Ας κάνουμε τον Cog να παίξει μια μελωδία!",

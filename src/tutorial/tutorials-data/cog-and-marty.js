@@ -163,7 +163,7 @@ const cogAndMartyTutorial = {
             expectedCode: [],
             presenter: "marty"
         },
-        /* STEP 2 -- go to cog event blocks */
+        /* STEP 2 -- enter Marty mode and go to Cog event blocks */
         {
             instructionActions: [
                 {
@@ -172,6 +172,9 @@ const cogAndMartyTutorial = {
                 }
             ],
             nextStepActions: [
+                {
+                    type: "ShowMartyMode",
+                },
                 {
                     type: "HighlightElement",
                     elementId: "cog-start",
@@ -183,7 +186,7 @@ const cogAndMartyTutorial = {
             buttons: ["previous", "readAloud", "next"],
             presenter: "marty"
         },
-        /* STEP 3 -- add ontouchcog block */
+        /* STEP 3 -- add ontouchcog block to Marty's script */
         {
             instructionActions: [
                 {
@@ -192,6 +195,9 @@ const cogAndMartyTutorial = {
                 }
             ],
             nextStepActions: [
+                {
+                    type: "ShowMartyMode",
+                },
                 {
                     type: "ShowCategory",
                     category: "cog-start"
@@ -202,6 +208,9 @@ const cogAndMartyTutorial = {
                 },
             ],
             hintActions: [
+                {
+                    type: "ShowMartyMode",
+                },
                 {
                     type: "ShowCategory",
                     category: "cog-start"
@@ -219,128 +228,7 @@ const cogAndMartyTutorial = {
             expectedCode: ["ontouchcog"],
             presenter: "marty"
         },
-        /* STEP 4 -- go to sprite event blocks */
-        {
-            instructionActions: [
-                {
-                    type: "ShowInstructorText",
-                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_SPRITE_BLOCKS"),
-                }
-            ],
-            nextStepActions: [
-                {
-                    type: "HighlightElement",
-                    elementId: "sprite-start",
-                    hexColor: "#855cd659",
-                    onClickAction: "NextStep"
-                },
-            ],
-            hintActions: [],
-            buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
-            presenter: "marty"
-        },
-        /* STEP 5 -- add message block after the ontouchcog block */
-        {
-            instructionActions: [
-                {
-                    type: "ShowInstructorText",
-                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_MESSAGE_BLOCK"),
-                }
-            ],
-            nextStepActions: [
-                {
-                    type: "ShowCategory",
-                    category: "sprite-start"
-                },
-                {
-                    type: "HighlightBlocks",
-                    blocks: ["message_block"]
-                },
-            ],
-            hintActions: [
-                {
-                    type: "ShowCategory",
-                    category: "sprite-start"
-                },
-                {
-                    type: "HighlightBlocks",
-                    blocks: ["message_block"]
-                },
-                {
-                    type: "DragBlockToScriptArea",
-                    block: "message_block",
-                }
-            ],
-            buttons: ["previous", "readAloud", "next", "hint"],
-            expectedCode: ["ontouchcog=>message"],
-            presenter: "marty"
-        },
-        /* STEP 6 -- go to marty mode */
-        {
-            instructionActions: [
-                {
-                    type: "ShowInstructorText",
-                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_MARTY_MODE"),
-                }
-            ],
-            nextStepActions: [
-                {
-                    type: "HighlightElement",
-                    elementId: "martyMode",
-                    hexColor: "#855cd659",
-                    onClickAction: "NextStep"
-                }
-            ],
-            hintActions: [
-            ],
-            buttons: ["previous", "readAloud", "next"],
-            expectedCode: [],
-            presenter: "marty"
-        },
-        /* STEP 7 -- add onmessage block */
-        {
-            instructionActions: [
-                {
-                    type: "ShowInstructorText",
-                    text: Localization.localize("COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK"),
-                }
-            ],
-            nextStepActions: [
-                {
-                    type: "ShowMartyMode",
-                },
-                {
-                    type: "ShowCategory",
-                    category: "marty-start"
-                },
-                {
-                    type: "HighlightBlocks",
-                    blocks: ["onmessage_block"]
-                }
-            ],
-            hintActions: [
-                {
-                    type: "ShowMartyMode",
-                },
-                {
-                    type: "ShowCategory",
-                    category: "marty-start"
-                },
-                {
-                    type: "HighlightBlocks",
-                    blocks: ["onmessage_block"]
-                },
-                {
-                    type: "DragBlockToScriptArea",
-                    block: "onmessage_block",
-                }
-            ],
-            buttons: ["previous", "readAloud", "next", "hint"],
-            expectedCode: ["onmessage"],
-            presenter: "marty"
-        },
-        /* STEP 8 -- go to marty motion blocks */
+        /* STEP 4 -- go to marty motion blocks */
         {
             instructionActions: [
                 {
@@ -366,7 +254,7 @@ const cogAndMartyTutorial = {
             expectedCode: [],
             presenter: "marty"
         },
-        /* STEP 9 -- add marty dance block */
+        /* STEP 5 -- add marty dance block after the Cog trigger */
         {
             instructionActions: [
                 {
@@ -405,10 +293,10 @@ const cogAndMartyTutorial = {
                 }
             ],
             buttons: ["previous", "readAloud", "next", "hint"],
-            expectedCode: ["onmessage=>martyDance"],
+            expectedCode: ["ontouchcog=>martyDance"],
             presenter: "marty"
         },
-        /* STEP 10 -- end */
+        /* STEP 6 -- end */
         {
             instructionActions: [
                 {

@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "現在讓我們轉到 Marty。我們需要啟用 Marty 模式才能查看 Marty 積木。點擊 Marty 模式按鈕。",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "進入 Marty 模式後，將「on message」積木從 Marty Start 類別拖曳到腳本區域。該積木將監聽 Cog 發送的訊息。",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "現在，讓我們選擇 Marty 的運動積木。點選 Marty 積木的「運動」類別。",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "快完成了！將“Marty Dance”積木拖到腳本區域。這個積木會讓 Marty 在收到消息時跳舞。",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "快完成了！將「Marty Dance」積木連接到「on touch cog」積木下方。按下 Cog 的按鈕時，Marty 就會跳舞。",
   "COG_AND_MARTY_TUTORIAL_END": "太棒了！你成功寫了 Cog 和 Marty 之間的互動程式碼。現在點擊 Cog 的按鈕，就能看到 Marty 跳舞啦！",
   "COG_JRBLOCKS1_TITLE": "1. 創作一首曲子",
   "COG_JRBLOCKS1_STEP_1_TEXT": "讓我們讓 Cog 演奏一段曲子吧！",

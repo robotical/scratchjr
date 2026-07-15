@@ -3,6 +3,7 @@ import { setMainLandmark, setNavigationLandmark, setSelectedState } from "../uti
 import Localization from "../utils/Localization";
 import OS from "../tablet/OS";
 import Lobby from "../lobby/Lobby";
+import goToLink from "../utils/goToLink";
 
 export function homeMain() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -15,7 +16,7 @@ export function homeMain() {
       tutorialReturnPlace: urlParams.get("tutorialReturnPlace") || "book",
       tutorialReturnSubmenu: urlParams.get("tutorialReturnSubmenu") || "tutorials"
     });
-    window.location.href = `editor.html?${editorParams.toString()}`;
+    goToLink(`editor.html?${editorParams.toString()}`);
     return;
   }
   showHostBackControls();

@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "Laten we nu naar Marty gaan. We moeten de Marty-modus inschakelen om de Marty-blokken te zien. Klik op de Marty-modusknop.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "In de Marty-modus sleep je het blok 'op bericht' van de categorie Marty Start naar het scriptgebied. Dit blok luistert naar het bericht dat door Cog is verzonden.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "Laten we nu Marty's bewegingsblokken selecteren. Klik op de categorie Beweging van Marty-blokken.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "We zijn er bijna! Sleep het blok 'Marty Dance' naar het scriptgebied. Dit blok zorgt ervoor dat Marty gaat dansen wanneer het bericht wordt ontvangen.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "We zijn er bijna! Sleep het blok 'Marty Dance' onder het blok 'on touch cog'. Marty danst wanneer de knop van Cog wordt ingedrukt.",
   "COG_AND_MARTY_TUTORIAL_END": "Goed gedaan! Je hebt Cog en Marty succesvol geprogrammeerd om met elkaar te communiceren. Klik nu op Cogs knop om Marty te zien dansen!",
   "COG_JRBLOCKS1_TITLE": "1. Maak een melodie",
   "COG_JRBLOCKS1_STEP_1_TEXT": "Laten we Cog een liedje laten spelen!",

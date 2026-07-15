@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "Siirrytään nyt Martyyn. Meidän on otettava Marty-tila käyttöön nähdäksemme Marty-palikat. Klikkaa Marty-tila-painiketta.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "Kun olet Marty-tilassa, vedä 'viestistä' -lohko Marty Start -kategoriasta skriptialueelle. Tämä lohko kuuntelee Cogin lähettämää viestiä.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "Valitaan nyt Martyn liikepalikat. Klikkaa Martyn palikoiden Liike-luokkaa.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Olemme melkein perillä! Vedä 'Marty Dance' -lohko skriptialueelle. Tämä lohko saa Martyn tanssimaan, kun viesti vastaanotetaan.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Olemme melkein perillä! Vedä 'Marty Dance' -lohko 'on touch cog' -lohkon alle. Marty tanssii, kun Cogin painiketta painetaan.",
   "COG_AND_MARTY_TUTORIAL_END": "Hienoa työtä! Olet onnistuneesti koodannut Cogin ja Martyn vuorovaikuttamaan keskenään. Klikkaa nyt Cogin painiketta nähdäksesi Martyn tanssivan!",
   "COG_JRBLOCKS1_TITLE": "1. Tee sävelmä",
   "COG_JRBLOCKS1_STEP_1_TEXT": "Laitetaan Cog soittamaan sävelmä!",

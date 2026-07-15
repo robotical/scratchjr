@@ -345,7 +345,7 @@ function indexGohome() {
       }
     });
     const homeUrl = homeParams.toString() ? `home.html?${homeParams.toString()}` : "home.html";
-    window.location.href = homeUrl;
+    goToLink(homeUrl);
   }
 }
 

@@ -3,6 +3,7 @@ import { moveFocusByKey, setMainLandmark, setSelectedState } from '../utils/acce
 import Localization from '../utils/Localization';
 import TutorialFetcher from '../tutorial/TutorialFetcher';
 import { BLOCK_GUIDE_EXTENSION, BLOCK_GUIDE_MODES } from '../editor/blocks/BlockGuideRegistry';
+import goToLink from '../utils/goToLink';
 
 function getNavigationHref(baseHref, fileName, query) {
     const cleanHref = baseHref.split('#')[0].split('?')[0];
@@ -17,16 +18,18 @@ function getNavigationHref(baseHref, fileName, query) {
 }
 
 function navigateFromTutorials(fileName, query) {
+    const href = getNavigationHref(window.location.href, fileName, query);
+
     try {
         if (window.parent && window.parent !== window) {
-            window.parent.location.href = getNavigationHref(window.parent.location.href, fileName, query);
+            goToLink(href, window.parent);
             return;
         }
     } catch (e) {
         console.log(e);
     }
 
-    window.location.href = getNavigationHref(window.location.href, fileName, query);
+    goToLink(href);
 }
 
 function setupGuidePage() {

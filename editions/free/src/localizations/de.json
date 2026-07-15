@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "Kommen wir nun zu Marty. Um die Marty-Blöcke sehen zu können, müssen wir den Marty-Modus aktivieren. Klicken Sie auf die Schaltfläche „Marty-Modus“.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "Im Marty-Modus ziehen Sie den Block „Bei Nachricht“ aus der Kategorie „Marty-Start“ in den Skriptbereich. Dieser Block wartet auf die von Cog gesendete Nachricht.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "Wählen wir nun Martys Bewegungsblöcke aus. Klicken Sie auf die Kategorie „Bewegung“ der Marty-Blöcke.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Wir sind fast da! Ziehe den Block „Marty Dance“ in den Skriptbereich. Dieser Block lässt Marty tanzen, wenn die Nachricht empfangen wird.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Wir sind fast da! Ziehe den Block „Marty Dance“ unter den Block „on touch cog“. Marty tanzt, wenn Cogs Taste gedrückt wird.",
   "COG_AND_MARTY_TUTORIAL_END": "Super gemacht! Du hast Cog und Marty erfolgreich so programmiert, dass sie miteinander interagieren. Klick jetzt auf Cogs Button, um Marty tanzen zu sehen!",
   "COG_JRBLOCKS1_TITLE": "1. Machen Sie eine Melodie",
   "COG_JRBLOCKS1_STEP_1_TEXT": "Lassen wir Cog eine Melodie spielen!",

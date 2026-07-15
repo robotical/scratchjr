@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "이제 Marty로 넘어가 볼까요? Marty 블록을 보려면 Marty Mode를 활성화해야 합니다. Marty Mode 버튼을 클릭하세요.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "Marty Mode에 진입하면 Marty Start 카테고리에서 '메시지 수신' 블록을 스크립트 영역으로 드래그하세요. 이 블록은 Cog에서 전송된 메시지를 수신합니다.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "이제 Marty의 동작 블록을 선택해 보겠습니다. Marty 블록의 동작 카테고리를 클릭하세요.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "거의 다 왔어요! '마티 댄스' 블록을 스크립트 영역으로 끌어다 놓으세요. 이 블록은 메시지를 받으면 마티가 춤을 추도록 합니다.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "거의 다 왔어요! '마티 댄스' 블록을 'on touch cog' 블록 아래에 연결하세요. Cog의 버튼을 누르면 마티가 춤을 춥니다.",
   "COG_AND_MARTY_TUTORIAL_END": "잘했어요! Cog와 Marty가 서로 소통하도록 코딩이 완료되었습니다. 이제 Cog의 버튼을 클릭하여 Marty가 춤추는 모습을 감상해 보세요!",
   "COG_JRBLOCKS1_TITLE": "1. 곡을 만들어 보세요",
   "COG_JRBLOCKS1_STEP_1_TEXT": "코그에게 곡을 연주하게 해 보자!",

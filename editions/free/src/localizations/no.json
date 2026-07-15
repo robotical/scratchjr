@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "La oss nå flytte til Marty. Vi må aktivere Marty Mode for å se Marty-blokkene. Klikk på Marty Mode-knappen.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "Når du er i Marty-modus, drar du \"on message\"-blokken fra Marty Start-kategorien til skriptområdet. Denne blokken vil lytte etter meldingen sendt av Cog.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "La oss nå velge Martys bevegelsesblokker. Klikk på bevegelseskategorien til Marty-blokker.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Vi er nesten der! Dra 'Marty Dance'-blokken til manusområdet. Denne blokken vil få Marty til å danse når meldingen mottas.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Vi er nesten der! Dra 'Marty Dance'-blokken under 'on touch cog'-blokken. Marty danser når du trykker på knappen på Cog.",
   "COG_AND_MARTY_TUTORIAL_END": "Flott jobb! Du har kodet Cog og Marty til å samhandle med hverandre. Klikk nå på Cogs-knappen for å se Marty danse!",
   "COG_JRBLOCKS1_TITLE": "1. Lag en melodi",
   "COG_JRBLOCKS1_STEP_1_TEXT": "La oss få Cog til å spille en melodi!",

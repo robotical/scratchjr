@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "Nyní se přesuňme k Martymu. Abychom viděli Martyho bloky, musíme povolit Martyho režim. Klikněte na tlačítko Martyho režim.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "V režimu Marty přetáhněte blok „on message“ z kategorie Marty Start do oblasti skriptů. Tento blok bude naslouchat zprávám odeslaným Cogem.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "Nyní si vybereme Martyho pohybové bloky. Klikneme na kategorii Pohyb mezi Martyho bloky.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Už jsme skoro tam! Přetáhněte blok „Marty Dance“ do oblasti skriptu. Tento blok roztančí Martyho, až bude zpráva přijata.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Už jsme skoro tam! Přetáhněte blok „Marty Dance“ pod blok „on touch cog“. Marty začne tančit po stisknutí tlačítka na Cogu.",
   "COG_AND_MARTY_TUTORIAL_END": "Skvělá práce! Úspěšně jste naprogramovali Cog a Martyho, aby spolu interagovali. Nyní klikněte na Cogovo tlačítko a uvidíte Martyho tančit!",
   "COG_JRBLOCKS1_TITLE": "1. Vytvořte melodii",
   "COG_JRBLOCKS1_STEP_1_TEXT": "Nechme Coga zahrát melodii!",

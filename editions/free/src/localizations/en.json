@@ -672,7 +672,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "Now let's move to Marty. We need to enable Marty Mode to see the Marty blocks. Click on the Marty Mode button.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "Once in Marty Mode, drag the 'on message' block from the Marty Start category to the script area. This block will listen for the message sent by Cog.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "Now, let's select Marty's motion blocks. Click on the Motion category of Marty blocks.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "We're almost there! Drag the 'Marty Dance' block to the script area. This block will make Marty dance when the message is received.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "We're almost there! Drag the 'Marty Dance' block beneath the 'on touch cog' block. Marty will dance when Cog's button is pressed.",
   "COG_AND_MARTY_TUTORIAL_END": "Great job! You have successfully coded Cog and Marty to interact with each other. Now click Cog's button to see Marty dance!",
   "COG_JRBLOCKS1_TITLE": "1. Make a tune",
   "COG_JRBLOCKS1_STEP_1_TEXT": "Let's make Cog play a tune!",

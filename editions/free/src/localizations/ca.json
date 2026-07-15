@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "Ara passem a Marty. Hem d'habilitar el mode Marty per veure els blocs de Marty. Feu clic al botó Mode Marty.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "Un cop al mode Marty, arrossegueu el bloc \"missatge activat\" des de la categoria Inici de Marty a l'àrea d'script. Aquest bloc escoltarà el missatge enviat per Cog.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "Ara, seleccionem els blocs de moviment de Marty. Feu clic a la categoria de moviment dels blocs Marty.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Ja gairebé hi som! Arrossegueu el bloc \"Marty Dance\" a l'àrea de guió. Aquest bloc farà ballar en Marty quan es rebi el missatge.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Ja gairebé hi som! Arrossegueu el bloc \"Marty Dance\" sota el bloc \"on touch cog\". En Marty ballarà quan es premi el botó d'en Cog.",
   "COG_AND_MARTY_TUTORIAL_END": "Gran feina! Heu codificat correctament Cog i Marty per interactuar entre ells. Ara feu clic al botó de Cog per veure en Marty ballar!",
   "COG_JRBLOCKS1_TITLE": "1. Fes una melodia",
   "COG_JRBLOCKS1_STEP_1_TEXT": "Fem que Cog toqui una melodia!",

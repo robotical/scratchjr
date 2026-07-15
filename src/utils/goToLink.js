@@ -1,14 +1,18 @@
-export default function goToLink(hrefFile) {
-    // checks if href file gets redirected, if it does, 
+export default function goToLink (hrefFile, targetWindow = window) {
+    // checks if href file gets redirected, if it does,
     // it uses the href (browser), otherwise (phone)
     // it uses the file
-    const href = hrefFile.replace(".html", "");
+    const href = hrefFile.replace('.html', '');
+    const navigate = (destination) => {
+        targetWindow.location.href = destination;
+    };
+
     try {
-        fetch(hrefFile).then(response => {
-            if (response.redirected) window.location.href = href;
-            else window.location.href = hrefFile;
-        }).catch(_ => window.location.href = hrefFile);
+        return fetch(hrefFile).then(response => {
+            navigate(response.redirected ? href : hrefFile);
+        }).catch(() => navigate(hrefFile));
     } catch(e) {
-        window.location.href = hrefFile;
+        navigate(hrefFile);
+        return Promise.resolve();
     }
 }

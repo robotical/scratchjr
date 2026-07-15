@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "Nawr, gadewch i ni symud i Marty. Mae angen i ni alluogi Marty Mode i weld y blociau Marty. Cliciwch ar y botwm Marty Mode.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "Unwaith y byddwch yn Marty Mode, llusgwch y bloc 'ar neges' o'r categori Marty Start i'r ardal sgript. Bydd y bloc hwn yn gwrando am y neges a anfonwyd gan Cog.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "Nawr, gadewch i ni ddewis blociau cynnig Marty. Cliciwch ar y categori Cynnig o flociau Marty.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Rydyn ni bron yno! Llusgwch y bloc 'Marty Dance' i'r ardal sgript. Bydd y bloc hwn yn gwneud i Marty ddawnsio pan dderbynnir y neges.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Rydyn ni bron yno! Llusgwch y bloc 'Marty Dance' o dan y bloc 'on touch cog'. Bydd Marty yn dawnsio pan fydd botwm Cog yn cael ei wasgu.",
   "COG_AND_MARTY_TUTORIAL_END": "Gwaith gwych! Rydych chi wedi codio Cog and Marty yn llwyddiannus i ryngweithio â'ch gilydd. Nawr cliciwch ar fotwm Cog i weld Marty yn dawnsio!",
   "COG_JRBLOCKS1_TITLE": "1. Gwnewch dôn",
   "COG_JRBLOCKS1_STEP_1_TEXT": "Gadewch i ni wneud i Cog chwarae alaw!",

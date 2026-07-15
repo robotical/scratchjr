@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "Ahora pasemos a Marty. Necesitamos activar el Modo Marty para ver los bloques de Marty. Haz clic en el botón Modo Marty.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "Una vez en Modo Marty, arrastra el bloque \"en el mensaje\" desde la categoría Inicio de Marty hasta el área de script. Este bloque escuchará el mensaje enviado por Cog.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "Ahora, seleccionemos los bloques de movimiento de Marty. Haga clic en la categoría \"Movimiento\" de los bloques de Marty.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "¡Ya casi terminamos! Arrastra el bloque \"Marty Dance\" al área del script. Este bloque hará que Marty baile al recibir el mensaje.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "¡Ya casi terminamos! Arrastra el bloque \"Marty Dance\" debajo del bloque \"on touch cog\". Marty bailará cuando se pulse el botón de Cog.",
   "COG_AND_MARTY_TUTORIAL_END": "¡Excelente trabajo! Has programado con éxito a Cog y Marty para que interactúen. ¡Ahora haz clic en el botón de Cog para ver bailar a Marty!",
   "COG_JRBLOCKS1_TITLE": "1. Hacer una melodía",
   "COG_JRBLOCKS1_STEP_1_TEXT": "¡Hagamos que Cog toque una melodía!",

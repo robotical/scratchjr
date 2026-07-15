@@ -599,7 +599,7 @@
   "COG_AND_MARTY_TUTORIAL_MARTY_MODE": "Şimdi Marty'ye geçelim. Marty bloklarını görmek için Marty Modunu etkinleştirmemiz gerekiyor. Marty Modu düğmesine tıklayın.",
   "COG_AND_MARTY_TUTORIAL_ONMESSAGE_BLOCK": "Marty Modu'ndayken, 'on message' bloğunu Marty Start kategorisinden script alanına sürükleyin. Bu blok Cog tarafından gönderilen mesajı dinleyecektir.",
   "COG_AND_MARTY_TUTORIAL_MARTY_MOTION_BLOCKS": "Şimdi Marty'nin hareket bloklarını seçelim. Marty bloklarının Hareket kategorisine tıklayın.",
-  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Neredeyse oradayız! 'Marty Dance' bloğunu script alanına sürükleyin. Bu blok, mesaj alındığında Marty'nin dans etmesini sağlayacak.",
+  "COG_AND_MARTY_TUTORIAL_MARTY_DANCE_BLOCK": "Neredeyse oradayız! 'Marty Dance' bloğunu 'on touch cog' bloğunun altına sürükleyin. Cog'un düğmesine basıldığında Marty dans edecek.",
   "COG_AND_MARTY_TUTORIAL_END": "Harika iş! Cog ve Marty'yi birbirleriyle etkileşime girecek şekilde başarıyla kodladınız. Şimdi Marty'nin dansını görmek için Cog'un düğmesine tıklayın!",
   "COG_JRBLOCKS1_TITLE": "1. Bir melodi yap",
   "COG_JRBLOCKS1_STEP_1_TEXT": "Haydi Cog'a bir şarkı çaldıralım!",
