@@ -4,17 +4,32 @@ import Localization from "../utils/Localization";
 import OS from "../tablet/OS";
 import Lobby from "../lobby/Lobby";
 import goToLink from "../utils/goToLink";
+import {
+  CURRICULUM_ARTIFACT_SHA256_PARAM,
+  CURRICULUM_ARTIFACT_URL_PARAM,
+} from "../editor/CurriculumArtifact";
 
 export function homeMain() {
   const urlParams = new URLSearchParams(window.location.search);
-  /*Tutorial*/
-  if (urlParams.get("tutorial")) {
+  const hasTutorial = Boolean(urlParams.get("tutorial"));
+  const hasCurriculumArtifact = urlParams.has(CURRICULUM_ARTIFACT_URL_PARAM) ||
+    urlParams.has(CURRICULUM_ARTIFACT_SHA256_PARAM);
+  /*Tutorial and curriculum artifacts open directly in the editor.*/
+  if (hasTutorial || hasCurriculumArtifact) {
     const editorParams = new URLSearchParams({
       pmd5: "-1",
       mode: "edit",
-      tutorial: urlParams.get("tutorial"),
-      tutorialReturnPlace: urlParams.get("tutorialReturnPlace") || "book",
-      tutorialReturnSubmenu: urlParams.get("tutorialReturnSubmenu") || "tutorials"
+    });
+    if (hasTutorial) {
+      editorParams.set("tutorial", urlParams.get("tutorial"));
+      editorParams.set("tutorialReturnPlace", urlParams.get("tutorialReturnPlace") || "book");
+      editorParams.set("tutorialReturnSubmenu", urlParams.get("tutorialReturnSubmenu") || "tutorials");
+    }
+    [CURRICULUM_ARTIFACT_URL_PARAM, CURRICULUM_ARTIFACT_SHA256_PARAM].forEach(function (key) {
+      const value = urlParams.get(key);
+      if (value) {
+        editorParams.set(key, value);
+      }
     });
     goToLink(`editor.html?${editorParams.toString()}`);
     return;

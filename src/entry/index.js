@@ -5,6 +5,10 @@ import UI from "../editor/ui/UI";
 import Localization from "../utils/Localization";
 import InitialOptions from "../utils/InitialOptions";
 import goToLink from "../utils/goToLink";
+import {
+  CURRICULUM_ARTIFACT_SHA256_PARAM,
+  CURRICULUM_ARTIFACT_URL_PARAM,
+} from "../editor/CurriculumArtifact";
 
 /*
 When this code starts up, there are several scenarios:
@@ -338,7 +342,13 @@ function indexGohome() {
   function doNext() {
     const currentParams = new URLSearchParams(window.location.search);
     const homeParams = new URLSearchParams();
-    ["tutorial", "tutorialReturnPlace", "tutorialReturnSubmenu"].forEach((key) => {
+    [
+      "tutorial",
+      "tutorialReturnPlace",
+      "tutorialReturnSubmenu",
+      CURRICULUM_ARTIFACT_URL_PARAM,
+      CURRICULUM_ARTIFACT_SHA256_PARAM,
+    ].forEach((key) => {
       const value = currentParams.get(key);
       if (value) {
         homeParams.set(key, value);

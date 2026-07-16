@@ -30,6 +30,8 @@
     left: ${5 * scaleMultiplier}px;
     width: ${css_vh(25)};
     height: ${css_vh(18.75)};
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
 }
 
 .aproject.empty {
@@ -160,6 +162,167 @@
 .card-action-delete {
     left: auto;
     right: 8px;
+}
+
+.project-options-button {
+    position: absolute;
+    top: ${css_vh(1.1)};
+    right: ${css_vh(0.8)};
+    z-index: 8;
+    width: ${css_vh(5.2)};
+    height: ${css_vh(5.2)};
+    padding: 0 0 ${css_vh(1.1)};
+    border: 2px solid #315F7B;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 ${css_vh(0.25)} ${css_vh(0.55)} rgba(27, 62, 78, 0.35);
+    color: #315F7B;
+    cursor: pointer;
+    font-family: 'Lato Regular';
+    font-size: ${css_vh(4.2)};
+    font-weight: bold;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.project-options-button:hover,
+.project-options-button:focus-visible,
+.project-options-button[aria-expanded="true"] {
+    background: #EAF7FF;
+    outline: 3px solid #133C46;
+    outline-offset: 2px;
+}
+
+.project-options-menu {
+    position: absolute;
+    top: ${css_vh(6.7)};
+    right: ${css_vh(0.8)};
+    z-index: 20;
+    min-width: ${css_vh(18)};
+    padding: ${css_vh(0.7)};
+    border: 2px solid #315F7B;
+    border-radius: 12px;
+    background: #FFFDF7;
+    box-shadow: 0 ${css_vh(0.45)} ${css_vh(1.1)} rgba(27, 62, 78, 0.4);
+}
+
+.project-options-menu[hidden] {
+    display: none;
+}
+
+.project-options-delete {
+    display: flex;
+    align-items: center;
+    gap: ${css_vh(0.8)};
+    width: 100%;
+    min-height: ${css_vh(4.8)};
+    padding: ${css_vh(0.7)} ${css_vh(1)};
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #9E1F28;
+    cursor: pointer;
+    font-family: 'Lato Regular';
+    font-size: ${css_vh(1.8)};
+    font-weight: bold;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.project-options-delete:hover,
+.project-options-delete:focus-visible {
+    background: #FCE5E5;
+    outline: 3px solid #9E1F28;
+    outline-offset: -1px;
+}
+
+.project-options-delete-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: ${css_vh(2.6)};
+    height: ${css_vh(2.6)};
+    border-radius: 50%;
+    background: #E43D44;
+    color: #fff;
+    font-size: ${css_vh(1.8)};
+    line-height: 1;
+}
+
+.project-delete-dialog-backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 12000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: ${css_vh(3)};
+    background: rgba(27, 51, 66, 0.72);
+}
+
+.project-delete-dialog {
+    width: min(${css_vh(52)}, 90vw);
+    padding: ${css_vh(3)};
+    border: ${css_vh(0.4)} solid #315F7B;
+    border-radius: 18px;
+    background: #FFFDF7;
+    box-shadow: 0 ${css_vh(0.8)} ${css_vh(2)} rgba(0, 0, 0, 0.35);
+    text-align: center;
+}
+
+.project-delete-dialog-title {
+    margin: 0;
+    color: #315F7B;
+    font-family: 'Lato Regular';
+    font-size: ${css_vh(3.2)};
+    line-height: 1.2;
+}
+
+.project-delete-dialog-description {
+    margin: ${css_vh(1.6)} 0 0;
+    color: #416E86;
+    font-family: 'Lato Regular';
+    font-size: ${css_vh(2.1)};
+    line-height: 1.35;
+}
+
+.project-delete-dialog-actions {
+    display: flex;
+    justify-content: center;
+    gap: ${css_vh(1.4)};
+    margin-top: ${css_vh(2.6)};
+}
+
+.project-delete-cancel,
+.project-delete-confirm {
+    min-width: ${css_vh(14)};
+    min-height: ${css_vh(5.2)};
+    padding: ${css_vh(0.8)} ${css_vh(1.5)};
+    border: 2px solid #315F7B;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Lato Regular';
+    font-size: ${css_vh(1.9)};
+    font-weight: bold;
+}
+
+.project-delete-cancel {
+    background: #5D9CC8;
+}
+
+.project-delete-confirm {
+    border-color: #9E1F28;
+    background: #E43D44;
+}
+
+.project-delete-cancel:focus-visible,
+.project-delete-confirm:focus-visible {
+    outline: 3px solid #133C46;
+    outline-offset: 3px;
 }
 
 .closex {

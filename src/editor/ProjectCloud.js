@@ -106,12 +106,19 @@ async function ensureProjectFile(md5, base64) {
   }
   var existing = await fetchProjectFileBase64(md5);
   if (existing) {
+    if (existing !== base64) {
+      throw new Error("Project asset identifier collision: " + md5);
+    }
     return;
   }
   try {
-    await dataStoreInstance.writeProjectFile(md5, base64, { encoding: "base64" });
+    var result = await dataStoreInstance.writeProjectFile(md5, base64, { encoding: "base64" });
+    if (result === -1) {
+      throw new Error("Failed to persist project asset: " + md5);
+    }
   } catch (err) {
     console.warn("ProjectCloud: failed to persist asset", md5, err);
+    throw err;
   }
 }
 
@@ -142,6 +149,13 @@ function collectAssetIds(metadata) {
       }
       if (sprite.md5) {
         ids.push(sprite.md5);
+      }
+      if (sprite.animationFrames && sprite.animationFrames.length) {
+        for (var frame = 0; frame < sprite.animationFrames.length; frame++) {
+          if (sprite.animationFrames[frame]) {
+            ids.push(sprite.animationFrames[frame]);
+          }
+        }
       }
       if (!sprite.sounds || !sprite.sounds.length) {
         continue;

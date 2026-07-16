@@ -17,6 +17,9 @@
     "categoryStopColor": "#D62222",
     "paletteBlockShadowOpacity": 0.8,
     "autoSaveInterval": 30000,
+    "curriculumArtifactAllowedOrigins": [
+        "https://cdn.sanity.io"
+    ],
     "defaultLocale": "en",
     "defaultLocaleShort": "en",
     "supportedLocales": {
