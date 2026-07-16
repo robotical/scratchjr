@@ -25,9 +25,9 @@ import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
 import Scripts from '../ui/Scripts';
 import {
-    newHTML, newDiv, newP, gn,
+    newHTML, newButton, newDiv, newP, gn,
     setCanvasSizeScaledToWindowDocumentHeight,
-    DEGTOR, getIdFor, setProps, isTablet, isiOS,
+    DEGTOR, getIdFor, setProps, isTablet,
     isAndroid, fitInRect, scaleMultiplier, setCanvasSize,
     globaly, globalx, rgbToHex, WINDOW_INNER_HEIGHT
 } from '../../utils/lib';
@@ -1211,97 +1211,32 @@ export default class Sprite {
         ctx.textBaseline = 'top';
         ctx.fillText(this.str, 0, 0);
         this.setPos(this.xcoor, this.ycoor);
+        this.addTextDeleteButton();
     }
 
-    startShaking() {
-        var p = this.div.parentNode;
-        var shake = newHTML('div', 'shakeme', p);
-        shake.id = 'shakediv';
-
-        // TODO: merge these for iOS
-        if (isAndroid) {
-            setProps(shake.style, {
-                position: 'absolute',
-                left: this.screenLeft() + 'px',
-                top: this.screenTop() + 'px',
-                width: (this.w * this.scale) + 'px',
-                height: (this.h * this.scale) + 'px'
-            });
-        } else {
-            setProps(shake.style, {
-                position: 'absolute',
-                left: (this.screenLeft() / this.scale) + 'px',
-                top: (this.screenTop() / this.scale) + 'px',
-                width: this.w + 'px',
-                height: this.h + 'px',
-                zoom: Math.floor(this.scale * 100) + '%'
-            });
-        }
-        var mtx = 'translate3d(0px, 0px, 0px)';
-        if (this.img) {
-            mtx += ' rotate(' + this.angle + 'deg)';
-            if (this.flip) {
-                mtx += 'scale(' + -1 + ', ' + 1 + ')';
-            } else {
-                mtx += 'scale(' + 1 + ', ' + 1 + ')';
-            }
-        }
-        this.setTransform(mtx);
-        shake.appendChild(this.div);
-        var cb = newHTML('div', (this.type == 'sprite') ? 'deletesprite' : 'deletetext', shake);
-        if (isiOS && this.type == 'sprite') {
-            cb.style.zoom = Math.floor((1 / this.scale) * 100) + '%';
-        }
-        if ((globalx(cb) - globalx(ScratchJr.stage.div)) < 0) {
-            cb.style.left = Math.abs(globalx(cb) - globalx(ScratchJr.stage.div)) * this.scale + 'px';
-        }
-        if ((globaly(cb) - globaly(ScratchJr.stage.div)) < 0) {
-            cb.style.top = Math.abs(globaly(cb) - globaly(ScratchJr.stage.div)) * this.scale + 'px';
-        }
-        cb.id = 'deletesprite';
-        this.div = shake;
-        this.div.owner = this;
-    }
-
-    stopShaking() {
-        if (this.div.id != 'shakediv') {
+    addTextDeleteButton() {
+        if (this.type != 'text' || !ScratchJr.isEditable()) {
             return;
         }
-        var p = this.div;
-        this.div = this.div.childNodes[0];
-        ScratchJr.stage.currentPage.div.appendChild(this.div);
-        if (p.id == 'shakediv') {
-            p.parentNode.removeChild(p);
-        }
-
-        // TODO: merge these for iOS
-        if (isAndroid) {
-            this.render();
-        } else {
-            var mtx = 'translate3d(' + (this.xcoor - this.cx) + 'px,' + (this.ycoor - this.cy) + 'px, 0px)';
-            if (this.img) {
-                mtx += ' rotate(' + this.angle + 'deg)';
-                if (this.flip) {
-                    mtx += 'scale(' + -this.scale + ', ' + this.scale + ')';
-                } else {
-                    mtx += 'scale(' + this.scale + ', ' + this.scale + ')';
-                }
-            }
-            this.setTransform(mtx);
-        }
-    }
-
-    drawCloseButton() {
-        var ctx = this.div.getContext('2d');
-        var img = document.createElement('img');
-        img.src = 'assets/ui/closeit.svg';
-        if (!img.complete) {
-            img.onload = function () {
-                ctx.drawImage(0, 0);
-            };
-        } else {
-            ctx.drawImage(img, 0, 0);
-        }
+        var me = this;
+        var label = Localization.localize('A11Y_DELETE') + ' ' + (this.str || 'text');
+        var button = newButton('textsprite-delete-button', this.div, {
+            ariaLabel: label,
+            title: label
+        });
+        button.setAttribute('aria-controls', this.id);
+        button.style.left = Math.max(0, this.w - 12) + 'px';
+        var stopEvent = function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        };
+        button.onpointerdown = stopEvent;
+        button.ontouchstart = stopEvent;
+        button.oncontextmenu = stopEvent;
+        button.onclick = function (event) {
+            stopEvent(event);
+            ScratchJr.stage.removeSprite(me);
+        };
     }
 
     //////////////////////////////////////////

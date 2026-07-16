@@ -60,6 +60,11 @@ export default class Thumbs {
         return Localization.localize('LIBRARY_CHARACTER') + ' ' + spriteName;
     }
 
+    static getDeleteSpriteLabel(spriteName) {
+        return Localization.localize('A11Y_DELETE') + ' ' +
+            Localization.localize('LIBRARY_CHARACTER') + ' ' + spriteName;
+    }
+
     static focusWhenAvailable(selector, fallbackSelector) {
         window.setTimeout(function () {
             var target = document.querySelector(selector);
@@ -264,9 +269,6 @@ export default class Thumbs {
         }
         var row = newHTML('div', 'pageactionrow', container);
         row.setAttribute('data-owner', page.id);
-        if (ScratchJr.shaking && ScratchJr.shaking.owner == page.id) {
-            row.setAttribute('class', 'pageactionrow delete-mode');
-        }
         var label = Thumbs.getDuplicatePageLabel(page.num);
         var button = newButton('duplicatepage', row, {
             ariaLabel: label,
@@ -279,6 +281,17 @@ export default class Thumbs {
         };
         var icon = newHTML('span', 'duplicatepageicon', button);
         icon.setAttribute('aria-hidden', 'true');
+
+        var deleteLabel = Thumbs.getDeletePageLabel(page.num);
+        var deleteButton = newButton('deletepage', row, {
+            ariaLabel: deleteLabel,
+            title: deleteLabel
+        });
+        deleteButton.setAttribute('data-owner', page.id);
+        deleteButton.setAttribute('aria-controls', page.id);
+        deleteButton.onclick = function (event) {
+            Thumbs.deletePageAction(event, deleteButton.getAttribute('data-owner'));
+        };
     }
 
     static updateDuplicatePageButtons() {
@@ -295,17 +308,18 @@ export default class Thumbs {
             button.setAttribute('aria-label', label);
             button.setAttribute('title', label);
         }
-    }
 
-    static setDuplicatePageDeleteMode(pageId, enabled) {
-        var row = document.querySelector('#pageactions .pageactionrow[data-owner="' + pageId + '"]');
-        if (!row) {
-            return;
-        }
-        if (enabled) {
-            row.classList.add('delete-mode');
-        } else {
-            row.classList.remove('delete-mode');
+        var deleteButtons = document.querySelectorAll('#pageactions .deletepage');
+        var canDelete = ScratchJr.isEditable() && ScratchJr.stage.pages.length > 1;
+        for (var j = 0; j < deleteButtons.length; j++) {
+            var deleteButton = deleteButtons[j];
+            var deletePageId = deleteButton.getAttribute('data-owner');
+            var deletePageNumber = pageIds.indexOf(deletePageId) + 1;
+            var deleteLabel = Thumbs.getDeletePageLabel(deletePageNumber);
+            deleteButton.disabled = !canDelete;
+            deleteButton.setAttribute('aria-disabled', canDelete ? 'false' : 'true');
+            deleteButton.setAttribute('aria-label', deleteLabel);
+            deleteButton.setAttribute('title', deleteLabel);
         }
     }
 
@@ -343,12 +357,6 @@ export default class Thumbs {
             Thumbs.t = e.target;
         }
         var tb = Thumbs.getType(Thumbs.t, 'pagethumb');
-        if (ScratchJr.shaking && (e.target.className == 'deletethumb')) {
-            ScratchJr.clearSelection();
-            OS.analyticsEvent('editor', 'delete_scene');
-            ScratchJr.stage.deletePage(tb.owner);
-            return;
-        }
         if (ScratchJr.shaking) {
             ScratchJr.clearSelection();
             return;
@@ -360,7 +368,7 @@ export default class Thumbs {
             Thumbs.clickOnPage(e, tb.owner);
         } else {
             Events.startDrag(e, tb, Thumbs.prepareToDragPage, Thumbs.dropPage, Thumbs.draggingPage,
-                Thumbs.clickPage, Thumbs.startPageShaking);
+                Thumbs.clickPage);
         }
     }
 
@@ -616,8 +624,13 @@ export default class Thumbs {
     }
 
     static deletePageAction(event, pageId) {
-        event.preventDefault();
-        event.stopPropagation();
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        if (!pageId || !ScratchJr.isEditable() || ScratchJr.stage.pages.length < 2) {
+            return;
+        }
         ScratchJr.clearSelection();
         OS.analyticsEvent('editor', 'delete_scene');
         ScratchJr.stage.deletePage(pageId);
@@ -669,26 +682,6 @@ export default class Thumbs {
         );
     }
 
-
-    static startPageShaking(tb) {
-        ScratchJr.shaking = tb;
-        ScratchJr.stopShaking = Thumbs.stopPageShaking;
-        Thumbs.setDuplicatePageDeleteMode(tb.owner, true);
-        var cc = tb.getAttribute('class');
-        tb.setAttribute('class', cc + ' shakeme');
-        tb.childNodes[tb.childElementCount - 1].style.visibility = 'visible';
-    }
-
-
-    static stopPageShaking(b) {
-        Thumbs.setDuplicatePageDeleteMode(b.owner, false);
-        ScratchJr.shaking = undefined;
-        ScratchJr.stopShaking = undefined;
-        var cc = b.getAttribute('class');
-        cc = cc.substr(0, cc.length - 8);
-        b.setAttribute('class', cc);
-        b.childNodes[b.childElementCount - 1].style.visibility = 'hidden';
-    }
 
     static emptyPage(p) {
         var tb = newHTML('div', 'pagethumb', p);
@@ -748,9 +741,13 @@ export default class Thumbs {
 
     static updateSprites() {
         var costumes = gn('spritecc');
+        var spriteActions = gn('spriteactions');
         costumes.style.top = '0px';
         while (costumes.childElementCount > 0) {
             costumes.removeChild(costumes.childNodes[0]);
+        }
+        while (spriteActions && spriteActions.childElementCount > 0) {
+            spriteActions.removeChild(spriteActions.childNodes[0]);
         }
         if (ScratchJr.isMartyModeEnabled) {
             Thumbs.createMartyModeCard(costumes);
@@ -773,6 +770,9 @@ export default class Thumbs {
             } else {
                 if (th) Thumbs.unhighlighSprite(th);
             }
+            if (th && th.style.display != 'none') {
+                Thumbs.addSpriteDeleteButton(spriteActions, spr);
+            }
         }
         if (!ScratchJr.getSprite()) {
             ScratchJr.stage.currentPage.setCurrentSprite(undefined);
@@ -790,12 +790,17 @@ export default class Thumbs {
         }
         if (spr.thumbnail) {
             spr.updateSpriteThumb();
+            Thumbs.updateSpriteDeleteButton(spr);
         } else {
             var costumes = gn('spritecc');
+            var spriteActions = gn('spriteactions');
             if (spr.type != 'sprite') {
                 return;
             }
-            spr.spriteThumbnail(costumes);
+            var newThumb = spr.spriteThumbnail(costumes);
+            if (newThumb && newThumb.style.display != 'none') {
+                Thumbs.addSpriteDeleteButton(spriteActions, spr);
+            }
             Thumbs.selectThisSprite(spr);
             UI.resetSpriteLibrary();
         }
@@ -830,11 +835,38 @@ export default class Thumbs {
     //  Sprite Thumbnails
     ////////////////////////////////////////////
 
-    static startDragThumb(e, tb) {
-        if (ScratchJr.shaking && (e.target.id == 'deletespritethumb')) {
-            ScratchJr.clearSelection();
-            ScratchJr.stage.removeSprite(gn(tb.owner).owner);
+    static addSpriteDeleteButton(container, spr) {
+        if (!container || !spr || !ScratchJr.isEditable()) {
+            return;
         }
+        var row = newHTML('div', 'spriteactionrow', container);
+        row.setAttribute('data-owner', spr.id);
+        var label = Thumbs.getDeleteSpriteLabel(spr.name);
+        var button = newButton('deletespritethumb', row, {
+            ariaLabel: label,
+            title: label
+        });
+        button.setAttribute('data-owner', spr.id);
+        button.setAttribute('aria-controls', spr.id);
+        button.onclick = function (event) {
+            Thumbs.deleteSpriteAction(event, button.getAttribute('data-owner'));
+        };
+    }
+
+    static updateSpriteDeleteButton(spr) {
+        if (!spr) {
+            return;
+        }
+        var button = document.querySelector('#spriteactions .deletespritethumb[data-owner="' + spr.id + '"]');
+        if (!button) {
+            return;
+        }
+        var label = Thumbs.getDeleteSpriteLabel(spr.name);
+        button.setAttribute('aria-label', label);
+        button.setAttribute('title', label);
+    }
+
+    static startDragThumb(e, tb) {
         if (ScratchJr.shaking) {
             ScratchJr.clearSelection();
         }
@@ -842,31 +874,7 @@ export default class Thumbs {
             Thumbs.clickOnSprite(e, tb);
         } else {
             Events.startDrag(e, tb, Thumbs.prepareToDrag, Thumbs.drop,
-                Thumbs.dragging, Thumbs.click, Thumbs.startCharShaking);
-        }
-    }
-
-    static startCharShaking(tb) {
-        if (!tb) {
-            return;
-        }
-        ScratchJr.shaking = tb;
-        ScratchJr.stopShaking = Thumbs.stopCharShaking;
-        var cc = tb.getAttribute('class');
-        tb.setAttribute('class', cc + ' shakethumb');
-        var close = newHTML('div', 'deletespritethumb', tb);
-        close.id = 'deletespritethumb';
-    }
-
-    static stopCharShaking(b) {
-        ScratchJr.shaking = undefined;
-        ScratchJr.stopShaking = undefined;
-        var cc = b.getAttribute('class');
-        cc = cc.substr(0, cc.length - 8);
-        b.setAttribute('class', cc);
-        var ic = b.childNodes[b.childElementCount - 1];
-        if (ic.getAttribute('class') == 'deletespritethumb') {
-            b.removeChild(ic);
+                Thumbs.dragging, Thumbs.click);
         }
     }
 
@@ -884,11 +892,6 @@ export default class Thumbs {
     }
 
     static clickOnSprite(e, el) {
-        if (ScratchJr.shaking && (ScratchJr.shaking == el)) {
-            ScratchJr.clearSelection();
-            ScratchJr.stage.removeSprite(gn(el.owner).owner);
-            return;
-        }
         var spritename = el.owner;
         if (!gn(spritename)) {
             return;
@@ -906,8 +909,10 @@ export default class Thumbs {
     }
 
     static deleteSpriteAction(event, spriteId) {
-        event.preventDefault();
-        event.stopPropagation();
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
         if (!gn(spriteId)) {
             return;
         }

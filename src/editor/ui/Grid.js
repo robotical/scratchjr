@@ -201,9 +201,6 @@ export default class Grid {
         };
         Events.dragthumbnail = spr.div;
         Events.clearEvents();
-        if (!ScratchJr.inFullscreen && spr) {
-            Events.holdit(spr.div, ScratchJr.stage.startShaking);
-        }
         ScratchJr.stage.setEvents();
     }
 

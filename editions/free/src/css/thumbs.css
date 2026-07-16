@@ -3,7 +3,7 @@
     position: relative;
     margin: 0px;
     padding: 0px;
-    width: ${css_vw(21.68)};
+    width: ${css_vh(28.91)};
     height: ${css_vh(26.04)};
     vertical-align: top;
 }
@@ -159,94 +159,43 @@
     left: 8px;
 }
 
-.card-action-delete {
-    left: auto;
-    right: 8px;
-}
-
-.project-options-button {
+.project-delete-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: absolute;
     top: ${css_vh(1.1)};
     right: ${css_vh(0.8)};
     z-index: 8;
     width: ${css_vh(5.2)};
     height: ${css_vh(5.2)};
-    padding: 0 0 ${css_vh(1.1)};
-    border: 2px solid #315F7B;
+    padding: 0 0 ${css_vh(0.3)};
+    border: 2px solid #fff;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow: 0 ${css_vh(0.25)} ${css_vh(0.55)} rgba(27, 62, 78, 0.35);
-    color: #315F7B;
+    background: #E43D44;
+    box-shadow: 0 0 0 2px #9E1F28, 0 ${css_vh(0.25)} ${css_vh(0.55)} rgba(27, 62, 78, 0.35);
+    color: #fff;
     cursor: pointer;
     font-family: 'Lato Regular';
-    font-size: ${css_vh(4.2)};
+    font-size: ${css_vh(3.8)};
     font-weight: bold;
     line-height: 1;
+    opacity: 0.55;
+    transition: opacity 0.15s ease, transform 0.1s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
-.project-options-button:hover,
-.project-options-button:focus-visible,
-.project-options-button[aria-expanded="true"] {
-    background: #EAF7FF;
+.project-delete-button:hover,
+.project-delete-button:focus-visible {
+    background: #C92F37;
+    opacity: 1;
     outline: 3px solid #133C46;
-    outline-offset: 2px;
+    outline-offset: 3px;
 }
 
-.project-options-menu {
-    position: absolute;
-    top: ${css_vh(6.7)};
-    right: ${css_vh(0.8)};
-    z-index: 20;
-    min-width: ${css_vh(18)};
-    padding: ${css_vh(0.7)};
-    border: 2px solid #315F7B;
-    border-radius: 12px;
-    background: #FFFDF7;
-    box-shadow: 0 ${css_vh(0.45)} ${css_vh(1.1)} rgba(27, 62, 78, 0.4);
-}
-
-.project-options-menu[hidden] {
-    display: none;
-}
-
-.project-options-delete {
-    display: flex;
-    align-items: center;
-    gap: ${css_vh(0.8)};
-    width: 100%;
-    min-height: ${css_vh(4.8)};
-    padding: ${css_vh(0.7)} ${css_vh(1)};
-    border: 0;
-    border-radius: 8px;
-    background: transparent;
-    color: #9E1F28;
-    cursor: pointer;
-    font-family: 'Lato Regular';
-    font-size: ${css_vh(1.8)};
-    font-weight: bold;
-    text-align: left;
-    white-space: nowrap;
-}
-
-.project-options-delete:hover,
-.project-options-delete:focus-visible {
-    background: #FCE5E5;
-    outline: 3px solid #9E1F28;
-    outline-offset: -1px;
-}
-
-.project-options-delete-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: ${css_vh(2.6)};
-    height: ${css_vh(2.6)};
-    border-radius: 50%;
-    background: #E43D44;
-    color: #fff;
-    font-size: ${css_vh(1.8)};
-    line-height: 1;
+.project-delete-button:active {
+    opacity: 1;
+    transform: scale(0.94);
 }
 
 .project-delete-dialog-backdrop {
@@ -264,7 +213,9 @@
 }
 
 .project-delete-dialog {
-    width: min(${css_vh(52)}, 90vw);
+    box-sizing: border-box;
+    width: ${css_vh(52)};
+    max-width: 90vw;
     padding: ${css_vh(3)};
     border: ${css_vh(0.4)} solid #315F7B;
     border-radius: 18px;
@@ -323,18 +274,6 @@
 .project-delete-confirm:focus-visible {
     outline: 3px solid #133C46;
     outline-offset: 3px;
-}
-
-.closex {
-    position: relative;
-    float: left;
-    top: ${css_vh(-54.17)};
-    z-index: 5;
-    visibility: hidden;
-    width: ${css_vh(5.86)};
-    height: ${css_vh(5.73)};
-    background:  url('../assets/ui/closeit.svg');
-    background-size: 101%;
 }
 
 .share {

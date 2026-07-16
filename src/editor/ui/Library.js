@@ -8,16 +8,14 @@ import Events from '../../utils/Events';
 import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
 import Alert from './Alert';
-import {gn, newHTML, scaleMultiplier,
+import {gn, newHTML, newButton, scaleMultiplier,
     getDocumentWidth, getDocumentHeight, setProps, newCanvas, frame,
     isTablet} from '../../utils/lib';
 
 let selectedOne;
 let nativeJr = true;
 let clickThumb;
-let shaking;
 let type;
-let timeoutEvent;
 let libFrame;
 let headerButtons;
 let uploadButton;
@@ -260,6 +258,9 @@ export default class Library {
         function drawMe (dataurl) {
             img.src = dataurl;
         }
+        if (tb.byme && tb.id != 'none') {
+            Library.addAssetDeleteButton(tb);
+        }
         // tb.ontouchstart = function (evt) {
         //     fcn(evt, tb);
         // };
@@ -276,6 +277,28 @@ export default class Library {
             };
         }
         return tb;
+    }
+
+    static addAssetDeleteButton (tb) {
+        var assetType = type == 'costumes' ?
+            Localization.localize('LIBRARY_CHARACTER') : Localization.localize('LIBRARY_BACKGROUND');
+        var assetName = tb.fieldname || assetType;
+        var label = Localization.localize('A11Y_DELETE') + ' ' + assetName;
+        var button = newButton('asset-delete-button', tb, {
+            ariaLabel: label,
+            title: label
+        });
+        var stopEvent = function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        };
+        button.onpointerdown = stopEvent;
+        button.ontouchstart = stopEvent;
+        button.oncontextmenu = stopEvent;
+        button.onclick = function (event) {
+            stopEvent(event);
+            Library.removeFromAssetList(tb);
+        };
     }
 
     static addLocalThumbChoose (parent, data, w, h, fcn) {
@@ -400,15 +423,6 @@ export default class Library {
 
     static selectAsset (e, tb) {
         tb.pt = JSON.stringify(Events.getTargetPoint(e));
-        if (shaking && (e.target.className == 'deleteasset')) {
-            Library.removeFromAssetList();
-            return;
-        } else if (shaking) {
-            Library.stopShaking();
-        }
-        if (tb.byme && (tb.id != 'none')) {
-            holdit(tb);
-        }
         tb.ontouchend = function (evt) {
             clickMe(evt, tb);
         };
@@ -424,21 +438,6 @@ export default class Library {
         window.onpointermove = function (evt) {
             clearEvents(evt, tb);
         };
-        function holdit () {
-            var repeat = function () {
-                tb.ontouchend = undefined;
-                // window.onmouseup = undefined;
-                // window.onmousemove = undefined;
-                window.onpointerup = undefined;
-                window.onpointermove = undefined;
-                timeoutEvent = undefined;
-                Library.stopShaking();
-                shaking = tb;
-                Library.clearAllSelections();
-                Library.startShaking(tb);
-            };
-            timeoutEvent = setTimeout(repeat, 500);
-        }
         function clearEvents (e, tb) {
             var pt = Events.getTargetPoint(e);
             var pt2 = JSON.parse(tb.pt);
@@ -446,13 +445,9 @@ export default class Library {
                 return;
             }
             e.preventDefault();
-            if (timeoutEvent) {
-                clearTimeout(timeoutEvent);
-            }
             if (clickThumb) {
                 Library.unSelect(clickThumb);
             }
-            timeoutEvent = undefined;
             tb.ontouchend = undefined;
             // window.onmousemove = undefined;
             // window.onmouseup = undefined;
@@ -460,11 +455,7 @@ export default class Library {
             window.onpointerup = undefined;
         }
         function clickMe (e, tb) {
-            if (timeoutEvent) {
-                clearTimeout(timeoutEvent);
-            }
             Library.selectThisAsset(e, tb);
-            timeoutEvent = undefined;
             tb.ontouchend = undefined;
             // tb.onmouseup = undefined;
             // window.onmousemove = undefined;
@@ -475,28 +466,12 @@ export default class Library {
         }
     }
 
-    static startShaking (b) {
-        b.className = b.className + ' shakeme';
-        newHTML('div', 'deleteasset', b);
-        shaking = b;
-    }
-
-    static stopShaking () {
-        if (!shaking) {
-            return;
+    static removeFromAssetList (assetBox) {
+        if (!assetBox || !assetBox.parentNode) {
+            return false;
         }
-        var b = shaking;
-        b.setAttribute('class', 'assetbox off');
-        var ic = b.childNodes[b.childElementCount - 1];
-        if (ic.getAttribute('class') == 'deleteasset') {
-            b.removeChild(ic);
-        }
-        shaking = undefined;
-    }
-
-    static removeFromAssetList () {
         ScratchAudio.sndFX('cut.wav');
-        var b = shaking;
+        var b = assetBox;
         b.parentNode.removeChild(b);
         var key = (type == 'costumes') ? 'usershapes' : 'userbkgs';
         var json = {};
@@ -582,6 +557,10 @@ export default class Library {
         for (var i = 0; i < div.childElementCount; i++) {
             if (div.childNodes[i].nodeName == 'DIV') {
                 div.childNodes[i].className = 'assetbox off';
+                var deleteButton = div.childNodes[i].querySelector('.asset-delete-button');
+                if (deleteButton) {
+                    deleteButton.style.visibility = '';
+                }
             }
         }
     }
@@ -591,9 +570,6 @@ export default class Library {
         tb.className = 'assetbox off';
         selectedOne = undefined;
         if (clickThumb) {
-            if (tb.byme && (clickThumb.childElementCount > 1)) {
-                clickThumb.childNodes[clickThumb.childElementCount - 1].style.visibility = 'hidden';
-            }
             clickThumb = undefined;
         }
     }

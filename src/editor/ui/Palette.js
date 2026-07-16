@@ -210,12 +210,9 @@ export default class Palette {
             if (!hitRect(ths, pt)) {
                 continue;
             }
-            if (ScratchJr.shaking && (ScratchJr.shaking == ths)) {
-                Palette.removeSound(ths);
-            } else {
-                Events.startDrag(e, ths, Palette.prepareForDrag,
-                    Palette.dropBlockFromPalette, ScriptsPane.draggingBlock, Palette.showHelp, Palette.startShaking);
-            }
+            Events.startDrag(e, ths, Palette.prepareForDrag,
+                Palette.dropBlockFromPalette, ScriptsPane.draggingBlock, Palette.showHelp,
+                Palette.showHelpOnHold);
         }
         ScratchJr.clearSelection();
     }
@@ -273,39 +270,11 @@ export default class Palette {
         timeoutid = setTimeout(Palette.closeHelpBalloon, 2000);
     }
 
-    static startShaking(b) {
-        if (!b.owner) {
+    static showHelpOnHold(b) {
+        if (!b.owner || b.owner.blocktype == 'playusersnd') {
             return;
         }
-        if (b.owner.blocktype != 'playusersnd') {
-            Palette.showHelp(null, b); return;
-        }
-        ScratchJr.shaking = b;
-        ScratchJr.stopShaking = Palette.stopShaking;
-        b.setAttribute('class', 'shakeme');
-        newHTML('div', 'deletesound', b);
-    }
-
-    static clickBlock(e, b) {
-        if (ScratchJr.shaking && (b == ScratchJr.shaking)) {
-            Palette.removeSound(b);
-        } else {
-            ScratchJr.clearSelection();
-            Palette.showHelp(e, b);
-        }
-    }
-
-    static stopShaking(b) {
-        if (!b.owner) {
-            return;
-        }
-        ScratchJr.shaking = undefined;
-        ScratchJr.stopShaking = undefined;
-        b.setAttribute('class', '');
-        var ic = b.childNodes[b.childElementCount - 1];
-        if (ic.getAttribute('class') == 'deletesound') {
-            b.removeChild(ic);
-        }
+        Palette.showHelp(null, b);
     }
 
     static openPaletteBalloon(obj, label) {
@@ -793,12 +762,44 @@ export default class Palette {
             var val = (MediaLib.sounds.indexOf(list[i]) < 0) ? i : list[i];
             var newb = Palette.addBlockSound(pal, op, val, dx, blockdy);
             newb.lift();
+            if (op == 'playusersnd') {
+                Palette.addSoundDeleteButton(pal, newb, dx);
+            }
             dx += betweenblocks;
         }
         console.log("should be adding record sound");
         if ((list.length < 6) && Record.available) {
             Palette.drawRecordSound(newb.div.offsetWidth, newb.div.offsetHeight, dx);
         }
+    }
+
+    static addSoundDeleteButton(parent, block, dx) {
+        if (!parent || !block || !block.div) {
+            return;
+        }
+        var recordedSoundNumber = Number(block.getArgValue()) + 1;
+        var label = Localization.localize('A11Y_DELETE') + ' ' +
+            Localization.localize('BLOCKS_PLAY_RECORDED') + ' ' + recordedSoundNumber;
+        var button = newButton('delete-recorded-sound', parent, {
+            ariaLabel: label,
+            title: label
+        });
+        button.owner = block;
+        setProps(button.style, {
+            left: (dx - (4 * scaleMultiplier)) + 'px',
+            top: 0
+        });
+        var stopEvent = function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        };
+        button.onpointerdown = stopEvent;
+        button.ontouchstart = stopEvent;
+        button.oncontextmenu = stopEvent;
+        button.onclick = function (event) {
+            stopEvent(event);
+            Palette.removeSound(button);
+        };
     }
 
     static addBlockSound(parent, op, val, dx, dy) {

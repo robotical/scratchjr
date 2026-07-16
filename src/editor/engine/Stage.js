@@ -4,7 +4,6 @@ import Thumbs from '../ui/Thumbs';
 import UI from '../ui/UI';
 import Undo from '../ui/Undo';
 import ScriptsPane from '../ui/ScriptsPane';
-import Rectangle from '../../geom/Rectangle';
 import Events from '../../utils/Events';
 import ScratchAudio from '../../utils/ScratchAudio';
 import Vector from '../../geom/Vector';
@@ -468,20 +467,8 @@ export default class Stage {
         var pt = this.getStagePt(e);
         setCanvasSize(ScratchJr.workingCanvas, 480, 360);
         var ctx = ScratchJr.workingCanvas.getContext('2d');
-        var target = (e.target.nodeName == 'CANVAS') ? this.checkShaking(pt, e.target) : e.target;
-        if (ScratchJr.shaking && (target.id == 'deletesprite')) {
-            this.removeSprite(ScratchJr.shaking.owner);
-            return;
-        }
         ctx.clearRect(0, 0, 480, 360);
         var hitobj = this.whoIsIt(ctx, pt);
-        if (ScratchJr.shaking && hitobj && (hitobj.id == ScratchJr.shaking.id)) { // check grid case
-            var sprname = ScratchJr.shaking.id;
-            if (((pt.x - gn(sprname).owner.screenLeft()) < 45) && ((pt.y - gn(sprname).owner.screenTop()) < 45)) {
-                this.removeSprite(ScratchJr.shaking.owner);
-                return;
-            }
-        }
         if (!hitobj) {
             ScratchJr.clearSelection();
             return;
@@ -493,18 +480,6 @@ export default class Stage {
         }
     }
 
-    checkShaking(pt, target) {
-        if (!ScratchJr.shaking) {
-            return target;
-        }
-        var dx = globalx(gn('deletesprite')) - globalx(ScratchJr.stage.pagesdiv);
-        var dy = globaly(gn('deletesprite')) - globaly(ScratchJr.stage.pagesdiv);
-        var w = gn('deletesprite').offsetWidth;
-        var h = gn('deletesprite').offsetHeight;
-        var rect = new Rectangle(dx, dy, w, h);
-        return rect.hitRect(pt) ? gn('deletesprite') : target;
-    }
-
     mouseDownOnSprite(spr, pt) {
         this.initialPoint = {
             x: pt.x,
@@ -512,12 +487,6 @@ export default class Stage {
         };
         Events.dragthumbnail = spr.div;
         Events.clearEvents();
-        if (!ScratchJr.inFullscreen && ScratchJr.isEditable()) {
-            if (spr.type != 'sprite') { 
-                // deactivate the shaking event for sprites -- sprites can only be removed by the side sprite element
-                Events.holdit(spr.div, this.startShaking);
-            }
-        }
         this.setEvents();
     }
 
@@ -593,25 +562,6 @@ export default class Stage {
         // window.onmouseup = function (evt) {
         //     me.mouseUp(evt);
         // };
-    }
-
-    startShaking(b) {
-        if (!b.owner) {
-            return;
-        }
-        Events.clearEvents();
-        ScratchJr.shaking = b;
-        ScratchJr.stopShaking = ScratchJr.stage.stopShaking;
-        b.owner.startShaking();
-    }
-
-    stopShaking(b) {
-        if (!b.owner) {
-            return;
-        }
-        b.owner.stopShaking();
-        ScratchJr.shaking = undefined;
-        ScratchJr.stopShaking = undefined;
     }
 
     startSpriteDrag() {

@@ -16,7 +16,6 @@ import goToLink from "../utils/goToLink";
 let frame;
 let scrollvalue;
 let version;
-let timeoutEvent;
 
 export default class Home {
   static init() {
@@ -31,11 +30,6 @@ export default class Home {
     } else {
       frame.ontouchstart = Home.handleTouchStart;
       frame.ontouchend = Home.handleTouchEnd;
-    }
-    if (!Home.optionsListenersInstalled) {
-      document.addEventListener("pointerdown", Home.handleOptionsDocumentPointerDown, true);
-      document.addEventListener("keydown", Home.handleOptionsDocumentKeyDown, true);
-      Home.optionsListenersInstalled = true;
     }
     Home.displayYourProjects();
   }
@@ -65,45 +59,15 @@ export default class Home {
   //////////////////////////
 
   static handleTouchStart(e) {
-    // // On my android tablet, when touching a project,
-    // // the tablet triggers the mousedown event
-    // // after touchstart event about 600ms
-    // // --Donald
-    // if (performingAction) {
-    //     return;
-    // }
-    // performingAction = true;
-    // setTimeout(function () {
-    //     performingAction = false;
-    // }, 1000);
     if (typeof e.button == "number" && e.button != 0) {
       return;
     }
     Home.dragging = false;
-    Home.holding = false;
-    // if ((t.nodeName == "INPUT") || (t.nodeName == "FORM")) return;
-    var mytarget = Home.getMouseTarget(e);
-    if (
-      mytarget != Home.actionTarget &&
-      Home.actionTarget
-    ) {
-      Home.setDeleteAffordanceVisibility(Home.actionTarget, "hidden");
-    }
-    Home.actionTarget = mytarget;
+    Home.actionTarget = Home.getMouseTarget(e);
     Home.initialPt = Events.getTargetPoint(e);
     if (Home.actionTarget) {
-      holdit(Home.actionTarget);
-    }
-    function holdit() {
       frame.ontouchmove = Home.handleMove;
       frame.onpointermove = Home.handleMove;
-      var repeat = function () {
-        if (Home.getDeleteAffordance(Home.actionTarget)) {
-          Home.setDeleteAffordanceVisibility(Home.actionTarget, "visible");
-          Home.holding = true;
-        }
-      };
-      timeoutEvent = setTimeout(repeat, 500);
     }
     Home.scrolltop = document.body.scrollTop;
   }
@@ -117,10 +81,6 @@ export default class Home {
     if (!Home.dragging) {
       return;
     }
-    if (timeoutEvent) {
-      clearTimeout(timeoutEvent);
-    }
-    timeoutEvent = undefined;
   }
 
   static getMouseTarget(e) {
@@ -152,10 +112,6 @@ export default class Home {
     }
     frame.ontouchmove = undefined;
     frame.onpointermove = undefined;
-    if (timeoutEvent) {
-      clearTimeout(timeoutEvent);
-    }
-    timeoutEvent = undefined;
     if (Home.dragging) {
       return;
     }
@@ -168,10 +124,7 @@ export default class Home {
     if (!Home.actionTarget) {
       return;
     }
-    if (Home.holding) {
-      return;
-    }
-    Home.performActionForTarget(Home.actionTarget, Home.getAction(e));
+    Home.performActionForTarget(Home.actionTarget, "project");
   }
 
   static performActionForTarget(target, action) {
@@ -211,7 +164,6 @@ export default class Home {
         );
         break;
       default:
-        Home.setDeleteAffordanceVisibility(target, "hidden");
         break;
     }
     function doNext() {
@@ -263,41 +215,6 @@ export default class Home {
     Home.actionTarget = undefined;
   }
 
-  static getAction(e) {
-    if (!Home.actionTarget) {
-      return "none";
-    }
-    var shown = Home.isDeleteAffordanceVisible(Home.actionTarget);
-    if (e && shown) {
-      var t;
-      if (window.event) {
-        t = window.event.srcElement;
-      } else {
-        t = e.target;
-      }
-      if (t.classList && t.classList.contains("closex")) {
-        return "delete";
-      }
-    }
-    return "project";
-  }
-
-  static getDeleteAffordance(target) {
-    return target ? target.querySelector(".closex") : null;
-  }
-
-  static setDeleteAffordanceVisibility(target, visibility) {
-    var close = Home.getDeleteAffordance(target);
-    if (close) {
-      close.style.visibility = visibility;
-    }
-  }
-
-  static isDeleteAffordanceVisible(target) {
-    var close = Home.getDeleteAffordance(target);
-    return close ? close.style.visibility == "visible" : false;
-  }
-
   static stopCardGesture(element) {
     var stop = function (e) {
       e.stopPropagation();
@@ -308,108 +225,22 @@ export default class Home {
     element.ontouchend = stop;
   }
 
-  static handleOptionsDocumentPointerDown(e) {
-    var active = Home.activeProjectOptions;
-    if (!active) {
-      return;
-    }
-    if (active.button.contains(e.target) || active.menu.contains(e.target)) {
-      return;
-    }
-    Home.closeProjectOptions(false);
-  }
-
-  static handleOptionsDocumentKeyDown(e) {
-    if (e.key != "Escape" || !Home.activeProjectOptions) {
-      return;
-    }
-    e.preventDefault();
-    Home.closeProjectOptions(true);
-  }
-
-  static openProjectOptions(button, menu, focusMenuItem) {
-    if (Home.activeProjectOptions && Home.activeProjectOptions.menu != menu) {
-      Home.closeProjectOptions(false);
-    }
-    menu.hidden = false;
-    button.setAttribute("aria-expanded", "true");
-    Home.activeProjectOptions = { button: button, menu: menu };
-    if (focusMenuItem) {
-      var firstItem = menu.querySelector('[role="menuitem"]');
-      if (firstItem) {
-        firstItem.focus();
-      }
-    }
-  }
-
-  static closeProjectOptions(restoreFocus) {
-    var active = Home.activeProjectOptions;
-    if (!active) {
-      return;
-    }
-    active.menu.hidden = true;
-    active.button.setAttribute("aria-expanded", "false");
-    Home.activeProjectOptions = undefined;
-    if (restoreFocus && document.contains(active.button)) {
-      active.button.focus();
-    }
-  }
-
-  static addProjectOptions(target, projectName) {
-    var menuId = "project-options-menu-" + target.id;
-    var optionsLabel = Localization.localizeOptional("Project options") + ": " + projectName;
-    var button = newButton("project-options-button", target, {
-      ariaLabel: optionsLabel,
-      title: Localization.localizeOptional("Project options"),
-      textContent: "\u22ef"
+  static addProjectDeleteButton(target, projectName, parent) {
+    var button = newButton("project-delete-button", parent, {
+      ariaLabel: Localization.localize("A11Y_DELETE") + " " + projectName,
+      title: Localization.localizeOptional("Delete project"),
+      textContent: "\u00d7"
     });
-    button.setAttribute("aria-haspopup", "menu");
-    button.setAttribute("aria-expanded", "false");
-    button.setAttribute("aria-controls", menuId);
-
-    var menu = newHTML("div", "project-options-menu", target);
-    menu.id = menuId;
-    menu.setAttribute("role", "menu");
-    menu.hidden = true;
-    var deleteButton = newButton("project-options-delete", menu, {
-      ariaLabel: Localization.localize("A11Y_DELETE") + " " + projectName
-    });
-    deleteButton.setAttribute("role", "menuitem");
-    var deleteIcon = newHTML("span", "project-options-delete-icon", deleteButton);
-    deleteIcon.setAttribute("aria-hidden", "true");
-    deleteIcon.textContent = "\u2715";
-    var deleteLabel = newHTML("span", undefined, deleteButton);
-    deleteLabel.textContent = Localization.localizeOptional("Delete project");
-
     Home.stopCardGesture(button);
-    Home.stopCardGesture(menu);
     button.onclick = function (e) {
       e.preventDefault();
       e.stopPropagation();
-      if (menu.hidden) {
-        Home.openProjectOptions(button, menu, true);
-      } else {
-        Home.closeProjectOptions(true);
-      }
-    };
-    button.onkeydown = function (e) {
-      if (e.key != "ArrowDown") {
-        return;
-      }
-      e.preventDefault();
-      e.stopPropagation();
-      Home.openProjectOptions(button, menu, true);
-    };
-    deleteButton.onclick = function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      Home.closeProjectOptions(false);
+      button.focus();
       Home.showDeleteConfirmation(target, projectName);
     };
     target.oncontextmenu = function (e) {
       e.preventDefault();
       e.stopPropagation();
-      Home.openProjectOptions(button, menu, true);
     };
   }
 
@@ -537,8 +368,7 @@ export default class Home {
       ribbonVertical.style.visibility = "visible";
     }
 
-    newHTML("div", "closex", tb);
-    Home.addProjectOptions(tb, data.name);
+    Home.addProjectDeleteButton(tb, data.name, mt);
     Home.addCardActionButton(
       tb,
       "card-action-open",

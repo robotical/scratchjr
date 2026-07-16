@@ -1890,6 +1890,8 @@ export default class UI {
         div.setAttribute('id', 'spritecc');
         div.setAttribute('role', 'group');
         div.setAttribute('aria-label', UI.getGuideControlLabel('INTERFACE_GUIDE_CHARACTERS'));
+        var spriteActions = newHTML('div', 'spriteactions', p);
+        spriteActions.setAttribute('id', 'spriteactions');
         // div.ontouchstart = UI.spriteThumbsActions;
         // div.onmousedown = UI.spriteThumbsActions;
         if (isTablet) {
@@ -2172,11 +2174,9 @@ export default class UI {
             return;
         }
         if (gn('scrollbar').className == 'scrollbar off') {
-            Events.startDrag(e, tb, UI.ignoreEvent, UI.ignoreEvent, UI.ignoreEvent, UI.spriteClicked,
-                ScratchJr.isEditable() ? Thumbs.startCharShaking : undefined);
+            Events.startDrag(e, tb, UI.ignoreEvent, UI.ignoreEvent, UI.ignoreEvent, UI.spriteClicked);
         } else {
-            Events.startDrag(e, tb, UI.prepareToScroll, UI.stopScroll, UI.spriteScolling, UI.spriteClicked,
-                ScratchJr.isEditable() ? Thumbs.startCharShaking : undefined);
+            Events.startDrag(e, tb, UI.prepareToScroll, UI.stopScroll, UI.spriteScolling, UI.spriteClicked);
         }
     }
 
@@ -2912,6 +2912,10 @@ export default class UI {
         var costumes = gn('spritecc');
         while (costumes.childElementCount > 0) {
             costumes.removeChild(costumes.childNodes[0]);
+        }
+        var spriteActions = gn('spriteactions');
+        while (spriteActions && spriteActions.childElementCount > 0) {
+            spriteActions.removeChild(spriteActions.childNodes[0]);
         }
         var pthumbs = Thumbs.getPageList();
         while (pthumbs.childElementCount > 0) {

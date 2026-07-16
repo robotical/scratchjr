@@ -340,7 +340,7 @@ describe("duplicate page", () => {
   );
 
   it(
-    "always shows the duplicate glyph and hides the action during long-press delete mode",
+    "always shows duplicate and bottom-right delete actions without long-press mode",
     async () => {
       const { browser, page, errors } = await openPage("/editor.html?mode=edit");
 
@@ -353,6 +353,12 @@ describe("duplicate page", () => {
           const action = document.querySelector(
             `#pageactions .duplicatepage[data-owner="${currentPageId}"]`
           );
+          const deleteAction = document.querySelector(
+            `#pageactions .deletepage[data-owner="${currentPageId}"]`
+          );
+          const row = deleteAction.parentElement;
+          const deleteBounds = deleteAction.getBoundingClientRect();
+          const rowBounds = row.getBoundingClientRect();
           const icon = action.querySelector(".duplicatepageicon");
           const backSquare = window.getComputedStyle(icon, "::before");
           const frontSquare = window.getComputedStyle(icon, "::after");
@@ -362,6 +368,10 @@ describe("duplicate page", () => {
             frontContent: frontSquare.content,
             backZIndex: backSquare.zIndex,
             frontZIndex: frontSquare.zIndex,
+            deleteVisibility: window.getComputedStyle(deleteAction).visibility,
+            deleteEnabled: !deleteAction.disabled,
+            deleteAtBottomRight: Math.abs(deleteBounds.right - rowBounds.right) < 2
+              && Math.abs(deleteBounds.bottom - rowBounds.bottom) < 2,
           };
         }, pageId);
 
@@ -370,8 +380,11 @@ describe("duplicate page", () => {
         expect(restingState.frontContent).not.toBe("none");
         expect(restingState.backZIndex).not.toBe("-1");
         expect(restingState.frontZIndex).not.toBe("-1");
+        expect(restingState.deleteVisibility).toBe("visible");
+        expect(restingState.deleteEnabled).toBe(true);
+        expect(restingState.deleteAtBottomRight).toBe(true);
 
-        await page.evaluate((currentPageId) => new Promise((resolve) => {
+        const heldState = await page.evaluate((currentPageId) => new Promise((resolve) => {
           const thumb = document.querySelector(`.pagethumb[data-owner="${currentPageId}"]`);
           const bounds = thumb.getBoundingClientRect();
           thumb.dispatchEvent(new PointerEvent("pointerdown", {
@@ -383,27 +396,39 @@ describe("duplicate page", () => {
             pointerType: "mouse",
             isPrimary: true,
           }));
-          window.setTimeout(resolve, 600);
+          window.setTimeout(() => {
+            const duplicateAction = document.querySelector(
+              `#pageactions .duplicatepage[data-owner="${currentPageId}"]`
+            );
+            const deleteAction = document.querySelector(
+              `#pageactions .deletepage[data-owner="${currentPageId}"]`
+            );
+            const result = {
+              isShaking: thumb.classList.contains("shakeme"),
+              hasLegacyDeleteControl: Boolean(thumb.querySelector(".deletethumb")),
+              duplicateVisibility: window.getComputedStyle(duplicateAction).visibility,
+              deleteVisibility: window.getComputedStyle(deleteAction).visibility,
+            };
+            window.dispatchEvent(new PointerEvent("pointerup", {
+              bubbles: true,
+              cancelable: true,
+              clientX: bounds.left + (bounds.width / 2),
+              clientY: bounds.top + (bounds.height / 2),
+              pointerId: 1,
+              pointerType: "mouse",
+              isPrimary: true,
+            }));
+            resolve(result);
+          }, 600);
         }), pageId);
-        await page.waitForFunction((currentPageId) => {
-          const thumb = document.querySelector(`.pagethumb[data-owner="${currentPageId}"]`);
-          const action = document.querySelector(
-            `#pageactions .duplicatepage[data-owner="${currentPageId}"]`
-          );
-          return thumb.classList.contains("shakeme")
-            && window.getComputedStyle(action).visibility === "hidden"
-            && window.getComputedStyle(thumb.querySelector(".deletethumb")).visibility === "visible";
-        }, { timeout: 5_000 }, pageId);
 
-        await page.evaluate(() => window.ScratchJr.clearSelection());
-        await page.waitForFunction((currentPageId) => {
-          const thumb = document.querySelector(`.pagethumb[data-owner="${currentPageId}"]`);
-          const action = document.querySelector(
-            `#pageactions .duplicatepage[data-owner="${currentPageId}"]`
-          );
-          return !thumb.classList.contains("shakeme")
-            && window.getComputedStyle(action).visibility === "visible";
-        }, { timeout: 5_000 }, pageId);
+        expect(heldState.isShaking).toBe(false);
+        expect(heldState.hasLegacyDeleteControl).toBe(false);
+        expect(heldState.duplicateVisibility).toBe("visible");
+        expect(heldState.deleteVisibility).toBe("visible");
+
+        await page.click(`#pageactions .deletepage[data-owner="${pageId}"]`);
+        await page.waitForFunction(() => window.ScratchJr.stage.pages.length === 1);
         expect(errors).toEqual([]);
       } finally {
         await browser.close();
