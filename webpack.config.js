@@ -50,6 +50,10 @@ module.exports = {
         type: "javascript/auto",
       },
       {
+        test: /\.hex$/,
+        type: "asset/resource",
+      },
+      {
         test: /\.js$/,
         include: /node_modules/,
         loader: "strip-sourcemap-loader",

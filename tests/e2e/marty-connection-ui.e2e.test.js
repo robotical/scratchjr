@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { newHTMLMock } = vi.hoisted(() => ({
+const { microBitUpdaterMocks, newHTMLMock } = vi.hoisted(() => ({
+    microBitUpdaterMocks: {
+        isSupported: vi.fn(() => false),
+        selectAndUpdate: vi.fn()
+    },
     newHTMLMock: vi.fn()
 }));
 
@@ -30,7 +34,8 @@ vi.mock('@/painteditor/Paint', () => ({ default: {} }));
 vi.mock('@/utils/Events', () => ({ default: {} }));
 vi.mock('@/utils/Localization', () => ({
     default: {
-        localize: key => key
+        localize: key => key,
+        localizeOptional: key => key
     }
 }));
 vi.mock('@/utils/ScratchAudio', () => ({ default: {} }));
@@ -127,6 +132,10 @@ vi.mock('@/editor/ui/Trace', () => ({
         clear: vi.fn()
     }
 }));
+vi.mock('@/microbit/MicroBitUpdater', () => ({
+    isMicroBitUpdateSupported: microBitUpdaterMocks.isSupported,
+    selectAndUpdateMicroBit: microBitUpdaterMocks.selectAndUpdate
+}));
 
 describe('Marty connection UI', () => {
     let UI;
@@ -136,6 +145,7 @@ describe('Marty connection UI', () => {
     beforeEach(async () => {
         vi.useFakeTimers();
         vi.clearAllMocks();
+        microBitUpdaterMocks.isSupported.mockReturnValue(false);
         global.window = {
             applicationManager: {
                 disconnectGeneric: vi.fn(raft => {
@@ -387,6 +397,60 @@ describe('Marty connection UI', () => {
         expect(message).toBe('No micro:bit was selected. Click Connect again when you are ready.');
     });
 
+    it('opens the software-or-connect dialog for the direct web path when WebUSB is available', () => {
+        const button = createConnectionButton();
+        const openDialogSpy = vi.spyOn(UI, 'openMicroBitConnectionDialog').mockImplementation(() => {});
+        microBitUpdaterMocks.isSupported.mockReturnValue(true);
+
+        UI.connectMicroBit(button);
+
+        expect(openDialogSpy).toHaveBeenCalledWith(button);
+        openDialogSpy.mockRestore();
+    });
+
+    it('keeps the host-managed micro:bit connection path unchanged', () => {
+        const button = createConnectionButton();
+        const microBit = createMicroBit();
+        const connectGenericMicroBit = vi.fn(callback => callback(microBit));
+        const openDialogSpy = vi.spyOn(UI, 'openMicroBitConnectionDialog').mockImplementation(() => {});
+        window.applicationManager.connectGenericMicroBit = connectGenericMicroBit;
+        microBitUpdaterMocks.isSupported.mockReturnValue(true);
+
+        UI.connectMicroBit(button);
+
+        expect(connectGenericMicroBit).toHaveBeenCalledOnce();
+        expect(openDialogSpy).not.toHaveBeenCalled();
+        expect(microBit.__mbjrHostManaged).toBe(true);
+        openDialogSpy.mockRestore();
+    });
+
+    it('shows installation success after the WebUSB updater completes', async () => {
+        const dialog = createMicroBitUpdateDialog();
+        const renderSpy = vi.spyOn(UI, 'renderMicroBitConnectionDialog').mockImplementation(() => {});
+        microBitUpdaterMocks.selectAndUpdate.mockImplementation(async progress => progress(0.755));
+
+        await UI.startMicroBitUpdate(dialog);
+
+        expect(renderSpy).toHaveBeenNthCalledWith(1, dialog, 'updating');
+        expect(dialog.microBitControls.progress.attributes.value).toBe('75.5');
+        expect(dialog.microBitControls.progressLabel.textContent).toBe('Installing 75%');
+        expect(renderSpy).toHaveBeenNthCalledWith(2, dialog, 'success');
+        renderSpy.mockRestore();
+    });
+
+    it('keeps keyboard focus on a visible installer control as its state changes', () => {
+        const dialog = createCompleteMicroBitUpdateDialog();
+
+        UI.renderMicroBitConnectionDialog(dialog, 'updating');
+        expect(dialog.microBitControls.progress.focus).toHaveBeenCalledOnce();
+
+        UI.renderMicroBitConnectionDialog(dialog, 'success');
+        expect(dialog.microBitControls.connectButton.focus).toHaveBeenCalledOnce();
+
+        UI.renderMicroBitConnectionDialog(dialog, 'error');
+        expect(dialog.microBitControls.updateButton.focus).toHaveBeenCalledOnce();
+    });
+
     it('uses the micro:bit five-character friendly name when it is advertised', () => {
         const microBit = {
             getFriendlyName: () => 'BBC micro:bit [vopet]'
@@ -478,6 +542,33 @@ function createMicroBit() {
     return microBit;
 }
 
+function createMicroBitUpdateDialog() {
+    return {
+        microBitControls: {
+            progress: new FakeElement(),
+            progressLabel: new FakeElement()
+        }
+    };
+}
+
+function createCompleteMicroBitUpdateDialog() {
+    const dialog = new FakeElement();
+    dialog.microBitControls = {
+        closeButton: new FakeElement(),
+        title: new FakeElement(),
+        message: new FakeElement(),
+        progressArea: new FakeElement(),
+        progress: new FakeElement(),
+        progressLabel: new FakeElement(),
+        errorDetails: new FakeElement(),
+        firmwareHelp: new FakeElement(),
+        backButton: new FakeElement(),
+        updateButton: new FakeElement(),
+        connectButton: new FakeElement()
+    };
+    return dialog;
+}
+
 class FakeElement {
     constructor(classes = []) {
         this.classList = new FakeClassList(classes);
@@ -488,6 +579,7 @@ class FakeElement {
         this.textContent = '';
         this.innerHTML = '';
         this.onclick = null;
+        this.focus = vi.fn();
     }
 
     querySelector(selector) {
@@ -517,6 +609,10 @@ class FakeElement {
 
     setAttribute(name, value) {
         this.attributes[name] = value;
+    }
+
+    getAttribute(name) {
+        return this.attributes[name];
     }
 }
 

@@ -977,6 +977,172 @@ div.frame {
     outline-offset: 3px;
 }
 
+/* micro:bit connection and software installer */
+.microBitConnectionDialog {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: ${css_vh(56)};
+    min-height: ${css_vh(31)};
+    transform: translate(-50%, -50%);
+    z-index: 12000;
+    box-sizing: border-box;
+    padding: ${css_vh(3.2)} ${css_vh(3.4)} ${css_vh(3)};
+    border: 3px solid #F4AD46;
+    border-radius: 16px;
+    background: #FEDF8F;
+    box-shadow: 0 ${css_vh(0.65)} ${css_vh(2.2)} rgba(0, 0, 0, 0.32);
+    font-family: 'Lato Regular';
+}
+
+.microBitConnectionDialog.fade {
+    display: none;
+    opacity: 0;
+}
+
+.microBitConnectionDialog.fade.in {
+    display: block;
+    opacity: 1;
+}
+
+.microBitConnectionDialogClose {
+    position: absolute;
+    right: ${css_vh(1.1)};
+    top: ${css_vh(1.1)};
+    width: ${css_vh(4.3)};
+    height: ${css_vh(4.3)};
+    border: 0;
+    padding: 0;
+    background: url('../assets/ui/closeit.svg') no-repeat center center;
+    background-size: 100%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.microBitConnectionDialogClose:disabled {
+    cursor: default;
+    opacity: 0.45;
+}
+
+.microBitConnectionDialogTitle {
+    color: #315F7B;
+    font-size: ${css_vh(3.4)};
+    font-weight: bold;
+    line-height: ${css_vh(4)};
+    text-align: center;
+    text-shadow: 0 ${css_vh(0.13)} #fff;
+}
+
+.microBitConnectionDialogBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: ${css_vh(17)};
+    padding-top: ${css_vh(1.6)};
+    text-align: center;
+}
+
+.microBitConnectionDialogIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: ${css_vh(8)};
+    height: ${css_vh(8)};
+    border-radius: 50%;
+    background: #F9CF37;
+}
+
+.microBitConnectionDialogIcon svg {
+    width: ${css_vh(6.3)};
+    height: ${css_vh(6.3)};
+}
+
+.microBitConnectionDialogMessage {
+    max-width: ${css_vh(45)};
+    margin-top: ${css_vh(1.2)};
+    color: #315F7B;
+    font-size: ${css_vh(1.9)};
+    line-height: ${css_vh(2.6)};
+}
+
+.microBitConnectionDialogProgress {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: min(100%, ${css_vh(38)});
+    margin-top: ${css_vh(1.5)};
+}
+
+.microBitConnectionDialogProgressBar {
+    width: 100%;
+    height: ${css_vh(1.5)};
+    accent-color: #5D9CC8;
+}
+
+.microBitConnectionDialogProgressLabel {
+    margin-top: ${css_vh(0.5)};
+    color: #315F7B;
+    font-size: ${css_vh(1.65)};
+    font-weight: bold;
+}
+
+.microBitConnectionDialogError {
+    display: none;
+    max-width: ${css_vh(45)};
+    margin-top: ${css_vh(1)};
+    padding: ${css_vh(0.8)} ${css_vh(1)};
+    border-radius: 8px;
+    background: #FFF5D9;
+    color: #9E1F28;
+    font-size: ${css_vh(1.45)};
+    line-height: ${css_vh(2)};
+    overflow-wrap: anywhere;
+}
+
+.microBitConnectionDialogHelp {
+    display: none;
+    margin-top: ${css_vh(1)};
+    color: #255E83;
+    font-size: ${css_vh(1.6)};
+    font-weight: bold;
+}
+
+.microBitConnectionDialogActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: ${css_vh(1)};
+    margin-top: ${css_vh(1.3)};
+}
+
+.microBitConnectionDialogButton {
+    min-width: ${css_vh(10)};
+    min-height: ${css_vh(4.2)};
+    padding: ${css_vh(0.5)} ${css_vh(1.3)};
+    border: 2px solid #315F7B;
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Lato Regular';
+    font-size: ${css_vh(1.7)};
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.microBitConnectionDialogButton.secondary {
+    background: #5D9CC8;
+}
+
+.microBitConnectionDialogButton.primary {
+    background: #2E9E66;
+}
+
+.microBitConnectionDialogClose:focus-visible,
+.microBitConnectionDialogButton:focus-visible,
+.microBitConnectionDialogHelp:focus-visible {
+    outline: 3px solid #133C46;
+    outline-offset: 3px;
+}
+
 /* parental gate */
 .parentalgate {
     position: fixed;

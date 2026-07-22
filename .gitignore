@@ -1,6 +1,7 @@
 /android/ScratchJr/app/src/main/gen/
 /node_modules
 /src/build/
+/src/assets/microbit/
 .DS_Store
 *.iml
 .gradle

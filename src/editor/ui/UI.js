@@ -49,6 +49,10 @@ import { signalSvg } from '../../html-svgs/signal-svg';
 import { createRaftConnectionIssueDetectedHelper, createRaftConnectionIssueResolvedHelper, raftDisconnectedSubscriptionHelper, raftVerifiedSubscriptionHelper } from '../../utils/raft-subscription-helpers';
 import { truncateString } from "../../utils/truncate-string";
 import Trace from './Trace';
+import {
+    isMicroBitUpdateSupported,
+    selectAndUpdateMicroBit
+} from '../../microbit/MicroBitUpdater';
 
 let projectNameTextInput = null;
 let info = null;
@@ -56,6 +60,7 @@ let okclicky = null;
 let infoBoxOpen = false;
 let activeCloudPanel = null;
 let cloudAlertAnchor = null;
+let microBitConnectionAnchor = null;
 
 const EMAILSHARE = 0;
 const AIRDROPSHARE = 1;
@@ -78,11 +83,50 @@ const MICROBIT_HOST_CONNECT_METHODS = [
     'connectMicrobit'
 ];
 const MICROBIT_EXTENSION_BLOCK_PREFIX = 'microbit';
+const MICROBIT_INTERFACE_FIRMWARE_URL = 'https://microbit.org/get-started/user-guide/firmware/';
+const MICROBIT_INSTALLER_COPY = {
+    MICROBIT_INSTALLER_BACK: 'Back',
+    MICROBIT_INSTALLER_CANCEL: 'Cancel',
+    MICROBIT_INSTALLER_CANCELLED: 'No micro:bit was selected. Choose Try again when you are ready.',
+    MICROBIT_INSTALLER_CONNECT: 'Connect',
+    MICROBIT_INSTALLER_ERROR_DEFAULT: 'Check the USB connection and try again.',
+    MICROBIT_INSTALLER_HELP: 'Open the micro:bit firmware instructions',
+    MICROBIT_INSTALLER_INSTALL: 'Install software',
+    MICROBIT_INSTALLER_INSTALL_NOW: 'Install now',
+    MICROBIT_INSTALLER_INTERFACE_FIRMWARE:
+        'Your micro:bit needs an interface firmware update before Blocks Jr can install its software.',
+    MICROBIT_INSTALLER_MESSAGE_CHOICE:
+        'Connect over Bluetooth, or install the required micro:bit software first using a USB cable.',
+    MICROBIT_INSTALLER_MESSAGE_READY:
+        'Connect your micro:bit to this computer with a USB cable, then choose Install now.',
+    MICROBIT_INSTALLER_MESSAGE_SUCCESS:
+        'Your micro:bit is ready. Disconnect the USB cable, power it on, then choose Connect.',
+    MICROBIT_INSTALLER_MESSAGE_UPDATING: 'Keep the USB cable connected until the installation is complete.',
+    MICROBIT_INSTALLER_PROGRESS: 'Installing {PERCENT}%',
+    MICROBIT_INSTALLER_TITLE_CHOICE: 'Connect micro:bit',
+    MICROBIT_INSTALLER_TITLE_ERROR: 'Could not install software',
+    MICROBIT_INSTALLER_TITLE_READY: 'Install micro:bit software',
+    MICROBIT_INSTALLER_TITLE_SUCCESS: 'Software installed',
+    MICROBIT_INSTALLER_TITLE_UPDATING: 'Installing micro:bit software',
+    MICROBIT_INSTALLER_TRY_AGAIN: 'Try again'
+};
 
 const SVG_ID_ATTRIBUTE_RE = /\s+id="[^"]*"/g;
 
 function stripInlineSvgIds(svgMarkup) {
     return svgMarkup.replace(SVG_ID_ATTRIBUTE_RE, '');
+}
+
+function localizeMicroBitInstaller(key, formatting = {}) {
+    const localized = Localization.localizeOptional(key, formatting);
+    if (localized !== key) {
+        return localized;
+    }
+    let fallback = MICROBIT_INSTALLER_COPY[key] || key;
+    Object.keys(formatting).forEach(formatKey => {
+        fallback = fallback.replace(`{${formatKey}}`, formatting[formatKey]);
+    });
+    return fallback;
 }
 
 function getMartySensorAvailabilityFromRaft(raft) {
@@ -781,6 +825,14 @@ export default class UI {
 
     static connectMicroBit(connectButton) {
         const hostConnect = UI.getHostMicroBitConnectFunction();
+        if (!hostConnect && isMicroBitUpdateSupported()) {
+            UI.openMicroBitConnectionDialog(connectButton);
+            return;
+        }
+        UI.performMicroBitConnection(connectButton, hostConnect);
+    }
+
+    static performMicroBitConnection(connectButton, hostConnect = UI.getHostMicroBitConnectFunction()) {
         if (hostConnect) {
             hostConnect((microBit) => {
                 if (!microBit) {
@@ -805,6 +857,237 @@ export default class UI {
             .catch(error => {
                 UI.showMicroBitConnectionError(connectButton, error);
             });
+    }
+
+    static createMicroBitConnectionDialog() {
+        const dialog = newHTML('div', 'microBitConnectionDialog fade', frame);
+        dialog.setAttribute('id', 'microBitConnectionDialog');
+
+        const closeButton = newButton('microBitConnectionDialogClose', dialog, {
+            ariaLabel: Localization.localize('A11Y_CLOSE')
+        });
+        closeButton.setAttribute('id', 'microBitConnectionDialogClose');
+        closeButton.onclick = UI.closeMicroBitConnectionDialog;
+
+        const title = newHTML('div', 'microBitConnectionDialogTitle', dialog);
+        title.setAttribute('id', 'microBitConnectionDialogTitle');
+
+        const body = newHTML('div', 'microBitConnectionDialogBody', dialog);
+        const icon = newHTML('div', 'microBitConnectionDialogIcon', body);
+        icon.innerHTML = stripInlineSvgIds(microBitSvg);
+
+        const message = newHTML('div', 'microBitConnectionDialogMessage', body);
+        message.setAttribute('id', 'microBitConnectionDialogMessage');
+        message.setAttribute('aria-live', 'polite');
+
+        const progressArea = newHTML('div', 'microBitConnectionDialogProgress', body);
+        const progress = newHTML('progress', 'microBitConnectionDialogProgressBar', progressArea);
+        progress.setAttribute('max', '100');
+        progress.setAttribute('value', '0');
+        progress.setAttribute('tabindex', '-1');
+        const progressLabel = newHTML('div', 'microBitConnectionDialogProgressLabel', progressArea);
+        progressLabel.setAttribute('id', 'microBitConnectionDialogProgressLabel');
+        progressLabel.setAttribute('aria-live', 'polite');
+        progress.setAttribute('aria-labelledby', 'microBitConnectionDialogProgressLabel');
+
+        const errorDetails = newHTML('div', 'microBitConnectionDialogError', body);
+        errorDetails.setAttribute('role', 'alert');
+
+        const firmwareHelp = newHTML('a', 'microBitConnectionDialogHelp', body);
+        firmwareHelp.setAttribute('href', MICROBIT_INTERFACE_FIRMWARE_URL);
+        firmwareHelp.setAttribute('target', '_blank');
+        firmwareHelp.setAttribute('rel', 'noopener noreferrer');
+        firmwareHelp.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_HELP');
+
+        const actions = newHTML('div', 'microBitConnectionDialogActions', dialog);
+        const backButton = newButton('microBitConnectionDialogButton secondary', actions, {
+            id: 'microBitConnectionDialogBack',
+            textContent: localizeMicroBitInstaller('MICROBIT_INSTALLER_CANCEL')
+        });
+        const updateButton = newButton('microBitConnectionDialogButton secondary', actions, {
+            id: 'microBitConnectionDialogUpdate',
+            textContent: localizeMicroBitInstaller('MICROBIT_INSTALLER_INSTALL')
+        });
+        const connectButton = newButton('microBitConnectionDialogButton primary', actions, {
+            id: 'microBitConnectionDialogConnect',
+            textContent: localizeMicroBitInstaller('MICROBIT_INSTALLER_CONNECT')
+        });
+
+        backButton.onclick = () => {
+            if (dialog.getAttribute('data-activity') === 'choice') {
+                UI.closeMicroBitConnectionDialog();
+                return;
+            }
+            UI.renderMicroBitConnectionDialog(dialog, 'choice');
+        };
+        updateButton.onclick = () => {
+            const activity = dialog.getAttribute('data-activity');
+            if (activity === 'choice') {
+                UI.renderMicroBitConnectionDialog(dialog, 'ready');
+                return;
+            }
+            UI.startMicroBitUpdate(dialog);
+        };
+        connectButton.onclick = () => {
+            const anchor = microBitConnectionAnchor;
+            UI.closeMicroBitConnectionDialog(null, {restoreFocus: true});
+            if (anchor) {
+                UI.performMicroBitConnection(anchor);
+            }
+        };
+
+        dialog.microBitControls = {
+            closeButton,
+            title,
+            message,
+            progressArea,
+            progress,
+            progressLabel,
+            errorDetails,
+            firmwareHelp,
+            backButton,
+            updateButton,
+            connectButton
+        };
+
+        registerDialog(dialog, {
+            labelledBy: 'microBitConnectionDialogTitle',
+            initialFocus: function () {
+                return connectButton;
+            },
+            scope: frame,
+            onRequestClose: UI.closeMicroBitConnectionDialog
+        });
+        return dialog;
+    }
+
+    static renderMicroBitConnectionDialog(dialog, activity, options = {}) {
+        const controls = dialog.microBitControls;
+        if (!controls) {
+            return;
+        }
+        dialog.setAttribute('data-activity', activity);
+
+        controls.progressArea.style.display = activity === 'updating' ? 'flex' : 'none';
+        controls.errorDetails.style.display = activity === 'error' && options.details ? 'block' : 'none';
+        controls.firmwareHelp.style.display = options.showFirmwareHelp ? 'inline-block' : 'none';
+        controls.backButton.style.display = activity === 'updating' ? 'none' : '';
+        controls.updateButton.style.display = activity === 'success' || activity === 'updating' ? 'none' : '';
+        controls.connectButton.style.display = activity === 'choice' || activity === 'success' ? '' : 'none';
+        controls.closeButton.disabled = activity === 'updating';
+
+        controls.errorDetails.textContent = options.details || '';
+        let focusControl = null;
+        switch (activity) {
+            case 'ready':
+                controls.title.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_TITLE_READY');
+                controls.message.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_MESSAGE_READY');
+                controls.backButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_BACK');
+                controls.updateButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_INSTALL_NOW');
+                focusControl = controls.updateButton;
+                break;
+            case 'updating':
+                controls.title.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_TITLE_UPDATING');
+                controls.message.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_MESSAGE_UPDATING');
+                controls.progress.setAttribute('value', '0');
+                controls.progressLabel.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_PROGRESS', {
+                    PERCENT: 0
+                });
+                focusControl = controls.progress;
+                break;
+            case 'success':
+                controls.title.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_TITLE_SUCCESS');
+                controls.message.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_MESSAGE_SUCCESS');
+                controls.backButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_BACK');
+                controls.connectButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_CONNECT');
+                focusControl = controls.connectButton;
+                break;
+            case 'error':
+                controls.title.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_TITLE_ERROR');
+                controls.message.textContent = options.message ||
+                    localizeMicroBitInstaller('MICROBIT_INSTALLER_ERROR_DEFAULT');
+                controls.backButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_BACK');
+                controls.updateButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_TRY_AGAIN');
+                focusControl = controls.updateButton;
+                break;
+            case 'choice':
+            default:
+                controls.title.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_TITLE_CHOICE');
+                controls.message.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_MESSAGE_CHOICE');
+                controls.backButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_CANCEL');
+                controls.updateButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_INSTALL');
+                controls.connectButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_CONNECT');
+                focusControl = controls.connectButton;
+                break;
+        }
+        if (focusControl && typeof focusControl.focus === 'function') {
+            focusControl.focus();
+        }
+    }
+
+    static openMicroBitConnectionDialog(connectButton) {
+        let dialog = gn('microBitConnectionDialog');
+        if (!dialog) {
+            dialog = UI.createMicroBitConnectionDialog();
+        }
+        microBitConnectionAnchor = connectButton;
+        UI.renderMicroBitConnectionDialog(dialog, 'choice');
+
+        const backdrop = gn('backdrop');
+        if (backdrop) {
+            backdrop.setAttribute('class', 'modal-backdrop fade in');
+            setProps(backdrop.style, {display: 'block'});
+        }
+        dialog.className = 'microBitConnectionDialog fade in';
+        openDialog(dialog);
+    }
+
+    static closeMicroBitConnectionDialog(event, options = {}) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const dialog = gn('microBitConnectionDialog');
+        if (!dialog || dialog.getAttribute('data-activity') === 'updating') {
+            return;
+        }
+        dialog.className = 'microBitConnectionDialog fade';
+        closeDialog(dialog, {restoreFocus: options.restoreFocus !== false});
+        microBitConnectionAnchor = null;
+
+        const backdrop = gn('backdrop');
+        if (backdrop) {
+            backdrop.setAttribute('class', 'modal-backdrop fade');
+            setProps(backdrop.style, {display: 'none'});
+        }
+    }
+
+    static async startMicroBitUpdate(dialog) {
+        UI.renderMicroBitConnectionDialog(dialog, 'updating');
+        const controls = dialog.microBitControls;
+        try {
+            await selectAndUpdateMicroBit(progress => {
+                const percentage = Math.max(0, Math.min(100, Math.floor(progress * 200) / 2));
+                controls.progress.setAttribute('value', String(percentage));
+                controls.progressLabel.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_PROGRESS', {
+                    PERCENT: Math.floor(percentage)
+                });
+            });
+            UI.renderMicroBitConnectionDialog(dialog, 'success');
+        } catch (error) {
+            const message = error && error.message ? error.message : '';
+            const wasCancelled = error && error.name === 'NotFoundError';
+            const needsInterfaceFirmware = message === 'No valid interfaces found.';
+            UI.renderMicroBitConnectionDialog(dialog, 'error', {
+                message: wasCancelled ?
+                    localizeMicroBitInstaller('MICROBIT_INSTALLER_CANCELLED') :
+                    (needsInterfaceFirmware ?
+                        localizeMicroBitInstaller('MICROBIT_INSTALLER_INTERFACE_FIRMWARE') :
+                        localizeMicroBitInstaller('MICROBIT_INSTALLER_ERROR_DEFAULT')),
+                details: wasCancelled || needsInterfaceFirmware ? '' : message,
+                showFirmwareHelp: needsInterfaceFirmware
+            });
+        }
     }
 
     static getMicroBitConnectionErrorMessage(error) {
