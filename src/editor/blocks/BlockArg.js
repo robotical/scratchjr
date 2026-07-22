@@ -414,12 +414,12 @@ export default class BlockArg {
         var scale = this.daddy.scale * window.devicePixelRatio;
         ctx.save();
         ctx.scale(scale, scale);
-        this.drawMicroBitBoard(ctx, microBitMatrixPatternToRows(this.argValue), 20, 10, 43, 42);
+        this.drawMicroBitDisplay(ctx, microBitMatrixPatternToRows(this.argValue), 13, 8, 49, 49);
         ctx.restore();
         return cnv;
     }
 
-    drawMicroBitBoard (ctx, rows, x, y, w, h) {
+    drawMicroBitDisplay (ctx, rows, x, y, w, h) {
         ctx.save();
         ctx.globalAlpha = 0.16;
         this.roundedRect(ctx, x + 1, y + 1, w, h, 7);
@@ -430,55 +430,23 @@ export default class BlockArg {
         this.roundedRect(ctx, x, y, w, h, 7);
         ctx.fillStyle = '#414757';
         ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = '#7C87A5';
+        ctx.stroke();
 
-        ctx.fillStyle = '#4C97FF';
-        ctx.beginPath();
-        ctx.moveTo(x, y + 9);
-        ctx.lineTo(x, y + 6);
-        ctx.quadraticCurveTo(x, y, x + 6, y);
-        ctx.lineTo(x + 11, y);
-        ctx.closePath();
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(x + w - 11, y);
-        ctx.lineTo(x + w - 6, y);
-        ctx.quadraticCurveTo(x + w, y, x + w, y + 6);
-        ctx.lineTo(x + w, y + 9);
-        ctx.closePath();
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(x, y + h - 9);
-        ctx.lineTo(x + 8, y + h);
-        ctx.lineTo(x + 6, y + h);
-        ctx.quadraticCurveTo(x, y + h, x, y + h - 6);
-        ctx.closePath();
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(x + w, y + h - 9);
-        ctx.lineTo(x + w - 9, y + h);
-        ctx.lineTo(x + w - 6, y + h);
-        ctx.quadraticCurveTo(x + w, y + h, x + w, y + h - 6);
-        ctx.closePath();
-        ctx.fill();
-
-        var startX = x + 9;
-        var startY = y + 8;
-        var step = 6;
-        var cell = 3.8;
+        var startX = x + 6;
+        var startY = y + 6;
+        var step = 8;
+        var cell = 5.5;
         for (var row = 0; row < 5; row++) {
             for (var col = 0; col < 5; col++) {
                 var enabled = rows[row] && rows[row][col] === '1';
                 this.roundedRect(ctx, startX + (col * step), startY + (row * step), cell, cell, 0.8);
-                ctx.fillStyle = enabled ? '#35C1DF' : '#7C87A5';
+                ctx.fillStyle = enabled ? '#FFFFFF' : '#7C87A5';
                 ctx.globalAlpha = enabled ? 1 : 0.35;
                 ctx.fill();
                 ctx.globalAlpha = 1;
             }
-        }
-
-        ctx.fillStyle = '#FFBF00';
-        for (var pin = 0; pin < 7; pin++) {
-            ctx.fillRect(x + 6 + (pin * 5), y + h - 1, 3, 5);
         }
         ctx.restore();
     }

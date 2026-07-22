@@ -1728,9 +1728,9 @@ form.projectname {
 }
 
 *.microbitMatrixCell.on {
-    background: #35C1DF;
-    border-color: #1F8EA6;
-    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.45), 0 0 0 2px rgba(255, 255, 255, 0.22);
+    background: #FFFFFF;
+    border-color: #C8CDD8;
+    box-shadow: inset 0 2px 0 rgba(65, 71, 87, 0.12), 0 0 0 2px rgba(65, 71, 87, 0.35);
 }
 
 *.microbitMatrixCell:active {
