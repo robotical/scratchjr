@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Remove extension">
+  <circle cx="32" cy="32" r="30" fill="#ed5252" stroke="#fff" stroke-width="4"/>
+  <path d="M22 24h20l-2 25H24l-2-25zm5-8h10l2 4H25l2-4zm-7 4h24v5H20v-5z" fill="#fff"/>
+  <path d="M29 29v15m6-15v15" stroke="#ed5252" stroke-width="3" stroke-linecap="round"/>
+</svg>

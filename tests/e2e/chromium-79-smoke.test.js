@@ -127,7 +127,7 @@ describe("Chromium 79 smoke test", () => {
   );
 
   it(
-    "keeps the extension entry visible and reveals micro:bit controls only while loaded",
+    "uses the third connection slot for either the extension entry or micro:bit controls",
     async () => {
       const { browser, page, errors } = await openPage("/editor.html?mode=edit");
 
@@ -137,6 +137,7 @@ describe("Chromium 79 smoke test", () => {
         const initialState = await page.evaluate(() => {
           const addButton = document.getElementById("addExtensionButton");
           const microBitButton = document.getElementById("microBitConnectionButton");
+          const removeButton = document.getElementById("microBitRemoveButton");
           return {
             addButtonDisplay: window.getComputedStyle(addButton).display,
             addButtonAriaHidden: addButton.getAttribute("aria-hidden"),
@@ -144,6 +145,9 @@ describe("Chromium 79 smoke test", () => {
             microBitButtonDisplay: window.getComputedStyle(microBitButton).display,
             microBitButtonAriaHidden: microBitButton.getAttribute("aria-hidden"),
             microBitButtonDisabled: microBitButton.disabled,
+            removeButtonDisplay: window.getComputedStyle(removeButton).display,
+            removeButtonAriaHidden: removeButton.getAttribute("aria-hidden"),
+            removeButtonDisabled: removeButton.disabled,
             rightCategoryIds: Array.from(document.querySelectorAll("#selectorsright .category-selector-button")).map(
               (button) => button.id
             ),
@@ -158,6 +162,9 @@ describe("Chromium 79 smoke test", () => {
           microBitButtonDisplay: "none",
           microBitButtonAriaHidden: "true",
           microBitButtonDisabled: true,
+          removeButtonDisplay: "none",
+          removeButtonAriaHidden: "true",
+          removeButtonDisabled: true,
           rightCategoryIds: ["cog-start", "cog-looks", "cog-sound"],
           extensionEnabled: false,
         });
@@ -195,6 +202,8 @@ describe("Chromium 79 smoke test", () => {
         const enabledState = await page.evaluate(() => {
           const addButton = document.getElementById("addExtensionButton");
           const microBitButton = document.getElementById("microBitConnectionButton");
+          const removeButton = document.getElementById("microBitRemoveButton");
+          const microBitAction = microBitButton.querySelector(".iconButtonContainer");
           return {
             addButtonDisplay: window.getComputedStyle(addButton).display,
             addButtonAriaHidden: addButton.getAttribute("aria-hidden"),
@@ -202,6 +211,13 @@ describe("Chromium 79 smoke test", () => {
             microBitButtonDisplay: window.getComputedStyle(microBitButton).display,
             microBitButtonAriaHidden: microBitButton.getAttribute("aria-hidden"),
             microBitButtonDisabled: microBitButton.disabled,
+            removeButtonDisplay: window.getComputedStyle(removeButton).display,
+            removeButtonAriaHidden: removeButton.getAttribute("aria-hidden"),
+            removeButtonDisabled: removeButton.disabled,
+            microBitUsesConnectControl: window.getComputedStyle(microBitAction).backgroundImage.includes(
+              "connect_btn-default.svg"
+            ),
+            microBitActionPosition: window.getComputedStyle(microBitAction).position,
             rightCategoryIds: Array.from(document.querySelectorAll("#selectorsright .category-selector-button")).map(
               (button) => button.id
             ),
@@ -216,12 +232,17 @@ describe("Chromium 79 smoke test", () => {
         });
 
         expect(enabledState).toEqual({
-          addButtonDisplay: "flex",
-          addButtonAriaHidden: "false",
-          addButtonDisabled: false,
+          addButtonDisplay: "none",
+          addButtonAriaHidden: "true",
+          addButtonDisabled: true,
           microBitButtonDisplay: "flex",
           microBitButtonAriaHidden: "false",
           microBitButtonDisabled: false,
+          removeButtonDisplay: "flex",
+          removeButtonAriaHidden: "false",
+          removeButtonDisabled: false,
+          microBitUsesConnectControl: true,
+          microBitActionPosition: "static",
           rightCategoryIds: ["cog-start", "cog-looks", "cog-sound", "microbit-start", "microbit-looks"],
           selectedRightCategoryIds: ["microbit-start"],
           paletteBlockTypes: [
@@ -230,6 +251,34 @@ describe("Chromium 79 smoke test", () => {
             "microbittilted",
           ],
           extensionEnabled: true,
+        });
+
+        const connectedActionState = await page.evaluate(() => {
+          const microBitButton = document.getElementById("microBitConnectionButton");
+          const microBitAction = microBitButton.querySelector(".iconButtonContainer");
+          microBitButton.classList.add("connectButtonConnected");
+          microBitAction.classList.remove("notConnectedButtonContainer");
+          microBitAction.classList.add("connectedButtonContainer");
+          microBitAction.textContent = "DISCONNECT";
+
+          const actionStyle = window.getComputedStyle(microBitAction);
+          const result = {
+            text: microBitAction.textContent,
+            backgroundImage: actionStyle.backgroundImage,
+            position: actionStyle.position,
+          };
+
+          microBitButton.classList.remove("connectButtonConnected");
+          microBitAction.classList.remove("connectedButtonContainer");
+          microBitAction.classList.add("notConnectedButtonContainer");
+          microBitAction.textContent = "";
+          return result;
+        });
+
+        expect(connectedActionState).toEqual({
+          text: "DISCONNECT",
+          backgroundImage: "none",
+          position: "static",
         });
 
         await page.click("#microbit-looks");
@@ -285,8 +334,8 @@ describe("Chromium 79 smoke test", () => {
         });
         expect(blocksAfterInsert).toContain("microbitdisplayclear");
 
-        await openExtensionsLibrary(page);
-        await page.waitForSelector("#extensionsLibrary.fade.in", { timeout: 30_000 });
+        await page.click("#microBitRemoveButton");
+        await page.waitForSelector("#microBitExtensionRemoveWarning.show", { timeout: 30_000 });
         const loadedLibraryState = await page.evaluate(() => ({
           microBitCardAction: document.getElementById("microBitExtensionCardAction").textContent.trim(),
           microBitCardLoaded: document.getElementById("microBitExtensionCard").classList.contains("loaded"),
@@ -296,8 +345,6 @@ describe("Chromium 79 smoke test", () => {
           microBitCardLoaded: true,
         });
 
-        await page.click("#microBitExtensionCard");
-        await page.waitForSelector("#microBitExtensionRemoveWarning.show", { timeout: 30_000 });
         await page.click("#microBitExtensionRemoveCancel");
         await page.waitForFunction(
           () => !document.getElementById("microBitExtensionRemoveWarning").classList.contains("show"),
@@ -312,7 +359,12 @@ describe("Chromium 79 smoke test", () => {
           hasMicroBitBlock: true,
         });
 
-        await page.click("#microBitExtensionCard");
+        await page.click(".extensionsLibraryClose");
+        await page.waitForFunction(
+          () => !document.getElementById("extensionsLibrary").classList.contains("in"),
+          { timeout: 30_000 }
+        );
+        await page.click("#microBitRemoveButton");
         await page.waitForSelector("#microBitExtensionRemoveWarning.show", { timeout: 30_000 });
         await page.click("#microBitExtensionRemoveConfirm");
         await page.waitForFunction(
@@ -324,6 +376,7 @@ describe("Chromium 79 smoke test", () => {
         const unloadedState = await page.evaluate(() => ({
           addButtonDisplay: window.getComputedStyle(document.getElementById("addExtensionButton")).display,
           microBitButtonDisplay: window.getComputedStyle(document.getElementById("microBitConnectionButton")).display,
+          removeButtonDisplay: window.getComputedStyle(document.getElementById("microBitRemoveButton")).display,
           extensionsLibraryOpen: document.getElementById("extensionsLibrary").classList.contains("in"),
           microBitCardAction: document.getElementById("microBitExtensionCardAction").textContent.trim(),
           microBitCardLoaded: document.getElementById("microBitExtensionCard").classList.contains("loaded"),
@@ -336,6 +389,7 @@ describe("Chromium 79 smoke test", () => {
         expect(unloadedState).toEqual({
           addButtonDisplay: "flex",
           microBitButtonDisplay: "none",
+          removeButtonDisplay: "none",
           extensionsLibraryOpen: false,
           microBitCardAction: "+",
           microBitCardLoaded: false,

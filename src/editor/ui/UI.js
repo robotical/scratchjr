@@ -338,6 +338,8 @@ export default class UI {
             'microBitConnectionButton',
             UI.connectMicroBit
         );
+        microBitButton.setAttribute('title', 'Connect micro:bit');
+        UI.createMicroBitRemoveButton(connectionButtonsArea);
 
         const connectedMicroBit = window.microBitManager?.getActiveMicroBit?.();
         if (connectedMicroBit) {
@@ -402,8 +404,9 @@ export default class UI {
     }
 
     static createExtensionAddButton(parent) {
-        const addButton = newButton('extensionAddButton', parent, {
-            ariaLabel: 'Manage extensions'
+        const addButton = newButton('connectButton extensionAddButton', parent, {
+            ariaLabel: 'Add an extension',
+            title: 'Add an extension'
         });
         addButton.setAttribute('id', 'addExtensionButton');
         const icon = newHTML('span', 'extensionAddIcon', addButton);
@@ -414,6 +417,24 @@ export default class UI {
             UI.openExtensionsLibrary();
         };
         return addButton;
+    }
+
+    static createMicroBitRemoveButton(parent) {
+        const removeButton = newButton('microBitRemoveButton', parent, {
+            ariaLabel: 'Remove micro:bit extension',
+            title: 'Remove micro:bit extension'
+        });
+        removeButton.setAttribute('id', 'microBitRemoveButton');
+        const icon = newHTML('span', 'microBitRemoveIcon', removeButton);
+        icon.setAttribute('aria-hidden', 'true');
+        removeButton.onclick = event => {
+            event.preventDefault();
+            event.stopPropagation();
+            ScratchAudio.sndFX('tap.wav');
+            UI.openExtensionsLibrary();
+            UI.showMicroBitExtensionRemoveWarning();
+        };
+        return removeButton;
     }
 
     static createExtensionsLibrary() {
@@ -711,21 +732,36 @@ export default class UI {
         const connectionButtonsArea = gn('connectionButtonsArea');
         const addButton = gn('addExtensionButton');
         const microBitButton = gn('microBitConnectionButton');
+        const microBitRemoveButton = gn('microBitRemoveButton');
 
         if (connectionButtonsArea) {
             connectionButtonsArea.classList.toggle('extensionEnabled', enabled);
         }
         if (addButton) {
-            addButton.style.display = 'flex';
-            addButton.disabled = false;
-            addButton.setAttribute('aria-hidden', 'false');
-            addButton.setAttribute('aria-label', 'Manage extensions');
-            addButton.removeAttribute('tabindex');
+            addButton.style.display = enabled ? 'none' : 'flex';
+            addButton.disabled = enabled;
+            addButton.setAttribute('aria-hidden', enabled ? 'true' : 'false');
+            addButton.setAttribute('aria-label', 'Add an extension');
+            if (enabled) {
+                addButton.setAttribute('tabindex', '-1');
+            } else {
+                addButton.removeAttribute('tabindex');
+            }
         }
         if (microBitButton) {
             microBitButton.style.display = enabled ? '' : 'none';
             microBitButton.disabled = !enabled;
             microBitButton.setAttribute('aria-hidden', enabled ? 'false' : 'true');
+        }
+        if (microBitRemoveButton) {
+            microBitRemoveButton.style.display = enabled ? 'flex' : 'none';
+            microBitRemoveButton.disabled = !enabled;
+            microBitRemoveButton.setAttribute('aria-hidden', enabled ? 'false' : 'true');
+            if (enabled) {
+                microBitRemoveButton.removeAttribute('tabindex');
+            } else {
+                microBitRemoveButton.setAttribute('tabindex', '-1');
+            }
         }
     }
 
@@ -917,6 +953,7 @@ export default class UI {
         const iconButtonContainer = button.querySelector('.iconButtonContainer');
         iconButtonContainer.classList.remove('connectedButtonContainer');
         iconButtonContainer.classList.add('notConnectedButtonContainer');
+        iconButtonContainer.textContent = '';
 
         const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
         const signalIndicator = button.querySelector('.signalIndicatorContainer');
@@ -1120,16 +1157,17 @@ export default class UI {
         const connectButtonContainer = button.querySelector('.iconButtonContainer');
         connectButtonContainer.classList.remove('notConnectedButtonContainer');
         connectButtonContainer.classList.add('connectedButtonContainer');
+        connectButtonContainer.textContent = 'DISCONNECT';
 
         const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
         const signalIndicator = button.querySelector('.signalIndicatorContainer');
         const raftName = button.querySelector('.raftNameConnectButton');
+        const friendlyName = UI.getMicroBitFriendlyName(microBit);
         batteryIndicator.style.display = 'none';
         signalIndicator.style.display = 'none';
         raftName.style.display = 'grid';
-        raftName.textContent = truncateString(
-            typeof microBit.getFriendlyName === 'function' ? microBit.getFriendlyName() : 'micro:bit'
-        );
+        raftName.textContent = UI.getMicroBitDisplayName(microBit);
+        raftName.setAttribute('title', friendlyName);
 
         const oldOnClick = button.onclick;
         let didHandleDisconnect = false;
@@ -1154,6 +1192,7 @@ export default class UI {
             }
 
             button.onclick = oldOnClick;
+            button.setAttribute('title', 'Connect micro:bit');
             button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' micro:bit');
         };
 
@@ -1168,8 +1207,8 @@ export default class UI {
                 handleDisconnected();
             }
         };
-        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' +
-            (typeof microBit.getFriendlyName === 'function' ? microBit.getFriendlyName() : 'micro:bit'));
+        button.setAttribute('title', 'Disconnect ' + friendlyName);
+        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' + friendlyName);
 
         if (window.microBitManager) {
             try {
@@ -1183,6 +1222,22 @@ export default class UI {
         if (typeof microBit.addDisconnectListener === 'function') {
             unsubscribeDisconnect = microBit.addDisconnectListener(handleDisconnected);
         }
+    }
+
+    static getMicroBitFriendlyName(microBit) {
+        const friendlyName = typeof microBit?.getFriendlyName === 'function' ?
+            microBit.getFriendlyName() : 'micro:bit';
+        return typeof friendlyName === 'string' && friendlyName.trim() ? friendlyName.trim() : 'micro:bit';
+    }
+
+    static getMicroBitDisplayName(microBit) {
+        const friendlyName = UI.getMicroBitFriendlyName(microBit);
+        const bracketedName = friendlyName.match(/\[([a-z]{5})\]\s*$/i);
+        if (bracketedName) {
+            return bracketedName[1];
+        }
+        const trailingName = friendlyName.match(/(?:^|[^a-z])([a-z]{5})\s*$/i);
+        return trailingName ? trailingName[1] : truncateString(friendlyName);
     }
 
     static leftPanel(div) {

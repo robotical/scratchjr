@@ -29,7 +29,7 @@
     border-radius: 10px;
     border: 3px solid #F4AD46;
 
-    width: ${css_vh(22.8)};
+    width: ${css_vh(34)};
     height: ${css_vh(12)};
 
     padding: 8px 4px;
@@ -69,20 +69,14 @@
 }
 
 .extensionAddButton {
-    position: absolute;
-    right: -${css_vh(1.45)};
-    bottom: -${css_vh(1.45)};
-    z-index: 5;
-    width: ${css_vh(5)};
-    height: ${css_vh(5)};
-    background: transparent;
-    border: 0;
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
     padding: 0;
-    -webkit-tap-highlight-color: transparent;
 }
 
 .extensionAddIcon {
@@ -110,6 +104,39 @@
 
 .extensionAddButton:active .extensionAddIcon {
     background: #3F7EA9;
+    transform: translateY(${css_vh(0.13)});
+}
+
+.microBitRemoveButton {
+    box-sizing: border-box;
+    position: absolute;
+    right: -${css_vh(0.9)};
+    top: -${css_vh(0.9)};
+    z-index: 6;
+    width: ${css_vh(3.4)};
+    height: ${css_vh(3.4)};
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: url('../assets/connection/remove_extension-default.svg') no-repeat center center;
+    background-size: 100%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.microBitRemoveIcon {
+    display: none;
+}
+
+.microBitRemoveButton:focus-visible {
+    outline: ${css_vh(0.3)} solid #133C46;
+    outline-offset: ${css_vh(0.15)};
+}
+
+.microBitRemoveButton:active {
     transform: translateY(${css_vh(0.13)});
 }
 
@@ -168,9 +195,57 @@
     height: ${css_vh(3)};
     background-image: url('../assets/connection/disconnect_btn-default.svg');
 }
+
+#microBitConnectionButton .connectedButtonContainer {
+    position: static;
+    width: ${css_vh(8)};
+    height: ${css_vh(1.8)};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    justify-self: center;
+    border-radius: ${css_vh(0.9)};
+    background-color: #f173a6;
+    background-image: none;
+    color: #fff;
+    font-family: 'Lato Regular';
+    font-size: ${css_vh(0.9)};
+    font-weight: bold;
+    line-height: 1;
+}
+
+#microBitConnectionButton.connectButtonConnected {
+    grid-template-rows:
+        minmax(0, 2.4fr)
+        minmax(0, 0.85fr)
+        minmax(0, 1fr);
+}
+
+#microBitConnectionButton.connectButtonConnected .connectIcon {
+    width: ${css_vh(4.4)};
+    height: ${css_vh(4.4)};
+}
+
+#microBitConnectionButton .batteryAndSignalContainer {
+    display: none;
+}
+
+#microBitConnectionButton .raftNameConnectButton {
+    width: auto;
+    min-width: ${css_vh(4.8)};
+    height: ${css_vh(1.55)};
+    justify-content: center;
+    text-align: center;
+}
 @media (hover: hover) and (pointer: fine) {
     .connectButton:hover .connectedButtonContainer {
         background-image: url('../assets/connection/disconnect_btn-hover.svg');
+    }
+
+    #microBitConnectionButton:hover .connectedButtonContainer {
+        background-color: #e71167;
+        background-image: none;
     }
 }
 

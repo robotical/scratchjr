@@ -387,6 +387,16 @@ describe('Marty connection UI', () => {
         expect(message).toBe('No micro:bit was selected. Click Connect again when you are ready.');
     });
 
+    it('uses the micro:bit five-character friendly name when it is advertised', () => {
+        const microBit = {
+            getFriendlyName: () => 'BBC micro:bit [vopet]'
+        };
+
+        expect(UI.getMicroBitFriendlyName(microBit)).toBe('BBC micro:bit [vopet]');
+        expect(UI.getMicroBitDisplayName(microBit)).toBe('vopet');
+        expect(UI.getMicroBitDisplayName({getFriendlyName: () => 'micro:bit'})).toBe('micro:bit');
+    });
+
     it('registers micro:bit blocks and restores the button after direct disconnect', () => {
         const button = createConnectionButton();
         const oldOnClick = vi.fn();
@@ -398,6 +408,9 @@ describe('Marty connection UI', () => {
         expect(window.microBitManager.addMicroBit).toHaveBeenCalledWith(microBit);
         expect(window.microBitManager.wireMicroBitWithBlocks).toHaveBeenCalledWith('microbit-1');
         expect(button.classList.contains('connectButtonConnected')).toBe(true);
+        expect(button.querySelector('.iconButtonContainer').textContent).toBe('DISCONNECT');
+        expect(button.querySelector('.raftNameConnectButton').textContent).toBe('micro:bit One');
+        expect(button.attributes.title).toBe('Disconnect micro:bit One');
 
         button.onclick();
         vi.advanceTimersByTime(1000);
@@ -407,6 +420,7 @@ describe('Marty connection UI', () => {
         expect(button.onclick).toBe(oldOnClick);
         expect(button.classList.contains('connectButtonConnected')).toBe(false);
         expect(button.querySelector('.iconButtonContainer').classList.contains('notConnectedButtonContainer')).toBe(true);
+        expect(button.querySelector('.iconButtonContainer').textContent).toBe('');
         expect(microBit.__disconnectUnsubscribed).toBe(true);
     });
 });

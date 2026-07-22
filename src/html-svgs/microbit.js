@@ -1,6 +1,6 @@
 export const microBitSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="micro:bit">
-  <g transform="translate(48 48) scale(2.1) translate(-42.5 -33)">
+  <g transform="translate(48 52) scale(2.1) translate(-42.5 -33)">
     <rect x="27" y="18" width="31" height="27" rx="3" fill="#231f20" opacity="0.16"/>
     <rect x="26" y="17" width="31" height="27" rx="3" fill="#414757"/>
     <path d="M26 25v-5c0-1.65 1.35-3 3-3h5z" fill="#4c97ff"/>
