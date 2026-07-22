@@ -177,7 +177,7 @@ export const BLOCK_GUIDE_METADATA = {
         'Starts when Cog is tilted right, left, forward, backward, side-to-side, or front-to-back.', 'tilt_any'),
     onsteercog: block('BLOCK_DESC_ON_STEER', 'Start on Steer', 'BLOCKS_ON_STEER_COG_DESCRIPTION',
         'Starts when Cog is steered left or right.', 'steerleft'),
-    ontouchcog: block('BLOCKS_ON_TOUCH_Cog', 'Start on Button', 'BLOCKS_ON_TOUCH_Cog_DESCRIPTION',
+    ontouchcog: block('BLOCKS_ON_TOUCH_Cog', 'Start on Button Press', 'BLOCKS_ON_TOUCH_Cog_DESCRIPTION',
         'Starts when Cog’s button is pressed.', 'ontouchcog'),
     onshake: block('BLOCKS_ON_MOVE', 'Start on Move', 'BLOCKS_ON_MOVE_DESCRIPTION',
         'Starts when Cog is shaken or moved.', 'onshake'),
@@ -213,7 +213,7 @@ export const BLOCK_GUIDE_METADATA = {
     setcogvolume: block('BLOCK_DESC_SET_COG_VOLUME', 'Set Cog Volume', 'BLOCK_DESC_SET_COG_VOLUME_DESCRIPTION',
         'Sets Cog’s sound volume to the chosen percentage.', 'CogVolume'),
 
-    microbitbuttonpressed: block('BLOCK_GUIDE_MICROBIT_BUTTON', 'Start on Button',
+    microbitbuttonpressed: block('BLOCK_GUIDE_MICROBIT_BUTTON', 'Start on Button Press',
         'BLOCK_GUIDE_MICROBIT_BUTTON_DESCRIPTION', 'Starts when micro:bit button A, B, or A+B is pressed.',
         'microbitbuttona'),
     microbittilted: block('BLOCK_GUIDE_MICROBIT_TILT', 'Start on Tilt',

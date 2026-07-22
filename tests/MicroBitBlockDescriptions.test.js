@@ -14,8 +14,8 @@ describe('micro:bit block descriptions', () => {
             custom: englishMessages.BLOCK_DESC_MICROBIT_DISPLAY_CUSTOM,
             clear: englishMessages.BLOCK_DESC_MICROBIT_CLEAR_DISPLAY
         }).toEqual({
-            cogButton: 'START ON BUTTON',
-            button: 'START ON BUTTON',
+            cogButton: 'START ON BUTTON PRESS',
+            button: 'START ON BUTTON PRESS',
             gesture: 'START ON GESTURE',
             tilt: 'START ON TILT',
             heart: 'DISPLAY HEART',
