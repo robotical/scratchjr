@@ -419,6 +419,7 @@ export default class Project {
             ScratchJr.isMartyModeEnabled = shouldEnableMartyMode;
         }
         UI.renderCorrectMartyModeIcon(ScratchJr.isMartyModeEnabled);
+        UI.ensureSpriteModeForStandaloneMicroBit();
     }
 
     static setModeFromConnectedMarty () {

@@ -1145,6 +1145,28 @@ export default class UI {
         UI.setMartyModeEnabled(true);
     }
 
+    static getConnectedMarty(excludingMarty = null) {
+        const excludedMartyId = excludingMarty?.id;
+        const isExcluded = marty => marty && excludedMartyId && marty.id === excludedMartyId;
+        const managerMarty = window.martyManager?.getActiveMarty?.();
+        if (managerMarty && !isExcluded(managerMarty)) {
+            return managerMarty;
+        }
+
+        const applicationMarty = window.applicationManager?.getTheCurrentlySelectedDeviceOrFirstOfItsKind?.('Marty');
+        return applicationMarty && !isExcluded(applicationMarty) ? applicationMarty : null;
+    }
+
+    static ensureSpriteModeForStandaloneMicroBit(microBit = null, options = {}) {
+        const connectedMicroBit = microBit || window.microBitManager?.getActiveMicroBit?.();
+        if (!connectedMicroBit || UI.getConnectedMarty(options.excludingMarty)) {
+            return false;
+        }
+
+        UI.setMartyModeEnabled(false);
+        return true;
+    }
+
     static showConnIssueOverlay(button, onExpired) {
         UI.hideConnIssueOverlay(button);
         button.style.pointerEvents = 'none';
@@ -1376,6 +1398,7 @@ export default class UI {
             // When raft is disconnected, update the UI and remove the raft
             button.classList.remove('connectButtonConnected');
             window.martyManager?.removeMarty?.(raft);
+            UI.ensureSpriteModeForStandaloneMicroBit(null, {excludingMarty: raft});
 
             // clear the interval to avoid memory leaks
             clearInterval(martySignalAndBatteryInterval);
@@ -1501,6 +1524,8 @@ export default class UI {
                 console.warn('Unable to wire micro:bit blocks after connection.', error);
             }
         }
+
+        UI.ensureSpriteModeForStandaloneMicroBit(microBit);
 
         if (typeof microBit.addDisconnectListener === 'function') {
             unsubscribeDisconnect = microBit.addDisconnectListener(handleDisconnected);

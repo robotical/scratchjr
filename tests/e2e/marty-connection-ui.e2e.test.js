@@ -158,7 +158,8 @@ describe('Marty connection UI', () => {
                     throw new Error('metadata not ready');
                 }),
                 removeMarty: vi.fn(),
-                setMartySensorAvailability: vi.fn()
+                setMartySensorAvailability: vi.fn(),
+                getActiveMarty: vi.fn(() => null)
             },
             cogManager: {
                 addCog: vi.fn(),
@@ -168,7 +169,8 @@ describe('Marty connection UI', () => {
             microBitManager: {
                 addMicroBit: vi.fn(),
                 wireMicroBitWithBlocks: vi.fn(),
-                removeMicroBit: vi.fn()
+                removeMicroBit: vi.fn(),
+                getActiveMicroBit: vi.fn(() => null)
             }
         };
         warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -486,6 +488,42 @@ describe('Marty connection UI', () => {
         expect(button.querySelector('.iconButtonContainer').classList.contains('notConnectedButtonContainer')).toBe(true);
         expect(button.querySelector('.iconButtonContainer').textContent).toBe('');
         expect(microBit.__disconnectUnsubscribed).toBe(true);
+    });
+
+    it('switches from Marty mode to Sprite mode when micro:bit connects without Marty', () => {
+        const button = createConnectionButton();
+        const microBit = createMicroBit();
+        ScratchJr.isMartyModeEnabled = true;
+
+        UI.setupMicroBitConnectionButton(button, microBit);
+
+        expect(ScratchJr.isMartyModeEnabled).toBe(false);
+    });
+
+    it('preserves Marty mode when micro:bit connects alongside Marty', () => {
+        const button = createConnectionButton();
+        const microBit = createMicroBit();
+        const marty = createMartyRaft();
+        window.martyManager.getActiveMarty.mockReturnValue(marty);
+        ScratchJr.isMartyModeEnabled = true;
+
+        UI.setupMicroBitConnectionButton(button, microBit);
+
+        expect(ScratchJr.isMartyModeEnabled).toBe(true);
+    });
+
+    it('switches to Sprite mode when Marty disconnect leaves micro:bit connected', () => {
+        const button = createConnectionButton();
+        const raft = createMartyRaft();
+        const microBit = createMicroBit();
+        window.microBitManager.getActiveMicroBit.mockReturnValue(microBit);
+
+        UI.setupMartyConnectionButton(button, raft);
+        expect(ScratchJr.isMartyModeEnabled).toBe(true);
+
+        button.onclick();
+
+        expect(ScratchJr.isMartyModeEnabled).toBe(false);
     });
 });
 
