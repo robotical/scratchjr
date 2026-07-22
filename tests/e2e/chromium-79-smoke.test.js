@@ -112,6 +112,14 @@ async function openExtensionsLibrary(page) {
   await page.click("#addExtensionButton");
 }
 
+async function getPaletteUndoGap(page) {
+  return page.evaluate(() => {
+    const palette = document.getElementById("palette").getBoundingClientRect();
+    const undoControls = document.getElementById("undocontrols").getBoundingClientRect();
+    return undoControls.left - palette.right;
+  });
+}
+
 describe("Chromium 79 smoke test", () => {
   it(
     "loads home page without console errors",
@@ -252,6 +260,16 @@ describe("Chromium 79 smoke test", () => {
           ],
           extensionEnabled: true,
         });
+
+        const standardPaletteUndoGap = await getPaletteUndoGap(page);
+        const maximumPaletteUndoGap = await page.evaluate(() => window.innerHeight * 0.02);
+        await page.setViewport({ width: 1200, height: 600 });
+        const widePaletteUndoGap = await getPaletteUndoGap(page);
+        await page.setViewport({ width: 800, height: 600 });
+
+        expect(standardPaletteUndoGap).toBeGreaterThanOrEqual(0);
+        expect(standardPaletteUndoGap).toBeLessThanOrEqual(maximumPaletteUndoGap);
+        expect(widePaletteUndoGap).toBeCloseTo(standardPaletteUndoGap, 1);
 
         const connectedActionState = await page.evaluate(() => {
           const microBitButton = document.getElementById("microBitConnectionButton");

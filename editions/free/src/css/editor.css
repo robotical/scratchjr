@@ -451,8 +451,8 @@ div.frame {
     position: relative;
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0)};
     height: ${64 * scaleMultiplier}px;
-    /* width: ${659 * scaleMultiplier}px; */
-    width: 85%;
+    /* Keep a fixed, height-scaled lane for undo/redo instead of a viewport percentage. */
+    width: calc(100% - ${120 * scaleMultiplier}px);
     z-index:4;
     overflow: hidden;
 }
