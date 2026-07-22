@@ -177,7 +177,7 @@ export const BLOCK_GUIDE_METADATA = {
         'Starts when Cog is tilted right, left, forward, backward, side-to-side, or front-to-back.', 'tilt_any'),
     onsteercog: block('BLOCK_DESC_ON_STEER', 'Start on Steer', 'BLOCKS_ON_STEER_COG_DESCRIPTION',
         'Starts when Cog is steered left or right.', 'steerleft'),
-    ontouchcog: block('BLOCKS_ON_TOUCH_Cog', 'Start on Touch', 'BLOCKS_ON_TOUCH_Cog_DESCRIPTION',
+    ontouchcog: block('BLOCKS_ON_TOUCH_Cog', 'Start on Button', 'BLOCKS_ON_TOUCH_Cog_DESCRIPTION',
         'Starts when Cog’s button is pressed.', 'ontouchcog'),
     onshake: block('BLOCKS_ON_MOVE', 'Start on Move', 'BLOCKS_ON_MOVE_DESCRIPTION',
         'Starts when Cog is shaken or moved.', 'onshake'),
