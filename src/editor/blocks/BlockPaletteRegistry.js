@@ -28,7 +28,7 @@ export const MARTY_PALETTES = [
 ];
 
 export const MICROBIT_PALETTES = [
-    ['microbitbuttonpressed', 'microbitgesture', 'microbittilted'],
+    ['microbitbuttonpressed', 'microbittilted'],
     ['microbitdisplayheart', 'microbitdisplayhappy', 'microbitdisplaycustom', 'microbitdisplaytext',
         'microbitdisplayclear']
 ];

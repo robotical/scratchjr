@@ -255,7 +255,6 @@ describe("Chromium 79 smoke test", () => {
           selectedRightCategoryIds: ["microbit-start"],
           paletteBlockTypes: [
             "microbitbuttonpressed",
-            "microbitgesture",
             "microbittilted",
           ],
           extensionEnabled: true,

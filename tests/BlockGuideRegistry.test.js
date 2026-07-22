@@ -31,7 +31,7 @@ describe('Blocks Guide registry', () => {
         const documentedIds = new Set(getDocumentedBlockIds());
 
         expect([...documentedIds].sort()).toEqual([...expectedIds].sort());
-        expect(documentedIds.size).toBe(89);
+        expect(documentedIds.size).toBe(88);
         expect(Object.keys(BLOCK_GUIDE_METADATA).sort()).toEqual([...expectedIds].sort());
     });
 
@@ -47,7 +47,7 @@ describe('Blocks Guide registry', () => {
         expect(BLOCK_GUIDE_MODES[2].categories.map((category) => category.id)).toEqual(
             ['start', 'looks', 'sound']
         );
-        expect(BLOCK_GUIDE_EXTENSION.blockCount).toBe(8);
+        expect(BLOCK_GUIDE_EXTENSION.blockCount).toBe(7);
     });
 
     it('provides visible copy and artwork for every documented block', () => {
