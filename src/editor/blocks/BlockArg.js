@@ -12,6 +12,7 @@ import {
     normalizeMicroBitMatrixPattern,
     toggleMicroBitMatrixCell as toggleMicroBitMatrixPatternCell
 } from '../../microbit/MicroBitMatrixPattern';
+import {resolveMicroBitTiltIcon} from '../../microbit/MicroBitBlockOptions';
 
 /*
 Argument types
@@ -328,6 +329,9 @@ export default class BlockArg {
     //////////////////////////////
 
     getIconFrom (key, list) {
+        if (this.daddy.blocktype === 'microbittilted') {
+            return resolveMicroBitTiltIcon(key, list);
+        }
         for (var i = 0; i < list.length; i++) {
             if (list[i].indexOf(key) > -1) {
                 return list[i];

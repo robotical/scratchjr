@@ -3,6 +3,10 @@ import IO from '../../tablet/IO';
 import { LINEAR_GRADIENT_COLOUR } from '../engine/Prims';
 import {DEFAULT_MICROBIT_MATRIX_PATTERN} from '../../microbit/MicroBitMatrixPattern';
 import {
+    MICROBIT_DEFAULT_TILT_OPTION,
+    MICROBIT_TILT_OPTIONS
+} from '../../microbit/MicroBitBlockOptions';
+import {
     COG_PALETTES,
     MARTY_PALETTES,
     MICROBIT_PALETTES,
@@ -44,7 +48,7 @@ const martynoisesensedshapes = ['martynoisesensednoisesensed', 'martynoisesensed
 const noteshapes = ['notec', 'notecsharp', 'noted', 'notedsharp', 'notee', 'notef', 'notefsharp', 'noteg', 'notegsharp', 'notea', 'noteasharp', 'noteb'];
 const microbitbuttonshapes = ['microbitbuttona', 'microbitbuttonb', 'microbitbuttonab'];
 const microbitgestureshapes = ['microbitgesturemoved', 'microbitgestureshaken', 'microbitgesturejumped'];
-const microbittiltshapes = ['microbittiltany', 'microbittiltright', 'microbittiltleft', 'microbittiltbackward', 'microbittiltforward'];
+const microbittiltshapes = MICROBIT_TILT_OPTIONS;
 
 let getshapes = ['LetterGet_Orange', 'LetterGet_Red', 'LetterGet_Yellow', 'LetterGet_Green',
     'LetterGet_Blue', 'LetterGet_Purple'];
@@ -466,7 +470,8 @@ export default class BlockSpecs {
             'microbitgesture': ['microbitgesture', microbitgestureshapes,
                 BlockSpecs.yellowStart, 'm', 'microbitgestureshaken', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'microbittilted': ['microbittilted', microbittiltshapes,
-                BlockSpecs.yellowStart, 'm', 'microbittiltany', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+                BlockSpecs.yellowStart, 'm', MICROBIT_DEFAULT_TILT_OPTION,
+                BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'microbitdisplayheart': ['microbitdisplayheart', BlockSpecs.getImageFrom('assets/blockicons/microbitdisplayheart', 'svg'),
                 BlockSpecs.pinkCmd, null, null, BlockSpecs.pinkCmdH, null, null, BlockSpecs.cmdS],
             'microbitdisplayhappy': ['microbitdisplayhappy', BlockSpecs.getImageFrom('assets/blockicons/microbitdisplayhappy', 'svg'),

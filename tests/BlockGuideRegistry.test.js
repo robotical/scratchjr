@@ -56,5 +56,7 @@ describe('Blocks Guide registry', () => {
             expect(item.description, `${blockId} description`).toBeTruthy();
             expect(Boolean(item.icon || item.symbol), `${blockId} artwork`).toBe(true);
         });
+        expect(BLOCK_GUIDE_METADATA.microbittilted.icon)
+            .toBe('../assets/blockicons/microbittiltright.svg');
     });
 });

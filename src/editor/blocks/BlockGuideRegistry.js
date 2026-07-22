@@ -5,6 +5,7 @@ import {
     SPRITE_PALETTES,
     clonePalettes
 } from './BlockPaletteRegistry';
+import {MICROBIT_DEFAULT_TILT_OPTION} from '../../microbit/MicroBitBlockOptions';
 
 const ICON_ROOT = '../assets/blockicons/';
 
@@ -220,7 +221,7 @@ export const BLOCK_GUIDE_METADATA = {
         'microbitgestureshaken'),
     microbittilted: block('BLOCK_GUIDE_MICROBIT_TILT', 'Start on Tilt',
         'BLOCK_GUIDE_MICROBIT_TILT_DESCRIPTION', 'Starts when the micro:bit is tilted in the selected direction.',
-        'microbittiltany'),
+        MICROBIT_DEFAULT_TILT_OPTION),
     microbitdisplayheart: block('BLOCK_GUIDE_MICROBIT_HEART', 'Display Heart',
         'BLOCK_DESC_MICROBIT_DISPLAY_HEART', 'Shows a heart on the micro:bit display.', 'microbitdisplayheart'),
     microbitdisplayhappy: block('BLOCK_GUIDE_MICROBIT_HAPPY', 'Display Happy Face',

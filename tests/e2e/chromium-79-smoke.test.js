@@ -261,6 +261,51 @@ describe("Chromium 79 smoke test", () => {
           extensionEnabled: true,
         });
 
+        const microBitTiltState = await page.evaluate(() => {
+          const paletteBlock = Array.from(document.querySelectorAll("#palette > div"))
+            .find((block) => block.owner && block.owner.blocktype === "microbittilted").owner;
+          return {
+            defaultValue: paletteBlock.getArgValue(),
+            options: JSON.parse(paletteBlock.arg.list),
+          };
+        });
+
+        expect(microBitTiltState).toEqual({
+          defaultValue: "microbittiltright",
+          options: [
+            "microbittiltright",
+            "microbittiltleft",
+            "microbittiltbackward",
+            "microbittiltforward",
+          ],
+        });
+
+        const legacyMicroBitTiltState = await page.evaluate(() => {
+          const scripts = window.ScratchJr.getActiveScript().owner;
+          const block = scripts.insertKeyboardBlock(null, [[
+            "microbittilted",
+            "microbittiltany",
+            50,
+            50,
+          ]]);
+          return {
+            value: block.getArgValue(),
+            icon: block.arg.icon,
+            options: JSON.parse(block.arg.list),
+          };
+        });
+
+        expect(legacyMicroBitTiltState).toEqual({
+          value: "microbittiltany",
+          icon: "microbittiltany",
+          options: [
+            "microbittiltright",
+            "microbittiltleft",
+            "microbittiltbackward",
+            "microbittiltforward",
+          ],
+        });
+
         const standardPaletteUndoGap = await getPaletteUndoGap(page);
         const maximumPaletteUndoGap = await page.evaluate(() => window.innerHeight * 0.02);
         await page.setViewport({ width: 1200, height: 600 });
