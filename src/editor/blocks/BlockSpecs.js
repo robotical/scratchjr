@@ -154,6 +154,7 @@ export default class BlockSpecs {
         BlockSpecs.numfieldimg = BlockSpecs.getImageFrom('assets/misc/Number-01');
         BlockSpecs.pressbutton = BlockSpecs.getImageFrom('assets/misc/pushbutton-01', 'svg');
         BlockSpecs.pressbuttonSmall = BlockSpecs.getImageFrom('assets/misc/pushbutton', 'svg');
+        BlockSpecs.paintbrush = BlockSpecs.getImageFrom('assets/paint/paintbrush', 'svg');
         BlockSpecs.caretrepeat = BlockSpecs.getImageFrom('assets/blocks/caretrepeat');
         BlockSpecs.cmdS = BlockSpecs.getImageFrom('assets/blocks/shadowCmd', 'svg');
         BlockSpecs.startS = BlockSpecs.getImageFrom('assets/blocks/shadowStart', 'svg');

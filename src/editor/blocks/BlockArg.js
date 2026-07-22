@@ -416,7 +416,23 @@ export default class BlockArg {
         ctx.scale(scale, scale);
         this.drawMicroBitDisplay(ctx, microBitMatrixPatternToRows(this.argValue), 13, 8, 49, 49);
         ctx.restore();
+        this.drawMicroBitEditorIndicator(ctx, scale);
         return cnv;
+    }
+
+    drawMicroBitEditorIndicator (ctx, scale) {
+        var paintbrush = BlockSpecs.paintbrush;
+        var drawIndicator = function () {
+            ctx.save();
+            ctx.scale(scale, scale);
+            ctx.drawImage(paintbrush, 38, 28, 30, 30);
+            ctx.restore();
+        };
+        if (!paintbrush.complete) {
+            paintbrush.addEventListener('load', drawIndicator, {once: true});
+        } else {
+            drawIndicator();
+        }
     }
 
     drawMicroBitDisplay (ctx, rows, x, y, w, h) {

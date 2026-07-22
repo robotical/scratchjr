@@ -369,10 +369,10 @@ describe("Chromium 79 smoke test", () => {
             50,
             50,
           ]]);
-          block.arg.pressMicroBitMatrixEditor({
-            preventDefault() {},
-            stopPropagation() {},
-          });
+          block.arg.button.dispatchEvent(new PointerEvent("pointerdown", {
+            bubbles: true,
+            cancelable: true,
+          }));
           const cells = Array.from(document.querySelectorAll(".microbitMatrixCell"));
           cells[12].dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, cancelable: true }));
           return {

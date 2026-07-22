@@ -46,6 +46,7 @@ describe('micro:bit display artwork', () => {
             const svg = readFileSync(join(ASSET_DIRECTORY, 'categories', file), 'utf8');
 
             expect(svg).not.toContain('data-microbit-display="true"');
+            expect(svg).toContain('data-microbit-source="microbit-small"');
             expect(svg).toMatch(/#4c97ff/i);
             expect(svg).toMatch(/#ffbf00/i);
         });
@@ -60,5 +61,17 @@ describe('micro:bit display artwork', () => {
         expect(blockArg).toContain("enabled ? '#FFFFFF' : '#7C87A5'");
         expect(blockArg).not.toContain('drawMicroBitBoard');
         expect(editorCss).toMatch(/\.microbitMatrixCell\.on\s*\{[^}]*background:\s*#FFFFFF;/s);
+    });
+
+    it('overlays the paintbrush artwork while retaining the editor arrow', () => {
+        const blockArg = readFileSync(join('src', 'editor', 'blocks', 'BlockArg.js'), 'utf8');
+        const blockSpecs = readFileSync(join('src', 'editor', 'blocks', 'BlockSpecs.js'), 'utf8');
+
+        expect(blockSpecs).toContain(
+            "BlockSpecs.paintbrush = BlockSpecs.getImageFrom('assets/paint/paintbrush', 'svg');"
+        );
+        expect(blockArg).toContain('this.button = this.addPressButton();');
+        expect(blockArg).toContain('this.drawMicroBitEditorIndicator(ctx, scale);');
+        expect(blockArg).toContain('ctx.drawImage(paintbrush, 38, 28, 30, 30);');
     });
 });
