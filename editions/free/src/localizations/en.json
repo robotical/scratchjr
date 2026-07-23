@@ -1304,5 +1304,5 @@
   "INTERFACE_GUIDE_DEVICE_BLOCK_CATEGORIES": "{N, number} | Device Block Categories",
   "INTERFACE_GUIDE_DEVICE_BLOCK_CATEGORIES_DESCRIPTION": "Choose Cog blocks. Optional device categories, such as micro:bit, appear here when their extension is enabled.",
   "INTERFACE_GUIDE_ZOOM": "{N, number} | Script Zoom",
-  "INTERFACE_GUIDE_ZOOM_DESCRIPTION": "Press and hold to zoom out for an overview of the programming area; release to return to normal size."
+  "INTERFACE_GUIDE_ZOOM_DESCRIPTION": "Use the minus and plus buttons to zoom the programming area out or in by 20% per click."
 }

@@ -10,10 +10,11 @@ import Menu from '../blocks/Menu';
 import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
 import {
-    gn, localx, localy, newHTML, isTablet,
-    globalx, globaly, setCanvasSize, getDocumentHeight, frame
+    gn, newButton, newHTML, isTablet,
+    setCanvasSize, getDocumentHeight, frame
 } from '../../utils/lib';
 
+import { zoomInSvg } from '../../html-svgs/zoom-in-svg';
 import { zoomOutSvg } from '../../html-svgs/zoom-out-svg';
 
 let scroll = undefined;
@@ -53,11 +54,23 @@ export default class ScriptsPane {
         scroll.contents.setAttribute('aria-label', getGuideLabel('INTERFACE_GUIDE_PROGRAMMING_SCRIPT'));
         zoom = new Zoom(scroll.contents);
 
-        // Add zoom button
-        const zoomButton = newHTML('div', 'zoom-button', div);
-        zoomButton.innerHTML = zoomOutSvg;
-        zoomButton.onpointerdown = () => zoom.zoomOut();
-        zoomButton.onpointerup = () => zoom.zoomReset();
+        const zoomControls = newHTML('div', 'zoom-controls', div);
+        zoomControls.setAttribute('role', 'group');
+        zoomControls.setAttribute('aria-label', getGuideLabel('INTERFACE_GUIDE_ZOOM'));
+
+        const zoomOutButton = newButton('zoom-button', zoomControls, {
+            ariaLabel: 'Zoom out',
+            title: 'Zoom out'
+        });
+        zoomOutButton.innerHTML = zoomOutSvg;
+        zoomOutButton.onclick = ScriptsPane.zoomOut;
+
+        const zoomInButton = newButton('zoom-button', zoomControls, {
+            ariaLabel: 'Zoom in',
+            title: 'Zoom in'
+        });
+        zoomInButton.innerHTML = zoomInSvg;
+        zoomInButton.onclick = ScriptsPane.zoomIn;
     }
 
     static zoomIn() {
@@ -68,6 +81,45 @@ export default class ScriptsPane {
     static zoomOut() {
         zoom.zoomOut();
         scroll.refresh();
+    }
+
+    static getScriptPoint(sc, x, y) {
+        return zoom.getLocalPoint(sc, x, y);
+    }
+
+    static getScriptPosition(sc, element) {
+        var rect = element.getBoundingClientRect();
+        return ScriptsPane.getScriptPoint(sc, rect.left, rect.top);
+    }
+
+    static applyDragTransform(element) {
+        var scale = element.dragVisualScale || 1;
+        var scaleTransform = scale == 1 ? '' : ' scale(' + scale + ')';
+        element.style.webkitTransform = 'translate3d(' + element.left + 'px,' +
+            element.top + 'px, 0)' + scaleTransform;
+    }
+
+    static positionDragCanvas(element, x, y) {
+        element.left = x;
+        element.top = y;
+        ScriptsPane.applyDragTransform(element);
+    }
+
+    static moveDragCanvas(element, dx, dy) {
+        ScriptsPane.positionDragCanvas(element, element.left + dx, element.top + dy);
+    }
+
+    static applyZoomToDragCanvas(element) {
+        element.dragVisualScale = zoom.getRenderedScale();
+        element.style.webkitTransformOrigin = '0 0';
+        element.style.transformOrigin = '0 0';
+        ScriptsPane.applyDragTransform(element);
+    }
+
+    static clearDragScale(element) {
+        delete element.dragVisualScale;
+        element.style.webkitTransformOrigin = '';
+        element.style.transformOrigin = '';
     }
 
     static setActiveScript(sprname) {
@@ -108,19 +160,13 @@ export default class ScriptsPane {
         var sc = ScratchJr.getActiveScript().owner;
         sc.dragList = sc.findGroup(Events.dragthumbnail.owner);
         sc.flowCaret = null;
-        var sy = Events.dragthumbnail.parentNode.scrollTop;
-        var sx = Events.dragthumbnail.parentNode.scrollLeft;
         Events.dragmousex = x;
         Events.dragmousey = y;
-        var lpt = {
-            x: localx(Events.dragthumbnail.parentNode, x),
-            y: localy(Events.dragthumbnail.parentNode, y)
-        };
-        var mx = Events.dragmousex - globalx(Events.dragDiv) - lpt.x + Events.dragthumbnail.left;
-        var my = Events.dragmousey - globaly(Events.dragDiv) - lpt.y + Events.dragthumbnail.top;
+        var draggedRect = Events.dragthumbnail.getBoundingClientRect();
+        var dragLayerRect = Events.dragDiv.getBoundingClientRect();
+        var mx = draggedRect.left - dragLayerRect.left;
+        var my = draggedRect.top - dragLayerRect.top;
         var mtx = new WebKitCSSMatrix(window.getComputedStyle(Events.dragthumbnail).webkitTransform);
-        my -= sy;
-        mx -= sx;
         Events.dragcanvas = Events.dragthumbnail;
         Events.dragcanvas.origin = 'scripts';
         Events.dragcanvas.startx = mtx.m41;
@@ -128,9 +174,10 @@ export default class ScriptsPane {
         if (!Events.dragcanvas.isReporter && Events.dragcanvas.parentNode) {
             Events.dragcanvas.parentNode.removeChild(Events.dragcanvas);
         }
-        Events.move3D(Events.dragcanvas, mx, my);
         Events.dragcanvas.style.zIndex = ScratchJr.dragginLayer;
         Events.dragDiv.appendChild(Events.dragcanvas);
+        ScriptsPane.applyZoomToDragCanvas(Events.dragcanvas);
+        ScriptsPane.positionDragCanvas(Events.dragcanvas, mx, my);
         var b = Events.dragcanvas.owner;
         b.detachBlock();
         //	b.lift();
@@ -158,19 +205,20 @@ export default class ScriptsPane {
         var pt = Events.getTargetPoint(e);
         var dx = pt.x - Events.dragmousex;
         var dy = pt.y - Events.dragmousey;
-        Events.move3D(Events.dragcanvas, dx, dy);
-        ScriptsPane.blockFeedback(Events.dragcanvas.left, Events.dragcanvas.top, e);
+        ScriptsPane.moveDragCanvas(Events.dragcanvas, dx, dy);
+        ScriptsPane.blockFeedback(e);
     }
 
-    static blockFeedback(dx, dy, e) {
+    static blockFeedback(e) {
         var script = ScratchJr.getActiveScript().owner;
-        var limit = gn('palette').parentNode.offsetTop + gn('palette').parentNode.offsetHeight;
-        var ycor = dy + Events.dragcanvas.offsetHeight;
-        if (ycor < limit) {
+        var dragRect = Events.dragcanvas.getBoundingClientRect();
+        var paletteRect = gn('palette').parentNode.getBoundingClientRect();
+        if (dragRect.bottom < paletteRect.bottom) {
             script.removeCaret();
         } else {
             script.removeCaret();
-            script.insertCaret(dx, dy);
+            var position = ScriptsPane.getScriptPosition(ScratchJr.getActiveScript(), Events.dragcanvas);
+            script.insertCaret(position.x, position.y);
         }
         var thumb;
         switch (Palette.getLandingPlace(script.dragList[0].div, e)) {
@@ -209,9 +257,8 @@ export default class ScriptsPane {
         var page = ScratchJr.stage.currentPage;
         switch (Palette.getLandingPlace(el, e)) {
             case 'scripts':
-                var dx = localx(sc, el.left);
-                var dy = localy(sc, el.top);
-                ScriptsPane.blockDropped(sc, dx, dy);
+                var position = ScriptsPane.getScriptPosition(sc, el);
+                ScriptsPane.blockDropped(sc, position.x, position.y);
                 // Start the story if scripts is changed.
                 ScratchJr.storyStart('ScriptsPane.changed');
                 break;
@@ -257,6 +304,7 @@ export default class ScriptsPane {
 
     static blockDropped(sc, dx, dy) {
         Events.dragcanvas.style.zIndex = '';
+        ScriptsPane.clearDragScale(Events.dragcanvas);
         var script = ScratchJr.getActiveScript().owner;
         ScriptsPane.cleanCarets();
         script.addBlockToScripts(Events.dragcanvas, dx, dy);
@@ -346,7 +394,8 @@ export default class ScriptsPane {
         var dy = pt.y - Events.dragmousey;
         Events.dragmousex = pt.x;
         Events.dragmousey = pt.y;
-        Events.move3D(ScratchJr.getActiveScript(), dx, dy);
+        var renderedScale = zoom.getRenderedScale();
+        Events.move3D(ScratchJr.getActiveScript(), dx / renderedScale, dy / renderedScale);
         scroll.refresh();
         e.preventDefault();
     }

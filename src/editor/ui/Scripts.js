@@ -10,7 +10,7 @@ import Undo from './Undo';
 import Events from '../../utils/Events';
 import ScratchAudio from '../../utils/ScratchAudio';
 import {gn, newHTML, setCanvasSize, setProps,
-    localx, localy, scaleMultiplier, hit3DRect, isTablet} from '../../utils/lib';
+    scaleMultiplier, hit3DRect, isTablet} from '../../utils/lib';
 import { makeSemanticButton, moveFocusByKey, setPressedState } from '../../utils/accessibility';
 
 export default class Scripts {
@@ -91,10 +91,7 @@ export default class Scripts {
         ScratchJr.unfocus(e);
         var sc = ScratchJr.getActiveScript();
         var spt = Events.getTargetPoint(e);
-        var pt = {
-            x: localx(sc, spt.x),
-            y: localy(sc, spt.y)
-        };
+        var pt = ScriptsPane.getScriptPoint(sc, spt.x, spt.y);
         for (var i = sc.childElementCount - 1; i > -1; i--) {
             var ths = sc.childNodes[i];
             if (!ths.owner) {
@@ -787,9 +784,8 @@ export default class Scripts {
         if (this.flowCaret == null) {
             return;
         }
-        var sc = ScratchJr.getActiveScript();
-        var dx = localx(sc, x);
-        var dy = localy(sc, y) + this.adjustCheight(this.dragList[0]);
+        var dx = x;
+        var dy = y + this.adjustCheight(this.dragList[0]);
         this.flowCaret.moveBlock(dx, dy);
         this.snapToPlace(new Array(this.flowCaret));
         if (this.flowCaret.div.style.visibility == 'visible') {

@@ -2082,12 +2082,30 @@ p.textsprite {
     -webkit-text-size-adjust: auto;
 }
 
-.zoom-button {
+.zoom-controls {
     position: absolute;
     bottom: 10px;
     right: 10px;
+    display: flex;
+    z-index: 1000;
+}
+
+.zoom-button {
     width: 50px;
     height: 50px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
     cursor: pointer;
-    z-index: 1000;
+}
+
+.zoom-button + .zoom-button {
+    margin-left: 8px;
+}
+
+.zoom-button svg {
+    display: block;
+    width: 100%;
+    height: 100%;
 }

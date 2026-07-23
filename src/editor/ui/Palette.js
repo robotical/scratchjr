@@ -370,6 +370,7 @@ export default class Palette {
         Events.dragcanvas = Events.dragthumbnail.owner.duplicateBlock(mx, my, sc.spr).div;
         Events.dragcanvas.style.zIndex = ScratchJr.dragginLayer;
         Events.dragDiv.appendChild(Events.dragcanvas);
+        ScriptsPane.applyZoomToDragCanvas(Events.dragcanvas);
         // Events.dragcanvas.owner.lift();
         sc.dragList = [Events.dragcanvas.owner];
         sc.prepareCaret(Events.dragcanvas.owner);
@@ -866,12 +867,14 @@ export default class Palette {
     // move to scratch jr app
     static getLandingPlace(el, e, scale) {
         scale = typeof scale !== 'undefined' ? scale : 1;
+        var dragVisualScale = el.dragVisualScale || 1;
         var sc = ScratchJr.getActiveScript().owner;
         var pt = e ? Events.getTargetPoint(e) : null;
         if (pt && !pt.x) {
             pt = null;
         }
-        var box = new Rectangle(el.left / scale, el.top / scale, el.offsetWidth / scale, el.offsetHeight / scale);
+        var box = new Rectangle(el.left / scale, el.top / scale,
+            el.offsetWidth * dragVisualScale / scale, el.offsetHeight * dragVisualScale / scale);
         var box2 = new Rectangle(globalx(gn('palette')), globaly(gn('palette')),
             gn('palette').offsetWidth, gn('palette').offsetHeight);
         if ((sc.flowCaret != null) && ((sc.flowCaret.prev != null) ||
@@ -921,7 +924,9 @@ export default class Palette {
 
     static getHittedThumb(el, div, scale) {
         scale = typeof scale !== 'undefined' ? scale : 1;
-        var box1 = new Rectangle(el.left / scale, el.top / scale, el.offsetWidth / scale, el.offsetHeight / scale);
+        var dragVisualScale = el.dragVisualScale || 1;
+        var box1 = new Rectangle(el.left / scale, el.top / scale,
+            el.offsetWidth * dragVisualScale / scale, el.offsetHeight * dragVisualScale / scale);
         var area = 0;
         var res = null;
         var dh = div.parentNode.scrollTop;
@@ -966,9 +971,8 @@ export default class Palette {
             case 'scripts':
                 OS.analyticsEvent('editor', 'new_block_' + element.owner.blocktype);
                 var sc = ScratchJr.getActiveScript();
-                var dx = localx(sc, element.left);
-                var dy = localy(sc, element.top);
-                ScriptsPane.blockDropped(sc, dx, dy);
+                var position = ScriptsPane.getScriptPosition(sc, element);
+                ScriptsPane.blockDropped(sc, position.x, position.y);
                 var spr = ScratchJr.getActiveScript().owner.spr;
                 Undo.record({
                     action: 'scripts',
