@@ -195,7 +195,7 @@ async function readProjectRow(page, projectId) {
 
 describe("cloud project loading from My Projects", () => {
   it(
-    "imports typed and saved cloud IDs, even when the usage timestamp cannot be updated",
+    "imports typed and saved cloud IDs, removes stale entries, and ignores tracking failures",
     async () => {
       const { browser, page, errors, state } = await openPage();
 
@@ -257,6 +257,16 @@ describe("cloud project loading from My Projects", () => {
         expect(state.blockedLastAccessErrors).toBeGreaterThan(0);
 
         state.failLastAccessedUpdate = false;
+        await page.evaluate((storageKey) => {
+          const entries = JSON.parse(window.localStorage.getItem(storageKey) || "[]");
+          entries.push({
+            customId: "missing-id",
+            projectName: "Unavailable project",
+            savedAt: Date.now(),
+            lastUsed: Date.now(),
+          });
+          window.localStorage.setItem(storageKey, JSON.stringify(entries));
+        }, CLOUD_IDS_STORAGE_KEY);
         await page.goto(`${HOST}/home.html?place=home`, { waitUntil: "networkidle2", timeout: 30_000 });
         await page.waitForSelector("#cloudproject .card-action-open", { timeout: 30_000 });
         expect(await page.$$eval(
@@ -266,17 +276,31 @@ describe("cloud project loading from My Projects", () => {
 
         await page.click("#cloudproject .card-action-open");
         await page.waitForSelector("#cloud-project-load-dialog[role='dialog']", { timeout: 10_000 });
-        await page.type("#cloud-project-id-input", "missing-id");
-        await page.click("#cloud-project-load-submit");
+        await page.waitForSelector(".cloud-project-saved-button[data-cloud-id='missing-id']", {
+          timeout: 10_000,
+        });
+        await page.click(".cloud-project-saved-button[data-cloud-id='missing-id']");
         await page.waitForFunction(
           () => {
             const status = document.getElementById("cloud-project-load-status");
-            return status && status.getAttribute("role") === "alert" && status.textContent.includes("could not be loaded");
+            return status && status.getAttribute("role") === "alert" &&
+              status.textContent.includes("no longer available");
           },
           { timeout: 10_000 }
         );
         expect(await page.$("#cloud-project-load-dialog")).not.toBeNull();
         expect(await page.$eval("#cloud-project-id-input", (input) => input.disabled)).toBe(false);
+
+        await page.click(".cloud-project-saved-remove[data-cloud-id='missing-id']");
+        expect(await page.$(".cloud-project-saved-button[data-cloud-id='missing-id']")).toBeNull();
+        expect(await page.$(".cloud-project-saved-remove[data-cloud-id='missing-id']")).toBeNull();
+        expect(await page.$(`.cloud-project-saved-button[data-cloud-id='${customId}']`)).not.toBeNull();
+        expect(await page.evaluate((storageKey) => {
+          const entries = JSON.parse(window.localStorage.getItem(storageKey) || "[]");
+          return entries.some((entry) => entry.customId === "missing-id");
+        }, CLOUD_IDS_STORAGE_KEY)).toBe(false);
+        expect(await page.$eval("#cloud-project-load-status", (element) => element.textContent))
+          .toContain("Saved cloud ID removed");
         expect(errors).toEqual([]);
       } finally {
         await browser.close();

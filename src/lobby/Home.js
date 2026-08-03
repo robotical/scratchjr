@@ -12,7 +12,7 @@ import ScratchAudio from "../utils/ScratchAudio";
 import Vector from "../geom/Vector";
 import { gn, newHTML, newButton, isTablet } from "../utils/lib";
 import { closeDialog, openDialog, registerDialog } from "../utils/accessibility";
-import { addStoredCloudId, getStoredCloudIds } from "../utils/cloudLocalStore";
+import { addStoredCloudId, getStoredCloudIds, removeStoredCloudId } from "../utils/cloudLocalStore";
 import goToLink from "../utils/goToLink";
 
 let frame;
@@ -491,13 +491,22 @@ export default class Home {
     var savedTitle = newHTML("h3", "cloud-project-saved-title", savedSection);
     savedTitle.textContent = Localization.localizeOptional("Saved cloud IDs");
     var savedList = newHTML("div", "cloud-project-saved-list", savedSection);
-    if (storedEntries.length < 1) {
+
+    var loading = false;
+    var savedButtons = [];
+
+    function showEmptySavedMessage() {
+      if (savedList.querySelector(".cloud-project-saved-item") ||
+          savedList.querySelector(".cloud-project-saved-empty")) {
+        return;
+      }
       var emptyMessage = newHTML("p", "cloud-project-saved-empty", savedList);
       emptyMessage.textContent = Localization.localizeOptional("No saved cloud IDs on this device yet.");
     }
 
-    var loading = false;
-    var savedButtons = [];
+    if (storedEntries.length < 1) {
+      showEmptySavedMessage();
+    }
 
     function setLoading(isLoading) {
       loading = isLoading;
@@ -555,10 +564,10 @@ export default class Home {
       }).catch(function (err) {
         console.warn("Home: cloud project load failed", err);
         setLoading(false);
-        setStatus(
-          Localization.localizeOptional("Cloud project could not be loaded. Check the ID and try again."),
-          true
-        );
+        var message = err && err.code == "CLOUD_PROJECT_NOT_FOUND"
+          ? "This cloud project is no longer available. You can remove its saved ID using the × button."
+          : "Cloud project could not be loaded. Check your connection and try again.";
+        setStatus(Localization.localizeOptional(message), true);
         input.focus();
         input.select();
       });
@@ -569,7 +578,8 @@ export default class Home {
         var label = entry.projectName
           ? entry.projectName + " (" + entry.customId + ")"
           : entry.customId;
-        var savedButton = newButton("cloud-project-saved-button", savedList, {
+        var savedItem = newHTML("div", "cloud-project-saved-item", savedList);
+        var savedButton = newButton("cloud-project-saved-button", savedItem, {
           textContent: label,
           ariaLabel: Localization.localizeOptional("Load cloud project") + " " + label
         });
@@ -579,7 +589,25 @@ export default class Home {
           e.stopPropagation();
           loadCloudProject(entry.customId);
         };
+        var removeButton = newButton("cloud-project-saved-remove", savedItem, {
+          textContent: "×",
+          ariaLabel: Localization.localizeOptional("Remove saved cloud ID") + " " + label,
+          title: Localization.localizeOptional("Remove saved cloud ID")
+        });
+        removeButton.setAttribute("data-cloud-id", entry.customId);
+        removeButton.onclick = function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          removeStoredCloudId(entry.customId);
+          if (savedItem.parentNode) {
+            savedItem.parentNode.removeChild(savedItem);
+          }
+          setStatus(Localization.localizeOptional("Saved cloud ID removed."), false);
+          showEmptySavedMessage();
+          input.focus();
+        };
         savedButtons.push(savedButton);
+        savedButtons.push(removeButton);
       })(storedEntries[i]);
     }
 

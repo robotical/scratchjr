@@ -286,7 +286,9 @@ export default class ProjectCloud {
   static async loadProjectFromCloud(customId, options) {
     var result = await WebappInterface.cloud_loadProject(customId);
     if (!result || !result.packageData) {
-      throw new Error("Project not found in cloud");
+      var notFoundError = new Error("Project not found in cloud");
+      notFoundError.code = "CLOUD_PROJECT_NOT_FOUND";
+      throw notFoundError;
     }
     var packageData = result.packageData;
     if (packageData && packageData.project && typeof packageData.project === "object" &&

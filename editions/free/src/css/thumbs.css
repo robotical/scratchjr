@@ -383,7 +383,8 @@
 
 .cloud-project-cancel,
 .cloud-project-load,
-.cloud-project-saved-button {
+.cloud-project-saved-button,
+.cloud-project-saved-remove {
     min-height: ${css_vh(6)};
     padding: ${css_vh(0.8)} ${css_vw(1.5)};
     border: 2px solid transparent;
@@ -406,9 +407,30 @@
     background: #2f9d50;
 }
 
+.cloud-project-saved-item {
+    display: inline-flex;
+    align-items: stretch;
+}
+
+.cloud-project-saved-item .cloud-project-saved-button {
+    border-radius: ${css_vh(1.2)} 0 0 ${css_vh(1.2)};
+}
+
+.cloud-project-saved-remove {
+    min-width: ${css_vh(6)};
+    padding-right: ${css_vw(1)};
+    padding-left: ${css_vw(1)};
+    border-color: #7e1821;
+    border-radius: 0 ${css_vh(1.2)} ${css_vh(1.2)} 0;
+    background: #a51f2b;
+    font-size: ${css_vh(3.5)};
+    line-height: 1;
+}
+
 .cloud-project-cancel:disabled,
 .cloud-project-load:disabled,
-.cloud-project-saved-button:disabled {
+.cloud-project-saved-button:disabled,
+.cloud-project-saved-remove:disabled {
     cursor: wait;
     opacity: 0.55;
 }
@@ -416,6 +438,7 @@
 .cloud-project-cancel:focus-visible,
 .cloud-project-load:focus-visible,
 .cloud-project-saved-button:focus-visible,
+.cloud-project-saved-remove:focus-visible,
 .cloud-project-id-input:focus-visible {
     outline: 3px solid #133c46;
     outline-offset: 3px;
