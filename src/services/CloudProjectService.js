@@ -92,11 +92,20 @@ async function updateLastAccessed(cloudId) {
   const trimmed = cloudId.trim();
   if (!trimmed) return;
 
-  await fetch(`${PROJECTS_ENDPOINT}/${trimmed}/lastAccessed.json`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(Date.now()), // must be valid JSON
-  });
+  try {
+    const response = await fetch(`${PROJECTS_ENDPOINT}/${trimmed}/lastAccessed.json`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(Date.now()), // must be valid JSON
+    });
+    if (!response.ok) {
+      console.warn(`CloudProjectService: failed to update lastAccessed (${response.status})`);
+    }
+  } catch (err) {
+    // Loading the project is the primary operation. A best-effort usage timestamp
+    // must not make an otherwise valid cloud project impossible to open.
+    console.warn("CloudProjectService: failed to update lastAccessed", err);
+  }
 }
 
 /** ---- public API ---- */

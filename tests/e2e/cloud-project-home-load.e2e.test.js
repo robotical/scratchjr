@@ -74,6 +74,10 @@ async function installFirebaseStub(page, state) {
       return;
     }
     if (method === "PUT") {
+      if (state.failLastAccessedUpdate) {
+        request.abort("failed");
+        return;
+      }
       request.respond(jsonResponse(null));
       return;
     }
@@ -103,11 +107,20 @@ async function openPage() {
   });
   const page = await browser.newPage();
   const errors = [];
-  const state = { cloudRecord: null, requests: [] };
+  const state = {
+    cloudRecord: null,
+    requests: [],
+    failLastAccessedUpdate: false,
+    blockedLastAccessErrors: 0,
+  };
 
   page.on("pageerror", (err) => errors.push(err.message || String(err)));
   page.on("console", (msg) => {
     if (msg.type() === "error") {
+      if (state.failLastAccessedUpdate && msg.text().includes("Failed to load resource: net::ERR_FAILED")) {
+        state.blockedLastAccessErrors += 1;
+        return;
+      }
       errors.push(msg.text());
     }
   });
@@ -182,7 +195,7 @@ async function readProjectRow(page, projectId) {
 
 describe("cloud project loading from My Projects", () => {
   it(
-    "imports a cloud project by ID, keeps it visible, and reports unknown IDs",
+    "imports typed and saved cloud IDs, even when the usage timestamp cannot be updated",
     async () => {
       const { browser, page, errors, state } = await openPage();
 
@@ -226,6 +239,33 @@ describe("cloud project loading from My Projects", () => {
         await page.waitForSelector(`.cloud-project-saved-button[data-cloud-id='${customId}']`, {
           timeout: 10_000,
         });
+
+        const updateRequestsBeforeSavedLoad = state.requests.filter(({ method }) => method === "PUT").length;
+        state.failLastAccessedUpdate = true;
+        await Promise.all([
+          page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30_000 }),
+          page.click(`.cloud-project-saved-button[data-cloud-id='${customId}']`),
+        ]);
+        await waitForEditorReady(page);
+
+        const savedButtonImportId = await page.evaluate(() => String(window.ScratchJr.currentProject));
+        expect(savedButtonImportId).not.toBe(originalProjectId);
+        expect(savedButtonImportId).not.toBe(importedProjectId);
+        expect((await readProjectRow(page, savedButtonImportId)).name).toBe(originalProject.name);
+        expect(state.requests.filter(({ method }) => method === "PUT").length)
+          .toBeGreaterThan(updateRequestsBeforeSavedLoad);
+        expect(state.blockedLastAccessErrors).toBeGreaterThan(0);
+
+        state.failLastAccessedUpdate = false;
+        await page.goto(`${HOST}/home.html?place=home`, { waitUntil: "networkidle2", timeout: 30_000 });
+        await page.waitForSelector("#cloudproject .card-action-open", { timeout: 30_000 });
+        expect(await page.$$eval(
+          "#scrollarea .projectthumb:not(#newproject):not(#cloudproject)",
+          (cards) => cards.length
+        )).toBe(3);
+
+        await page.click("#cloudproject .card-action-open");
+        await page.waitForSelector("#cloud-project-load-dialog[role='dialog']", { timeout: 10_000 });
         await page.type("#cloud-project-id-input", "missing-id");
         await page.click("#cloud-project-load-submit");
         await page.waitForFunction(
