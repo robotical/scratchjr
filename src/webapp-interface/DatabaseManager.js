@@ -3,11 +3,13 @@ import sqlWasm from "!!file-loader?name=sql-wasm-[contenthash].wasm!sql.js/dist/
 import { readdir, writeFile, readFile } from "fs-web";
 
 const SCRATCH_JR_DB_NAME_LOCAL_STORAGE = "scratchjrDb";
+const DEVICE_LOCAL_STORAGE_OUT_OF_SYNC_KEY = "scratchjrDeviceLocalStorageOutOfSync";
 
 export default class DatabaseManager {
   constructor(databaseFilename, databaseDir) {
     this.databaseFilename = databaseFilename;
     this.databaseDir = databaseDir;
+    this.saveQueue = Promise.resolve();
   }
 
   async init() {
@@ -20,30 +22,56 @@ export default class DatabaseManager {
       }
     }
 
-    if (window.applicationManager && window.applicationManager.isPhoneApp()) {
-      // we are on the phone app, so we need to load the database from local storage
-      dbExists = false;
-    }
-
-    if (!dbExists) {
-      console.log("db doesn't exist, looking at local storage...");
-      // if it doesn't exist, and we are on the phone app, look at local storage
+    const isPhoneApp = window.applicationManager && window.applicationManager.isPhoneApp();
+    // A failed native write leaves the filesystem copy as the only known-current snapshot.
+    const filesystemIsNewer = dbExists && this.isDeviceLocalStorageOutOfSync();
+    let deviceLoadAttempted = false;
+    const openDeviceCopy = async () => {
+      deviceLoadAttempted = true;
+      console.log("looking for db in device local storage...");
       const localStorageBuffer = await this.getFromDeviceLocalStorage();
       if (localStorageBuffer && localStorageBuffer.byteLength > 10) {
         console.log("opening from local storage...");
         await this.openFromLocalStorage(localStorageBuffer);
-      } else {
-        console.log("local storage didn't have a db, creating new db...");
-        await this.initTables();
       }
-      this.runMigrations();
-      this.save();
-    } else {
+    };
+    if (isPhoneApp && !filesystemIsNewer) {
+      await openDeviceCopy();
+    }
+
+    if (!this.isOpen() && dbExists) {
       console.log("db exists, opening...")
       await this.open();
-      this.runMigrations();
-      this.save();
     }
+
+    // A corrupt authoritative filesystem copy is still preferable to data
+    // destruction. Try the older native mirror as recovery before giving up.
+    if (!this.isOpen() && isPhoneApp && !deviceLoadAttempted) {
+      await openDeviceCopy();
+    }
+
+    if (!this.isOpen() && dbExists) {
+      throw new Error("Existing ScratchJr database could not be opened");
+    }
+
+    let createdNewDatabase = false;
+    if (!this.isOpen()) {
+      console.log("neither local storage nor the filesystem had a db, creating new db...");
+      await this.initTables();
+      createdNewDatabase = true;
+    }
+
+    this.runMigrations();
+    if (createdNewDatabase) {
+      const initialData = this.db.export();
+      await writeFile(this.databaseFilename, initialData.buffer);
+    }
+    // The in-memory database is ready for use even when the native mirror is
+    // temporarily unavailable. Keep the initial snapshot in the normal queue,
+    // but do not let a mirror outage prevent the editor from loading.
+    this.save().catch((error) => {
+      console.warn("Initial database snapshot save failed", error);
+    });
   }
 
   /** Opens the databse from local storage buffer */
@@ -63,12 +91,10 @@ export default class DatabaseManager {
 
   /** opens the database */
   async open() {
-    const fileToOpen = this.databaseFilename;
-
-    const filebuffer = await readFile(fileToOpen);
-    const buffer = new Uint8Array(filebuffer);
-    console.log("opening existing db")
     try {
+      const filebuffer = await readFile(this.databaseFilename);
+      const buffer = new Uint8Array(filebuffer);
+      console.log("opening existing db")
       const SQL = await initSqlJs({ locateFile: () => sqlWasm });
       // Load the db
       this.db = new SQL.Database(buffer);
@@ -135,23 +161,102 @@ export default class DatabaseManager {
 
   /** saves the database to the file specified in this.databaseFilename */
   async save() {
-    const data = this.db.export();
-    const buffer = data.buffer;
-    const saveOperations = [writeFile(this.databaseFilename, buffer)];
-    const deviceLocalStorageSave = this.saveToDeviceLocalStorage(buffer);
-    if (deviceLocalStorageSave) {
-      saveOperations.push(deviceLocalStorageSave);
-    }
-    this.lastSavePromise = Promise.all(saveOperations);
-    await this.lastSavePromise;
+    const savePromise = this.saveQueue
+      .catch(() => undefined)
+      .then(async () => {
+        const data = this.db.export();
+        const buffer = data.buffer;
+        const saveOperations = [writeFile(this.databaseFilename, buffer)];
+        let deviceLocalStorageSave;
+        try {
+          deviceLocalStorageSave = this.saveToDeviceLocalStorage(buffer);
+        } catch (error) {
+          deviceLocalStorageSave = Promise.reject(error);
+        }
+        if (deviceLocalStorageSave !== null && deviceLocalStorageSave !== undefined) {
+          saveOperations.push(
+            Promise.resolve(deviceLocalStorageSave).then((result) => {
+              if (result !== true) {
+                throw new Error("Device local storage save failed");
+              }
+              this.clearDeviceLocalStorageOutOfSync();
+              return result;
+            }).catch((error) => {
+              this.markDeviceLocalStorageOutOfSync();
+              throw error;
+            })
+          );
+        }
+
+        // Promise.all is intentionally fed operations that always resolve so
+        // the queue is not released while a sibling write is still running.
+        const outcomes = await Promise.all(saveOperations.map((operation) => {
+          return Promise.resolve(operation).then(
+            () => ({ succeeded: true }),
+            (error) => ({ error, succeeded: false })
+          );
+        }));
+        const failedOperation = outcomes.find((outcome) => !outcome.succeeded);
+        if (failedOperation) {
+          if (failedOperation.error instanceof Error) {
+            throw failedOperation.error;
+          }
+          throw new Error(String(failedOperation.error || "Database snapshot save failed"));
+        }
+      });
+
+    this.saveQueue = savePromise;
+    this.lastSavePromise = savePromise;
+    await savePromise;
   }
 
   saveToDeviceLocalStorage(buffer) {
     if (window.applicationManager && window.applicationManager.isPhoneApp()) {
+      // This write-ahead marker closes the teardown/crash window between the
+      // filesystem write and the native bridge response.
+      this.markDeviceLocalStorageOutOfSync();
       const base64String = this.arrayBufferToBase64(buffer);
       return window.applicationManager.saveFileOnDeviceLocalStorage('scratchjr', SCRATCH_JR_DB_NAME_LOCAL_STORAGE, base64String);
     }
     return null;
+  }
+
+  isDeviceLocalStorageOutOfSync() {
+    if (this.deviceLocalStorageOutOfSync === true) {
+      return true;
+    }
+    try {
+      if (!window.localStorage) {
+        return true;
+      }
+      return window.localStorage.getItem(DEVICE_LOCAL_STORAGE_OUT_OF_SYNC_KEY) === "true";
+    } catch (error) {
+      // If the marker cannot be read, prefer the filesystem rather than risk
+      // replacing it with an older native snapshot.
+      return true;
+    }
+  }
+
+  markDeviceLocalStorageOutOfSync() {
+    this.deviceLocalStorageOutOfSync = true;
+    try {
+      if (window.localStorage) {
+        window.localStorage.setItem(DEVICE_LOCAL_STORAGE_OUT_OF_SYNC_KEY, "true");
+      }
+    } catch (error) {
+      console.warn("Failed to mark device local storage as out of sync", error);
+    }
+  }
+
+  clearDeviceLocalStorageOutOfSync() {
+    try {
+      if (window.localStorage) {
+        window.localStorage.removeItem(DEVICE_LOCAL_STORAGE_OUT_OF_SYNC_KEY);
+      }
+      this.deviceLocalStorageOutOfSync = false;
+    } catch (error) {
+      console.warn("Failed to clear the device local storage sync marker", error);
+    }
   }
 
   async getFromDeviceLocalStorage() {
@@ -175,7 +280,7 @@ export default class DatabaseManager {
   /** removes all unused files of a specific filetype, e.g. unused svg files
           @param {string} fileType  note will be of format "wav" - not ".wav"
       */
-  cleanProjectFiles(fileType) {
+  async cleanProjectFiles(fileType) {
     // we don't use wav files, so translate that to webm.
     if (fileType === "wav") {
       fileType = "webm";
@@ -239,12 +344,11 @@ export default class DatabaseManager {
       // if the file is not being used, remove it
       console.log("...not in use, removing: ", currentFileToCheck);
 
-      this.removeProjectFile(currentFileToCheck);
+      await this.removeProjectFile(currentFileToCheck);
     }
-    this.save();
   }
 
-  removeProjectFile(fileMD5) {
+  async removeProjectFile(fileMD5) {
     const json = {};
     json.cond = "MD5 = ?";
     json.items = ["CONTENTS"];
@@ -255,7 +359,8 @@ export default class DatabaseManager {
 
     this.query(json);
 
-    this.save(); // flush the database to disk.
+    await this.save(); // flush the database to disk.
+    return true;
   }
   /** loads a file from the PROJECTFILES table
           @param {string} fileMD5 filename
@@ -277,7 +382,7 @@ export default class DatabaseManager {
     return null;
   }
 
-  saveToProjectFiles(fileMD5, content) {
+  async saveToProjectFiles(fileMD5, content) {
     const json = {};
     const keylist = ["md5", "contents"];
     const values = "?,?";
@@ -285,7 +390,7 @@ export default class DatabaseManager {
     json.stmt = `insert into projectfiles (${keylist.toString()}) values (${values})`;
     var insertSQLResult = this.stmt(json);
 
-    this.save(); // flush the database to disk.
+    await this.save(); // flush the database to disk.
 
     return insertSQLResult >= 0;
   }

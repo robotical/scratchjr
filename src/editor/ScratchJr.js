@@ -432,7 +432,7 @@ export default class ScratchJr {
         /*Tutorial*/ 
         // don't save project if we are in tutorial mode
         if (window.tutorialEngine) {
-            return onDone && onDone();
+            return onDone && onDone(true);
         }
         if (ScratchJr.isEditable() && !Project.error && changed) {
             if (editmode != 'storyStarter') {
@@ -446,7 +446,7 @@ export default class ScratchJr {
             }
         }
         if (onDone) {
-            onDone();
+            onDone(true);
         }
     }
 
@@ -487,7 +487,13 @@ export default class ScratchJr {
         OS.analyticsEvent('editor', 'project_editor_close');
     }
 
-    static flippage() {
+    static flippage(persisted) {
+        if (persisted === false) {
+            onHold = false;
+            Alert.close();
+            Alert.open(frame, gn('flip'), 'Save failed', '#ff0000');
+            return;
+        }
         Alert.close();
         OS.cleanassets('wav', doNext);
         function doNext() {

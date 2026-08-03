@@ -16,6 +16,7 @@ import {frame, gn, newHTML, scaleMultiplier, getIdFor,
 let metadata = undefined;
 let mediaCount = -1;
 let saving = false;
+let pendingSave = undefined;
 let interval = undefined;
 let pageid;
 let loadIcon = undefined;
@@ -23,6 +24,11 @@ let error = false;
 let projectbarsize = 66;
 let mediaCountBase = 1;
 let pendingEditorMode = null;
+let recoverySnapshotLoaded = false;
+
+const THUMBNAIL_SAVE_TIMEOUT = 3000;
+const PROJECT_SAVE_TIMEOUT = 5000;
+const RECOVERY_SNAPSHOT_KEY_PREFIX = 'scratchjrProjectRecovery:';
 
 const EDITOR_MODE_MARTY = 'marty';
 const EDITOR_MODE_SPRITE = 'sprite';
@@ -56,6 +62,10 @@ export default class Project {
 
     static get error () {
         return error;
+    }
+
+    static get saving () {
+        return saving;
     }
 
 
@@ -105,6 +115,11 @@ export default class Project {
         ScratchJr.log('got project metadata', ScratchJr.getTime(), 'sec');
         var data = JSON.parse(str)[0];
         metadata = IO.parseProjectData(data);
+        var recoverySnapshot = Project.loadRecoverySnapshot(ScratchJr.currentProject, metadata);
+        recoverySnapshotLoaded = Boolean(recoverySnapshot);
+        if (recoverySnapshot) {
+            metadata.json = recoverySnapshot;
+        }
         mediaCount = -1;
         if (metadata.json) {
             Project.loadData(metadata.json, doneProjectLoad);
@@ -134,7 +149,7 @@ export default class Project {
             Project.liftCurtain();
             ScratchJr.stage.currentPage.update();
             Project.applyLoadedEditorMode();
-            ScratchJr.changed = false;
+            ScratchJr.changed = recoverySnapshotLoaded;
             ScratchJr.storyStarted = false;
             UI.needsScroll();
             UI.setProjectInfoEnabled(true);
@@ -148,6 +163,8 @@ export default class Project {
 
     static init () {
         ScratchJr.log('Project init', ScratchJr.getTime(), 'sec');
+        window.addEventListener('pagehide', Project.storeRecoverySnapshot);
+        document.addEventListener('visibilitychange', Project.handleVisibilityChange);
         var bd = newHTML('div', 'modal-backdrop fade', frame.parentNode);
         bd.setAttribute('id', 'backdrop');
         setProps(gn('backdrop').style, {
@@ -529,6 +546,94 @@ export default class Project {
     // Save project data
     //////////////////////////////////////////////////
 
+    static handleVisibilityChange () {
+        if (document.visibilityState === 'hidden') {
+            Project.storeRecoverySnapshot();
+        }
+    }
+
+    static recoverySnapshotKey (id) {
+        return RECOVERY_SNAPSHOT_KEY_PREFIX + String(id);
+    }
+
+    static storeRecoverySnapshot () {
+        var id = ScratchJr.currentProject;
+        if (!id || ScratchJr.isSampleOrStarter() || !ScratchJr.stage || !ScratchJr.stage.pages[0]) {
+            return;
+        }
+        try {
+            var projectJSON = Project.getProject(ScratchJr.stage.pages[0].id);
+            if (!ScratchJr.changed && metadata && Project.projectDataMatches(projectJSON, metadata.json)) {
+                return;
+            }
+            window.localStorage.setItem(Project.recoverySnapshotKey(id), JSON.stringify({
+                id: String(id),
+                json: projectJSON,
+                projectCtime: metadata && metadata.ctime ? String(metadata.ctime) : null,
+                savedAt: Date.now(),
+                version: 1
+            }));
+        } catch (err) {
+            console.warn('Could not store the project recovery snapshot', err); //eslint-disable-line no-console
+        }
+    }
+
+    static loadRecoverySnapshot (id, durableMetadata) {
+        if (!id) {
+            return null;
+        }
+        var key = Project.recoverySnapshotKey(id);
+        try {
+            var rawSnapshot = window.localStorage.getItem(key);
+            if (!rawSnapshot) {
+                return null;
+            }
+            var snapshot = JSON.parse(rawSnapshot);
+            if (snapshot.version !== 1 || snapshot.id !== String(id) ||
+                typeof snapshot.savedAt !== 'number' || !isFinite(snapshot.savedAt) ||
+                !snapshot.json || !Array.isArray(snapshot.json.pages)) {
+                throw new Error('Invalid project recovery snapshot');
+            }
+            var durableMtime = durableMetadata ? parseInt(durableMetadata.mtime, 10) : NaN;
+            if (!isNaN(durableMtime) && snapshot.savedAt < durableMtime) {
+                throw new Error('Stale project recovery snapshot');
+            }
+            if (snapshot.projectCtime && durableMetadata && durableMetadata.ctime &&
+                snapshot.projectCtime !== String(durableMetadata.ctime)) {
+                throw new Error('Recovery snapshot belongs to a different project');
+            }
+            return snapshot.json;
+        } catch (err) {
+            try {
+                window.localStorage.removeItem(key);
+            } catch (removeError) {
+                // Ignore storage access failures; the database copy can still be loaded.
+            }
+            return null;
+        }
+    }
+
+    static clearRecoverySnapshot (id) {
+        if (!id) {
+            return;
+        }
+        try {
+            window.localStorage.removeItem(Project.recoverySnapshotKey(id));
+        } catch (err) {
+            // A stale recovery entry is safe: it will be overwritten or cleared by a later save.
+        }
+    }
+
+    static projectDataMatches (firstProject, secondProject) {
+        try {
+            var first = typeof firstProject === 'string' ? JSON.parse(firstProject) : firstProject;
+            var second = typeof secondProject === 'string' ? JSON.parse(secondProject) : secondProject;
+            return JSON.stringify(first) === JSON.stringify(second);
+        } catch (err) {
+            return false;
+        }
+    }
+
     static prepareToSave (id, whenDone) {
         if (saving) {
             Alert.open(frame, gn('flip'), 'Waiting', '#28A5DA');
@@ -540,12 +645,21 @@ export default class Project {
     }
 
     static waitUntilSaved (id, fcn) {
-        if (saving) {
-            setTimeout(function () {
-                Project.waitUntilSaved(id, fcn);
-            }, 500);
-        } else {
+        if (!saving) {
             Project.save(id, fcn);
+            return;
+        }
+
+        if (!pendingSave) {
+            pendingSave = {
+                id: id,
+                callbacks: []
+            };
+        } else {
+            pendingSave.id = id;
+        }
+        if (fcn) {
+            pendingSave.callbacks.push(fcn);
         }
     }
 
@@ -576,49 +690,155 @@ export default class Project {
     }
 
     static save (id, whenDone) {
-        // console.log(Error().stack);
         saving = true;
-        var th = metadata.thumbnail;
-        if (th && ScratchJr.editmode != 'storyStarter') { // Don't try to delete the thumbnail in a sample project
-            var thumb = (typeof th === 'string') ? JSON.parse(th) : th;
-            if (thumb.md5.indexOf('samples/') < 0) { // In case we've exited story-starter mode
-                Project.thumbnailUnique(thumb.md5, id, function (isUnique) {
-                    if (isUnique) {
-                        // the following removes the thumbnail the second time we save a project, but we actually need the thumb
-                        // OS.remove(thumb.md5, OS.trace); // remove thumb;
-                    }
-                });
+        if (!metadata) {
+            saving = false;
+            if (whenDone) {
+                whenDone(false);
+            }
+            return;
+        }
+
+        var previousThumbnail = metadata.thumbnail;
+        if (typeof previousThumbnail === 'string') {
+            try {
+                previousThumbnail = JSON.parse(previousThumbnail);
+            } catch (err) {
+                // Preserve the original value if an older project contains malformed thumbnail metadata.
             }
         }
-        metadata.id = id;
-        metadata.json = Project.getProject(ScratchJr.stage.pages[0].id);
-        Project.getThumbnailPNG(ScratchJr.stage.pages[0], 192, 144, getMD5);
+        var savedProjectJSON;
+        var thumbnailFinished = false;
+        var saveFinished = false;
+        var persistTimer;
+        var thumbnailTimer = setTimeout(function () {
+            persistProject(previousThumbnail);
+        }, THUMBNAIL_SAVE_TIMEOUT);
+
+        try {
+            metadata.id = id;
+            savedProjectJSON = Project.getProject(ScratchJr.stage.pages[0].id);
+            metadata.json = savedProjectJSON;
+            Project.getThumbnailPNG(ScratchJr.stage.pages[0], 192, 144, getMD5);
+        } catch (err) {
+            persistProject(previousThumbnail);
+        }
+
         function getMD5 (dataurl) {
-            var pngBase64 = dataurl.split(',')[1];
-            OS.getmd5(pngBase64, function (str) {
-                savePNG(str, pngBase64);
-            });
+            try {
+                var pngBase64 = dataurl && dataurl.split(',')[1];
+                if (!pngBase64) {
+                    persistProject(previousThumbnail);
+                    return;
+                }
+                OS.getmd5(pngBase64, function (str) {
+                    if (!str) {
+                        persistProject(previousThumbnail);
+                        return;
+                    }
+                    savePNG(str, pngBase64);
+                });
+            } catch (err) {
+                persistProject(previousThumbnail);
+            }
         }
 
         function savePNG (md5, pngBase64) {
-            var filename = ScratchJr.currentProject + '_' + md5;
-            OS.setmedianame(pngBase64, filename, 'png', doNext);
+            try {
+                var filename = ScratchJr.currentProject + '_' + md5;
+                OS.setmedianame(pngBase64, filename, 'png', doNext);
+            } catch (err) {
+                persistProject(previousThumbnail);
+            }
         }
 
         function doNext (md5) {
-            metadata.thumbnail = {
+            if (!md5) {
+                persistProject(previousThumbnail);
+                return;
+            }
+            persistProject({
                 'pagecount': ScratchJr.stage.pages.length,
                 'md5': md5
-            };
-            metadata.mtime = (new Date()).getTime().toString();
-            IO.saveProject(metadata, saveDone);
+            });
         }
 
-        function saveDone () {
+        function persistProject (nextThumbnail) {
+            if (thumbnailFinished) {
+                return;
+            }
+            thumbnailFinished = true;
+            clearTimeout(thumbnailTimer);
+            metadata.thumbnail = nextThumbnail;
+            metadata.mtime = (new Date()).getTime().toString();
+            persistTimer = setTimeout(function () {
+                saveDone(false);
+            }, PROJECT_SAVE_TIMEOUT);
+            try {
+                IO.saveProject(metadata, function (result) {
+                    saveDone(saveResultSucceeded(result));
+                });
+            } catch (err) {
+                saveDone(false);
+            }
+        }
+
+        function saveResultSucceeded (result) {
+            if (result === null || result === false || result === -1 || result === '-1') {
+                return false;
+            }
+            return typeof result !== 'string' || !/^(JSON|SQL) error:/.test(result);
+        }
+
+        function saveDone (persisted) {
+            if (saveFinished) {
+                return;
+            }
+            saveFinished = true;
+            clearTimeout(thumbnailTimer);
+            clearTimeout(persistTimer);
+
+            var nextSave = pendingSave;
+            pendingSave = undefined;
             saving = false;
+            if (persisted && !nextSave && projectMatchesSavedJSON()) {
+                ScratchJr.changed = false;
+                Project.clearRecoverySnapshot(id);
+            }
             if (whenDone) {
-                setTimeout(whenDone, 3000); // wait a bit to make sure the save is done
-                // whenDone();
+                try {
+                    whenDone(persisted);
+                } catch (err) {
+                    // A completion callback must not prevent a coalesced save from running.
+                }
+            }
+            if (nextSave) {
+                var runNextCallbacks = function (nextSavePersisted) {
+                    for (var i = 0; i < nextSave.callbacks.length; i++) {
+                        try {
+                            nextSave.callbacks[i](nextSavePersisted);
+                        } catch (err) {
+                            // One completion callback must not prevent the others from running.
+                        }
+                    }
+                };
+                if (saving) {
+                    Project.waitUntilSaved(nextSave.id, runNextCallbacks);
+                } else {
+                    Project.save(nextSave.id, runNextCallbacks);
+                }
+            }
+        }
+
+        function projectMatchesSavedJSON () {
+            if (!savedProjectJSON || !ScratchJr.stage || !ScratchJr.stage.pages[0]) {
+                return false;
+            }
+            try {
+                var currentProjectJSON = Project.getProject(ScratchJr.stage.pages[0].id);
+                return Project.projectDataMatches(currentProjectJSON, savedProjectJSON);
+            } catch (err) {
+                return false;
             }
         }
     }

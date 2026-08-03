@@ -10,7 +10,16 @@ let mediacounter = 0;
 export default class Webapp {
   // Database functions
   static async stmt(json, fcn) {
-    var result = await WebappInterface.database_stmt(json);
+    var result;
+    try {
+      result = await WebappInterface.database_stmt(json);
+    } catch (error) {
+      console.warn("Webapp stmt failed:", error);
+      if (typeof fcn !== "undefined") {
+        fcn(null);
+      }
+      return;
+    }
     if (typeof fcn !== "undefined") {
       fcn(result);
     }
@@ -33,8 +42,14 @@ export default class Webapp {
 
   // IO functions
   static async cleanassets(ft, fcn) {
-    await WebappInterface.io_cleanassets(ft);
-    fcn();
+    try {
+      await WebappInterface.io_cleanassets(ft);
+    } catch (error) {
+      console.warn("Webapp cleanassets failed:", error);
+    }
+    if (fcn) {
+      fcn();
+    }
   }
 
   static getmedia(file, fcn) {
@@ -80,14 +95,32 @@ export default class Webapp {
   }
 
   static async setmedia(str, ext, fcn) {
-    var result = await WebappInterface.io_setmedia(str, ext);
+    var result;
+    try {
+      result = await WebappInterface.io_setmedia(str, ext);
+    } catch (error) {
+      console.warn("Webapp setmedia failed:", error);
+      if (fcn) {
+        fcn(null);
+      }
+      return;
+    }
     if (fcn) {
       fcn(result);
     }
   }
 
   static async setmedianame(str, name, ext, fcn) {
-    var result = await WebappInterface.io_setmedianame(str, name, ext);
+    var result;
+    try {
+      result = await WebappInterface.io_setmedianame(str, name, ext);
+    } catch (error) {
+      console.warn("Webapp setmedianame failed:", error);
+      if (fcn) {
+        fcn(null);
+      }
+      return;
+    }
     if (fcn) {
       fcn(result);
     }
@@ -100,8 +133,17 @@ export default class Webapp {
     }
   }
 
-  static remove(str, fcn) {
-    var result = WebappInterface.io_remove(str);
+  static async remove(str, fcn) {
+    var result;
+    try {
+      result = await WebappInterface.io_remove(str);
+    } catch (error) {
+      console.warn("Webapp remove failed:", error);
+      if (fcn) {
+        fcn(null);
+      }
+      return;
+    }
     if (fcn) {
       fcn(result);
     }

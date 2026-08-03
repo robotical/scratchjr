@@ -7,6 +7,7 @@ export default class ScratchJRDataStore {
   constructor() {
     /** Cache of key to base64-encoded media value */
     this.mediaStrings = {};
+    this.databaseManagerPromise = null;
   }
 
   /** gets an md5 checksum of the data passed in.
@@ -19,14 +20,24 @@ export default class ScratchJRDataStore {
   }
 
   async getDatabaseManager() {
-    if (!this.databaseManager) {
-      const scratchFolder = await ScratchJRDataStore.getScratchJRFolder();
-      const scratchDBPath = path.join(scratchFolder, "scratchjr.sqllite");
-      this.databaseManager = new DatabaseManager(scratchDBPath, scratchFolder);
-      await this.databaseManager.init();
-      console.log("DatabaseManager created");
+    if (this.databaseManager) {
+      return this.databaseManager;
     }
-    return this.databaseManager;
+    if (!this.databaseManagerPromise) {
+      this.databaseManagerPromise = (async () => {
+        const scratchFolder = await ScratchJRDataStore.getScratchJRFolder();
+        const scratchDBPath = path.join(scratchFolder, "scratchjr.sqllite");
+        const manager = new DatabaseManager(scratchDBPath, scratchFolder);
+        await manager.init();
+        this.databaseManager = manager;
+        console.log("DatabaseManager created");
+        return manager;
+      })().catch((error) => {
+        this.databaseManagerPromise = null;
+        throw error;
+      });
+    }
+    return this.databaseManagerPromise;
   }
 
   /** returns whether there is a scratchjr.sqllite.restore in the Documents/ScratchJR folder */
@@ -114,7 +125,7 @@ export default class ScratchJRDataStore {
     */
   async removeProjectFile(filename) {
     const db = await this.getDatabaseManager();
-    db.removeProjectFile(filename);
+    return db.removeProjectFile(filename);
   }
 
   /** writes a file to database as a base64 encoded string
@@ -125,7 +136,7 @@ export default class ScratchJRDataStore {
     */
   async writeProjectFile(file, contents, encoding) {
     const db = await this.getDatabaseManager();
-    if (db.saveToProjectFiles(file, contents, encoding)) {
+    if (await db.saveToProjectFiles(file, contents, encoding)) {
       return file;
     }
     return -1;

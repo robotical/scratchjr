@@ -1823,8 +1823,14 @@ export default class UI {
             ScratchJr.onHold = true; // Freeze the editing UI
             ScratchJr.stopStripsFromTop(evt);
 
-            Project.prepareToSave(ScratchJr.currentProject, function () {
+            Project.prepareToSave(ScratchJr.currentProject, function (persisted) {
                 Alert.close();
+                if (!persisted) {
+                    ScratchJr.onHold = false;
+                    shareLoadingGif.style.visibility = 'hidden';
+                    Alert.open(frame, nameField, 'Save failed', '#ff0000');
+                    return;
+                }
 
                 // Package the project as a .sjr file
                 IO.compressProject(ScratchJr.currentProject, function (fullName) {
@@ -1991,7 +1997,12 @@ export default class UI {
             return;
         }
         UI.handleTextFieldSave(true);
-        Project.prepareToSave(ScratchJr.currentProject, function () {
+        Project.prepareToSave(ScratchJr.currentProject, function (persisted) {
+            if (!persisted) {
+                Alert.close();
+                Alert.open(frame, UI.getCloudAlertAnchor(), 'Cloud save failed', '#ff0000');
+                return;
+            }
             ProjectCloud.saveCurrentProjectToCloud().then(function (result) {
                 Alert.close();
                 var message = "";
@@ -2042,7 +2053,12 @@ export default class UI {
             return;
         }
         var shouldStore = storeOnSuccess ? true : false;
-        ScratchJr.saveProject(null, function () {
+        ScratchJr.saveProject(null, function (persisted) {
+            if (!persisted) {
+                Alert.close();
+                Alert.open(frame, UI.getCloudAlertAnchor(), 'Project save failed', '#ff0000');
+                return;
+            }
             Alert.close();
             Alert.open(frame, UI.getCloudAlertAnchor(), 'Loading from cloud', '#28A5DA');
             ProjectCloud.loadProjectFromCloud(customId).then(function (result) {

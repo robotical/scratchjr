@@ -1,5 +1,4 @@
 import ScratchJr from '../ScratchJr';
-import Project from '../ui/Project';
 import Prims from './Prims';
 import Thread from './Thread';
 
@@ -19,7 +18,6 @@ export default class Runtime {
         this.intervalId = window.setInterval(function () {
             rt.tickTask();
         }, 32);
-        Project.saving = false;
         // Prims.time = (new Date() - 0);
         this.threadsRunning = [];
     }

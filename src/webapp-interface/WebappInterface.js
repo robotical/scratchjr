@@ -127,7 +127,7 @@ export default class WebappInterface {
   static async io_cleanassets(fileType) {
     const db = await dataStoreInstance.getDatabaseManager();
     if (db) {
-      db.cleanProjectFiles(fileType);
+      await db.cleanProjectFiles(fileType);
     }
     return true;
   }
@@ -166,9 +166,9 @@ export default class WebappInterface {
     return true;
   }
 
-  static io_remove(filename) {
+  static async io_remove(filename) {
     console.log("io_remove: ", filename);
-    dataStoreInstance.removeProjectFile(filename);
+    await dataStoreInstance.removeProjectFile(filename);
     return true;
   }
 

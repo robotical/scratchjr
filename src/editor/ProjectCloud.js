@@ -52,6 +52,12 @@ function candidatePathsFor(md5) {
     candidates.push("./pnglibrary/" + cleaned);
     break;
   case "mp3":
+    if (cleaned === "pop.mp3") {
+      candidates.push("./" + cleaned);
+    } else {
+      candidates.push("./sounds/" + cleaned);
+    }
+    break;
   case "wav":
   case "webm":
   case "m4a":
