@@ -283,19 +283,20 @@ export default class ProjectCloud {
     return response;
   }
 
-  static async loadProjectFromCloud(customId) {
+  static async loadProjectFromCloud(customId, options) {
     var result = await WebappInterface.cloud_loadProject(customId);
     if (!result || !result.packageData) {
       throw new Error("Project not found in cloud");
     }
     var packageData = result.packageData;
-    if (packageData && packageData.project && !packageData.project.name && result.projectName) {
+    if (packageData && packageData.project && typeof packageData.project === "object" &&
+        !packageData.project.name && result.projectName) {
       packageData.project.name = result.projectName;
     }
-    var importResult = await ProjectCloud.importPackage(packageData);
+    var importResult = await ProjectCloud.importPackage(packageData, options);
     var newProjectId = importResult.projectId;
-    var newName = (packageData.project && packageData.project.name || "Untitled Project");
     var metadata = importResult.metadata;
+    var newName = (metadata && metadata.name) || result.projectName || "Untitled Project";
     return {
       projectId: newProjectId,
       customId: result.customId || customId,
@@ -307,7 +308,7 @@ export default class ProjectCloud {
     };
   }
 
-  static async importPackage(packageData) {
+  static async importPackage(packageData, options) {
     if (!packageData || !packageData.project) {
       throw new Error("Invalid project package");
     }
@@ -318,10 +319,19 @@ export default class ProjectCloud {
       await ensureProjectFile(md5, assets[md5]);
     }
     var projectMetadata = packageData.project;
+    if (typeof projectMetadata === "string") {
+      try {
+        projectMetadata = JSON.parse(projectMetadata);
+      } catch (err) {
+        throw new Error("Invalid project metadata");
+      }
+    }
+    if (!projectMetadata || typeof projectMetadata !== "object" || Array.isArray(projectMetadata)) {
+      throw new Error("Invalid project metadata");
+    }
+    projectMetadata = Object.assign({}, projectMetadata);
     if (!projectMetadata.name) {
       projectMetadata.name = "Imported Project";
-    } else {
-      projectMetadata.name = projectMetadata.name;
     }
     if (projectMetadata.json && typeof projectMetadata.json === "string") {
       try {
@@ -337,11 +347,13 @@ export default class ProjectCloud {
         console.warn("ProjectCloud: failed to parse thumbnail json", err);
       }
     }
+    var targetVersion = options && options.targetVersion;
+    projectMetadata.version = targetVersion || projectMetadata.version || ScratchJr.version;
+    if (!projectMetadata.version) {
+      throw new Error("Missing project version");
+    }
     var newId = await insertProject(projectMetadata);
     projectMetadata.id = newId;
-    if (!projectMetadata.version) {
-      projectMetadata.version = ScratchJr.version;
-    }
     if (!projectMetadata.deleted) {
       projectMetadata.deleted = "NO";
     }

@@ -2061,7 +2061,7 @@ export default class UI {
             }
             Alert.close();
             Alert.open(frame, UI.getCloudAlertAnchor(), 'Loading from cloud', '#28A5DA');
-            ProjectCloud.loadProjectFromCloud(customId).then(function (result) {
+            ProjectCloud.loadProjectFromCloud(customId, { targetVersion: ScratchJr.version }).then(function (result) {
                 Alert.close();
                 Alert.open(frame, UI.getCloudAlertAnchor(), 'Cloud project ready', '#28A5DA');
                 if (result && result.projectId) {

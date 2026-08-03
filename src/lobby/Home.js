@@ -6,11 +6,13 @@ import Lobby from "./Lobby";
 import OS from "../tablet/OS";
 import IO from "../tablet/IO";
 import Project from "../editor/ui/Project";
+import ProjectCloud from "../editor/ProjectCloud";
 import Localization from "../utils/Localization";
 import ScratchAudio from "../utils/ScratchAudio";
 import Vector from "../geom/Vector";
 import { gn, newHTML, newButton, isTablet } from "../utils/lib";
 import { closeDialog, openDialog, registerDialog } from "../utils/accessibility";
+import { addStoredCloudId, getStoredCloudIds } from "../utils/cloudLocalStore";
 import goToLink from "../utils/goToLink";
 
 let frame;
@@ -50,6 +52,28 @@ export default class Home {
         e.preventDefault();
         e.stopPropagation();
         Home.performActionForTarget(tb, "project");
+      }
+    );
+  }
+
+  static cloudProjectThumbnail(parent) {
+    var tb = newHTML("div", "projectthumb cloud-project-thumb", parent);
+    var card = newHTML("div", "aproject cloud", tb);
+    var icon = newHTML("div", "cloud-project-icon", card);
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = "☁";
+    tb.id = "cloudproject";
+    var label = newHTML("div", "projecttitle", tb);
+    var title = newHTML("h4", undefined, label);
+    title.textContent = Localization.localizeOptional("Load cloud project");
+    Home.addCardActionButton(
+      tb,
+      "card-action-open",
+      Localization.localizeOptional("Load cloud project"),
+      function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        Home.showCloudLoadDialog();
       }
     );
   }
@@ -138,6 +162,8 @@ export default class Home {
         ScratchAudio.sndFX("keydown.wav");
         if (md5 && md5 == "newproject") {
           Home.createNewProject();
+        } else if (md5 && md5 == "cloudproject") {
+          Home.showCloudLoadDialog();
         } else if (md5) {
           OS.setfile("homescroll.sjr", gn("wrapc").scrollTop, function () {
             doNext(md5);
@@ -299,6 +325,179 @@ export default class Home {
     openDialog(dialog);
   }
 
+  static showCloudLoadDialog() {
+    if (gn("cloud-project-load-dialog")) {
+      return;
+    }
+
+    var dialog = newHTML("div", "cloud-project-dialog-backdrop", frame);
+    dialog.id = "cloud-project-load-dialog";
+    var panel = newHTML("div", "cloud-project-dialog", dialog);
+    var titleId = "cloud-project-load-title";
+    var descriptionId = "cloud-project-load-description";
+    var title = newHTML("h2", "cloud-project-dialog-title", panel);
+    title.id = titleId;
+    title.textContent = Localization.localizeOptional("Load cloud project");
+    var description = newHTML("p", "cloud-project-dialog-description", panel);
+    description.id = descriptionId;
+    description.textContent = Localization.localizeOptional(
+      "Enter a cloud project ID. The project will be imported as a new local copy."
+    );
+
+    var form = newHTML("form", "cloud-project-load-form", panel);
+    var inputLabel = newHTML("label", "cloud-project-input-label", form);
+    inputLabel.setAttribute("for", "cloud-project-id-input");
+    inputLabel.textContent = Localization.localizeOptional("Project ID");
+    var input = newHTML("input", "cloud-project-id-input", form);
+    input.id = "cloud-project-id-input";
+    input.type = "text";
+    input.autocomplete = "off";
+    input.spellcheck = false;
+    input.maxLength = 64;
+
+    var actions = newHTML("div", "cloud-project-dialog-actions", form);
+    var cancelButton = newButton("cloud-project-cancel", actions, {
+      textContent: Localization.localizeOptional("Cancel")
+    });
+    var loadButton = newButton("cloud-project-load", actions, {
+      type: "submit",
+      textContent: Localization.localizeOptional("Load project")
+    });
+    loadButton.id = "cloud-project-load-submit";
+
+    var status = newHTML("p", "cloud-project-load-status", panel);
+    status.id = "cloud-project-load-status";
+    status.setAttribute("role", "status");
+    status.setAttribute("aria-live", "polite");
+
+    var storedEntries = getStoredCloudIds();
+    storedEntries.sort(function (a, b) {
+      return (b.lastUsed || b.savedAt || 0) - (a.lastUsed || a.savedAt || 0);
+    });
+    var savedSection = newHTML("div", "cloud-project-saved-section", panel);
+    var savedTitle = newHTML("h3", "cloud-project-saved-title", savedSection);
+    savedTitle.textContent = Localization.localizeOptional("Saved cloud IDs");
+    var savedList = newHTML("div", "cloud-project-saved-list", savedSection);
+    if (storedEntries.length < 1) {
+      var emptyMessage = newHTML("p", "cloud-project-saved-empty", savedList);
+      emptyMessage.textContent = Localization.localizeOptional("No saved cloud IDs on this device yet.");
+    }
+
+    var loading = false;
+    var savedButtons = [];
+
+    function setLoading(isLoading) {
+      loading = isLoading;
+      input.disabled = isLoading;
+      loadButton.disabled = isLoading;
+      cancelButton.disabled = isLoading;
+      for (var i = 0; i < savedButtons.length; i++) {
+        savedButtons[i].disabled = isLoading;
+      }
+      panel.setAttribute("aria-busy", isLoading ? "true" : "false");
+    }
+
+    function setStatus(message, isError) {
+      status.textContent = message;
+      status.className = isError
+        ? "cloud-project-load-status error"
+        : "cloud-project-load-status";
+      status.setAttribute("role", isError ? "alert" : "status");
+    }
+
+    function closeLoadDialog(restoreFocus) {
+      if (loading) {
+        return;
+      }
+      closeDialog(dialog, { restoreFocus: restoreFocus });
+      if (dialog.parentNode) {
+        dialog.parentNode.removeChild(dialog);
+      }
+    }
+
+    function loadCloudProject(customId) {
+      var trimmedId = customId ? customId.trim() : "";
+      if (loading) {
+        return;
+      }
+      if (!trimmedId) {
+        setStatus(Localization.localizeOptional("Enter a cloud project ID."), true);
+        input.focus();
+        return;
+      }
+      setLoading(true);
+      setStatus(Localization.localizeOptional("Loading cloud project…"), false);
+      ProjectCloud.loadProjectFromCloud(trimmedId, { targetVersion: version }).then(function (result) {
+        if (!result || !result.projectId) {
+          throw new Error("Cloud project import did not return a local project ID");
+        }
+        addStoredCloudId({
+          customId: result.customId || trimmedId,
+          projectName: result.projectName || "",
+          savedAt: result.savedAt || Date.now(),
+          lastUsed: Date.now()
+        });
+        setStatus(Localization.localizeOptional("Cloud project loaded. Opening…"), false);
+        Home.gotoEditor(result.projectId);
+      }).catch(function (err) {
+        console.warn("Home: cloud project load failed", err);
+        setLoading(false);
+        setStatus(
+          Localization.localizeOptional("Cloud project could not be loaded. Check the ID and try again."),
+          true
+        );
+        input.focus();
+        input.select();
+      });
+    }
+
+    for (var i = 0; i < storedEntries.length; i++) {
+      (function (entry) {
+        var label = entry.projectName
+          ? entry.projectName + " (" + entry.customId + ")"
+          : entry.customId;
+        var savedButton = newButton("cloud-project-saved-button", savedList, {
+          textContent: label,
+          ariaLabel: Localization.localizeOptional("Load cloud project") + " " + label
+        });
+        savedButton.setAttribute("data-cloud-id", entry.customId);
+        savedButton.onclick = function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          loadCloudProject(entry.customId);
+        };
+        savedButtons.push(savedButton);
+      })(storedEntries[i]);
+    }
+
+    Home.stopCardGesture(dialog);
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      loadCloudProject(input.value);
+    };
+    cancelButton.onclick = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeLoadDialog(true);
+    };
+    dialog.onclick = function (e) {
+      if (e.target == dialog) {
+        closeLoadDialog(true);
+      }
+    };
+    registerDialog(dialog, {
+      labelledBy: titleId,
+      describedBy: descriptionId,
+      initialFocus: input,
+      scope: frame,
+      onRequestClose: function () {
+        closeLoadDialog(true);
+      }
+    });
+    openDialog(dialog);
+  }
+
   //////////////////////////
   // Gather projects
   //////////////////////////
@@ -326,6 +525,7 @@ export default class Home {
         div.removeChild(div.childNodes[0]);
       }
       Home.emptyProjectThumbnail(div);
+      Home.cloudProjectThumbnail(div);
       for (var i = 0; i < data.length; i++) {
         Home.addProjectLink(div, data[i]);
       }
