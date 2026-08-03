@@ -356,3 +356,133 @@ describe("sprite paint editing availability", () => {
     60_000
   );
 });
+
+describe("animated Bee movement direction", () => {
+  it(
+    "faces toward horizontal movement while all animation frames remain active",
+    async () => {
+      const { browser, page, errors } = await openEditor();
+
+      try {
+        const frameOrientations = await page.evaluate(async () => {
+          const frames = ["BeeSprite1.svg", "BeeSprite2.svg", "BeeSprite3.svg"];
+
+          return Promise.all(frames.map(async (frame) => {
+            const image = new Image();
+            image.src = `/svglibrary/${frame}`;
+            await image.decode();
+
+            const canvas = document.createElement("canvas");
+            canvas.width = image.naturalWidth;
+            canvas.height = image.naturalHeight;
+            const context = canvas.getContext("2d");
+            context.drawImage(image, 0, 0);
+            const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+            let leftYellowPixels = 0;
+            let rightYellowPixels = 0;
+
+            for (let index = 0; index < pixels.length; index += 4) {
+              const red = pixels[index];
+              const green = pixels[index + 1];
+              const blue = pixels[index + 2];
+              const alpha = pixels[index + 3];
+              if (alpha <= 200 || red <= 200 || green <= 130 || green >= 230 || blue >= 140) {
+                continue;
+              }
+              const x = (index / 4) % canvas.width;
+              if (x < canvas.width / 2) {
+                leftYellowPixels += 1;
+              } else {
+                rightYellowPixels += 1;
+              }
+            }
+
+            return { frame, leftYellowPixels, rightYellowPixels };
+          }));
+        });
+
+        frameOrientations.forEach((frame) => {
+          expect(frame.rightYellowPixels).toBeGreaterThan(frame.leftYellowPixels * 2);
+        });
+
+        await page.evaluate(() => {
+          window.ScratchJr.stage.currentPage.addSprite(0.35, "BeeSprite1.svg", "Bee");
+        });
+        await page.waitForFunction(
+          () => {
+            const sprite = window.ScratchJr && window.ScratchJr.getSprite();
+            return Boolean(
+              sprite
+                && sprite.md5 === "BeeSprite1.svg"
+                && sprite.animationFrameDataUrls
+                && sprite.animationFrameDataUrls.length === 3
+            );
+          },
+          { timeout: 30_000 }
+        );
+
+        await page.click("#sprite-motion");
+        await page.waitForSelector("#forward_block", { visible: true });
+
+        const runMotion = async (blockType, expectedFlip, direction) => {
+          const startX = await page.evaluate((type) => {
+            const sprite = window.ScratchJr.getSprite();
+            const script = window.ScratchJr.getActiveScript();
+            script.owner.keyboardTargetBlock = null;
+            const paletteBlock = document.getElementById(`${type}_block`);
+            window.Palette.insertBlockFromKeyboard(
+              paletteBlock,
+              new Event("bee-facing-direction-test")
+            );
+            const matchingBlocks = window.ScratchJr.getBlocks().filter(
+              (block) => block.blocktype === type && block.prev === null
+            );
+            window.ScratchJr.runtime.addRunScript(
+              sprite,
+              matchingBlocks[matchingBlocks.length - 1]
+            );
+            return sprite.xcoor;
+          }, blockType);
+
+          await page.waitForFunction(
+            (flip, initialX, sign) => {
+              const sprite = window.ScratchJr.getSprite();
+              return sprite.flip === flip
+                && (sprite.xcoor - initialX) * sign > 0
+                && window.ScratchJr.runtime.inactive();
+            },
+            { timeout: 10_000 },
+            expectedFlip,
+            startX,
+            direction
+          );
+
+          return page.evaluate(() => {
+            const sprite = window.ScratchJr.getSprite();
+            return {
+              x: sprite.xcoor,
+              flip: sprite.flip,
+              scaleX: new WebKitCSSMatrix(window.getComputedStyle(sprite.div).transform).a,
+              animationFrames: sprite.animationFrames.length,
+            };
+          });
+        };
+
+        const moveRight = await runMotion("forward", false, 1);
+        const moveLeft = await runMotion("back", true, -1);
+
+        expect(moveRight.x).toBeGreaterThan(moveLeft.x);
+        expect(moveRight.flip).toBe(false);
+        expect(moveRight.scaleX).toBeGreaterThan(0);
+        expect(moveRight.animationFrames).toBe(3);
+        expect(moveLeft.flip).toBe(true);
+        expect(moveLeft.scaleX).toBeLessThan(0);
+        expect(moveLeft.animationFrames).toBe(3);
+        expect(errors).toEqual([]);
+      } finally {
+        await browser.close();
+      }
+    },
+    60_000
+  );
+});
