@@ -1,4 +1,7 @@
 
+const MIN_REST_BEATS = 1;
+const MAX_REST_BEATS = 9;
+
 
 export default class CogMusicBlocks {
 
@@ -19,10 +22,11 @@ export default class CogMusicBlocks {
     }
 
     rest(beats) {
-        const rtttl = `audio/rtttl/Rest:d=4,o=5,b=${this.bpm}:${(4 + 1) - beats}p`;
-        const duration = calculateRTTTLDur(rtttl);
-        // this.cog.sendRestMessage(rtttl); // avoid sending rest messages down to Cog, just send the duration to wait
-        return duration;
+        const requestedBeats = Number(beats);
+        const safeBeats = Number.isFinite(requestedBeats)
+            ? Math.min(MAX_REST_BEATS, Math.max(MIN_REST_BEATS, requestedBeats))
+            : MIN_REST_BEATS;
+        return safeBeats * (60000 / this.bpm);
     }
 
     playSound(sound) {

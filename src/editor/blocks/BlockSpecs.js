@@ -459,7 +459,7 @@ export default class BlockSpecs {
             'playnote': ['playnote', noteshapes,
                 BlockSpecs.limeCmd, 'm', 'notec', BlockSpecs.limeCmdH, null, null, BlockSpecs.cmdS, 'green'],
             'waitcrotchet': ['waitcrotchet', BlockSpecs.getImageFrom('assets/blockicons/noterest', 'svg'),
-                BlockSpecs.limeCmd, 'n', 1, BlockSpecs.limeCmdH, 1, 4, BlockSpecs.cmdS],
+                BlockSpecs.limeCmd, 'n', 1, BlockSpecs.limeCmdH, 1, 9, BlockSpecs.cmdS],
             'settempo': ['settempo', BlockSpecs.getImageFrom('assets/blockicons/tempo', 'svg'),
                 BlockSpecs.limeCmd, 'n', 60, BlockSpecs.limeCmdH, 1, 240, BlockSpecs.cmdS],
             'setcogvolume': ['setcogvolume', BlockSpecs.getImageFrom('assets/blockicons/CogVolume', 'svg'),
