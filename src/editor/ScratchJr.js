@@ -1122,7 +1122,7 @@ export default class ScratchJr {
         var ba = activeFocus;
         activeFocus.setCol(col);
         ba.argValue = col;
-        if (ba.daddy && ba.daddy.div.parentNode.owner) {
+        if (ba.daddy && ba.daddy.div.parentNode && ba.daddy.div.parentNode.owner) {
             var spr = ba.daddy.div.parentNode.owner.spr;
             if (spr && spr.div.parentNode) {
                 var action = {
@@ -1150,7 +1150,7 @@ export default class ScratchJr {
         var ba = activeFocus;
         activeFocus.setValue(parseFloat(val));
         ba.argValue = val;
-        if (ba.daddy && ba.daddy.div.parentNode.owner) {
+        if (ba.daddy && ba.daddy.div.parentNode && ba.daddy.div.parentNode.owner) {
             var spr = ba.daddy.div.parentNode.owner.spr;
             if (spr && spr.div.parentNode) {
                 var action = {

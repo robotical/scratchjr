@@ -216,6 +216,8 @@ export default class Scripts {
         case 'Backspace':
         case 'Delete':
             event.preventDefault();
+            event.stopPropagation();
+            ScratchJr.editDone();
             this.deleteKeyboardStrip(event.currentTarget.owner);
             break;
         }
