@@ -177,6 +177,78 @@
     left: 8px;
 }
 
+.project-duplicate-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: ${css_vh(1.1)};
+    left: ${css_vh(0.8)};
+    z-index: 8;
+    width: ${css_vh(5.2)};
+    height: ${css_vh(5.2)};
+    padding: 0;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #2B82B7;
+    box-shadow: 0 0 0 2px #16577D, 0 ${css_vh(0.25)} ${css_vh(0.55)} rgba(27, 62, 78, 0.35);
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.72;
+    transition: opacity 0.15s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.project-duplicate-button:hover,
+.project-duplicate-button:focus-visible {
+    background: #176D9F;
+    opacity: 1;
+    outline: 3px solid #133C46;
+    outline-offset: 3px;
+}
+
+.project-duplicate-button:active {
+    opacity: 1;
+    transform: scale(0.94);
+}
+
+.project-duplicate-button:disabled {
+    cursor: wait;
+    opacity: 0.45;
+}
+
+.project-duplicate-icon {
+    position: relative;
+    width: ${css_vh(2.9)};
+    height: ${css_vh(2.9)};
+}
+
+.project-duplicate-icon-back,
+.project-duplicate-icon-front {
+    box-sizing: border-box;
+    position: absolute;
+    width: ${css_vh(1.9)};
+    height: ${css_vh(2.2)};
+    border: ${css_vh(0.28)} solid #fff;
+    border-radius: ${css_vh(0.25)};
+}
+
+.project-duplicate-icon-back {
+    top: 0;
+    right: 0;
+}
+
+.project-duplicate-icon-front {
+    bottom: 0;
+    left: 0;
+    background: #2B82B7;
+}
+
+.project-duplicate-button:hover .project-duplicate-icon-front,
+.project-duplicate-button:focus-visible .project-duplicate-icon-front {
+    background: #176D9F;
+}
+
 .project-delete-button {
     display: flex;
     align-items: center;

@@ -18,6 +18,7 @@ import goToLink from "../utils/goToLink";
 let frame;
 let scrollvalue;
 let version;
+let pendingProjectFocus;
 
 export default class Home {
   static init() {
@@ -26,6 +27,10 @@ export default class Home {
     var inner = newHTML("div", "inner", frame);
     var div = newHTML("div", "scrollarea", inner);
     div.setAttribute("id", "scrollarea");
+    var status = newHTML("p", "sr-only", frame);
+    status.id = "project-action-status";
+    status.setAttribute("role", "status");
+    status.setAttribute("aria-live", "polite");
     if (window.PointerEvent || !('ontouchstart' in window)) {
       frame.onpointerdown = Home.handleTouchStart;
       frame.onpointerup = Home.handleTouchEnd;
@@ -189,6 +194,9 @@ export default class Home {
           Home.removeProjThumb
         );
         break;
+      case "duplicate":
+        Home.duplicateProject(target);
+        break;
       default:
         break;
     }
@@ -249,6 +257,111 @@ export default class Home {
     element.onpointerup = stop;
     element.ontouchstart = stop;
     element.ontouchend = stop;
+  }
+
+  static duplicateProject(target) {
+    if (!target || target.getAttribute("aria-busy") == "true") {
+      return;
+    }
+    var button = target.querySelector(".project-duplicate-button");
+    var sourceName = target.querySelector(".projecttitle h4");
+    sourceName = sourceName ? sourceName.textContent : "";
+    target.setAttribute("aria-busy", "true");
+    if (button) {
+      button.disabled = true;
+    }
+
+    IO.getObject(target.id, function (result) {
+      var source;
+      try {
+        var rows = JSON.parse(result);
+        if (!Array.isArray(rows) || rows.length < 1) {
+          throw new Error("Project not found");
+        }
+        source = IO.parseProjectData(rows[0]);
+        source.json = typeof source.json == "string" ? JSON.parse(source.json) : source.json;
+        source.thumbnail = typeof source.thumbnail == "string"
+          ? JSON.parse(source.thumbnail)
+          : source.thumbnail;
+      } catch (err) {
+        Home.projectDuplicateFailed(target, button, err);
+        return;
+      }
+
+      IO.uniqueProjectName({ name: source.name || sourceName }, function (namedProject) {
+        try {
+          IO.createProject({
+            name: namedProject.name,
+            version: source.version || version,
+            json: source.json,
+            thumbnail: source.thumbnail,
+            isgift: "0"
+          }, function (newProjectId) {
+            if (!Home.isValidProjectId(newProjectId)) {
+              Home.projectDuplicateFailed(
+                target,
+                button,
+                new Error("Project copy could not be saved")
+              );
+              return;
+            }
+            pendingProjectFocus = String(newProjectId);
+            Home.setProjectActionStatus(
+              Localization.localizeOptional("Duplicated project") + " " +
+              sourceName + " " + Localization.localizeOptional("as") + " " + namedProject.name + "."
+            );
+            OS.analyticsEvent("lobby", "project_duplicated");
+            Home.displayYourProjects();
+          });
+        } catch (err) {
+          Home.projectDuplicateFailed(target, button, err);
+        }
+      });
+    });
+  }
+
+  static projectDuplicateFailed(target, button, err) {
+    console.warn("Home: project duplication failed", err);
+    target.removeAttribute("aria-busy");
+    if (button) {
+      button.disabled = false;
+      button.focus();
+    }
+    Home.setProjectActionStatus(
+      Localization.localizeOptional("Project could not be duplicated. Please try again.")
+    );
+  }
+
+  static isValidProjectId(projectId) {
+    if (typeof projectId == "number") {
+      return projectId > 0;
+    }
+    return typeof projectId == "string" && /^[0-9]+$/.test(projectId) && Number(projectId) > 0;
+  }
+
+  static setProjectActionStatus(message) {
+    var status = gn("project-action-status");
+    if (status) {
+      status.textContent = message;
+    }
+  }
+
+  static addProjectDuplicateButton(target, projectName, parent) {
+    var button = newButton("project-duplicate-button", parent, {
+      ariaLabel: Localization.localizeOptional("Duplicate project") + " " + projectName,
+      title: Localization.localizeOptional("Duplicate project")
+    });
+    var icon = newHTML("span", "project-duplicate-icon", button);
+    icon.setAttribute("aria-hidden", "true");
+    newHTML("span", "project-duplicate-icon-back", icon);
+    newHTML("span", "project-duplicate-icon-front", icon);
+    Home.stopCardGesture(button);
+    button.onclick = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      button.focus();
+      Home.performActionForTarget(target, "duplicate");
+    };
   }
 
   static addProjectDeleteButton(target, projectName, parent) {
@@ -529,6 +642,16 @@ export default class Home {
       for (var i = 0; i < data.length; i++) {
         Home.addProjectLink(div, data[i]);
       }
+      if (pendingProjectFocus) {
+        var duplicatedCard = gn(pendingProjectFocus);
+        var duplicateButton = duplicatedCard
+          ? duplicatedCard.querySelector(".project-duplicate-button")
+          : null;
+        pendingProjectFocus = undefined;
+        if (duplicateButton) {
+          duplicateButton.focus();
+        }
+      }
       setTimeout(function () {
         Lobby.busy = false;
       }, 1000);
@@ -568,6 +691,7 @@ export default class Home {
       ribbonVertical.style.visibility = "visible";
     }
 
+    Home.addProjectDuplicateButton(tb, data.name, mt);
     Home.addProjectDeleteButton(tb, data.name, mt);
     Home.addCardActionButton(
       tb,
