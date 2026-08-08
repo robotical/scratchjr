@@ -14,7 +14,7 @@ async function customIdExists(customId) {
   return !!result && Object.keys(result).length > 0;
 }
 // Try to generate a unique customId (retrying a few times if needed)
-async function generateUniqueCustomId(length = 8, maxAttempts = 5) {
+async function generateUniqueCustomId(length = 3, maxAttempts = 5) {
   for (let i = 0; i < maxAttempts; i++) {
     const candidate = randomHashGenerator(length);
     if (!(await customIdExists(candidate))) return candidate;
@@ -142,7 +142,7 @@ export async function saveProjectPackage(packageData) {
       : packageData?.project; // already string? keep as is
 
 
-  const customId = await generateUniqueCustomId(8, 5);
+  const customId = await generateUniqueCustomId(3, 5);
 
   const payload = {
     savedAt,

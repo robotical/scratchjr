@@ -202,9 +202,15 @@ describe("cloud project loading from My Projects", () => {
       try {
         const originalProjectId = await createProjectFromHome(page);
         const originalProject = await readProjectRow(page, originalProjectId);
-        const customId = await saveCurrentProjectToCloud(page);
-        expect(customId).toHaveLength(8);
+        const generatedCustomId = await saveCurrentProjectToCloud(page);
+        expect(generatedCustomId).toHaveLength(3);
         expect(state.cloudRecord).not.toBeNull();
+
+        // Existing cloud projects can have the previously generated eight-character IDs.
+        // Keep loading independent of the length currently used for new IDs.
+        const legacyCustomId = "Ab3Def8Z";
+        state.cloudRecord.custom_id = legacyCustomId;
+        state.cloudRecord.packageData.custom_id = legacyCustomId;
 
         await page.evaluate((storageKey) => window.localStorage.removeItem(storageKey), CLOUD_IDS_STORAGE_KEY);
         await page.goto(`${HOST}/home.html?place=home`, { waitUntil: "networkidle2", timeout: 30_000 });
@@ -215,7 +221,7 @@ describe("cloud project loading from My Projects", () => {
           "No saved cloud IDs"
         );
 
-        await page.type("#cloud-project-id-input", customId);
+        await page.type("#cloud-project-id-input", legacyCustomId);
         await Promise.all([
           page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30_000 }),
           page.click("#cloud-project-load-submit"),
@@ -236,7 +242,7 @@ describe("cloud project loading from My Projects", () => {
         )).toBe(2);
 
         await page.click("#cloudproject .card-action-open");
-        await page.waitForSelector(`.cloud-project-saved-button[data-cloud-id='${customId}']`, {
+        await page.waitForSelector(`.cloud-project-saved-button[data-cloud-id='${legacyCustomId}']`, {
           timeout: 10_000,
         });
 
@@ -244,7 +250,7 @@ describe("cloud project loading from My Projects", () => {
         state.failLastAccessedUpdate = true;
         await Promise.all([
           page.waitForNavigation({ waitUntil: "networkidle2", timeout: 30_000 }),
-          page.click(`.cloud-project-saved-button[data-cloud-id='${customId}']`),
+          page.click(`.cloud-project-saved-button[data-cloud-id='${legacyCustomId}']`),
         ]);
         await waitForEditorReady(page);
 
@@ -294,7 +300,7 @@ describe("cloud project loading from My Projects", () => {
         await page.click(".cloud-project-saved-remove[data-cloud-id='missing-id']");
         expect(await page.$(".cloud-project-saved-button[data-cloud-id='missing-id']")).toBeNull();
         expect(await page.$(".cloud-project-saved-remove[data-cloud-id='missing-id']")).toBeNull();
-        expect(await page.$(`.cloud-project-saved-button[data-cloud-id='${customId}']`)).not.toBeNull();
+        expect(await page.$(`.cloud-project-saved-button[data-cloud-id='${legacyCustomId}']`)).not.toBeNull();
         expect(await page.evaluate((storageKey) => {
           const entries = JSON.parse(window.localStorage.getItem(storageKey) || "[]");
           return entries.some((entry) => entry.customId === "missing-id");
