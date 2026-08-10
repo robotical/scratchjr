@@ -177,11 +177,16 @@ export default class MicroBitBlocks {
     }
 
     emitGestureEvents (current, previous) {
+        let movementDetected = false;
         GESTURE_EVENTS.forEach(({event, bit}) => {
             if (bitIsSet(current.gestureState, bit) && !bitIsSet(previous.gestureState, bit)) {
+                movementDetected = true;
                 Prims.OnMicroBitEvent(event);
             }
         });
+        if (movementDetected) {
+            Prims.OnMicroBitEvent('microbitonmove');
+        }
     }
 
     emitTiltEvents (current) {

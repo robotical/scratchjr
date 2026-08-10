@@ -31,7 +31,7 @@ describe('Blocks Guide registry', () => {
         const documentedIds = new Set(getDocumentedBlockIds());
 
         expect([...documentedIds].sort()).toEqual([...expectedIds].sort());
-        expect(documentedIds.size).toBe(88);
+        expect(documentedIds.size).toBe(89);
         expect(Object.keys(BLOCK_GUIDE_METADATA).sort()).toEqual([...expectedIds].sort());
     });
 
@@ -47,7 +47,7 @@ describe('Blocks Guide registry', () => {
         expect(BLOCK_GUIDE_MODES[2].categories.map((category) => category.id)).toEqual(
             ['start', 'looks', 'sound']
         );
-        expect(BLOCK_GUIDE_EXTENSION.blockCount).toBe(7);
+        expect(BLOCK_GUIDE_EXTENSION.blockCount).toBe(8);
     });
 
     it('provides visible copy and artwork for every documented block', () => {
@@ -58,5 +58,7 @@ describe('Blocks Guide registry', () => {
         });
         expect(BLOCK_GUIDE_METADATA.microbittilted.icon)
             .toBe('../assets/blockicons/microbittiltright.svg');
+        expect(BLOCK_GUIDE_METADATA.microbitonmove.icon)
+            .toBe('../assets/blockicons/microbitgesturemoved.svg');
     });
 });

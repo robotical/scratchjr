@@ -470,6 +470,9 @@ export default class BlockSpecs {
                 BlockSpecs.yellowStart, 'm', 'microbitbuttona', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'microbitgesture': ['microbitgesture', microbitgestureshapes,
                 BlockSpecs.yellowStart, 'm', 'microbitgestureshaken', BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
+            'microbitonmove': ['microbitonmove',
+                BlockSpecs.getImageFrom('assets/blockicons/microbitgesturemoved', 'svg'),
+                BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
             'microbittilted': ['microbittilted', microbittiltshapes,
                 BlockSpecs.yellowStart, 'm', MICROBIT_DEFAULT_TILT_OPTION,
                 BlockSpecs.yellowStartH, null, null, BlockSpecs.startS, 'yellow'],
@@ -569,6 +572,7 @@ export default class BlockSpecs {
             'onlight': Localization.localize('BLOCK_DESC_ON_LIGHT'),
             'microbitbuttonpressed': Localization.localize('BLOCK_DESC_MICROBIT_ON_BUTTON'),
             'microbitgesture': Localization.localize('BLOCK_DESC_MICROBIT_ON_GESTURE'),
+            'microbitonmove': Localization.localize('BLOCK_DESC_ON_MOVE'),
             'microbittilted': Localization.localize('BLOCK_DESC_MICROBIT_ON_TILT'),
             'onclick': Localization.localize('BLOCK_DESC_ON_TAP', {
                 CHARACTER_NAME: spr.name

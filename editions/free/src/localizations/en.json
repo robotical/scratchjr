@@ -85,6 +85,8 @@
   "BLOCK_GUIDE_COG_NOTE_DESCRIPTION": "Plays the selected musical note through Cog.",
   "BLOCK_GUIDE_MICROBIT_BUTTON": "Start on Button Press",
   "BLOCK_GUIDE_MICROBIT_BUTTON_DESCRIPTION": "Starts when micro:bit button A, B, or A+B is pressed.",
+  "BLOCK_GUIDE_MICROBIT_MOVE": "Start on Move",
+  "BLOCK_GUIDE_MICROBIT_MOVE_DESCRIPTION": "Starts when the micro:bit detects movement.",
   "BLOCK_GUIDE_MICROBIT_GESTURE": "Start on Gesture",
   "BLOCK_GUIDE_MICROBIT_GESTURE_DESCRIPTION": "Starts when the micro:bit is moved, shaken, or jumped.",
   "BLOCK_GUIDE_MICROBIT_TILT": "Start on Tilt",

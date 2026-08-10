@@ -255,9 +255,24 @@ describe("Chromium 79 smoke test", () => {
           selectedRightCategoryIds: ["microbit-start"],
           paletteBlockTypes: [
             "microbitbuttonpressed",
+            "microbitonmove",
             "microbittilted",
           ],
           extensionEnabled: true,
+        });
+
+        const microBitMoveState = await page.evaluate(() => {
+          const paletteBlock = Array.from(document.querySelectorAll("#palette > div"))
+            .find((block) => block.owner && block.owner.blocktype === "microbitonmove").owner;
+          return {
+            value: paletteBlock.getArgValue(),
+            hasArgument: Boolean(paletteBlock.arg),
+          };
+        });
+
+        expect(microBitMoveState).toEqual({
+          value: null,
+          hasArgument: false,
         });
 
         const microBitTiltState = await page.evaluate(() => {

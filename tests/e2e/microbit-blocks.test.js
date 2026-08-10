@@ -88,7 +88,7 @@ describe('MicroBitBlocks', () => {
         expect(Prims.OnMicroBitEvent).toHaveBeenCalledWith('microbitbuttonab');
     });
 
-    it('emits gesture events on gesture bit transitions', () => {
+    it('emits legacy and consolidated movement events on gesture bit transitions', () => {
         blocks = new MicroBitBlocks(createMicroBit());
 
         sensorListener(
@@ -97,6 +97,8 @@ describe('MicroBitBlocks', () => {
         );
 
         expect(Prims.OnMicroBitEvent).toHaveBeenCalledWith('microbitgestureshaken');
+        expect(Prims.OnMicroBitEvent).toHaveBeenCalledWith('microbitonmove');
+        expect(Prims.OnMicroBitEvent).toHaveBeenCalledTimes(2);
     });
 
     it('emits tilt events on every tilted sensor update', () => {
