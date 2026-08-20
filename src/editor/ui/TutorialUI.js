@@ -1,6 +1,7 @@
 import { closexSvg } from "../../html-svgs/closex-svg";
 import { questionmarkSvg } from "../../html-svgs/questionmark-svg";
 import { readOutLoudSvg } from "../../html-svgs/readoutloud-svg";
+import { saveSvg } from "../../html-svgs/save-svg";
 import { gn, newHTML, stripHtml } from "../../utils/lib";
 import { closeDialog, openDialog, registerDialog } from "../../utils/accessibility";
 import Localization from "../../utils/Localization";
@@ -138,11 +139,16 @@ export default class TutorialUI {
         /* Menu bar contains the controls of the tutorial */
         TutorialUI.tutorialMenuBar = newHTML('div', 'tutorialMenuBar', TutorialUI.topSection);
         TutorialUI.tutorialMenuBar.setAttribute('id', 'tutorialMenuBar');
+        const keepProjectLabel = Localization.localizeOptional('Keep this project');
 
         // tutorial menu bar should have in this order a close button, the title of the tutorial, a question mark icon, previous and next buttons
         TutorialUI.tutorialMenuBar.innerHTML = `
             <button id="closeTutorial" class="tutorialButton" aria-label="${Localization.localize('A11Y_CLOSE')}">${closexSvg}</button>
             <div id="tutorialTitle" class="tutorialTitle">${this.tutorial.title}</div>
+            <button id="keepTutorialProject" class="tutorialKeepProjectButton" aria-label="${keepProjectLabel}">
+                ${saveSvg}<span id="keepTutorialProjectText">${keepProjectLabel}</span>
+            </button>
+            <span id="tutorialSaveStatus" class="sr-only" role="status" aria-live="polite"></span>
             <button id="tutorialReadAloud" class="tutorialButton" aria-label="${Localization.localize('A11Y_READ_ALOUD')}">${readOutLoudSvg}</button>
             <button id="tutorialHelp" class="tutorialButton" aria-label="${Localization.localize('A11Y_HELP')}">${questionmarkSvg}</button>
             <button id="previousStep" class="tutorialButton" aria-label="${Localization.localize('A11Y_PREVIOUS')}">
@@ -157,6 +163,30 @@ export default class TutorialUI {
             </button>
         `;
         gn('closeTutorial').addEventListener('click', TutorialUI.closeTutorial);
+        gn('keepTutorialProject').addEventListener('click', TutorialUI.keepTutorialProject);
+    }
+
+    static keepTutorialProject() {
+        const button = gn('keepTutorialProject');
+        const buttonText = gn('keepTutorialProjectText');
+        const status = gn('tutorialSaveStatus');
+        if (!button || button.disabled) {
+            return;
+        }
+        button.disabled = true;
+        buttonText.textContent = Localization.localizeOptional('Saving...');
+        status.textContent = Localization.localizeOptional('Saving project.');
+
+        ScratchJr.keepTutorialProject(function (result) {
+            if (!result || !result.persisted) {
+                button.disabled = false;
+                buttonText.textContent = Localization.localizeOptional('Try again');
+                status.textContent = Localization.localizeOptional('Project could not be saved. Please try again.');
+                return;
+            }
+            status.textContent = Localization.localizeOptional('Project saved.');
+            goToLink('home.html?place=home&timestamp=' + new Date().getTime());
+        });
     }
 
     static closeTutorial() {

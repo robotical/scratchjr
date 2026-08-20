@@ -90,6 +90,7 @@ async function assertTutorialOpened(page, tutorialId) {
         : null,
     hasTutorialMenuBar: Boolean(document.getElementById("tutorialMenuBar")),
     hasCloseTutorialButton: Boolean(document.getElementById("closeTutorial")),
+    hasKeepTutorialProjectButton: Boolean(document.getElementById("keepTutorialProject")),
     hasTutorialProgressBar: Boolean(document.getElementById("tutorialProgressBar")),
     hasTutorialInstructor: Boolean(document.getElementById("tutorialInstructor")),
     tutorialTitle: (
@@ -103,6 +104,7 @@ async function assertTutorialOpened(page, tutorialId) {
   expect(tutorialState.tutorialEngineId).toBe(tutorialId);
   expect(tutorialState.hasTutorialMenuBar).toBe(true);
   expect(tutorialState.hasCloseTutorialButton).toBe(true);
+  expect(tutorialState.hasKeepTutorialProjectButton).toBe(true);
   expect(tutorialState.hasTutorialProgressBar).toBe(true);
   expect(tutorialState.hasTutorialInstructor).toBe(true);
   expect(tutorialState.tutorialTitle.length).toBeGreaterThan(0);

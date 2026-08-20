@@ -17,6 +17,7 @@ import Events from '../utils/Events';
 import BlockSpecs from './blocks/BlockSpecs';
 import Runtime from './engine/Runtime';
 import Localization from '../utils/Localization';
+import {saveTutorialProject} from '../tutorial/TutorialProject';
 import { setPressedState } from '../utils/accessibility';
 import {
     libInit, gn, scaleMultiplier, newHTML,
@@ -448,6 +449,43 @@ export default class ScratchJr {
         if (onDone) {
             onDone(true);
         }
+    }
+
+    static keepTutorialProject(onDone) {
+        var tutorial = window.tutorialEngine && window.tutorialEngine.tutorial;
+        if (!tutorial || !Project.metadata) {
+            if (onDone) {
+                onDone({persisted: false});
+            }
+            return;
+        }
+
+        // A previous attempt may have created the local row before its project
+        // snapshot failed. Reuse it so retrying never creates duplicate projects.
+        if (currentProject) {
+            Project.prepareToSave(currentProject, function (persisted) {
+                if (onDone) {
+                    onDone({
+                        persisted: persisted === true,
+                        projectId: String(currentProject),
+                        projectName: Project.metadata.name
+                    });
+                }
+            });
+            return;
+        }
+
+        saveTutorialProject({
+            io: IO,
+            project: Project,
+            tutorial: tutorial,
+            version: version,
+            setActiveProject: function (projectId) {
+                currentProject = projectId;
+                editmode = 'edit';
+                storyStarted = false;
+            }
+        }, onDone);
     }
 
     /**

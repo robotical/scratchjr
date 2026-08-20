@@ -716,7 +716,14 @@ describe('Accessibility shell audit', () => {
             await page.waitForSelector('#tutorialMenuBar', { timeout: 40_000 });
             await page.waitForSelector('#nextStep', { timeout: 30_000 });
 
-            await expectNamedControls(page, ['#closeTutorial', '#tutorialReadAloud', '#tutorialHelp', '#previousStep', '#nextStep']);
+            await expectNamedControls(page, [
+                '#closeTutorial',
+                '#keepTutorialProject',
+                '#tutorialReadAloud',
+                '#tutorialHelp',
+                '#previousStep',
+                '#nextStep'
+            ]);
             await tabToSelector(page, '#closeTutorial');
             expectVisibleFocusIndicator(await getFocusStyles(page, '#closeTutorial'));
 
