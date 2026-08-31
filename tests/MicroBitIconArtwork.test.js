@@ -16,10 +16,7 @@ const DERIVATIVE_ASSETS = [
     join('blockicons', 'microbittiltright.svg'),
     join('blockicons', 'microbittiltleft.svg'),
     join('blockicons', 'microbittiltbackward.svg'),
-    join('blockicons', 'microbittiltforward.svg'),
-    join('blockicons', 'microbitbuttona.svg'),
-    join('blockicons', 'microbitbuttonb.svg'),
-    join('blockicons', 'microbitbuttonab.svg')
+    join('blockicons', 'microbittiltforward.svg')
 ];
 const TILT_ASSETS = DERIVATIVE_ASSETS.filter((file) => file.includes('microbittilt'));
 

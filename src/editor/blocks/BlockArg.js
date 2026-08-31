@@ -411,6 +411,10 @@ export default class BlockArg {
     drawMicroBitMatrixChoice (cnv) {
         var ctx = cnv.getContext('2d');
         ctx.clearRect(0, 0, cnv.width, cnv.height);
+        if (this.daddy.inpalette) {
+            this.daddy.drawMyIcon(ctx, 0, 0);
+            return cnv;
+        }
         var scale = this.daddy.scale * window.devicePixelRatio;
         ctx.save();
         ctx.scale(scale, scale);

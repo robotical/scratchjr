@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="76" height="66" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 66">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #2c2c31;
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: #1a1a1a;
+      }
+
+      .cls-3 {
+        fill: #ececec;
+      }
+    </style>
+  </defs>
+  <g>
+    <rect class="cls-2" x="12.99" y="9.55" width="47.7" height="47.7" rx="4.74" ry="4.74"/>
+    <g>
+      <rect class="cls-1" x="16.05" y="12.61" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="24.53" y="12.61" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="33.02" y="12.61" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="41.51" y="12.61" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="50" y="12.61" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="16.05" y="21.1" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="24.53" y="21.1" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="33.02" y="21.1" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="41.51" y="21.1" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="50" y="21.1" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="16.05" y="29.58" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="24.53" y="29.58" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="33.02" y="29.58" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="41.51" y="29.58" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="50" y="29.58" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="16.05" y="38.07" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="24.53" y="38.07" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="33.02" y="38.07" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="41.51" y="38.07" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="50" y="38.07" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="16.05" y="46.56" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="24.53" y="46.56" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="33.02" y="46.56" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="41.51" y="46.56" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+      <rect class="cls-1" x="50" y="46.56" width="7.63" height="7.63" rx="1.29" ry="1.29"/>
+    </g>
+  </g>
+  <g>
+    <circle class="cls-3" cx="46.9" cy="21.16" r="15.32"/>
+    <path class="cls-2" d="m37.93,25.15c.17-.6.48-1.14.92-1.58l7.4-7.4,1.38-1.38c.68.68,2.09,2.09,4.25,4.25l1.38,1.38-1.38,1.38-7.4,7.4c-.44.44-.98.76-1.58.92l-5.22,1.45c-.34.09-.71,0-.96-.25-.25-.25-.34-.62-.25-.96l1.45-5.22Zm2.27-.15c-.18.19-.31.42-.38.68l-.98,3.55,3.55-.98c.26-.07.5-.21.69-.4l-2.88-2.85h0Zm14.45-5.96c-.68-.68-2.09-2.09-4.25-4.25l-1.39-1.38c1.08-1.08,1.69-1.69,1.83-1.83.55-.56,1.3-.87,2.09-.87s1.54.31,2.09.87l1.46,1.46c.56.56.87,1.31.87,2.09s-.31,1.54-.87,2.09c-.14.14-.75.75-1.83,1.83h0Z"/>
+  </g>
+</svg>
