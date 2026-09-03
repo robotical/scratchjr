@@ -50,7 +50,9 @@ import { createRaftConnectionIssueDetectedHelper, createRaftConnectionIssueResol
 import { truncateString } from "../../utils/truncate-string";
 import Trace from './Trace';
 import {
+    MicroBitUpdateErrorCode,
     isMicroBitUpdateSupported,
+    microBitHexUrl,
     selectAndUpdateMicroBit
 } from '../../microbit/MicroBitUpdater';
 
@@ -89,7 +91,12 @@ const MICROBIT_INSTALLER_COPY = {
     MICROBIT_INSTALLER_CANCEL: 'Cancel',
     MICROBIT_INSTALLER_CANCELLED: 'No micro:bit was selected. Choose Try again when you are ready.',
     MICROBIT_INSTALLER_CONNECT: 'Connect',
+    MICROBIT_INSTALLER_DOWNLOAD_HEX: 'Download .hex instead',
+    MICROBIT_INSTALLER_DOWNLOAD_HELP:
+        'Or install manually: download the .hex file, then drag it onto the MICROBIT drive.',
     MICROBIT_INSTALLER_ERROR_DEFAULT: 'Check the USB connection and try again.',
+    MICROBIT_INSTALLER_FLASH_FAILED:
+        'Blocks Jr lost access while installing the software. Try the steps below, then try again.',
     MICROBIT_INSTALLER_HELP: 'Open the micro:bit firmware instructions',
     MICROBIT_INSTALLER_INSTALL: 'Install software',
     MICROBIT_INSTALLER_INSTALL_NOW: 'Install now',
@@ -108,7 +115,15 @@ const MICROBIT_INSTALLER_COPY = {
     MICROBIT_INSTALLER_TITLE_READY: 'Install micro:bit software',
     MICROBIT_INSTALLER_TITLE_SUCCESS: 'Software installed',
     MICROBIT_INSTALLER_TITLE_UPDATING: 'Installing micro:bit software',
-    MICROBIT_INSTALLER_TRY_AGAIN: 'Try again'
+    MICROBIT_INSTALLER_TRY_AGAIN: 'Try again',
+    MICROBIT_INSTALLER_USB_ACCESS:
+        'Blocks Jr could not access your micro:bit. MakeCode or another browser tab may still be using it.',
+    MICROBIT_INSTALLER_USB_STEP_MAKECODE:
+        'Close MakeCode, or use the lock icon in its address bar to remove BBC micro:bit CMSIS-DAP or DAPLink CMSIS-DAP.',
+    MICROBIT_INSTALLER_USB_STEP_RECONNECT:
+        'Reload or close MakeCode, then unplug and reconnect the micro:bit.',
+    MICROBIT_INSTALLER_USB_STEP_RETRY: 'Return here and choose Try again.',
+    MICROBIT_INSTALLER_USB_STEPS_TITLE: 'Try these steps:'
 };
 
 const SVG_ID_ATTRIBUTE_RE = /\s+id="[^"]*"/g;
@@ -893,11 +908,32 @@ export default class UI {
         const errorDetails = newHTML('div', 'microBitConnectionDialogError', body);
         errorDetails.setAttribute('role', 'alert');
 
+        const usbTroubleshooting = newHTML('div', 'microBitConnectionDialogTroubleshooting', body);
+        const usbTroubleshootingTitle = newHTML('div', 'microBitConnectionDialogTroubleshootingTitle', usbTroubleshooting);
+        usbTroubleshootingTitle.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_USB_STEPS_TITLE');
+        const usbTroubleshootingSteps = newHTML('ol', 'microBitConnectionDialogTroubleshootingSteps', usbTroubleshooting);
+        [
+            'MICROBIT_INSTALLER_USB_STEP_MAKECODE',
+            'MICROBIT_INSTALLER_USB_STEP_RECONNECT',
+            'MICROBIT_INSTALLER_USB_STEP_RETRY'
+        ].forEach(key => {
+            const step = newHTML('li', 'microBitConnectionDialogTroubleshootingStep', usbTroubleshootingSteps);
+            step.textContent = localizeMicroBitInstaller(key);
+        });
+
         const firmwareHelp = newHTML('a', 'microBitConnectionDialogHelp', body);
         firmwareHelp.setAttribute('href', MICROBIT_INTERFACE_FIRMWARE_URL);
         firmwareHelp.setAttribute('target', '_blank');
         firmwareHelp.setAttribute('rel', 'noopener noreferrer');
         firmwareHelp.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_HELP');
+
+        const manualDownload = newHTML('div', 'microBitConnectionDialogManual', body);
+        const manualDownloadHelp = newHTML('div', 'microBitConnectionDialogManualHelp', manualDownload);
+        manualDownloadHelp.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_DOWNLOAD_HELP');
+        const hexDownload = newHTML('a', 'microBitConnectionDialogDownload', manualDownload);
+        hexDownload.setAttribute('href', microBitHexUrl);
+        hexDownload.setAttribute('download', 'scratch-microbit.hex');
+        hexDownload.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_DOWNLOAD_HEX');
 
         const actions = newHTML('div', 'microBitConnectionDialogActions', dialog);
         const backButton = newButton('microBitConnectionDialogButton secondary', actions, {
@@ -944,7 +980,10 @@ export default class UI {
             progress,
             progressLabel,
             errorDetails,
+            usbTroubleshooting,
             firmwareHelp,
+            manualDownload,
+            hexDownload,
             backButton,
             updateButton,
             connectButton
@@ -970,7 +1009,9 @@ export default class UI {
 
         controls.progressArea.style.display = activity === 'updating' ? 'flex' : 'none';
         controls.errorDetails.style.display = activity === 'error' && options.details ? 'block' : 'none';
+        controls.usbTroubleshooting.style.display = options.showUsbTroubleshooting ? 'block' : 'none';
         controls.firmwareHelp.style.display = options.showFirmwareHelp ? 'inline-block' : 'none';
+        controls.manualDownload.style.display = options.showManualDownload ? 'block' : 'none';
         controls.backButton.style.display = activity === 'updating' ? 'none' : '';
         controls.updateButton.style.display = activity === 'success' || activity === 'updating' ? 'none' : '';
         controls.connectButton.style.display = activity === 'choice' || activity === 'success' ? '' : 'none';
@@ -984,6 +1025,7 @@ export default class UI {
                 controls.message.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_MESSAGE_READY');
                 controls.backButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_BACK');
                 controls.updateButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_INSTALL_NOW');
+                controls.manualDownload.style.display = 'block';
                 focusControl = controls.updateButton;
                 break;
             case 'updating':
@@ -1076,16 +1118,29 @@ export default class UI {
             UI.renderMicroBitConnectionDialog(dialog, 'success');
         } catch (error) {
             const message = error && error.message ? error.message : '';
+            const errorCode = error && error.code ? error.code : '';
             const wasCancelled = error && error.name === 'NotFoundError';
-            const needsInterfaceFirmware = message === 'No valid interfaces found.';
+            const needsInterfaceFirmware = errorCode === MicroBitUpdateErrorCode.INTERFACE_FIRMWARE ||
+                message === 'No valid interfaces found.';
+            const hasUsbAccessError = errorCode === MicroBitUpdateErrorCode.USB_ACCESS;
+            const flashFailed = errorCode === MicroBitUpdateErrorCode.FLASH_FAILED;
+            const showUsbTroubleshooting = hasUsbAccessError || flashFailed;
+            let installerMessage = localizeMicroBitInstaller('MICROBIT_INSTALLER_ERROR_DEFAULT');
+            if (wasCancelled) {
+                installerMessage = localizeMicroBitInstaller('MICROBIT_INSTALLER_CANCELLED');
+            } else if (needsInterfaceFirmware) {
+                installerMessage = localizeMicroBitInstaller('MICROBIT_INSTALLER_INTERFACE_FIRMWARE');
+            } else if (hasUsbAccessError) {
+                installerMessage = localizeMicroBitInstaller('MICROBIT_INSTALLER_USB_ACCESS');
+            } else if (flashFailed) {
+                installerMessage = localizeMicroBitInstaller('MICROBIT_INSTALLER_FLASH_FAILED');
+            }
             UI.renderMicroBitConnectionDialog(dialog, 'error', {
-                message: wasCancelled ?
-                    localizeMicroBitInstaller('MICROBIT_INSTALLER_CANCELLED') :
-                    (needsInterfaceFirmware ?
-                        localizeMicroBitInstaller('MICROBIT_INSTALLER_INTERFACE_FIRMWARE') :
-                        localizeMicroBitInstaller('MICROBIT_INSTALLER_ERROR_DEFAULT')),
-                details: wasCancelled || needsInterfaceFirmware ? '' : message,
-                showFirmwareHelp: needsInterfaceFirmware
+                message: installerMessage,
+                details: wasCancelled || needsInterfaceFirmware || showUsbTroubleshooting ? '' : message,
+                showFirmwareHelp: needsInterfaceFirmware,
+                showManualDownload: !wasCancelled,
+                showUsbTroubleshooting
             });
         }
     }

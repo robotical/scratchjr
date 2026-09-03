@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { microBitUpdaterMocks, newHTMLMock } = vi.hoisted(() => ({
+const { microBitUpdaterMocks, newButtonMock, newHTMLMock } = vi.hoisted(() => ({
     microBitUpdaterMocks: {
         isSupported: vi.fn(() => false),
         selectAndUpdate: vi.fn()
     },
+    newButtonMock: vi.fn(),
     newHTMLMock: vi.fn()
 }));
 
@@ -52,7 +53,7 @@ vi.mock('@/utils/lib', () => ({
     CSSTransition: vi.fn(),
     localx: vi.fn(),
     newHTML: newHTMLMock,
-    newButton: vi.fn(),
+    newButton: newButtonMock,
     scaleMultiplier: 1,
     fullscreenScaleMultiplier: 1,
     getIdFor: vi.fn(),
@@ -133,7 +134,13 @@ vi.mock('@/editor/ui/Trace', () => ({
     }
 }));
 vi.mock('@/microbit/MicroBitUpdater', () => ({
+    MicroBitUpdateErrorCode: {
+        FLASH_FAILED: 'flash-failed',
+        INTERFACE_FIRMWARE: 'interface-firmware',
+        USB_ACCESS: 'usb-access'
+    },
     isMicroBitUpdateSupported: microBitUpdaterMocks.isSupported,
+    microBitHexUrl: '/assets/scratch-microbit.hex',
     selectAndUpdateMicroBit: microBitUpdaterMocks.selectAndUpdate
 }));
 
@@ -179,7 +186,21 @@ describe('Marty connection UI', () => {
             import('@/editor/ScratchJr')
         ]);
         newHTMLMock.mockImplementation((type, className, parent) => {
-            const element = new FakeElement(className ? [className] : []);
+            const element = new FakeElement(className ? className.split(' ') : []);
+            if (parent) {
+                parent.appendChild(element);
+            }
+            return element;
+        });
+        newButtonMock.mockImplementation((className, parent, props = {}) => {
+            const element = new FakeElement(className ? className.split(' ') : []);
+            Object.keys(props).forEach(key => {
+                if (key === 'id') {
+                    element.setAttribute('id', props[key]);
+                } else {
+                    element[key] = props[key];
+                }
+            });
             if (parent) {
                 parent.appendChild(element);
             }
@@ -440,6 +461,36 @@ describe('Marty connection UI', () => {
         renderSpy.mockRestore();
     });
 
+    it('offers the bundled HEX file as a manual installation fallback', () => {
+        const dialog = UI.createMicroBitConnectionDialog();
+
+        expect(dialog.microBitControls.hexDownload.getAttribute('href')).toBe('/assets/scratch-microbit.hex');
+        expect(dialog.microBitControls.hexDownload.getAttribute('download')).toBe('scratch-microbit.hex');
+
+        UI.renderMicroBitConnectionDialog(dialog, 'ready');
+        expect(dialog.microBitControls.manualDownload.style.display).toBe('block');
+    });
+
+    it('shows MakeCode recovery steps when another context may own WebUSB', async () => {
+        const dialog = createMicroBitUpdateDialog();
+        const renderSpy = vi.spyOn(UI, 'renderMicroBitConnectionDialog').mockImplementation(() => {});
+        microBitUpdaterMocks.selectAndUpdate.mockRejectedValue({
+            name: 'MicroBitUpdateError',
+            code: 'usb-access',
+            message: 'Unable to claim interface.'
+        });
+
+        await UI.startMicroBitUpdate(dialog);
+
+        expect(renderSpy).toHaveBeenNthCalledWith(2, dialog, 'error', expect.objectContaining({
+            message: 'Blocks Jr could not access your micro:bit. MakeCode or another browser tab may still be using it.',
+            details: '',
+            showManualDownload: true,
+            showUsbTroubleshooting: true
+        }));
+        renderSpy.mockRestore();
+    });
+
     it('keeps keyboard focus on a visible installer control as its state changes', () => {
         const dialog = createCompleteMicroBitUpdateDialog();
 
@@ -599,7 +650,10 @@ function createCompleteMicroBitUpdateDialog() {
         progress: new FakeElement(),
         progressLabel: new FakeElement(),
         errorDetails: new FakeElement(),
+        usbTroubleshooting: new FakeElement(),
         firmwareHelp: new FakeElement(),
+        manualDownload: new FakeElement(),
+        hexDownload: new FakeElement(),
         backButton: new FakeElement(),
         updateButton: new FakeElement(),
         connectButton: new FakeElement()

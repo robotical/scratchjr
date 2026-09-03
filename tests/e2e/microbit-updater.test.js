@@ -1,6 +1,7 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const mocks = vi.hoisted(() => ({
+    connectError: null,
     dapLinks: [],
     flashError: null,
     isUniversalHex: vi.fn(() => true),
@@ -8,7 +9,8 @@ const mocks = vi.hoisted(() => ({
         {boardId: 0x9900},
         {boardId: 0x9903}
     ]),
-    webUsbDevices: []
+    webUsbDevices: [],
+    webUsbTransports: []
 }));
 
 vi.mock('@microbit/microbit-universal-hex', () => ({
@@ -20,7 +22,9 @@ vi.mock('dapjs', () => {
     class WebUSB {
         constructor (device) {
             this.device = device;
+            this.close = vi.fn(async () => {});
             mocks.webUsbDevices.push(device);
+            mocks.webUsbTransports.push(this);
         }
     }
 
@@ -32,6 +36,9 @@ vi.mock('dapjs', () => {
             this.connected = false;
             this.on = vi.fn();
             this.connect = vi.fn(async () => {
+                if (mocks.connectError) {
+                    throw mocks.connectError;
+                }
                 this.connected = true;
             });
             this.flash = vi.fn(async () => {
@@ -56,8 +63,10 @@ describe('MicroBitUpdater', () => {
     beforeEach(async () => {
         vi.clearAllMocks();
         mocks.dapLinks.length = 0;
+        mocks.connectError = null;
         mocks.flashError = null;
         mocks.webUsbDevices.length = 0;
+        mocks.webUsbTransports.length = 0;
         mocks.isUniversalHex.mockReturnValue(true);
         mocks.separateUniversalHex.mockReturnValue([
             {boardId: 0x9900},
@@ -120,7 +129,32 @@ describe('MicroBitUpdater', () => {
         requestDevice.mockResolvedValue({serialNumber: '9901ABCDEF'});
         mocks.flashError = new Error('flash failed');
 
-        await expect(updater.selectAndUpdateMicroBit()).rejects.toThrow('flash failed');
+        await expect(updater.selectAndUpdateMicroBit()).rejects.toMatchObject({
+            code: updater.MicroBitUpdateErrorCode.FLASH_FAILED,
+            message: 'flash failed'
+        });
         expect(mocks.dapLinks[0].disconnect).toHaveBeenCalledOnce();
+    });
+
+    it('classifies a claimed WebUSB interface and closes the partially opened transport', async () => {
+        requestDevice.mockResolvedValue({serialNumber: '9903ABCDEF'});
+        mocks.connectError = new DOMException('Unable to claim interface.', 'NetworkError');
+
+        await expect(updater.selectAndUpdateMicroBit()).rejects.toMatchObject({
+            code: updater.MicroBitUpdateErrorCode.USB_ACCESS,
+            message: 'Unable to claim interface.'
+        });
+        expect(mocks.webUsbTransports[0].close).toHaveBeenCalledOnce();
+        expect(mocks.dapLinks[0].flash).not.toHaveBeenCalled();
+    });
+
+    it('keeps missing CMSIS-DAP interfaces distinct from USB contention', async () => {
+        requestDevice.mockResolvedValue({serialNumber: '9903ABCDEF'});
+        mocks.connectError = new Error('No valid interfaces found.');
+
+        await expect(updater.selectAndUpdateMicroBit()).rejects.toMatchObject({
+            code: updater.MicroBitUpdateErrorCode.INTERFACE_FIRMWARE
+        });
+        expect(mocks.webUsbTransports[0].close).toHaveBeenCalledOnce();
     });
 });

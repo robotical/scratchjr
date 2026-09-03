@@ -14,6 +14,33 @@ const DeviceVersion = {
 const MICROBIT_VENDOR_ID = 0x0d28;
 const MICROBIT_PRODUCT_ID = 0x0204;
 
+const MicroBitUpdateErrorCode = Object.freeze({
+    BOARD_UNSUPPORTED: 'board-unsupported',
+    FLASH_FAILED: 'flash-failed',
+    HEX_LOAD_FAILED: 'hex-load-failed',
+    INTERFACE_FIRMWARE: 'interface-firmware',
+    USB_ACCESS: 'usb-access'
+});
+
+class MicroBitUpdateError extends Error {
+    constructor (code, message, cause) {
+        super(message);
+        this.name = 'MicroBitUpdateError';
+        this.code = code;
+        if (cause) {
+            this.cause = cause;
+        }
+    }
+}
+
+function wrapUpdateError (code, error) {
+    if (error instanceof MicroBitUpdateError) {
+        return error;
+    }
+    const message = error && error.message ? error.message : String(error || 'Unknown micro:bit update error.');
+    return new MicroBitUpdateError(code, message, error);
+}
+
 function getDeviceVersion (device) {
     const serialNumber = device && device.serialNumber ? device.serialNumber : '';
     const boardId = serialNumber.substring(0, 4);
@@ -71,16 +98,49 @@ async function updateMicroBit (device, progress) {
         target.on(DAPLink.EVENT_PROGRESS, progress);
     }
 
-    const version = getDeviceVersion(device);
-    const hexMap = await getHexMap();
-    const hexData = hexMap.get(version);
-    if (!hexData) {
-        throw new Error(`The bundled HEX file does not support micro:bit ${version}.`);
+    let version;
+    try {
+        version = getDeviceVersion(device);
+    } catch (error) {
+        throw wrapUpdateError(MicroBitUpdateErrorCode.BOARD_UNSUPPORTED, error);
     }
 
-    await target.connect();
+    let hexMap;
     try {
-        await target.flash(hexData);
+        hexMap = await getHexMap();
+    } catch (error) {
+        throw wrapUpdateError(MicroBitUpdateErrorCode.HEX_LOAD_FAILED, error);
+    }
+    const hexData = hexMap.get(version);
+    if (!hexData) {
+        throw new MicroBitUpdateError(
+            MicroBitUpdateErrorCode.BOARD_UNSUPPORTED,
+            `The bundled HEX file does not support micro:bit ${version}.`
+        );
+    }
+
+    try {
+        await target.connect();
+    } catch (error) {
+        // DAPjs opens the USBDevice before claiming its interface. If claiming
+        // fails, connected remains false and DAPLink.disconnect() will not close it.
+        try {
+            await transport.close();
+        } catch (closeError) {
+            // Preserve the useful connection failure rather than replacing it.
+        }
+        const code = error && error.message === 'No valid interfaces found.' ?
+            MicroBitUpdateErrorCode.INTERFACE_FIRMWARE :
+            MicroBitUpdateErrorCode.USB_ACCESS;
+        throw wrapUpdateError(code, error);
+    }
+
+    try {
+        try {
+            await target.flash(hexData);
+        } catch (error) {
+            throw wrapUpdateError(MicroBitUpdateErrorCode.FLASH_FAILED, error);
+        }
     } finally {
         if (target.connected) {
             await target.disconnect();
@@ -109,9 +169,12 @@ function isMicroBitUpdateSupported () {
 
 export {
     DeviceVersion,
+    MicroBitUpdateError,
+    MicroBitUpdateErrorCode,
     getDeviceVersion,
     getHexMap,
     isMicroBitUpdateSupported,
+    microBitHexUrl,
     selectAndUpdateMicroBit,
     updateMicroBit
 };

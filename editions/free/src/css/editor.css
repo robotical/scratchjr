@@ -982,8 +982,10 @@ div.frame {
     position: fixed;
     left: 50%;
     top: 50%;
-    width: ${css_vh(56)};
+    width: ${css_vh(62)};
     min-height: ${css_vh(31)};
+    max-height: 92vh;
+    overflow-y: auto;
     transform: translate(-50%, -50%);
     z-index: 12000;
     box-sizing: border-box;
@@ -1099,12 +1101,64 @@ div.frame {
     overflow-wrap: anywhere;
 }
 
+.microBitConnectionDialogTroubleshooting {
+    display: none;
+    box-sizing: border-box;
+    width: min(100%, ${css_vh(48)});
+    margin-top: ${css_vh(1.1)};
+    padding: ${css_vh(1)} ${css_vh(1.4)};
+    border-radius: 10px;
+    background: #FFF5D9;
+    color: #315F7B;
+    font-size: ${css_vh(1.45)};
+    line-height: ${css_vh(2)};
+    text-align: left;
+}
+
+.microBitConnectionDialogTroubleshootingTitle {
+    font-weight: bold;
+}
+
+.microBitConnectionDialogTroubleshootingSteps {
+    margin: ${css_vh(0.45)} 0 0;
+    padding-left: ${css_vh(2.5)};
+}
+
+.microBitConnectionDialogTroubleshootingStep + .microBitConnectionDialogTroubleshootingStep {
+    margin-top: ${css_vh(0.3)};
+}
+
 .microBitConnectionDialogHelp {
     display: none;
     margin-top: ${css_vh(1)};
     color: #255E83;
     font-size: ${css_vh(1.6)};
     font-weight: bold;
+}
+
+.microBitConnectionDialogManual {
+    display: none;
+    width: min(100%, ${css_vh(48)});
+    margin-top: ${css_vh(1.1)};
+    color: #315F7B;
+    font-size: ${css_vh(1.45)};
+    line-height: ${css_vh(2)};
+}
+
+.microBitConnectionDialogDownload {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: ${css_vh(3.7)};
+    margin-top: ${css_vh(0.65)};
+    padding: ${css_vh(0.35)} ${css_vh(1.25)};
+    border: 2px solid #315F7B;
+    border-radius: 9px;
+    background: #FFFFFF;
+    color: #255E83;
+    font-size: ${css_vh(1.55)};
+    font-weight: bold;
+    text-decoration: none;
 }
 
 .microBitConnectionDialogActions {
@@ -1138,7 +1192,8 @@ div.frame {
 
 .microBitConnectionDialogClose:focus-visible,
 .microBitConnectionDialogButton:focus-visible,
-.microBitConnectionDialogHelp:focus-visible {
+.microBitConnectionDialogHelp:focus-visible,
+.microBitConnectionDialogDownload:focus-visible {
     outline: 3px solid #133C46;
     outline-offset: 3px;
 }
