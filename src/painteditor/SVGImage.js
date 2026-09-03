@@ -164,8 +164,13 @@ export default class SVGImage {
             var y = Number(image.getAttribute('y'));
             var width = Number(image.getAttribute('width'));
             var height = Number(image.getAttribute('height'));
-            c.fillStyle = 'red';
-            c.fillRect(x, y, width, height);
+            // Camera fills have a matching path border which masks the image below.
+            // Preserve their legacy red backing, but do not add it to ordinary
+            // embedded images (such as raster-backed library sprites).
+            if (clip) {
+                c.fillStyle = 'red';
+                c.fillRect(x, y, width, height);
+            }
             c.save();
             c.translate(center.x, center.y);
             c.rotate(angle * DEGTOR);
