@@ -1,4 +1,4 @@
-export const DEFAULT_MICROBIT_MATRIX_PATTERN = '00100/01110/10101/00100/00100';
+export const DEFAULT_MICROBIT_MATRIX_PATTERN = '00000/00000/00000/00000/00000';
 
 export function normalizeMicroBitMatrixPattern(pattern) {
     const raw = String(pattern || '').replace(/[^01]/g, '');
