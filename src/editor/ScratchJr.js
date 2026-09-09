@@ -10,6 +10,7 @@ import IO from '../tablet/IO';
 import OS from '../tablet/OS';
 import UI from './ui/UI';
 import Menu from './blocks/Menu';
+import {COLOUR_SWATCHES, addColourPaletteHeader} from './blocks/ColourPalette';
 import Library from './ui/Library';
 import Grid from './ui/Grid';
 import ScriptsPane from './ui/ScriptsPane';
@@ -839,22 +840,20 @@ export default class ScratchJr {
         } else {
             colpad.onpointerdown = ScratchJr.eatEvent;
         }
-        // var pad = newHTML('div', 'insidekeyboard', colpad);
-        const colours = [
-            "#e30613",
-            "#009640",
-            "#009fe3",
-            "#662483",
-            "#e94e1b",
-            "#ffed00",
-        ];
-        for (const colour of colours) {
-            ScratchJr.keyboardAddCol(colpad, colour, "onecol");
+        colpad.className = "colkeyboard colour-palette off";
+        var grid = addColourPaletteHeader(colpad, 'marty');
+        for (const swatch of COLOUR_SWATCHES) {
+            ScratchJr.keyboardAddCol(grid, swatch.colour, "colour-palette-swatch", swatch.name);
         }
     }
 
-    static keyboardAddCol(p, col, c) {
-        var keym = newHTML("div", c, p);
+    static keyboardAddCol(p, col, c, name) {
+        var keym = newHTML("button", c, p);
+        keym.type = "button";
+        keym.setAttribute("aria-label", name);
+        keym.onclick = function (e) {
+            if (e.detail === 0) ScratchJr.colEditKey(e);
+        };
         keym.style.background = col;
         // var mk = newHTML('span', undefined, keym);
         // mk.textContent = col ? col : '';
@@ -879,17 +878,11 @@ export default class ScratchJr {
         activeFocus.delta = delta;
         b.oldvalue = ti.style.background;
         activeFocus.div.className = "colfield on";
-        colpad.className = "colkeyboard on";
+        colpad.className = "colkeyboard colour-palette on";
         editfirst = true;
-        var p = ti.parentNode.parentNode.owner;
-        // if (Number(p.min) < 0) {
-        //     ScratchJr.setMinusKey();
-        // } else {
-        //     ScratchJr.setSpaceKey();
-        // }
-        if (delta == 0) {
-            ScratchJr.needsToScroll(b);
-        }
+        var position = Menu.getDropDownPosition(b.daddy.div, 260, 260);
+        colpad.style.left = position.x + "px";
+        colpad.style.top = position.y + "px";
     }
 
     /////////////////////////////////////////
@@ -1154,7 +1147,7 @@ export default class ScratchJr {
     static closeColEdit() {
         ScratchJr.colEditDone();
         ScratchJr.resetScroll();
-        colpad.className = "colkeyboard off";
+        colpad.className = "colkeyboard colour-palette off";
         activeFocus.div.className = "colfield off";
         activeFocus = undefined;
         // stop accepting keyboard events

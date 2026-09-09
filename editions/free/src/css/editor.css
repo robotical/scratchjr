@@ -2164,3 +2164,74 @@ p.textsprite {
     width: 100%;
     height: 100%;
 }
+
+/* The two device colour pickers share the same reference-card layout. */
+.colour-palette {
+    box-sizing: border-box;
+    padding: 0;
+    border: 0;
+    border-radius: 9px;
+    background: #bf6eaf;
+    box-shadow: none;
+    cursor: default;
+    font-family: 'Lato Regular', sans-serif;
+}
+.colour-palette-icon {
+    position: absolute;
+    top: 3%;
+    left: 23%;
+    width: 54%;
+    height: 34%;
+    object-fit: contain;
+    pointer-events: none;
+}
+.colour-palette-label {
+    position: absolute;
+    top: 40%;
+    width: 100%;
+    color: #000;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.25;
+}
+.colour-palette-grid {
+    position: absolute;
+    top: 50.5%;
+    left: 14%;
+    width: 72%;
+    height: 46.5%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 8px;
+}
+.colour-palette-swatch {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.colour-palette-swatch:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+.colour-palette-swatch:active { opacity: 0.8; }
+.colkeyboard.colour-palette {
+    width: ${260 * scaleMultiplier}px;
+    height: ${260 * scaleMultiplier}px;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    z-index: 100000;
+    border-radius: ${9 * scaleMultiplier}px;
+    background: #bf6eaf;
+    border: 0;
+    box-shadow: none;
+}
+.colkeyboard.colour-palette .colour-palette-label { font-size: ${16 * scaleMultiplier}px; }
+.colkeyboard.colour-palette .colour-palette-grid { gap: ${8 * scaleMultiplier}px; }

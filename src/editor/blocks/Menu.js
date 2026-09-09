@@ -1,4 +1,5 @@
 import BlockSpecs from './BlockSpecs';
+import {COLOUR_SWATCHES, addColourPaletteHeader} from './ColourPalette';
 import {scaleMultiplier, setProps, setCanvasSize, newHTML, isTablet,
     newDiv, getDocumentHeight, drawThumbnail, frame, globalx, globaly} from '../../utils/lib';
 import Path from '../../painteditor/Path';
@@ -16,16 +17,56 @@ export default class Menu {
 
     static openDropDown (b, fcn) {
         var size = 50;
+        var isColourPalette = b.owner.blocktype === 'selectcolour';
         var color = b.owner.blocktype == 'setspeed' ? 'orange' : 'yellow';
         if (b.owner.spec[9]) {
             color = b.owner.spec[9]; // menu colour
         }
         var list = JSON.parse(b.owner.arg.list);
         var num = b.owner.arg.numperrow;
-        var p = b.parentNode;
         var dh = size * Math.round(list.length / num);
         var rows = list.length / num;
         var w = size * list.length / rows;
+        if (isColourPalette) {
+            w = 260;
+            dh = 260;
+        }
+        var position = Menu.getDropDownPosition(b, w, dh);
+        var dx = position.x;
+        var dy = position.y;
+        var mu = newDiv(frame, dx, dy, w, dh, {
+            position: 'absolute',
+            zIndex: 100000,
+            webkitTransform: 'translate(' + (-w / 2) + 'px,' + (-dh / 2) + 'px) ' +
+                'scale(' + scaleMultiplier + ', ' + scaleMultiplier + ') ' +
+                'translate(' + (w / 2) + 'px, ' + (dh / 2) + 'px)'
+        });
+        mu.setAttribute('class', isColourPalette ? 'menustyle colour-palette' : 'menustyle ' + color);
+        mu.active = b;
+        if (isColourPalette) {
+            var grid = addColourPaletteHeader(mu, 'cog');
+            COLOUR_SWATCHES.forEach(function (swatch) {
+                var choice = newHTML('button', 'colour-palette-swatch', grid);
+                choice.type = 'button';
+                choice.style.background = swatch.colour;
+                choice.setAttribute('aria-label', swatch.name);
+                choice.onclick = function (evt) {
+                    fcn(evt, mu, b, 'selectcolour' + swatch.name);
+                };
+                choice.onpointerdown = function (evt) { evt.stopPropagation(); };
+                choice.ontouchstart = function (evt) { evt.stopPropagation(); };
+            });
+        } else {
+            for (var i = 0; i < list.length; i++) {
+                Menu.addImageToDropDown(mu, list[i], b, fcn);
+            }
+        }
+        openMenu = mu;
+    }
+
+    // Both device colour pickers use the same block anchor and edge clamping.
+    static getDropDownPosition (b, w, dh) {
+        var p = b.parentNode;
         var scaledWidth = w * scaleMultiplier;
         var dx = b.left + (b.offsetWidth - scaledWidth) / 2;
         if ((dx + scaledWidth) > p.width) {
@@ -39,19 +80,7 @@ export default class Menu {
         if ((dy + ((10 + dh) * scaleMultiplier)) > getDocumentHeight()) {
             dy = getDocumentHeight() - ((15 + dh) * scaleMultiplier);
         }
-        var mu = newDiv(frame, dx, dy, w, dh, {
-            position: 'absolute',
-            zIndex: 100000,
-            webkitTransform: 'translate(' + (-w / 2) + 'px,' + (-dh / 2) + 'px) ' +
-                'scale(' + scaleMultiplier + ', ' + scaleMultiplier + ') ' +
-                'translate(' + (w / 2) + 'px, ' + (dh / 2) + 'px)'
-        });
-        mu.setAttribute('class', 'menustyle ' + color);
-        mu.active = b;
-        for (var i = 0; i < list.length; i++) {
-            Menu.addImageToDropDown(mu, list[i], b, fcn);
-        }
-        openMenu = mu;
+        return {x: dx, y: Math.max(5, dy)};
     }
 
     static addImageToDropDown (mu, c, block, fcn) {
