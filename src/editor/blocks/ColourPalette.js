@@ -8,10 +8,15 @@ export const COLOUR_SWATCHES = [
     {name: 'purple', colour: '#7e2785'}
 ];
 
+export const SENSED_COLOUR_SWATCHES = COLOUR_SWATCHES.filter(swatch => swatch.name !== 'orange')
+    .concat([{name: 'none', colour: '#ffffff', label: 'No colour'}]);
+
 export function addColourPaletteHeader (parent, device) {
     var icon = document.createElement('img');
     icon.className = 'colour-palette-icon ' + device;
-    icon.src = 'assets/blockicons/' + (device === 'cog' ? 'CogColourPalette' : 'MartyColourPalette') + '.svg';
+    var artwork = device === 'cog' ? 'CogColourPalette' :
+        (device === 'marty-sensor' ? 'martycoloursensednone' : 'MartyColourPalette');
+    icon.src = 'assets/blockicons/' + artwork + '.svg';
     icon.alt = '';
     parent.appendChild(icon);
     var label = document.createElement('div');

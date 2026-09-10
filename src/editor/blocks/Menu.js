@@ -1,5 +1,5 @@
 import BlockSpecs from './BlockSpecs';
-import {COLOUR_SWATCHES, addColourPaletteHeader} from './ColourPalette';
+import {COLOUR_SWATCHES, SENSED_COLOUR_SWATCHES, addColourPaletteHeader} from './ColourPalette';
 import {scaleMultiplier, setProps, setCanvasSize, newHTML, isTablet,
     newDiv, getDocumentHeight, drawThumbnail, frame, globalx, globaly} from '../../utils/lib';
 import Path from '../../painteditor/Path';
@@ -17,7 +17,8 @@ export default class Menu {
 
     static openDropDown (b, fcn) {
         var size = 50;
-        var isColourPalette = b.owner.blocktype === 'selectcolour';
+        var isColourSensor = b.owner.blocktype === 'martycoloursensed';
+        var isColourPalette = b.owner.blocktype === 'selectcolour' || isColourSensor;
         var color = b.owner.blocktype == 'setspeed' ? 'orange' : 'yellow';
         if (b.owner.spec[9]) {
             color = b.owner.spec[9]; // menu colour
@@ -42,16 +43,22 @@ export default class Menu {
                 'translate(' + (w / 2) + 'px, ' + (dh / 2) + 'px)'
         });
         mu.setAttribute('class', isColourPalette ? 'menustyle colour-palette' : 'menustyle ' + color);
+        if (isColourSensor) mu.classList.add('colour-palette-sensing');
         mu.active = b;
         if (isColourPalette) {
-            var grid = addColourPaletteHeader(mu, 'cog');
-            COLOUR_SWATCHES.forEach(function (swatch) {
+            var grid = addColourPaletteHeader(mu, isColourSensor ? 'marty-sensor' : 'cog');
+            var swatches = isColourSensor ? SENSED_COLOUR_SWATCHES : COLOUR_SWATCHES;
+            swatches.forEach(function (swatch) {
                 var choice = newHTML('button', 'colour-palette-swatch', grid);
                 choice.type = 'button';
                 choice.style.background = swatch.colour;
-                choice.setAttribute('aria-label', swatch.name);
+                choice.setAttribute('aria-label', swatch.label || swatch.name);
+                if (swatch.name === 'none') {
+                    choice.classList.add('colour-palette-none');
+                    choice.textContent = swatch.label;
+                }
                 choice.onclick = function (evt) {
-                    fcn(evt, mu, b, 'selectcolour' + swatch.name);
+                    fcn(evt, mu, b, (isColourSensor ? 'martycoloursensed' : 'selectcolour') + swatch.name);
                 };
                 choice.onpointerdown = function (evt) { evt.stopPropagation(); };
                 choice.ontouchstart = function (evt) { evt.stopPropagation(); };
