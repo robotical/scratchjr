@@ -1042,6 +1042,7 @@ export default class ScratchJr {
             return;
         }
         ScratchJr.fillValueWithCol(c);
+        ScratchJr.editDone();
     }
 
     /**
