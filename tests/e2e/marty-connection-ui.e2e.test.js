@@ -154,6 +154,8 @@ describe('Marty connection UI', () => {
         vi.clearAllMocks();
         microBitUpdaterMocks.isSupported.mockReturnValue(false);
         global.window = {
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
             applicationManager: {
                 disconnectGeneric: vi.fn(raft => {
                     raft.__disconnectCallback();
@@ -410,6 +412,39 @@ describe('Marty connection UI', () => {
         expect(button.style.pointerEvents).toBe('auto');
 
         raft.__disconnectCallback();
+    });
+
+    it('finishes Cog cleanup after an embedded document replaces its global manager', () => {
+        const button = createConnectionButton();
+        const raft = createCogRaft();
+        const originalCogManager = window.cogManager;
+
+        UI.setupCogConnectionButton(button, raft);
+        window.cogManager = undefined;
+
+        expect(() => raft.__disconnectCallback()).not.toThrow();
+        expect(originalCogManager.removeCog).toHaveBeenCalledWith(raft);
+        expect(raft.__disconnectedUnsubscribed).toBe(true);
+        expect(raft.__connectionIssueDetectedUnsubscribed).toBe(true);
+        expect(raft.__connectionIssueResolvedUnsubscribed).toBe(true);
+        expect(button.classList.contains('connectButtonConnected')).toBe(false);
+    });
+
+    it('releases Cog observers when the embedded page is hidden', () => {
+        const button = createConnectionButton();
+        const raft = createCogRaft();
+
+        UI.setupCogConnectionButton(button, raft);
+        const pageHideHandler = window.addEventListener.mock.calls.find(
+            ([eventName]) => eventName === 'pagehide'
+        )[1];
+        pageHideHandler();
+
+        expect(window.cogManager.removeCog).toHaveBeenCalledWith(raft);
+        expect(raft.__disconnectedUnsubscribed).toBe(true);
+        expect(raft.__connectionIssueDetectedUnsubscribed).toBe(true);
+        expect(raft.__connectionIssueResolvedUnsubscribed).toBe(true);
+        expect(window.removeEventListener).toHaveBeenCalledWith('pagehide', pageHideHandler);
     });
 
     it('uses a friendly message when the micro:bit chooser is cancelled', () => {

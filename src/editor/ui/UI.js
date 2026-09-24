@@ -1354,9 +1354,11 @@ export default class UI {
             signalIndicator.innerHTML = stripInlineSvgIds(signalSvg(raft.getRSSI()));
         }, 300);
 
-        // Add the raft to the cog manager and wire it with blocks
-        window.cogManager.addCog(raft);
-        window.cogManager.wireCogWithBlocks(raft.id);
+        // Keep this page's manager stable if the embedded document navigates
+        // before the host emits its disconnect event.
+        const cogManager = window.cogManager;
+        cogManager.addCog(raft);
+        cogManager.wireCogWithBlocks(raft.id);
 
         // Store the old onClick function to restore it later
         const oldOnClick = button.onclick;
@@ -1373,7 +1375,6 @@ export default class UI {
 
             // When raft is disconnected, update the UI and remove the raft
             button.classList.remove('connectButtonConnected');
-            window.cogManager.removeCog(raft);
 
             // clear the interval to avoid memory leaks
             clearInterval(cogSignalAndBatteryInterval);
@@ -1391,10 +1392,15 @@ export default class UI {
             connIssueSubs.unsubscribe();
             // Unsubscribe from the issue resolved event to avoid memory leaks
             connIssueResolvedSubs.unsubscribe();
+            window.removeEventListener?.('pagehide', handleDisconnected);
 
             // Restore the old onClick function
             button.onclick = oldOnClick;
             button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' Cog');
+
+            // A page navigation can replace window.cogManager while this
+            // callback is still retained by the host RAFT object.
+            cogManager?.removeCog?.(raft);
         };
 
         // Set the new onClick function to disconnect the raft
@@ -1421,6 +1427,7 @@ export default class UI {
         // Set up a subscription to the raft disconnected event
         const disconnectedSubs = raftDisconnectedSubscriptionHelper(raft);
         disconnectedSubs.subscribe(handleDisconnected);
+        window.addEventListener?.('pagehide', handleDisconnected, {once: true});
     }
 
     static setupMartyConnectionButton(button, raft) {
