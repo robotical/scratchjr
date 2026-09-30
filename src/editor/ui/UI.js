@@ -102,6 +102,8 @@ const MICROBIT_INSTALLER_COPY = {
     MICROBIT_INSTALLER_INSTALL_NOW: 'Install now',
     MICROBIT_INSTALLER_INTERFACE_FIRMWARE:
         'Your micro:bit needs an interface firmware update before Blocks Jr can install its software.',
+    MICROBIT_INSTALLER_MESSAGE_CONNECT:
+        'Turn on your micro:bit, then choose Connect to search for it over Bluetooth.',
     MICROBIT_INSTALLER_MESSAGE_CHOICE:
         'Connect over Bluetooth, or install the required micro:bit software first using a USB cable.',
     MICROBIT_INSTALLER_MESSAGE_READY:
@@ -563,12 +565,9 @@ export default class UI {
             }
             UI.enableMicroBitExtension();
             UI.closeExtensionsLibrary(null, { playSound: false, restoreFocus: false });
-            setTimeout(() => {
-                const microBitButton = gn('microBitConnectionButton');
-                if (microBitButton) {
-                    microBitButton.focus();
-                }
-            }, 0);
+            const microBitButton = gn('microBitConnectionButton');
+            microBitButton.focus();
+            UI.openMicroBitConnectionDialog(microBitButton);
         };
 
         registerDialog(dialog, {
@@ -1006,6 +1005,7 @@ export default class UI {
             return;
         }
         dialog.setAttribute('data-activity', activity);
+        const canInstall = !UI.getHostMicroBitConnectFunction() && isMicroBitUpdateSupported();
 
         controls.progressArea.style.display = activity === 'updating' ? 'flex' : 'none';
         controls.errorDetails.style.display = activity === 'error' && options.details ? 'block' : 'none';
@@ -1013,7 +1013,8 @@ export default class UI {
         controls.firmwareHelp.style.display = options.showFirmwareHelp ? 'inline-block' : 'none';
         controls.manualDownload.style.display = options.showManualDownload ? 'block' : 'none';
         controls.backButton.style.display = activity === 'updating' ? 'none' : '';
-        controls.updateButton.style.display = activity === 'success' || activity === 'updating' ? 'none' : '';
+        controls.updateButton.style.display = activity === 'success' || activity === 'updating' ||
+            (activity === 'choice' && !canInstall) ? 'none' : '';
         controls.connectButton.style.display = activity === 'choice' || activity === 'success' ? '' : 'none';
         controls.closeButton.disabled = activity === 'updating';
 
@@ -1055,7 +1056,8 @@ export default class UI {
             case 'choice':
             default:
                 controls.title.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_TITLE_CHOICE');
-                controls.message.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_MESSAGE_CHOICE');
+                controls.message.textContent = localizeMicroBitInstaller(canInstall ?
+                    'MICROBIT_INSTALLER_MESSAGE_CHOICE' : 'MICROBIT_INSTALLER_MESSAGE_CONNECT');
                 controls.backButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_CANCEL');
                 controls.updateButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_INSTALL');
                 controls.connectButton.textContent = localizeMicroBitInstaller('MICROBIT_INSTALLER_CONNECT');

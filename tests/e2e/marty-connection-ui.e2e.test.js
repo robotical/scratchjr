@@ -1,4 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { gn } from '@/utils/lib';
+import { closeDialog, openDialog } from '@/utils/accessibility';
+
+const elementsById = new Map();
 
 const { microBitUpdaterMocks, newButtonMock, newHTMLMock } = vi.hoisted(() => ({
     microBitUpdaterMocks: {
@@ -39,7 +43,7 @@ vi.mock('@/utils/Localization', () => ({
         localizeOptional: key => key
     }
 }));
-vi.mock('@/utils/ScratchAudio', () => ({ default: {} }));
+vi.mock('@/utils/ScratchAudio', () => ({ default: { sndFX: vi.fn() } }));
 vi.mock('@/utils/cloudLocalStore', () => ({
     addStoredCloudId: vi.fn(),
     getStoredCloudIds: vi.fn(() => []),
@@ -152,6 +156,8 @@ describe('Marty connection UI', () => {
     beforeEach(async () => {
         vi.useFakeTimers();
         vi.clearAllMocks();
+        elementsById.clear();
+        gn.mockImplementation(id => elementsById.get(id));
         microBitUpdaterMocks.isSupported.mockReturnValue(false);
         global.window = {
             addEventListener: vi.fn(),
@@ -211,6 +217,7 @@ describe('Marty connection UI', () => {
         UI = uiModule.default;
         ScratchJr = scratchJrModule.default;
         ScratchJr.isMartyModeEnabled = false;
+        ScratchJr.isMicroBitExtensionEnabled = false;
         ScratchJr.stage = {
             currentPage: {}
         };
@@ -453,6 +460,115 @@ describe('Marty connection UI', () => {
         );
 
         expect(message).toBe('No micro:bit was selected. Click Connect again when you are ready.');
+    });
+
+    it.each([
+        [true, false],
+        [false, false],
+        [true, true]
+    ])('opens a choice on explicit extension addition (USB %s, host %s)', (usbSupported, hostManaged) => {
+        microBitUpdaterMocks.isSupported.mockReturnValue(usbSupported);
+        const button = createConnectionButton();
+        button.setAttribute('id', 'microBitConnectionButton');
+        const requestBluetooth = vi.fn();
+        window.microBitManager.createAndConnectMicroBit = requestBluetooth;
+        const hostConnect = vi.fn();
+        if (hostManaged) {
+            window.applicationManager.connectGenericMicroBit = hostConnect;
+        }
+        UI.createExtensionsLibrary();
+        const openSpy = vi.spyOn(UI, 'openMicroBitConnectionDialog');
+
+        gn('microBitExtensionCard').onclick();
+
+        const dialog = gn('microBitConnectionDialog');
+        expect(ScratchJr.isMicroBitExtensionEnabled).toBe(true);
+        expect(gn('extensionsLibrary').className).toBe('extensionsLibrary fade');
+        expect(dialog.getAttribute('data-activity')).toBe('choice');
+        expect(dialog.className).toBe('microBitConnectionDialog fade in');
+        expect(dialog.microBitControls.connectButton.style.display).toBe('');
+        expect(dialog.microBitControls.updateButton.style.display).toBe(
+            usbSupported && !hostManaged ? '' : 'none'
+        );
+        expect(button.focus.mock.invocationCallOrder[0]).toBeLessThan(openSpy.mock.invocationCallOrder[0]);
+        expect(requestBluetooth).not.toHaveBeenCalled();
+        expect(hostConnect).not.toHaveBeenCalled();
+        expect(microBitUpdaterMocks.selectAndUpdate).not.toHaveBeenCalled();
+        expect(openDialog).toHaveBeenCalledWith(dialog);
+
+        dialog.microBitControls.backButton.onclick();
+        expect(closeDialog).toHaveBeenCalledWith(dialog, {restoreFocus: true});
+        expect(dialog.className).toBe('microBitConnectionDialog fade');
+        expect(requestBluetooth).not.toHaveBeenCalled();
+        expect(hostConnect).not.toHaveBeenCalled();
+        openSpy.mockRestore();
+    });
+
+    it('starts the host connection only after Connect in the automatic choice', () => {
+        const button = createConnectionButton();
+        button.setAttribute('id', 'microBitConnectionButton');
+        const hostConnect = vi.fn();
+        window.applicationManager.connectGenericMicroBit = hostConnect;
+        UI.createExtensionsLibrary();
+        gn('microBitExtensionCard').onclick();
+
+        gn('microBitConnectionDialog').microBitControls.connectButton.onclick();
+
+        expect(hostConnect).toHaveBeenCalledOnce();
+        expect(gn('microBitConnectionDialog').className).toBe('microBitConnectionDialog fade');
+    });
+
+    it('installs before Bluetooth and connects from the successful installation dialog', async () => {
+        microBitUpdaterMocks.isSupported.mockReturnValue(true);
+        microBitUpdaterMocks.selectAndUpdate.mockResolvedValue(undefined);
+        const button = createConnectionButton();
+        button.setAttribute('id', 'microBitConnectionButton');
+        const microBit = createMicroBit();
+        window.microBitManager.createAndConnectMicroBit = vi.fn().mockResolvedValue(microBit);
+        UI.createExtensionsLibrary();
+        gn('microBitExtensionCard').onclick();
+        const dialog = gn('microBitConnectionDialog');
+
+        dialog.microBitControls.updateButton.onclick();
+        expect(dialog.getAttribute('data-activity')).toBe('ready');
+        expect(microBitUpdaterMocks.selectAndUpdate).not.toHaveBeenCalled();
+        dialog.microBitControls.updateButton.onclick();
+        await Promise.resolve();
+
+        expect(dialog.getAttribute('data-activity')).toBe('success');
+        expect(dialog.microBitControls.connectButton.style.display).toBe('');
+        expect(window.microBitManager.createAndConnectMicroBit).not.toHaveBeenCalled();
+        dialog.microBitControls.connectButton.onclick();
+        await Promise.resolve();
+
+        expect(window.microBitManager.createAndConnectMicroBit).toHaveBeenCalledOnce();
+        expect(window.microBitManager.addMicroBit).toHaveBeenCalledWith(microBit);
+        expect(button.classList.contains('connectButtonConnected')).toBe(true);
+    });
+
+    it('keeps retry and manual installation available after failure without searching for Bluetooth', async () => {
+        microBitUpdaterMocks.isSupported.mockReturnValue(true);
+        microBitUpdaterMocks.selectAndUpdate.mockRejectedValue({code: 'usb-access', message: 'Unable to claim interface'});
+        const button = createConnectionButton();
+        button.setAttribute('id', 'microBitConnectionButton');
+        window.microBitManager.createAndConnectMicroBit = vi.fn();
+        UI.openMicroBitConnectionDialog(button);
+        const dialog = gn('microBitConnectionDialog');
+        dialog.microBitControls.updateButton.onclick();
+        dialog.microBitControls.updateButton.onclick();
+        await Promise.resolve();
+
+        expect(dialog.getAttribute('data-activity')).toBe('error');
+        expect(dialog.microBitControls.connectButton.style.display).toBe('none');
+        expect(dialog.microBitControls.manualDownload.style.display).toBe('block');
+        expect(dialog.microBitControls.updateButton.textContent).toBe('Try again');
+        expect(window.microBitManager.createAndConnectMicroBit).not.toHaveBeenCalled();
+
+        microBitUpdaterMocks.selectAndUpdate.mockResolvedValue(undefined);
+        dialog.microBitControls.updateButton.onclick();
+        await Promise.resolve();
+        expect(dialog.getAttribute('data-activity')).toBe('success');
+        expect(window.microBitManager.createAndConnectMicroBit).not.toHaveBeenCalled();
     });
 
     it('opens the software-or-connect dialog for the direct web path when WebUSB is available', () => {
@@ -736,6 +852,13 @@ class FakeElement {
 
     setAttribute(name, value) {
         this.attributes[name] = value;
+        if (name === 'id') {
+            elementsById.set(value, this);
+        }
+    }
+
+    removeAttribute(name) {
+        delete this.attributes[name];
     }
 
     getAttribute(name) {
@@ -754,6 +877,14 @@ class FakeClassList {
 
     remove(...classes) {
         classes.forEach(className => this.classes.delete(className));
+    }
+
+    toggle(className, enabled) {
+        if (enabled) {
+            this.add(className);
+        } else {
+            this.remove(className);
+        }
     }
 
     contains(className) {

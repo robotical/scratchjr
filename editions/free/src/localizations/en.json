@@ -1280,6 +1280,7 @@
   "MICROBIT_INSTALLER_INSTALL": "Install software",
   "MICROBIT_INSTALLER_INSTALL_NOW": "Install now",
   "MICROBIT_INSTALLER_INTERFACE_FIRMWARE": "Your micro:bit needs an interface firmware update before Blocks Jr can install its software.",
+  "MICROBIT_INSTALLER_MESSAGE_CONNECT": "Turn on your micro:bit, then choose Connect to search for it over Bluetooth.",
   "MICROBIT_INSTALLER_MESSAGE_CHOICE": "Connect over Bluetooth, or install the required micro:bit software first using a USB cable.",
   "MICROBIT_INSTALLER_MESSAGE_READY": "Connect your micro:bit to this computer with a USB cable, then choose Install now.",
   "MICROBIT_INSTALLER_MESSAGE_SUCCESS": "Your micro:bit is ready. Disconnect the USB cable, power it on, then choose Connect.",
