@@ -10,6 +10,7 @@ import IO from '../../tablet/IO';
 import Paint from '../../painteditor/Paint';
 import SVG2Canvas from '../../utils/SVG2Canvas';
 import Localization from '../../utils/Localization';
+import { startTutorialAfterProjectLoad } from '../../tutorial/TutorialStartup';
 import {frame, gn, newHTML, scaleMultiplier, getIdFor,
     isAndroid, setProps, setCanvasSize} from '../../utils/lib';
 
@@ -270,6 +271,7 @@ export default class Project {
         ScratchJr.log('load done', ScratchJr.getTime(), 'sec', '-- media missing = ', mediaCount);
         ScratchJr.stage.resetPages();
         ScratchJr.runtime.beginTimer();
+        startTutorialAfterProjectLoad();
     }
 
     static liftCurtain () {

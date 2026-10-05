@@ -130,6 +130,14 @@ async function enableMicroBitExtension(page) {
 }
 
 async function insertMicroBitBlock(page) {
+  // Adding the extension now opens its device setup dialog. Keep the
+  // extension enabled, but cancel pairing before editing the palette.
+  await page.waitForSelector('#microBitConnectionDialog.in', { visible: true, timeout: 30_000 });
+  await page.click('#microBitConnectionDialogBack');
+  await page.waitForFunction(
+    () => !document.getElementById('microBitConnectionDialog').classList.contains('in'),
+    { timeout: 30_000 }
+  );
   await page.click("#microbit-looks");
   await page.waitForFunction(
     (blockType) => Boolean(document.querySelector(`#palette [data-blocktype="${blockType}"]`)),

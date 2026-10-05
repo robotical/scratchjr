@@ -19,9 +19,6 @@ import {
   inappTutorials,
 } from "./inapp";
 
-// import TutorialFetcher from '../tutorial/TutorialFetcher';
-import TutorialEngine from '../tutorial/TutorialEngine';
-
 function markEmbeddedHost() {
   try {
     if (window.parent !== window || window.frameElement) {
@@ -194,22 +191,6 @@ window.onload = () => {
         if (skipLinkTargetId) {
           ensureSkipLink(skipLinkTargetId, Localization.localize('A11Y_SKIP_TO_MAIN'));
         }
-        
-        /*Tutorial*/
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get("tutorial")) {
-          // Load tutorial
-          const TutorialFetcher = require('../tutorial/TutorialFetcher').default;
-          const tutorial = TutorialFetcher.fetchTutorial(urlParams.get("tutorial"));
-          if (tutorial) {
-            // For better UI, give a little time for the UI to load before starting the tutorial
-            setTimeout(() => {
-              window.tutorialEngine = new TutorialEngine(tutorial);
-            }, 1000);
-          }
-        }
-        /* End Tutorial */
-
       });
     });
     // Initialize currentUsage data
