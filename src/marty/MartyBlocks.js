@@ -24,41 +24,46 @@ export default class MartyBlocks {
 
     static MARTY_SOUNDS_NOT_IN_FW = "1.3.0"; // greater versions than this support the new sound file location
 
+    static COLOUR_POLL_INTERVAL_MS = 100;
+    static COLOUR_READING_MAX_AGE_MS = 500;
+
     constructor(marty) {
         this.marty = marty;
+        this.sensorListeners = [];
 
         // Subscribe to the published data events of the marty
-        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.red, this.onColourSensedRed.bind(this));
-        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.green, this.onColourSensedGreen.bind(this));
-        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.blue, this.onColourSensedBlue.bind(this));
-        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.purple, this.onColourSensedPurple.bind(this));
-        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.yellow, this.onColourSensedYellow.bind(this));
-        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.air, this.onColourSensedNone.bind(this));
-        this.marty.publishedDataAnalyser.on(this.marty.publishedDataAnalyser.eventsMap.colourSensed.unclear, this.onColourSensedNone.bind(this));
+        const colourEvents = this.marty.publishedDataAnalyser.eventsMap.colourSensed;
+        this.subscribeToSensorEvent(colourEvents.red, this.onColourSensedRed);
+        this.subscribeToSensorEvent(colourEvents.green, this.onColourSensedGreen);
+        this.subscribeToSensorEvent(colourEvents.blue, this.onColourSensedBlue);
+        this.subscribeToSensorEvent(colourEvents.purple, this.onColourSensedPurple);
+        this.subscribeToSensorEvent(colourEvents.yellow, this.onColourSensedYellow);
+        this.subscribeToSensorEvent(colourEvents.air, this.onColourSensedNone);
+        this.subscribeToSensorEvent(colourEvents.unclear, this.onColourSensedNone);
 
         const obstacleSenseEvents = this.marty.publishedDataAnalyser.eventsMap?.objectSense;
         if (obstacleSenseEvents) {
             const obstacleDetectedEvent = obstacleSenseEvents.near;
             if (obstacleDetectedEvent) {
-                this.marty.publishedDataAnalyser.on(obstacleDetectedEvent, this.onObstacleSensed.bind(this));
+                this.subscribeToSensorEvent(obstacleDetectedEvent, this.onObstacleSensed);
             }
 
             const obstacleNotDetectedEvent = obstacleSenseEvents.none;
             if (obstacleNotDetectedEvent) {
-                this.marty.publishedDataAnalyser.on(obstacleNotDetectedEvent, this.onObstacleNotSensed.bind(this));
+                this.subscribeToSensorEvent(obstacleNotDetectedEvent, this.onObstacleNotSensed);
             }
         }
 
         const lightSenseEvents = this.marty.publishedDataAnalyser.eventsMap?.lightSense;
         if (lightSenseEvents) {
             if (lightSenseEvents.none) {
-                this.marty.publishedDataAnalyser.on(lightSenseEvents.none, this.onLightSensedLow.bind(this));
+                this.subscribeToSensorEvent(lightSenseEvents.none, this.onLightSensedLow);
             }
             if (lightSenseEvents.mid) {
-                this.marty.publishedDataAnalyser.on(lightSenseEvents.mid, this.onLightSensedMid.bind(this));
+                this.subscribeToSensorEvent(lightSenseEvents.mid, this.onLightSensedMid);
             }
             if (lightSenseEvents.high) {
-                this.marty.publishedDataAnalyser.on(lightSenseEvents.high, this.onLightSensedHigh.bind(this));
+                this.subscribeToSensorEvent(lightSenseEvents.high, this.onLightSensedHigh);
             }
         }
 
@@ -66,13 +71,46 @@ export default class MartyBlocks {
         if (noiseSenseEvents) {
             const noiseDetectedEvent = noiseSenseEvents.high;
             if (noiseDetectedEvent) {
-                this.marty.publishedDataAnalyser.on(noiseDetectedEvent, this.onNoiseSensed.bind(this));
+                this.subscribeToSensorEvent(noiseDetectedEvent, this.onNoiseSensed);
             }
             
             const noNoiseEvent = noiseSenseEvents.low;
             if (noNoiseEvent) {
-                this.marty.publishedDataAnalyser.on(noNoiseEvent, this.onNoNoiseSensed.bind(this));
+                this.subscribeToSensorEvent(noNoiseEvent, this.onNoNoiseSensed);
             }
+        }
+
+        // Hosts may emit only on colour changes. Recheck the confirmed state so
+        // a held colour also starts newly added or previously busy scripts.
+        // Prims.OnMartyEvent prevents overlapping runs of the same script.
+        this.colourPollInterval = setInterval(() => this.pollSensedColour(), MartyBlocks.COLOUR_POLL_INTERVAL_MS);
+        this.destroyOnPageHide = this.destroy.bind(this);
+        window.addEventListener?.('pagehide', this.destroyOnPageHide, {once: true});
+    }
+
+    subscribeToSensorEvent(event, callback) {
+        const listener = callback.bind(this);
+        this.sensorListeners.push({event, listener});
+        this.marty.publishedDataAnalyser.on(event, listener);
+    }
+
+    pollSensedColour() {
+        if (!this.marty || this.marty.isVerified === false || this.marty.isConnected === false || document.hidden) {
+            return;
+        }
+        // Use the host's confirmed colour, never raw RGB values or cached telemetry.
+        const receivedAtMs = this.marty.raftStateInfo?.addOnInfoValidMs;
+        if (Number.isFinite(receivedAtMs)) {
+            const age = Date.now() - receivedAtMs;
+            if (receivedAtMs <= 0 || age < 0 || age >= MartyBlocks.COLOUR_READING_MAX_AGE_MS) {
+                return;
+            }
+        }
+        const colour = this.marty.publishedDataAnalyser.martyState?.colourSensed;
+        if (['red', 'green', 'blue', 'purple', 'yellow'].indexOf(colour) !== -1) {
+            Prims.OnMartyEvent('martycoloursensed' + colour);
+        } else if (colour === 'air' || colour === 'unclear') {
+            this.onColourSensedNone();
         }
     }
 
@@ -124,6 +162,15 @@ export default class MartyBlocks {
     }
 
     destroy() {
+        clearInterval(this.colourPollInterval);
+        window.removeEventListener?.('pagehide', this.destroyOnPageHide);
+        if (!this.marty) {
+            return;
+        }
+        this.sensorListeners.forEach(({event, listener}) => {
+            this.marty.publishedDataAnalyser.removeListener(event, listener);
+        });
+        this.sensorListeners = [];
         this.marty = null;
     }
 

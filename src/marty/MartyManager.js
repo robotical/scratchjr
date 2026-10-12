@@ -24,6 +24,7 @@ class MartyManager {
     wireMartyWithBlocks(martyId) {
         const marty = this.martys[martyId];
         if (marty) {
+            marty.blocks?.destroy?.();
             const martyBlocks = new MartyBlocks(marty);
             marty.blocks = martyBlocks;
             Prims.martyBlocks = martyBlocks;
