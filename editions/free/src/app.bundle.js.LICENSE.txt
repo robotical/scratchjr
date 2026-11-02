@@ -27,6 +27,12 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
+/*! LAME/lamejs MP3 encoder, LGPL-2.1-or-later.
+ * Original copyright notices are retained in src/vendor/lame-all.js.
+ * License: licenses/lamejs-LGPL-2.1.txt
+ * Source: https://github.com/robotical/MartyBlocks2.0/blob/v4.0.80/robotical/marty-blocks-lib/src/lame-all.js
+ */
+
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 
 /*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */

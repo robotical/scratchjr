@@ -2,6 +2,8 @@ import { closexSvg } from "../../html-svgs/closex-svg";
 import { questionmarkSvg } from "../../html-svgs/questionmark-svg";
 import { readOutLoudSvg } from "../../html-svgs/readoutloud-svg";
 import { saveSvg } from "../../html-svgs/save-svg";
+import { martySvg } from "../../html-svgs/marty";
+import TutorialNarration from "../../tutorial/TutorialNarration";
 import { gn, newHTML, stripHtml } from "../../utils/lib";
 import { closeDialog, openDialog, registerDialog } from "../../utils/accessibility";
 import Localization from "../../utils/Localization";
@@ -13,10 +15,10 @@ import UI from "./UI";
 export default class TutorialUI {
 
     static _highlightedElements = [];
-    static onReadAloudClickBound = null;
 
     /* Sets up tutorial UI elements */
     static setupUI(tutorial) {
+        if (this.narration) this.narration.destroy();
         this.tutorial = tutorial;
         const frame = gn('frame');
         TutorialUI.frame = frame;
@@ -92,46 +94,15 @@ export default class TutorialUI {
     }
 
     static onReadAloudClick() {
-        // If already speaking, cancel
-        if (this.utterance && speechSynthesis.speaking) {
-            console.log("Cancelling...");
-            speechSynthesis.cancel();
-            this.utterance = null;
-            return;
-        }
-        // Create a new this.utterance
-        this.utterance = new SpeechSynthesisUtterance(stripHtml(this.textToRead).trim() || " ");
-        this.utterance.lang = 'en-US';
-
-        // Debug hooks
-        this.utterance.onstart = () => console.log("▶️ started");
-        this.utterance.onboundary = e => console.log("boundary", e.charIndex);
-        this.utterance.onerror = e => console.error("❌ error", e);
-        this.utterance.onend = () => {
-            console.log("✅ finished");
-            this.utterance = null;
-        };
-        this.utterance.onpause = () => console.log("⏸ paused");
-        this.utterance.onresume = () => console.log("▶️ resumed");
-
-        console.log("Speaking:", this.utterance.text);
-        speechSynthesis.speak(this.utterance);
+        return this.narration.playDevice();
     }
 
-    static showReadAloudButton(textToRead, voiceName = "Google US English") {
-        this.utterance = null;
-        this.voiceName = voiceName;
-        this.textToRead = textToRead;
-        const btn = document.getElementById('tutorialReadAloud');
-        btn.style.visibility = 'visible';
-        this.onReadAloudClickBound = this.onReadAloudClick.bind(this);
-        btn.addEventListener('click', this.onReadAloudClickBound);
+    static showReadAloudButton(textToRead) {
+        this.narration.show(stripHtml(textToRead || '').trim());
     }
 
     static hideReadAloudButton() {
-        const readAloudButton = gn('tutorialReadAloud');
-        readAloudButton.style.visibility = 'hidden';
-        readAloudButton.removeEventListener('click', this.onReadAloudClickBound);
+        this.narration.hide();
     }
 
     /* Menu Bar */
@@ -149,7 +120,13 @@ export default class TutorialUI {
                 ${saveSvg}<span id="keepTutorialProjectText">${keepProjectLabel}</span>
             </button>
             <span id="tutorialSaveStatus" class="sr-only" role="status" aria-live="polite"></span>
-            <button id="tutorialReadAloud" class="tutorialButton" aria-label="${Localization.localize('A11Y_READ_ALOUD')}">${readOutLoudSvg}</button>
+            <div id="tutorialAudioControls" class="tutorialAudioControls" hidden>
+                <button id="tutorialMartyReadAloud" class="tutorialButton" type="button" hidden>
+                    ${martySvg.replace(/\sid="[^"]*"/g, '').replace('<svg', '<svg aria-hidden="true" focusable="false"')}
+                </button>
+                <button id="tutorialReadAloud" class="tutorialButton" type="button"
+                    aria-label="${Localization.localize('A11Y_READ_ALOUD')}">${readOutLoudSvg}</button>
+            </div>
             <button id="tutorialHelp" class="tutorialButton" aria-label="${Localization.localize('A11Y_HELP')}">${questionmarkSvg}</button>
             <button id="previousStep" class="tutorialButton" aria-label="${Localization.localize('A11Y_PREVIOUS')}">
                 <svg id="tutorial-left-pointing-arrow-svg" viewBox="0 0 24 24" fill="#133C46" xmlns="http://www.w3.org/2000/svg">
@@ -164,6 +141,12 @@ export default class TutorialUI {
         `;
         gn('closeTutorial').addEventListener('click', TutorialUI.closeTutorial);
         gn('keepTutorialProject').addEventListener('click', TutorialUI.keepTutorialProject);
+        this.narration = new TutorialNarration({
+            root: this.tutorialMenuBar,
+            getLocale: () => Localization.currentLocale || 'en',
+            localize: text => Localization.localizeOptional(text),
+            readLabel: Localization.localize('A11Y_READ_ALOUD')
+        });
     }
 
     static keepTutorialProject() {
@@ -190,6 +173,7 @@ export default class TutorialUI {
     }
 
     static closeTutorial() {
+        TutorialUI.narration.stop();
         const urlParams = new URLSearchParams(window.location.search);
         const tutorialId = urlParams.get('tutorial');
         const tutorialReturnPlace = urlParams.get('tutorialReturnPlace');
@@ -305,6 +289,7 @@ export default class TutorialUI {
     }
 
     static showModal(content) {
+        this.narration.stop();
         const modalMedia = TutorialUI.modal.querySelector('#modalMedia');
         modalMedia.innerHTML = content;
         TutorialUI.modal.style.display = 'block';
@@ -355,6 +340,7 @@ export default class TutorialUI {
         speechBubble.style.display = 'block';
         const speechBubbleText = TutorialUI.instructor.querySelector('#speechBubbleText');
         speechBubbleText.innerHTML = text;
+        TutorialUI.updateNarrationText();
         TutorialUI.momentarilyHighlightSpeechBubble(speechBubble);
     }
 
@@ -363,6 +349,7 @@ export default class TutorialUI {
         speechBubble.style.display = 'block';
         const speechBubbleImage = TutorialUI.instructor.querySelector('#speechBubbleImage');
         speechBubbleImage.innerHTML = `<img src="${imageURL}" alt="${text}" class="tutorialImage" /><br />${text}`;
+        TutorialUI.updateNarrationText();
         speechBubbleImage.querySelector('img').addEventListener('click', (e) => {
             TutorialUI.showModal(`<img class="modalImage" src="${imageURL}" alt="expanded image" />`);
         });
@@ -380,6 +367,14 @@ export default class TutorialUI {
             TutorialUI.showModal(`<video class="modalVideo" src="${videoURL}" controls autoplay></video>`);
         });
         TutorialUI.momentarilyHighlightSpeechBubble(speechBubble);
+    }
+
+    static updateNarrationText() {
+        const text = ['#speechBubbleText', '#speechBubbleImage'].map(selector => {
+            const element = TutorialUI.instructor.querySelector(selector);
+            return (element.innerText || element.textContent || '').trim();
+        }).filter(Boolean).join('. ');
+        this.narration.setText(text);
     }
 
     static momentarilyHighlightSpeechBubble(speechBubble) {

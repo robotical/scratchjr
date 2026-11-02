@@ -5,11 +5,12 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 100001;
-    width: 500px;
-    height: 30px;
+    width: 600px;
+    max-width: calc(100% - 24px);
+    min-height: 44px;
 
     display: grid;
-    grid-template-columns: min-content 1fr min-content min-content min-content min-content min-content;
+    grid-template-columns: min-content minmax(0, 1fr) repeat(5, min-content);
     align-items: center;
 
     background: white;
@@ -17,8 +18,8 @@
     border-radius: 40px;
 
     border: 3px solid #F4AD46;
-    column-gap: 10px;
-    padding: 0 3px;
+    column-gap: 6px;
+    padding: 4px 6px;
 }
 
 .tutorialKeepProjectButton {
@@ -55,8 +56,64 @@
     opacity: .7;
 }
 
-#tutorialReadAloud {
-    /* align-items: start; */
+.tutorialAudioControls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid #d9e8ed;
+    border-radius: 15px;
+    background: #f0f7f9;
+}
+
+.tutorialAudioControls[hidden],
+.tutorialAudioControls button[hidden] {
+    display: none;
+}
+
+.tutorialAudioControls .tutorialButton {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 5px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    background: transparent;
+}
+
+.tutorialAudioControls .tutorialButton svg {
+    width: 30px;
+    height: 30px;
+}
+
+.tutorialAudioControls .tutorialButton:hover,
+.tutorialAudioControls .tutorialButton[aria-pressed="true"] {
+    border-color: #9ccbd6;
+    background: #dceff4;
+}
+
+.tutorialAudioControls .tutorialButton:focus-visible {
+    outline: 2px solid #14778e;
+    outline-offset: 2px;
+}
+
+.tutorialAudioControls .tutorialButton[aria-busy="true"] {
+    opacity: .65;
+}
+
+@media (max-width: 480px) {
+    .tutorialKeepProjectButton {
+        min-width: 32px;
+        width: 32px;
+        padding: 0;
+    }
+
+    #keepTutorialProjectText {
+        display: none;
+    }
 }
 
 #nextStep,
@@ -94,7 +151,10 @@
     font-size: 13px;
     color: #133C46;
     text-align: left;
-    font-family: 'Lato Regular'
+    font-family: 'Lato Regular';
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Progress Bar */

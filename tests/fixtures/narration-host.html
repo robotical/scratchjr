@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Blocks Jr narration test host</title></head>
+<body style="margin:0;font-family:sans-serif">
+    <nav style="height:48px;display:flex;align-items:center;gap:8px;padding:0 12px">
+        <strong>Mock robot · no physical playback</strong>
+        <button id="connectMockMarty">Connect mock Marty</button>
+        <button id="verifyMockMarty">Verify mock Marty</button>
+        <button id="disconnectMockMarty">Disconnect mock Marty</button>
+        <output id="narrationStatus">Disconnected</output>
+    </nav>
+    <object id="jrActivity" type="text/html" style="width:100%;height:calc(100vh - 48px)"
+        data="/index.html?tutorial=marty-jr-blocks-1"></object>
+    <script>
+        window.narrationEvents = [];
+        window.applicationManager = {
+            connectedRafts: {}, connectedRaftsContext: [], selectedLocale: 'en',
+            hideBackHomeButton: function () {},
+            isPhoneApp: function () { return false; },
+            getTheCurrentlySelectedDeviceOrFirstOfItsKind: function () { return null; }
+        };
+        var observers = [];
+        var marty = {
+            id: 'narration-marty', type: 'Marty', connectionMethod: 'PhoneBLE', isVerified: false,
+            subscribe: function (observer) { observers.push(observer); },
+            unsubscribe: function (observer) { observers = observers.filter(function (item) {return item !== observer;}); },
+            getSoundStreamingProfile: function () { return {sampleRate: 16000, bitRate: 16, avgFlag: false}; },
+            sendRestMessage: function (command) {
+                window.narrationEvents.push({command: command});
+                document.getElementById('narrationStatus').textContent = command;
+                return Promise.resolve({rslt: 'ok'});
+            },
+            streamAudio: function (audio, clearExisting, duration) {
+                window.narrationEvents.push({streamBytes: audio.length, clearExisting: clearExisting, duration: duration});
+                document.getElementById('narrationStatus').textContent = 'Mock Marty received ' + audio.length + ' audio bytes';
+                return Promise.resolve(true);
+            }
+        };
+        document.getElementById('connectMockMarty').onclick = function () {
+            marty.isVerified = false;
+            window.applicationManager.connectedRafts[marty.id] = marty;
+            window.applicationManager.connectedRaftsContext = [{id: marty.id, isSelected: true}];
+            document.getElementById('narrationStatus').textContent = 'Connected, awaiting verification';
+        };
+        document.getElementById('verifyMockMarty').onclick = function () {
+            marty.isVerified = true;
+            document.getElementById('narrationStatus').textContent = 'Verified';
+        };
+        document.getElementById('disconnectMockMarty').onclick = function () {
+            marty.isVerified = false;
+            window.applicationManager.connectedRafts = {};
+            window.applicationManager.connectedRaftsContext = [];
+            document.getElementById('narrationStatus').textContent = 'Disconnected';
+        };
+    </script>
+</body>
+</html>
