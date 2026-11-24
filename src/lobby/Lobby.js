@@ -347,7 +347,7 @@ export default class Lobby {
             gn('wrapc').scrollTop = 0;
         };
         errorTimer = window.setTimeout(function () {
-            Lobby.errorLoading('Loading timeout');
+            Lobby.errorLoading(Localization.localize('GUIDE_LOAD_TIMEOUT'));
         }, 20000);
     }
 
@@ -374,7 +374,7 @@ export default class Lobby {
         div.setAttribute('id', 'htmlcontents');
         div = newHTML('div', 'errormsg', div);
         var h = newHTML('h1', undefined, div);
-        h.textContent = page.toUpperCase() + ': UNDER CONSTRUCTION';
+        h.textContent = Localization.localize('PAGE_UNDER_CONSTRUCTION');
         busy = false;
     }
 

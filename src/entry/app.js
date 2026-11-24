@@ -67,6 +67,13 @@ window.onload = () => {
 
   // Load CSS and set root/entryFunction for all pages
   switch (page) {
+    case "notFound":
+      titleKey = "PAGE_NOT_FOUND";
+      entryFunction = () => {
+        document.getElementById("not-found-title").textContent = Localization.localize("PAGE_NOT_FOUND");
+        document.getElementById("not-found-description").textContent = Localization.localize("PAGE_NOT_FOUND_HINT");
+      };
+      break;
     case "index":
       // Index page (splash screen)
       preprocessAndLoadCss("css", "css/font.css");

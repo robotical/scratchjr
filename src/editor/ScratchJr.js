@@ -10,7 +10,7 @@ import IO from '../tablet/IO';
 import OS from '../tablet/OS';
 import UI from './ui/UI';
 import Menu from './blocks/Menu';
-import {COLOUR_SWATCHES, addColourPaletteHeader} from './blocks/ColourPalette';
+import {COLOUR_SWATCHES, addColourPaletteHeader, swatchLabel} from './blocks/ColourPalette';
 import Library from './ui/Library';
 import Grid from './ui/Grid';
 import ScriptsPane from './ui/ScriptsPane';
@@ -530,7 +530,7 @@ export default class ScratchJr {
         if (persisted === false) {
             onHold = false;
             Alert.close();
-            Alert.open(frame, gn('flip'), 'Save failed', '#ff0000');
+            Alert.open(frame, gn('flip'), Localization.localize('CLOUD_PROJECT_LOCAL_SAVE_FAILED'), '#ff0000');
             return;
         }
         Alert.close();
@@ -843,7 +843,7 @@ export default class ScratchJr {
         colpad.className = "colkeyboard colour-palette off";
         var grid = addColourPaletteHeader(colpad, 'marty');
         for (const swatch of COLOUR_SWATCHES) {
-            ScratchJr.keyboardAddCol(grid, swatch.colour, "colour-palette-swatch", swatch.name);
+            ScratchJr.keyboardAddCol(grid, swatch.colour, "colour-palette-swatch", swatchLabel(swatch));
         }
     }
 

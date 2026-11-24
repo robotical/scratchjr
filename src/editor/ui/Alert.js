@@ -45,6 +45,9 @@ export default class Alert {
             position: 'absolute',
             zIndex: targetZIndex
         });
+        balloon.setAttribute('role', 'status');
+        balloon.setAttribute('aria-label', label);
+        balloon.textContent = label;
         balloon.icon = obj;
         balloon.addEventListener('click', Alert.close);
         balloon.style.cursor = 'pointer';

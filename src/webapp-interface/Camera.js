@@ -1,3 +1,4 @@
+import Localization from '../utils/Localization';
 class Camera {
   constructor() {
     this.isMirrored = true;
@@ -106,7 +107,7 @@ class Camera {
       this.videoCaptureElement.isRecordingPermitted = true;
       const supports = navigator.mediaDevices.getSupportedConstraints();
       if (!supports['facingMode']) {
-        alert('This browser does not support facingMode!');
+        alert(Localization.localize('CAMERA_SWITCH_UNSUPPORTED'));
       }
       this.videoCaptureElement.startRecord({
         video: {

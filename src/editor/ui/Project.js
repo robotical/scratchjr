@@ -318,7 +318,7 @@ export default class Project {
             error = false;
         } catch (e) {
             console.log(e); //eslint-disable-line no-console
-            var errorMessage = 'Error -- project data corrupted.';
+            var errorMessage = Localization.localize('PROJECT_DATA_CORRUPTED');
 
             if (window.reloadDebug) {
                 document.write(e.message + '\n' + metadata['json']);
@@ -638,10 +638,10 @@ export default class Project {
 
     static prepareToSave (id, whenDone) {
         if (saving) {
-            Alert.open(frame, gn('flip'), 'Waiting', '#28A5DA');
+            Alert.open(frame, gn('flip'), Localization.localize('PROJECT_SAVE_WAITING'), '#28A5DA');
             Project.waitUntilSaved(id, whenDone);
         } else {
-            Alert.open(frame, gn('flip'), 'Saving', '#28A5DA');
+            Alert.open(frame, gn('flip'), Localization.localize('Saving...'), '#28A5DA');
             Project.save(id, whenDone);
         }
     }

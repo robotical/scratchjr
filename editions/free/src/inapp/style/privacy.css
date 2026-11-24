@@ -22,6 +22,11 @@ body {
   margin-bottom: ${css_vh(10.4)};
 }
 
+html:lang(ar) body {
+  direction: rtl;
+  text-align: start;
+}
+
 h1 {
   font-size: ${css_vh(5.3)};
   margin-bottom: ${css_vh(0.65)};

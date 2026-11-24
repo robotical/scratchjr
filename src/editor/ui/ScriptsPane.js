@@ -59,15 +59,15 @@ export default class ScriptsPane {
         zoomControls.setAttribute('aria-label', getGuideLabel('INTERFACE_GUIDE_ZOOM'));
 
         const zoomOutButton = newButton('zoom-button', zoomControls, {
-            ariaLabel: 'Zoom out',
-            title: 'Zoom out'
+            ariaLabel: Localization.localize('EDITOR_ZOOM_OUT'),
+            title: Localization.localize('EDITOR_ZOOM_OUT')
         });
         zoomOutButton.innerHTML = zoomOutSvg;
         zoomOutButton.onclick = ScriptsPane.zoomOut;
 
         const zoomInButton = newButton('zoom-button', zoomControls, {
-            ariaLabel: 'Zoom in',
-            title: 'Zoom in'
+            ariaLabel: Localization.localize('EDITOR_ZOOM_IN'),
+            title: Localization.localize('EDITOR_ZOOM_IN')
         });
         zoomInButton.innerHTML = zoomInSvg;
         zoomInButton.onclick = ScriptsPane.zoomIn;
