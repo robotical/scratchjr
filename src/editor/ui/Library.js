@@ -117,8 +117,8 @@ export default class Library {
     uploadButton.style.display = 'none';
     uploadButton.onclick = Library.triggerUpload;
     uploadButton.setAttribute('role', 'button');
-    uploadButton.setAttribute('aria-label', 'Upload Asset');
-    uploadButton.setAttribute('title', 'Upload Asset');
+    uploadButton.setAttribute('aria-label', Localization.localize('LIBRARY_UPLOAD_ASSET'));
+    uploadButton.setAttribute('title', Localization.localize('LIBRARY_UPLOAD_ASSET'));
         var okbut = newHTML('div', 'okicon', buttons);
         okbut.setAttribute('id', 'okbut');
         var cancelbut = newHTML('div', 'cancelicon', buttons);
@@ -728,7 +728,7 @@ export default class Library {
         var file = files[0];
         event.target.value = '';
         if (!Library.isValidUpload(file)) {
-            Library.showUploadError('Unsupported file type');
+            Library.showUploadError(Localization.localize('LIBRARY_UPLOAD_UNSUPPORTED'));
             return;
         }
         try {
@@ -739,17 +739,17 @@ export default class Library {
                 pendingSelectId = result.backgroundMd5;
                 Library.reloadAssets();
                 // ScratchJr.stage.currentPage.setBackground(result.backgroundMd5, ScratchJr.stage.currentPage.updateBkg);
-                Library.showUploadSuccess('Background added');
+                Library.showUploadSuccess(Localization.localize('LIBRARY_BACKGROUND_ADDED'));
             } else {
                 var sprite = await Library.importSpriteFile(file);
                 pendingSelectId = sprite.spriteMd5;
                 Library.reloadAssets();
                 // ScratchJr.stage.currentPage.addSprite(sprite.scale, sprite.spriteMd5, sprite.name);
-                Library.showUploadSuccess('Character added');
+                Library.showUploadSuccess(Localization.localize('LIBRARY_CHARACTER_ADDED'));
             }
         } catch (err) {
             console.error('Asset upload failed', err);
-            Library.showUploadError('Upload failed');
+            Library.showUploadError(Localization.localize('LIBRARY_UPLOAD_FAILED'));
         } finally {
             uploadInProgress = false;
             Library.updateUploadState(false);
@@ -773,7 +773,7 @@ export default class Library {
         if (supportsUpload) {
             uploadButton.style.display = 'inline-block';
             uploadButton.setAttribute('aria-hidden', 'false');
-            var ariaLabel = (type == 'costumes') ? 'Upload Character' : 'Upload Background';
+            var ariaLabel = Localization.localize(type == 'costumes' ? 'LIBRARY_UPLOAD_CHARACTER' : 'LIBRARY_UPLOAD_BACKGROUND');
             uploadButton.setAttribute('aria-label', ariaLabel);
             uploadButton.setAttribute('title', ariaLabel);
         } else {

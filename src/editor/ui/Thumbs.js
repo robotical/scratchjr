@@ -810,7 +810,7 @@ export default class Thumbs {
         var card = newHTML('div', MARTY_MODE_SIDEBAR_CARD_CLASS, parent);
         card.setAttribute('id', MARTY_MODE_SIDEBAR_CARD_ID);
         card.setAttribute('role', 'img');
-        card.setAttribute('aria-label', 'Marty Mode');
+        card.setAttribute('aria-label', Localization.localize('A11Y_MARTY_MODE'));
 
         var icon = newHTML('div', 'marty-mode-card-icon', card);
         var martyBirdsEyeSprite = ScratchJr.stage?.currentPage?.getMartyBirdsEyeSprite?.();
@@ -827,7 +827,7 @@ export default class Thumbs {
         }
 
         var label = newHTML('p', 'marty-mode-card-label', card);
-        label.textContent = 'Marty Mode';
+        label.textContent = Localization.localize('A11Y_MARTY_MODE');
         return card;
     }
 

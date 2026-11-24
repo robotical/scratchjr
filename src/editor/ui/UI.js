@@ -1894,7 +1894,7 @@ export default class UI {
                 if (!persisted) {
                     ScratchJr.onHold = false;
                     shareLoadingGif.style.visibility = 'hidden';
-                    Alert.open(frame, nameField, 'Save failed', '#ff0000');
+                    Alert.open(frame, nameField, Localization.localize('CLOUD_PROJECT_LOCAL_SAVE_FAILED'), '#ff0000');
                     return;
                 }
 

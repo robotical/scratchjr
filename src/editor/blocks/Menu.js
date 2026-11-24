@@ -1,5 +1,5 @@
 import BlockSpecs from './BlockSpecs';
-import {COLOUR_SWATCHES, SENSED_COLOUR_SWATCHES, addColourPaletteHeader} from './ColourPalette';
+import {COLOUR_SWATCHES, SENSED_COLOUR_SWATCHES, addColourPaletteHeader, swatchLabel} from './ColourPalette';
 import {scaleMultiplier, setProps, setCanvasSize, newHTML, isTablet,
     newDiv, getDocumentHeight, drawThumbnail, frame, globalx, globaly} from '../../utils/lib';
 import Path from '../../painteditor/Path';
@@ -52,10 +52,11 @@ export default class Menu {
                 var choice = newHTML('button', 'colour-palette-swatch', grid);
                 choice.type = 'button';
                 choice.style.background = swatch.colour;
-                choice.setAttribute('aria-label', swatch.label || swatch.name);
+                var label = swatchLabel(swatch);
+                choice.setAttribute('aria-label', label);
                 if (swatch.name === 'none') {
                     choice.classList.add('colour-palette-none');
-                    choice.textContent = swatch.label;
+                    choice.textContent = label;
                 }
                 choice.onclick = function (evt) {
                     fcn(evt, mu, b, (isColourSensor ? 'martycoloursensed' : 'selectcolour') + swatch.name);

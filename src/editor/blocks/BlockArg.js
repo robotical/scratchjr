@@ -572,7 +572,7 @@ export default class BlockArg {
         var cell = newHTML('div', 'microbitMatrixCell', grid);
         cell.setAttribute('role', 'button');
         cell.setAttribute('tabindex', '0');
-        cell.setAttribute('aria-label', 'micro:bit LED ' + (index + 1));
+        cell.setAttribute('aria-label', Localization.localize('MICROBIT_LED_CELL', {N: index + 1}));
         cell.owner = this;
         var toggle = (evt) => {
             evt.preventDefault();

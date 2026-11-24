@@ -24,6 +24,24 @@ vi.mock('@/utils/Localization', () => ({
 const homeLanguages = ['ar', 'en', 'el', 'it', 'nl', 'fr', 'de', 'bg', 'da', 'no', 'cs', 'es', 'sv', 'fi'];
 
 describe.each(homeLanguages)('Blocks Jr in %s', locale => {
+    it('provides every catalog entry and translates the audited guide and privacy text', () => {
+        const messages = JSON.parse(readFileSync(new URL(
+            `../../editions/free/src/localizations/${locale}.json`, import.meta.url
+        ), 'utf8'));
+        for (const [key, source] of Object.entries(english)) {
+            expect(messages[key]?.trim(), key).toBeTruthy();
+            const prose = key.startsWith('ABOUT_BLOCKS_JR_') && /TAGLINE|DESCRIPTION/.test(key) ||
+                /^INTERFACE_GUIDE_.*_DESCRIPTION$/.test(key) || key.startsWith('PRIVACY_');
+            if (locale !== 'en' && prose && source.trim().includes(' ')) {
+                expect(messages[key].trim(), key).not.toBe(source.trim());
+            }
+        }
+        const format = (key, values) => new IntlMessageFormat(messages[key], locale).format(values);
+        expect(format('PROJECT_DUPLICATED', {SOURCE: 'Marty 7', COPY: 'Marty 8'})).toContain('Marty 7');
+        expect(format('PROJECT_DUPLICATED', {SOURCE: 'Marty 7', COPY: 'Marty 8'})).toContain('Marty 8');
+        expect(format('PROJECT_DELETE_DESCRIPTION', {NAME: 'Marty 8'})).toContain('Marty 8');
+    });
+
     it('provides the cloud-project messages without relying on English fallback', () => {
         const messages = JSON.parse(readFileSync(new URL(
             `../../editions/free/src/localizations/${locale}.json`, import.meta.url

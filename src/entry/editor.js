@@ -1,3 +1,4 @@
+import Localization from '../utils/Localization';
 import ScratchJr from "../editor/ScratchJr";
 import OS from "../tablet/OS";
 import Camera from "../painteditor/Camera";
@@ -19,7 +20,7 @@ function replaceArtifactRequestWithProject(projectId) {
 
 function showArtifactImportError() {
   window.setTimeout(function () {
-    window.alert("This Blocks Jr project could not be opened. Please check the link and try again.");
+    window.alert(Localization.localize('PROJECT_LINK_ERROR'));
   }, 0);
 }
 

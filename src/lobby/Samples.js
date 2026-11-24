@@ -101,7 +101,7 @@ export default class Samples {
         newHTML('div', 'woodframe', mt);
         newHTML('div', 'sampleicon', mt);
         var name = newHTML('p', undefined, tb);
-        name.textContent = 'Sample ' + pos;
+        name.textContent = Localization.localize('SAMPLE_NUMBER', {N: pos});
         var openButton = newButton('sr-only-focusable lobby-card-action card-action-open', tb, {
             ariaLabel: Localization.localize('A11Y_OPEN') + ' ' + name.textContent
         });

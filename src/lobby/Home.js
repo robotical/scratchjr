@@ -52,7 +52,7 @@ export default class Home {
     Home.addCardActionButton(
       tb,
       "card-action-open",
-      Localization.localize("A11Y_CREATE") + " " + Localization.localize("NEW_PROJECT_PREFIX"),
+      Localization.localize("PROJECT_CREATE"),
       function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -307,8 +307,7 @@ export default class Home {
             }
             pendingProjectFocus = String(newProjectId);
             Home.setProjectActionStatus(
-              Localization.localizeOptional("Duplicated project") + " " +
-              sourceName + " " + Localization.localizeOptional("as") + " " + namedProject.name + "."
+              Localization.localize("PROJECT_DUPLICATED", {SOURCE: sourceName, COPY: namedProject.name})
             );
             OS.analyticsEvent("lobby", "project_duplicated");
             Home.displayYourProjects();
@@ -328,7 +327,7 @@ export default class Home {
       button.focus();
     }
     Home.setProjectActionStatus(
-      Localization.localizeOptional("Project could not be duplicated. Please try again.")
+      Localization.localize("PROJECT_DUPLICATE_ERROR")
     );
   }
 
@@ -348,8 +347,8 @@ export default class Home {
 
   static addProjectDuplicateButton(target, projectName, parent) {
     var button = newButton("project-duplicate-button", parent, {
-      ariaLabel: Localization.localizeOptional("Duplicate project") + " " + projectName,
-      title: Localization.localizeOptional("Duplicate project")
+      ariaLabel: Localization.localize("PROJECT_DUPLICATE_NAMED", {NAME: projectName}),
+      title: Localization.localize("PROJECT_DUPLICATE")
     });
     var icon = newHTML("span", "project-duplicate-icon", button);
     icon.setAttribute("aria-hidden", "true");
@@ -366,8 +365,8 @@ export default class Home {
 
   static addProjectDeleteButton(target, projectName, parent) {
     var button = newButton("project-delete-button", parent, {
-      ariaLabel: Localization.localize("A11Y_DELETE") + " " + projectName,
-      title: Localization.localizeOptional("Delete project"),
+      ariaLabel: Localization.localize("PROJECT_DELETE_NAMED", {NAME: projectName}),
+      title: Localization.localize("PROJECT_DELETE"),
       textContent: "\u00d7"
     });
     Home.stopCardGesture(button);
@@ -390,17 +389,16 @@ export default class Home {
     var descriptionId = "project-delete-description-" + target.id;
     var title = newHTML("h2", "project-delete-dialog-title", panel);
     title.id = titleId;
-    title.textContent = Localization.localizeOptional("Delete project") + "?";
+    title.textContent = Localization.localize("PROJECT_DELETE_QUESTION");
     var description = newHTML("p", "project-delete-dialog-description", panel);
     description.id = descriptionId;
-    description.textContent = "\u201c" + projectName + "\u201d "
-      + Localization.localizeOptional("will be permanently deleted.");
+    description.textContent = Localization.localize("PROJECT_DELETE_DESCRIPTION", {NAME: projectName});
     var actions = newHTML("div", "project-delete-dialog-actions", panel);
     var cancelButton = newButton("project-delete-cancel", actions, {
       textContent: Localization.localize("ACTION_CANCEL")
     });
     var deleteButton = newButton("project-delete-confirm", actions, {
-      textContent: Localization.localizeOptional("Delete project")
+      textContent: Localization.localize("PROJECT_DELETE")
     });
 
     Home.stopCardGesture(dialog);
@@ -722,7 +720,7 @@ export default class Home {
     Home.addCardActionButton(
       tb,
       "card-action-open",
-      Localization.localize("A11Y_OPEN") + " " + data.name,
+      Localization.localize("PROJECT_OPEN_NAMED", {NAME: data.name}),
       function (e) {
         e.preventDefault();
         e.stopPropagation();
