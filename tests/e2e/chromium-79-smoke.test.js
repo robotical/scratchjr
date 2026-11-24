@@ -71,7 +71,7 @@ async function getTutorialFrame(page) {
 
   await page.waitForFunction(() => {
     const iframe = document.getElementById("htmlcontents");
-    const frameLocation = iframe?.contentWindow?.location?.href;
+    const frameLocation = iframe && iframe.contentWindow && iframe.contentWindow.location.href;
     return typeof frameLocation === "string" && frameLocation.includes("/inapp/tutorials.html");
   }, { timeout: 30_000 });
 
