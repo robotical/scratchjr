@@ -45,6 +45,11 @@ async function openPage(pathname) {
   });
   const page = await browser.newPage();
   const errors = [];
+  // The bare editor fixture has no site favicon. Browsers may request one automatically.
+  await page.setRequestInterception(true);
+  page.on("request", request => new URL(request.url()).pathname === "/favicon.ico"
+    ? request.respond({status: 204})
+    : request.continue());
 
   page.on("pageerror", (err) => errors.push(err.message || String(err)));
   page.on("console", (msg) => {
@@ -208,6 +213,10 @@ describe("Chromium 79 smoke test", () => {
           },
           { timeout: 30_000 }
         );
+
+        await page.waitForSelector("#microBitConnectionDialogClose", {visible: true});
+        await page.click("#microBitConnectionDialogClose");
+        await page.waitForSelector("#backdrop", {hidden: true});
 
         const enabledState = await page.evaluate(() => {
           const addButton = document.getElementById("addExtensionButton");
