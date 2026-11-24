@@ -302,7 +302,7 @@ export default class UI {
     static createConnectButton(parent, iconName, buttonText, buttonId, onClick) {
         // Create button container
         const connectButton = newButton('connectButton', parent, {
-            ariaLabel: Localization.localize('A11Y_CONNECT') + ' ' + buttonText
+            ariaLabel: Localization.localize('A11Y_CONNECT_DEVICE', {NAME: buttonText})
         });
 
         // Set button ID
@@ -332,6 +332,7 @@ export default class UI {
 
         // Create button container 
         const iconButtonContainer = newHTML('div', 'iconButtonContainer notConnectedButtonContainer', connectButton);
+        iconButtonContainer.setAttribute('data-label', Localization.localize('A11Y_CONNECT'));
 
         // Pointer activation can leave :focus-visible stuck on embedded touch browsers.
         // Track the input modality so pointer clicks do not retain a focus ring while
@@ -399,7 +400,7 @@ export default class UI {
             'microBitConnectionButton',
             UI.connectMicroBit
         );
-        microBitButton.setAttribute('title', 'Connect micro:bit');
+        microBitButton.setAttribute('title', Localization.localize('A11Y_CONNECT_DEVICE', {NAME: 'micro:bit'}));
         UI.createMicroBitRemoveButton(connectionButtonsArea);
 
         const connectedMicroBit = window.microBitManager?.getActiveMicroBit?.();
@@ -466,8 +467,8 @@ export default class UI {
 
     static createExtensionAddButton(parent) {
         const addButton = newButton('connectButton extensionAddButton', parent, {
-            ariaLabel: 'Add an extension',
-            title: 'Add an extension'
+            ariaLabel: Localization.localizeOptional('Add an extension'),
+            title: Localization.localizeOptional('Add an extension')
         });
         addButton.setAttribute('id', 'addExtensionButton');
         const icon = newHTML('span', 'extensionAddIcon', addButton);
@@ -482,8 +483,8 @@ export default class UI {
 
     static createMicroBitRemoveButton(parent) {
         const removeButton = newButton('microBitRemoveButton', parent, {
-            ariaLabel: 'Remove micro:bit extension',
-            title: 'Remove micro:bit extension'
+            ariaLabel: Localization.localizeOptional('Remove micro:bit extension'),
+            title: Localization.localizeOptional('Remove micro:bit extension')
         });
         removeButton.setAttribute('id', 'microBitRemoveButton');
         const icon = newHTML('span', 'microBitRemoveIcon', removeButton);
@@ -509,11 +510,11 @@ export default class UI {
 
         const title = newHTML('div', 'extensionsLibraryTitle', dialog);
         title.setAttribute('id', 'extensionsLibraryTitle');
-        title.textContent = 'Extensions';
+        title.textContent = Localization.localizeOptional('Extensions');
 
         const cards = newHTML('div', 'extensionsLibraryCards', dialog);
         const microBitCard = newButton('extensionsLibraryCard', cards, {
-            ariaLabel: 'Add micro:bit extension'
+            ariaLabel: Localization.localizeOptional('Add micro:bit extension')
         });
         microBitCard.setAttribute('id', 'microBitExtensionCard');
 
@@ -525,7 +526,7 @@ export default class UI {
         cardTitle.textContent = 'micro:bit';
         const cardDescription = newHTML('div', 'extensionsLibraryCardDescription', textWrap);
         cardDescription.setAttribute('id', 'microBitExtensionCardDescription');
-        cardDescription.textContent = 'Adds micro:bit blocks and connection.';
+        cardDescription.textContent = Localization.localizeOptional('Adds micro:bit blocks and connection.');
         const action = newHTML('div', 'extensionsLibraryCardAction', microBitCard);
         action.setAttribute('id', 'microBitExtensionCardAction');
         action.textContent = '+';
@@ -535,17 +536,17 @@ export default class UI {
         removeWarning.setAttribute('id', 'microBitExtensionRemoveWarning');
         removeWarning.setAttribute('aria-live', 'polite');
         const warningTitle = newHTML('div', 'extensionsLibraryWarningTitle', removeWarning);
-        warningTitle.textContent = 'Remove micro:bit extension?';
+        warningTitle.textContent = Localization.localizeOptional('Remove micro:bit extension?');
         const warningText = newHTML('div', 'extensionsLibraryWarningText', removeWarning);
-        warningText.textContent = 'All micro:bit blocks used in this project will be deleted from the editor.';
+        warningText.textContent = Localization.localizeOptional('All micro:bit blocks used in this project will be deleted from the editor.');
         const warningActions = newHTML('div', 'extensionsLibraryWarningActions', removeWarning);
         const cancelRemove = newButton('extensionsLibrarySecondaryButton', warningActions, {
             id: 'microBitExtensionRemoveCancel',
-            textContent: 'Cancel'
+            textContent: localizeMicroBitInstaller('MICROBIT_INSTALLER_CANCEL')
         });
         const confirmRemove = newButton('extensionsLibraryDangerButton', warningActions, {
             id: 'microBitExtensionRemoveConfirm',
-            textContent: 'Remove'
+            textContent: Localization.localizeOptional('Remove')
         });
         cancelRemove.onclick = () => {
             ScratchAudio.sndFX('tap.wav');
@@ -638,11 +639,11 @@ export default class UI {
         const action = gn('microBitExtensionCardAction');
 
         card.classList.toggle('loaded', isLoaded);
-        card.setAttribute('aria-label', isLoaded ? 'Remove micro:bit extension' : 'Add micro:bit extension');
+        card.setAttribute('aria-label', isLoaded ? Localization.localizeOptional('Remove micro:bit extension') : Localization.localizeOptional('Add micro:bit extension'));
         if (description) {
             description.textContent = isLoaded ?
-                'micro:bit blocks are available. Select to remove.' :
-                'Adds micro:bit blocks and connection.';
+                Localization.localizeOptional('micro:bit blocks are available. Select to remove.') :
+                Localization.localizeOptional('Adds micro:bit blocks and connection.');
         }
         if (action) {
             action.textContent = isLoaded ? '-' : '+';
@@ -757,7 +758,7 @@ export default class UI {
         if (button) {
             button.classList.remove('connectButtonConnected');
             UI.resetConnectionButtonVisuals(button);
-            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' micro:bit');
+            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT_DEVICE', {NAME: 'micro:bit'}));
         }
     }
 
@@ -799,7 +800,7 @@ export default class UI {
             addButton.style.display = enabled ? 'none' : 'flex';
             addButton.disabled = enabled;
             addButton.setAttribute('aria-hidden', enabled ? 'true' : 'false');
-            addButton.setAttribute('aria-label', 'Add an extension');
+            addButton.setAttribute('aria-label', Localization.localizeOptional('Add an extension'));
             if (enabled) {
                 addButton.setAttribute('tabindex', '-1');
             } else {
@@ -886,6 +887,7 @@ export default class UI {
         const title = newHTML('div', 'microBitConnectionDialogTitle', dialog);
         title.setAttribute('id', 'microBitConnectionDialogTitle');
 
+        dialog.setAttribute('dir', 'auto');
         const body = newHTML('div', 'microBitConnectionDialogBody', dialog);
         const icon = newHTML('div', 'microBitConnectionDialogIcon', body);
         icon.innerHTML = stripInlineSvgIds(microBitSvg);
@@ -1151,12 +1153,12 @@ export default class UI {
         const message = error && error.message ? error.message : '';
         const errorName = error && error.name ? error.name : '';
         if (errorName == 'NotFoundError' || /cancelled|canceled|requestDevice\(\) chooser/i.test(message)) {
-            return 'No micro:bit was selected. Click Connect again when you are ready.';
+            return Localization.localizeOptional('No micro:bit was selected. Click Connect again when you are ready.');
         }
         if (/web bluetooth is not available|not available in this browser/i.test(message)) {
-            return 'micro:bit connection is not available in this browser. Try a browser that supports Web Bluetooth.';
+            return Localization.localizeOptional('micro:bit connection is not available in this browser. Try a browser that supports Web Bluetooth.');
         }
-        return 'Could not connect to the micro:bit. Check that it is powered on and nearby, then try again.';
+        return Localization.localizeOptional('Could not connect to the micro:bit. Check that it is powered on and nearby, then try again.');
     }
 
     static showMicroBitConnectionError(button, error) {
@@ -1398,7 +1400,7 @@ export default class UI {
 
             // Restore the old onClick function
             button.onclick = oldOnClick;
-            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' Cog');
+            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT_DEVICE', {NAME: 'Cog'}));
 
             // A page navigation can replace window.cogManager while this
             // callback is still retained by the host RAFT object.
@@ -1409,7 +1411,7 @@ export default class UI {
         button.onclick = () => {
             UI.disconnectRaftAndClearWhenConfirmed(raft, handleDisconnected);
         };
-        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' + raft.getFriendlyName());
+        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT_DEVICE', {NAME: raft.getFriendlyName()}));
 
         // Set up a subscription to the raft issue detected event
         const connIssueSubs = createRaftConnectionIssueDetectedHelper(raft);
@@ -1476,14 +1478,14 @@ export default class UI {
 
             // Restore the old onClick function
             button.onclick = oldOnClick;
-            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' Marty');
+            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT_DEVICE', {NAME: 'Marty'}));
         };
 
         // Set the new onClick function before Marty-specific setup. Sensor and block metadata can arrive late.
         button.onclick = () => {
             UI.disconnectRaftAndClearWhenConfirmed(raft, handleDisconnected);
         };
-        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' + raft.getFriendlyName());
+        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT_DEVICE', {NAME: raft.getFriendlyName()}));
 
         martySignalAndBatteryInterval = setInterval(() => {
             if (!raft) {
@@ -1527,7 +1529,7 @@ export default class UI {
         const connectButtonContainer = button.querySelector('.iconButtonContainer');
         connectButtonContainer.classList.remove('notConnectedButtonContainer');
         connectButtonContainer.classList.add('connectedButtonContainer');
-        connectButtonContainer.textContent = 'DISCONNECT';
+        connectButtonContainer.textContent = Localization.localize('A11Y_DISCONNECT');
 
         const batteryIndicator = button.querySelector('.batteryIndicatorContainer');
         const signalIndicator = button.querySelector('.signalIndicatorContainer');
@@ -1562,8 +1564,8 @@ export default class UI {
             }
 
             button.onclick = oldOnClick;
-            button.setAttribute('title', 'Connect micro:bit');
-            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT') + ' micro:bit');
+            button.setAttribute('title', Localization.localize('A11Y_CONNECT_DEVICE', {NAME: 'micro:bit'}));
+            button.setAttribute('aria-label', Localization.localize('A11Y_CONNECT_DEVICE', {NAME: 'micro:bit'}));
         };
 
         button.onclick = () => {
@@ -1577,8 +1579,8 @@ export default class UI {
                 handleDisconnected();
             }
         };
-        button.setAttribute('title', 'Disconnect ' + friendlyName);
-        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT') + ' ' + friendlyName);
+        button.setAttribute('title', Localization.localize('A11Y_DISCONNECT_DEVICE', {NAME: friendlyName}));
+        button.setAttribute('aria-label', Localization.localize('A11Y_DISCONNECT_DEVICE', {NAME: friendlyName}));
 
         if (window.microBitManager) {
             try {

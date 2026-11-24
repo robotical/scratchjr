@@ -115,7 +115,7 @@ export default class TutorialUI {
         // tutorial menu bar should have in this order a close button, the title of the tutorial, a question mark icon, previous and next buttons
         TutorialUI.tutorialMenuBar.innerHTML = `
             <button id="closeTutorial" class="tutorialButton" aria-label="${Localization.localize('A11Y_CLOSE')}">${closexSvg}</button>
-            <div id="tutorialTitle" class="tutorialTitle">${this.tutorial.title}</div>
+            <div id="tutorialTitle" dir="auto" class="tutorialTitle">${this.tutorial.title}</div>
             <button id="keepTutorialProject" class="tutorialKeepProjectButton" aria-label="${keepProjectLabel}">
                 ${saveSvg}<span id="keepTutorialProjectText">${keepProjectLabel}</span>
             </button>
@@ -246,8 +246,8 @@ export default class TutorialUI {
                         </svg>
                     </button>
                 </div>
-                <div id="speechBubbleText"></div>
-                <div id="speechBubbleImage"></div>
+                <div id="speechBubbleText" dir="auto"></div>
+                <div id="speechBubbleImage" dir="auto"></div>
                 <div id="speechBubbleVideo"></div>
                 <svg id="tutorial-down-pointing-arrow-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6 8L12 14L18 8" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -348,10 +348,11 @@ export default class TutorialUI {
         const speechBubble = TutorialUI.instructor.querySelector('.speechBubble');
         speechBubble.style.display = 'block';
         const speechBubbleImage = TutorialUI.instructor.querySelector('#speechBubbleImage');
-        speechBubbleImage.innerHTML = `<img src="${imageURL}" alt="${text}" class="tutorialImage" /><br />${text}`;
+        speechBubbleImage.innerHTML = `<img src="${imageURL}" alt="" class="tutorialImage" /><br />${text}`;
         TutorialUI.updateNarrationText();
         speechBubbleImage.querySelector('img').addEventListener('click', (e) => {
-            TutorialUI.showModal(`<img class="modalImage" src="${imageURL}" alt="expanded image" />`);
+            TutorialUI.showModal(`<img class="modalImage" src="${imageURL}" alt="" />`);
+            TutorialUI.modal.querySelector("img").alt = stripHtml(text);
         });
         TutorialUI.momentarilyHighlightSpeechBubble(speechBubble);
     }

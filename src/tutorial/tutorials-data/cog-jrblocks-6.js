@@ -4,7 +4,7 @@ const cogJrBlocksTutorial6 = {
     id: "cog-jrblocks-6",
     platform: "blocksjr",
     title: Localization.localize("COG_JRBLOCKS6_TITLE"),
-    description: "We'll use the IR sensors on cog to detect obstacles!",
+    description: Localization.localize("COG_JRBLOCKS6_DESCRIPTION"),
     tutorialSteps: [
         /* STEP 1 -- intro*/
         {

@@ -4,7 +4,7 @@ const cogJrBlocksTutorial10 = {
     id: "cog-jrblocks-10",
     platform: "blocksjr",
     title: Localization.localize("COG_JRBLOCKS10_TITLE"),
-    description: "We'll use the Marty simulator to explore a different way of moving!",
+    description: Localization.localize("COG_JRBLOCKS10_DESCRIPTION"),
     tutorialSteps: [
         /* STEP 1 -- intro*/
         {

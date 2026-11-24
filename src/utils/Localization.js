@@ -1,4 +1,5 @@
 import Cookie from './Cookie';
+import englishMessages from '../../editions/free/src/localizations/en.json';
 import Intl from 'intl';
 import IO from '../tablet/IO';
 // import IntlMessageFormat from "expose-loader?IntlMessageFormat!intl-messageformat";
@@ -8,6 +9,13 @@ if (!window.Intl) {
     window.Intl = Intl;
 }
 
+require('intl/locale-data/jsonp/ar.js');
+require('intl/locale-data/jsonp/bg.js');
+require('intl/locale-data/jsonp/cs.js');
+require('intl/locale-data/jsonp/da.js');
+require('intl/locale-data/jsonp/el.js');
+require('intl/locale-data/jsonp/fi.js');
+require('intl/locale-data/jsonp/nb.js');
 require('intl/locale-data/jsonp/ca.js');
 require('intl/locale-data/jsonp/de.js');
 require('intl/locale-data/jsonp/en.js');
@@ -22,6 +30,13 @@ require('intl/locale-data/jsonp/th.js');
 require('intl/locale-data/jsonp/zh.js');
 
 // require('expose-loader?IntlMessageFormat!intl-messageformat');
+require('intl-messageformat/dist/locale-data/ar');
+require('intl-messageformat/dist/locale-data/bg');
+require('intl-messageformat/dist/locale-data/cs');
+require('intl-messageformat/dist/locale-data/da');
+require('intl-messageformat/dist/locale-data/el');
+require('intl-messageformat/dist/locale-data/fi');
+require('intl-messageformat/dist/locale-data/no');
 require('intl-messageformat/dist/locale-data/ca');
 require('intl-messageformat/dist/locale-data/de');
 require('intl-messageformat/dist/locale-data/en');
@@ -41,73 +56,59 @@ let localizationMessages = {};
 // Configuration
 const sampleKeyPrefix = 'key_';
 
+function supportedLocale(tag) {
+    const {supportedLocales, defaultLocale} = window.Settings;
+    const locales = Object.values(supportedLocales);
+    const normalized = (tag || defaultLocale).toLowerCase();
+    const language = normalized.split('-')[0];
+    return locales.find(code => code === normalized) ||
+        locales.find(code => code === language) ||
+        locales.find(code => code.split('-')[0] === language) || defaultLocale;
+}
+
 export default class Localization {
     static get currentLocale () {
         return currentLocale;
     }
 
-    // Take the browser's reported locale from navigator.language
-    // Normalize this value and find a match in supportedLocales
-    // If we support a similar language but not the specific one, it's returned.
-    // E.g., if we support 'en-US' but not 'en-GB', the user gets 'en-US'
-    // The match in supported locales (or the default locale) is returned.
     static determineLocaleFromBrowser () {
-        let defaultLocale = window.Settings.defaultLocale;
-        let supportedLocales = window.Settings.supportedLocales;
-
-        var localizationLanguage = window.navigator.userLanguage || window.navigator.language || 'en-us';
-
-        var localizationLanguageParts = localizationLanguage.split('-');
-        // Capitalize last part of localization for includes
-        localizationLanguageParts[localizationLanguageParts.length - 1] = (
-            localizationLanguageParts[localizationLanguageParts.length - 1].toUpperCase()
-        );
-
-        var desiredLocale = localizationLanguageParts.join('-');
-        if (desiredLocale in Object.keys(supportedLocales)) {
-            return desiredLocale;
-        }
-
-        // We're not supporting this locale yet - do we support an ancestor?
-        for (var localeKey in supportedLocales) {
-            var supportedLocale = supportedLocales[localeKey];
-            var parts = supportedLocale.split('-');
-            if (parts[0] == localizationLanguageParts[0]) {
-                return supportedLocale; // Top-level is the same
-            }
-        }
-
-        return window.applicationManager?.selectedLocale || defaultLocale;
+        return supportedLocale(window.navigator.userLanguage || window.navigator.language);
     }
 
-    // Include locale support files and load the messages
-    // Call this when the app is initialized
     static includeLocales (localizationRoot, whenDone) {
-        var localizationCookie = window.applicationManager?.selectedLocale || Cookie.get('localization');
-        console.log("localizationCookie", localizationCookie)
-        if (localizationCookie === null) {
-            currentLocale = this.determineLocaleFromBrowser();
-        } else {
-            currentLocale = localizationCookie;
-        }
-        var topLevel = currentLocale.split('-')[0];
-        if (topLevel === 'zh' || topLevel === 'pt') {
-            // need to handle locale in addition to language code for Chinese,
-            // and Portuguese, ensure it's lower case to match filename
-            topLevel = currentLocale.toLowerCase();
-        }
-
-        // Get messages
-        IO.requestFromServer(localizationRoot + 'localizations/' + topLevel + '.json', (result) => {
-            try {
-                localizationMessages = JSON.parse(result);
-                whenDone();
-            } catch (e) {
-                mv2.sendFeedbackToServer(JSON.stringify({
-                    'message': 'Soft error parsing localization file -- ignore, it\'ll work in next iteration',
-                }));
+        const {defaultLocale} = window.Settings;
+        // Guide and tutorial pages can be nested one frame deeper than the host bridge.
+        let hostLocale;
+        let frame = window;
+        try {
+            while (frame) {
+                hostLocale = frame.applicationManager?.selectedLocale;
+                if (hostLocale || frame === frame.parent) break;
+                frame = frame.parent;
             }
-        });
+        } catch (error) {
+            // A cross-origin parent cannot share its application manager.
+        }
+        const preferred = hostLocale || Cookie.get('localization');
+        const locale = preferred ? supportedLocale(preferred) : this.determineLocaleFromBrowser();
+
+        function load(code) {
+            IO.requestFromServer(localizationRoot + 'localizations/' + code + '.json', result => {
+                try {
+                    const messages = JSON.parse(result);
+                    localizationMessages = code === defaultLocale ? messages : Object.assign({}, englishMessages, messages);
+                } catch (error) {
+                    if (code !== defaultLocale) {
+                        load(defaultLocale);
+                        return;
+                    }
+                    localizationMessages = englishMessages;
+                }
+                currentLocale = code;
+                whenDone();
+            });
+        }
+        load(locale);
     }
 
     // Translate a particular message given the message key and info

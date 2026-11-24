@@ -557,7 +557,8 @@ export default class BlockSpecs {
     }
 
     static blockDesc(b, spr) {
-        var str = b.getArgValue() ? b.getArgValue().toString() : (b.blocktype == 'playsnd') ? 'SOUND' : '';
+        const arg = b.getArgValue();
+        const str = arg == null ? '' : String(arg);
 
         return {
             'onflag': Localization.localize('BLOCK_DESC_GREEN_FLAG'),
@@ -625,6 +626,10 @@ export default class BlockSpecs {
             'microbitdisplaytext': Localization.localize('BLOCK_DESC_MICROBIT_DISPLAY_TEXT'),
             'microbitdisplaycustom': Localization.localize('BLOCK_DESC_MICROBIT_DISPLAY_CUSTOM'),
             'microbitdisplayclear': Localization.localize('BLOCK_DESC_MICROBIT_CLEAR_DISPLAY'),
+            'playsnd': str ? Localization.localize('BLOCK_DESC_PLAY_SOUND', {
+                SOUND_NAME: str === 'pop.mp3' ? Localization.localize('BLOCK_DESC_PLAY_SOUND_POP') : str
+            }) : Localization.localize('BLOCK_GUIDE_PLAY_SOUND'),
+            'playusersnd': Localization.localize('BLOCK_DESC_PLAY_RECORDED_SOUND'),
             'pop': Localization.localize('BLOCK_PLAY_POP_SOUND'),
             'endstack': Localization.localize('BLOCK_DESC_END'),
             'stopall': Localization.localize('BLOCK_DESC_STOP', {

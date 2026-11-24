@@ -4,7 +4,7 @@ const cogJrBlocksTutorial4 = {
     id: "cog-jrblocks-4",
     platform: "blocksjr",
     title: Localization.localize("COG_JRBLOCKS4_TITLE"),
-    description: "We'll introduce the tilt sensing on cog, and show how to interact with sprites in Jr Blocks",
+    description: Localization.localize("COG_JRBLOCKS4_DESCRIPTION"),
     tutorialSteps: [
         /* STEP 1 -- intro*/
         {

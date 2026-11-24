@@ -4,7 +4,7 @@ const cogJrBlocksTutorial7 = {
     id: "cog-jrblocks-7",
     platform: "blocksjr",
     title: Localization.localize("COG_JRBLOCKS7_TITLE"),
-    description: "We'll introduce the counter in Jr Blocks, and use the IR sensor and tilt sensor to make a checkout and an odometer!",
+    description: Localization.localize("COG_JRBLOCKS7_DESCRIPTION"),
     tutorialSteps: [
         /* STEP 1 -- intro*/
         {

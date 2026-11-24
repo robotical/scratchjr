@@ -224,9 +224,7 @@ describe("Chromium 79 smoke test", () => {
             removeButtonDisplay: window.getComputedStyle(removeButton).display,
             removeButtonAriaHidden: removeButton.getAttribute("aria-hidden"),
             removeButtonDisabled: removeButton.disabled,
-            microBitUsesConnectControl: window.getComputedStyle(microBitAction).backgroundImage.includes(
-              "connect_btn-default.svg"
-            ),
+            microBitUsesConnectControl: microBitAction.getAttribute("data-label") === "Connect",
             microBitActionPosition: window.getComputedStyle(microBitAction).position,
             rightCategoryIds: Array.from(document.querySelectorAll("#selectorsright .category-selector-button")).map(
               (button) => button.id
