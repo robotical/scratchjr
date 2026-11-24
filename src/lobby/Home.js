@@ -70,11 +70,11 @@ export default class Home {
     tb.id = "cloudproject";
     var label = newHTML("div", "projecttitle", tb);
     var title = newHTML("h4", undefined, label);
-    title.textContent = Localization.localizeOptional("Load cloud project");
+    title.textContent = Localization.localize("CLOUD_PROJECT_LOAD_TITLE");
     Home.addCardActionButton(
       tb,
       "card-action-open",
-      Localization.localizeOptional("Load cloud project"),
+      Localization.localize("CLOUD_PROJECT_LOAD_TITLE"),
       function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -397,7 +397,7 @@ export default class Home {
       + Localization.localizeOptional("will be permanently deleted.");
     var actions = newHTML("div", "project-delete-dialog-actions", panel);
     var cancelButton = newButton("project-delete-cancel", actions, {
-      textContent: Localization.localizeOptional("Cancel")
+      textContent: Localization.localize("ACTION_CANCEL")
     });
     var deleteButton = newButton("project-delete-confirm", actions, {
       textContent: Localization.localizeOptional("Delete project")
@@ -450,17 +450,15 @@ export default class Home {
     var descriptionId = "cloud-project-load-description";
     var title = newHTML("h2", "cloud-project-dialog-title", panel);
     title.id = titleId;
-    title.textContent = Localization.localizeOptional("Load cloud project");
+    title.textContent = Localization.localize("CLOUD_PROJECT_LOAD_TITLE");
     var description = newHTML("p", "cloud-project-dialog-description", panel);
     description.id = descriptionId;
-    description.textContent = Localization.localizeOptional(
-      "Enter a cloud project ID. The project will be imported as a new local copy."
-    );
+    description.textContent = Localization.localize("CLOUD_PROJECT_IMPORT_HINT");
 
     var form = newHTML("form", "cloud-project-load-form", panel);
     var inputLabel = newHTML("label", "cloud-project-input-label", form);
     inputLabel.setAttribute("for", "cloud-project-id-input");
-    inputLabel.textContent = Localization.localizeOptional("Project ID");
+    inputLabel.textContent = Localization.localize("CLOUD_PROJECT_ID_LABEL");
     var input = newHTML("input", "cloud-project-id-input", form);
     input.id = "cloud-project-id-input";
     input.type = "text";
@@ -470,11 +468,11 @@ export default class Home {
 
     var actions = newHTML("div", "cloud-project-dialog-actions", form);
     var cancelButton = newButton("cloud-project-cancel", actions, {
-      textContent: Localization.localizeOptional("Cancel")
+      textContent: Localization.localize("ACTION_CANCEL")
     });
     var loadButton = newButton("cloud-project-load", actions, {
       type: "submit",
-      textContent: Localization.localizeOptional("Load project")
+      textContent: Localization.localize("CLOUD_PROJECT_LOAD_PROJECT")
     });
     loadButton.id = "cloud-project-load-submit";
 
@@ -489,7 +487,7 @@ export default class Home {
     });
     var savedSection = newHTML("div", "cloud-project-saved-section", panel);
     var savedTitle = newHTML("h3", "cloud-project-saved-title", savedSection);
-    savedTitle.textContent = Localization.localizeOptional("Saved cloud IDs");
+    savedTitle.textContent = Localization.localize("CLOUD_PROJECT_SAVED_IDS");
     var savedList = newHTML("div", "cloud-project-saved-list", savedSection);
 
     var loading = false;
@@ -501,7 +499,7 @@ export default class Home {
         return;
       }
       var emptyMessage = newHTML("p", "cloud-project-saved-empty", savedList);
-      emptyMessage.textContent = Localization.localizeOptional("No saved cloud IDs on this device yet.");
+      emptyMessage.textContent = Localization.localize("CLOUD_PROJECT_EMPTY");
     }
 
     if (storedEntries.length < 1) {
@@ -543,12 +541,12 @@ export default class Home {
         return;
       }
       if (!trimmedId) {
-        setStatus(Localization.localizeOptional("Enter a cloud project ID."), true);
+        setStatus(Localization.localize("CLOUD_PROJECT_ENTER_ID"), true);
         input.focus();
         return;
       }
       setLoading(true);
-      setStatus(Localization.localizeOptional("Loading cloud project…"), false);
+      setStatus(Localization.localize("CLOUD_PROJECT_LOADING"), false);
       ProjectCloud.loadProjectFromCloud(trimmedId, { targetVersion: version }).then(function (result) {
         if (!result || !result.projectId) {
           throw new Error("Cloud project import did not return a local project ID");
@@ -559,15 +557,15 @@ export default class Home {
           savedAt: result.savedAt || Date.now(),
           lastUsed: Date.now()
         });
-        setStatus(Localization.localizeOptional("Cloud project loaded. Opening…"), false);
+        setStatus(Localization.localize("CLOUD_PROJECT_OPENING"), false);
         Home.gotoEditor(result.projectId);
       }).catch(function (err) {
         console.warn("Home: cloud project load failed", err);
         setLoading(false);
-        var message = err && err.code == "CLOUD_PROJECT_NOT_FOUND"
-          ? "This cloud project is no longer available. You can remove its saved ID using the × button."
-          : "Cloud project could not be loaded. Check your connection and try again.";
-        setStatus(Localization.localizeOptional(message), true);
+        var messageKey = err && err.code == "CLOUD_PROJECT_NOT_FOUND"
+          ? "CLOUD_PROJECT_NOT_FOUND"
+          : "CLOUD_PROJECT_LOAD_FAILED";
+        setStatus(Localization.localize(messageKey), true);
         input.focus();
         input.select();
       });
@@ -581,7 +579,7 @@ export default class Home {
         var savedItem = newHTML("div", "cloud-project-saved-item", savedList);
         var savedButton = newButton("cloud-project-saved-button", savedItem, {
           textContent: label,
-          ariaLabel: Localization.localizeOptional("Load cloud project") + " " + label
+          ariaLabel: Localization.localize("CLOUD_PROJECT_LOAD_TITLE") + " " + label
         });
         savedButton.setAttribute("data-cloud-id", entry.customId);
         savedButton.onclick = function (e) {
@@ -591,8 +589,8 @@ export default class Home {
         };
         var removeButton = newButton("cloud-project-saved-remove", savedItem, {
           textContent: "×",
-          ariaLabel: Localization.localizeOptional("Remove saved cloud ID") + " " + label,
-          title: Localization.localizeOptional("Remove saved cloud ID")
+          ariaLabel: Localization.localize("CLOUD_PROJECT_REMOVE_ID") + " " + label,
+          title: Localization.localize("CLOUD_PROJECT_REMOVE_ID")
         });
         removeButton.setAttribute("data-cloud-id", entry.customId);
         removeButton.onclick = function (e) {
@@ -602,7 +600,7 @@ export default class Home {
           if (savedItem.parentNode) {
             savedItem.parentNode.removeChild(savedItem);
           }
-          setStatus(Localization.localizeOptional("Saved cloud ID removed."), false);
+          setStatus(Localization.localize("CLOUD_PROJECT_REMOVED"), false);
           showEmptySavedMessage();
           input.focus();
         };

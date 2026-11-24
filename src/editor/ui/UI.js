@@ -1718,7 +1718,7 @@ export default class UI {
         var cloudControls = newHTML('div', 'infoboxCloudControls', cloudSection);
 
         var cloudSaveToggle = newButton('infoboxCloudToggleButton', cloudControls, {
-            textContent: 'Save'
+            textContent: Localization.localize('CLOUD_PROJECT_SAVE')
         });
         cloudSaveToggle.id = 'cloudToggleSave';
         cloudSaveToggle.onclick = function () {
@@ -1726,7 +1726,7 @@ export default class UI {
         };
 
         var cloudLoadToggle = newButton('infoboxCloudToggleButton', cloudControls, {
-            textContent: 'Load'
+            textContent: Localization.localize('CLOUD_PROJECT_LOAD')
         });
         cloudLoadToggle.id = 'cloudToggleLoad';
         cloudLoadToggle.onclick = function () {
@@ -1738,9 +1738,9 @@ export default class UI {
         var cloudSavePanel = newHTML('div', 'infoboxCloudPanel', cloudPanels);
         cloudSavePanel.id = 'cloudSavePanel';
         var cloudSaveDescription = newHTML('div', 'infoboxCloudDescription', cloudSavePanel);
-        cloudSaveDescription.textContent = 'Save a copy of this project to the cloud.';
+        cloudSaveDescription.textContent = Localization.localize('CLOUD_PROJECT_SAVE_HINT');
         var cloudSaveButton = newButton('infoboxCloudButton', cloudSavePanel, {
-            textContent: 'Save to Cloud'
+            textContent: Localization.localize('CLOUD_PROJECT_SAVE_TO_CLOUD')
         });
         cloudSaveButton.id = 'infoboxCloudSave';
         cloudSaveButton.onclick = function (e) {
@@ -1751,10 +1751,10 @@ export default class UI {
         var cloudLoadPanel = newHTML('div', 'infoboxCloudPanel', cloudPanels);
         cloudLoadPanel.id = 'cloudLoadPanel';
         var cloudLoadDescription = newHTML('div', 'infoboxCloudDescription', cloudLoadPanel);
-        cloudLoadDescription.textContent = 'Choose a saved ID or enter a new one to load a project.';
+        cloudLoadDescription.textContent = Localization.localize('CLOUD_PROJECT_LOAD_HINT');
         var cloudLoadActions = newHTML('div', 'infoboxCloudLoadActions', cloudLoadPanel);
         var cloudLoadPromptButton = newButton('infoboxCloudSecondaryButton', cloudLoadActions, {
-            textContent: 'Enter ID to Load'
+            textContent: Localization.localize('CLOUD_PROJECT_ENTER_TO_LOAD')
         });
         cloudLoadPromptButton.id = 'infoboxCloudLoadPrompt';
         cloudLoadPromptButton.onclick = function (e) {
@@ -1929,7 +1929,7 @@ export default class UI {
         projectNameTextInput = ti;
         ti.name = 'myproject';
         ti.maxLength = 30;
-        ti.setAttribute('aria-label', Localization.localizeOptional('Project name'));
+        ti.setAttribute('aria-label', Localization.localize('A11Y_PROJECT_NAME'));
         ti.onkeypress = undefined;
         ti.autocomplete = 'off';
         ti.autocorrect = false;
@@ -2001,14 +2001,14 @@ export default class UI {
         });
         if (entries.length < 1) {
             var emptyMessage = newHTML('div', 'infoboxCloudListEmpty', listContainer);
-            emptyMessage.textContent = 'No stored IDs yet. Save a project or add one manually.';
+            emptyMessage.textContent = Localization.localize('CLOUD_PROJECT_EDITOR_EMPTY');
             return;
         }
         var header = newHTML('div', 'infoboxCloudListHeader', listContainer);
-        newHTML('div', 'infoboxCloudCell id', header).textContent = 'Custom ID';
-        newHTML('div', 'infoboxCloudCell name', header).textContent = 'Project';
-        newHTML('div', 'infoboxCloudCell saved', header).textContent = 'Updated';
-        newHTML('div', 'infoboxCloudCell actions', header).textContent = 'Actions';
+        newHTML('div', 'infoboxCloudCell id', header).textContent = Localization.localize('CLOUD_PROJECT_CUSTOM_ID');
+        newHTML('div', 'infoboxCloudCell name', header).textContent = Localization.localize('NEW_PROJECT_PREFIX');
+        newHTML('div', 'infoboxCloudCell saved', header).textContent = Localization.localize('CLOUD_PROJECT_UPDATED');
+        newHTML('div', 'infoboxCloudCell actions', header).textContent = Localization.localize('CLOUD_PROJECT_ACTIONS');
 
         for (var i = 0; i < entries.length; i++) {
             UI.addCloudIdRow(listContainer, entries[i]);
@@ -2019,7 +2019,7 @@ export default class UI {
         var row = newHTML('div', 'infoboxCloudRow', parent);
         newHTML('div', 'infoboxCloudCell id', row).textContent = entry.customId;
         var nameCell = newHTML('div', 'infoboxCloudCell name', row);
-        nameCell.textContent = entry.projectName ? entry.projectName : 'Unnamed Project';
+        nameCell.textContent = entry.projectName ? entry.projectName : Localization.localize('CLOUD_PROJECT_UNNAMED');
         var savedCell = newHTML('div', 'infoboxCloudCell saved', row);
         if (entry.lastUsed || entry.savedAt) {
             var ts = entry.lastUsed || entry.savedAt;
@@ -2034,7 +2034,7 @@ export default class UI {
         }
         var actions = newHTML('div', 'infoboxCloudCell actions', row);
         var loadButton = newButton('infoboxCloudActionButton primary', actions, {
-            textContent: 'Load'
+            textContent: Localization.localize('CLOUD_PROJECT_LOAD')
         });
         loadButton.onclick = function (e) {
             e.preventDefault();
@@ -2043,7 +2043,7 @@ export default class UI {
             UI.loadCloudProject(entry.customId, true);
         };
         var deleteButton = newButton('infoboxCloudActionButton danger', actions, {
-            textContent: 'Delete'
+            textContent: Localization.localize('A11Y_DELETE')
         });
         deleteButton.onclick = function (e) {
             e.preventDefault();
@@ -2059,23 +2059,20 @@ export default class UI {
         ScratchAudio.sndFX('tap.wav');
         if (!ScratchJr.currentProject) {
             Alert.close();
-            Alert.open(frame, UI.getCloudAlertAnchor(), 'No active project', '#ff0000');
+            Alert.open(frame, UI.getCloudAlertAnchor(), Localization.localize('CLOUD_PROJECT_NO_ACTIVE'), '#ff0000');
             return;
         }
         UI.handleTextFieldSave(true);
         Project.prepareToSave(ScratchJr.currentProject, function (persisted) {
             if (!persisted) {
                 Alert.close();
-                Alert.open(frame, UI.getCloudAlertAnchor(), 'Cloud save failed', '#ff0000');
+                Alert.open(frame, UI.getCloudAlertAnchor(), Localization.localize('CLOUD_PROJECT_SAVE_FAILED'), '#ff0000');
                 return;
             }
             ProjectCloud.saveCurrentProjectToCloud().then(function (result) {
                 Alert.close();
-                var message = "";
-                if (result && result.customId) {
-                    message += "Here’s your project ID: " + result.customId +
-                        ". Keep this ID safe — you’ll need it to load your data later.";
-                }
+                var message = result && result.customId ?
+                    Localization.localize('CLOUD_PROJECT_SAVE_SUCCESS', {ID: result.customId}) : '';
                 Alert.open(frame, UI.getCloudAlertAnchor(), message, '#28A5DA');
                 if (result && result.customId) {
                     addStoredCloudId({
@@ -2090,7 +2087,7 @@ export default class UI {
             }).catch(function (err) {
                 console.error(err);
                 Alert.close();
-                Alert.open(frame, UI.getCloudAlertAnchor(), 'Cloud save failed', '#ff0000');
+                Alert.open(frame, UI.getCloudAlertAnchor(), Localization.localize('CLOUD_PROJECT_SAVE_FAILED'), '#ff0000');
             });
         });
     }
@@ -2099,7 +2096,7 @@ export default class UI {
         evt.preventDefault();
         evt.stopPropagation();
         ScratchAudio.sndFX('tap.wav');
-        var identifier = window.prompt('Enter the custom ID to load');
+        var identifier = window.prompt(Localization.localize('CLOUD_PROJECT_ENTER_ID'));
         if (!identifier) {
             return;
         }
@@ -2122,14 +2119,14 @@ export default class UI {
         ScratchJr.saveProject(null, function (persisted) {
             if (!persisted) {
                 Alert.close();
-                Alert.open(frame, UI.getCloudAlertAnchor(), 'Project save failed', '#ff0000');
+                Alert.open(frame, UI.getCloudAlertAnchor(), Localization.localize('CLOUD_PROJECT_LOCAL_SAVE_FAILED'), '#ff0000');
                 return;
             }
             Alert.close();
-            Alert.open(frame, UI.getCloudAlertAnchor(), 'Loading from cloud', '#28A5DA');
+            Alert.open(frame, UI.getCloudAlertAnchor(), Localization.localize('CLOUD_PROJECT_LOADING'), '#28A5DA');
             ProjectCloud.loadProjectFromCloud(customId, { targetVersion: ScratchJr.version }).then(function (result) {
                 Alert.close();
-                Alert.open(frame, UI.getCloudAlertAnchor(), 'Cloud project ready', '#28A5DA');
+                Alert.open(frame, UI.getCloudAlertAnchor(), Localization.localize('CLOUD_PROJECT_READY'), '#28A5DA');
                 if (result && result.projectId) {
                     ScratchJr.currentProject = result.projectId;
                     ScratchJr.editmode = 'edit';
@@ -2155,7 +2152,7 @@ export default class UI {
             }).catch(function (err) {
                 console.error(err);
                 Alert.close();
-                Alert.open(frame, UI.getCloudAlertAnchor(), 'Cloud load failed', '#ff0000');
+                Alert.open(frame, UI.getCloudAlertAnchor(), Localization.localize('CLOUD_PROJECT_LOAD_FAILED'), '#ff0000');
             });
         });
     }

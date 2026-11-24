@@ -57,6 +57,10 @@ async function installFirebaseStub(page, state) {
   await page.setRequestInterception(true);
   page.on("request", (request) => {
     const url = request.url();
+    if (url === HOST + "/favicon.ico") {
+      request.respond({status: 204});
+      return;
+    }
     if (!url.startsWith(FIREBASE_ORIGIN)) {
       request.continue();
       return;
@@ -100,8 +104,9 @@ async function installFirebaseStub(page, state) {
   });
 }
 
-async function openPage() {
+async function openPage(locale) {
   const browser = await puppeteer.launch({
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
     headless: true,
     args: ["--no-sandbox"],
   });
@@ -125,6 +130,7 @@ async function openPage() {
     }
   });
   await installFirebaseStub(page, state);
+  if (locale) await page.setCookie({name: "localization", value: locale, url: HOST});
   await page.goto(`${HOST}/home.html?place=home`, { waitUntil: "networkidle2", timeout: 30_000 });
   return { browser, page, errors, state };
 }
@@ -194,6 +200,43 @@ async function readProjectRow(page, projectId) {
 }
 
 describe("cloud project loading from My Projects", () => {
+  it("shows the Spanish cloud dialog and editor controls, including saved IDs and validation", async () => {
+    const { browser, page } = await openPage("es");
+    try {
+      await page.waitForSelector("#cloudproject .card-action-open");
+      await page.evaluate(key => localStorage.setItem(key, JSON.stringify([
+        {customId: "rcd", projectName: "Kinder Data"}
+      ])), CLOUD_IDS_STORAGE_KEY);
+      await page.click("#cloudproject .card-action-open");
+      expect(await page.$eval("#cloud-project-load-title", el => el.textContent)).toBe("Cargar proyecto de la nube");
+      expect(await page.$eval("#cloud-project-load-description", el => el.textContent)).toMatch(/^Introduce el ID/);
+      expect(await page.$eval(".cloud-project-input-label", el => el.textContent)).toBe("ID del proyecto");
+      expect(await page.$eval(".cloud-project-cancel", el => el.textContent)).toBe("Cancelar");
+      expect(await page.$eval(".cloud-project-saved-title", el => el.textContent)).toBe("IDs de la nube guardados");
+      expect(await page.$eval(".cloud-project-saved-button", el => el.textContent)).toBe("Kinder Data (rcd)");
+      await page.click("#cloud-project-load-submit");
+      expect(await page.$eval("#cloud-project-load-status", el => el.textContent)).toBe("Introduce el ID de un proyecto de la nube.");
+      await page.click(".cloud-project-saved-remove");
+      expect(await page.$eval(".cloud-project-saved-empty", el => el.textContent)).toMatch(/^Todavía no hay/);
+      await page.click(".cloud-project-cancel");
+      await createProjectFromHome(page);
+      await page.click("#projectinfo");
+      await page.click("#cloudToggleSave");
+      expect(await page.$eval("#infoboxCloudSave", el => el.textContent)).toBe("Guardar en la nube");
+      await page.click("#cloudToggleLoad");
+      expect(await page.$eval("#infoboxCloudLoadPrompt", el => el.textContent)).toBe("Introducir un ID");
+      const promptText = new Promise(resolve => page.once("dialog", async dialog => {
+        const text = dialog.message();
+        await dialog.dismiss();
+        resolve(text);
+      }));
+      await page.click("#infoboxCloudLoadPrompt");
+      expect(await promptText).toBe("Introduce el ID de un proyecto de la nube.");
+    } finally {
+      await browser.close();
+    }
+  }, 90_000);
+
   it(
     "imports typed and saved cloud IDs, removes stale entries, and ignores tracking failures",
     async () => {
