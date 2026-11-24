@@ -24,6 +24,21 @@ vi.mock('@/utils/Localization', () => ({
 const homeLanguages = ['ar', 'en', 'el', 'it', 'nl', 'fr', 'de', 'bg', 'da', 'no', 'cs', 'es', 'sv', 'fi'];
 
 describe.each(homeLanguages)('Blocks Jr in %s', locale => {
+    it('provides the cloud-project messages without relying on English fallback', () => {
+        const messages = JSON.parse(readFileSync(new URL(
+            `../../editions/free/src/localizations/${locale}.json`, import.meta.url
+        ), 'utf8'));
+        const keys = Object.keys(english).filter(key => key.startsWith('CLOUD_PROJECT_'))
+            .concat(['ACTION_CANCEL', 'A11Y_PROJECT_NAME', 'A11Y_DELETE']);
+        for (const key of keys) {
+            expect(messages[key]?.trim(), key).toBeTruthy();
+            if (locale !== 'en' && english[key].includes(' ')) {
+                expect(messages[key], key).not.toBe(english[key]);
+            }
+        }
+        expect(new IntlMessageFormat(messages.CLOUD_PROJECT_SAVE_SUCCESS, locale).format({ID: 'rcd'})).toContain('rcd');
+    });
+
     it('resolves the palette, guide, connection installer and all student-led lesson strings', () => {
         const messages = JSON.parse(readFileSync(new URL(
             `../../editions/free/src/localizations/${locale}.json`, import.meta.url
