@@ -4,7 +4,7 @@ const cogJrBlocksTutorial3 = {
     id: "cog-jrblocks-3",
     platform: "blocksjr",         // should this be jrblocks?
     title: Localization.localize("COG_JRBLOCKS3_TITLE"),
-    description: "Combining what they've learned in the last two activities, students can construct a combined sound and light show on their cog! They can connect the sound sequence and the light sequence up to the same starting event, to see that they can make two sequences run simultaneously",
+    description: Localization.localize("COG_JRBLOCKS3_DESCRIPTION"),
     tutorialSteps: [
         /* STEP 1 -- intro*/
         {

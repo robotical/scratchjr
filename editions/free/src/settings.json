@@ -24,6 +24,7 @@
     "defaultLocaleShort": "en",
     "supportedLocales": {
         "English": "en",
+        "Arabic": "ar",
         "Danish": "da",
         "German": "de",
         "Greek": "el",

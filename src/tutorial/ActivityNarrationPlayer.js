@@ -88,6 +88,7 @@ const loadNormalMartyAudio = async (text, locale, signal) => {
         ar: 'arb',
         zh: 'cmn-CN',
         da: 'da-DK',
+        no: 'nb-NO',
         nl: 'nl-NL',
         en: 'en-US',
         fr: 'fr-FR',
@@ -107,7 +108,11 @@ const loadNormalMartyAudio = async (text, locale, signal) => {
         tr: 'tr-TR',
         cy: 'cy-GB'
     };
-    const language = locales[locale.toLowerCase().split('-')[0]] || 'en-US';
+    const language = locales[locale.toLowerCase().split('-')[0]];
+    if (!language) {
+        // Let the device speak the selected language when the legacy voice service has no voice for it.
+        throw new Error('No legacy narration voice for ' + locale);
+    }
     const chunks = splitNarrationText(text);
     const recordings = new Array(chunks.length);
     let next = 0;

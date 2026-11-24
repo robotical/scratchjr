@@ -99,7 +99,7 @@ const cogAndMartyTutorial = {
     id: "cog-and-marty-tutorial",
     platform: "blocksjr",
     title: Localization.localize("COG_AND_MARTY_TUTORIAL_TITLE"),
-    description: "Learn how Cog and Marty can interact with each other",
+    description: Localization.localize("COG_AND_MARTY_TUTORIAL_DESCRIPTION"),
     tutorialSteps: [
         /* STEP 1 -- intro*/
         {

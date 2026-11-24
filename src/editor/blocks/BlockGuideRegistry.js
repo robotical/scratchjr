@@ -223,17 +223,17 @@ export const BLOCK_GUIDE_METADATA = {
         'BLOCK_GUIDE_MICROBIT_TILT_DESCRIPTION', 'Starts when the micro:bit is tilted in the selected direction.',
         MICROBIT_DEFAULT_TILT_OPTION),
     microbitdisplayheart: block('BLOCK_GUIDE_MICROBIT_HEART', 'Display Heart',
-        'BLOCK_DESC_MICROBIT_DISPLAY_HEART', 'Shows a heart on the micro:bit display.', 'microbitdisplayheart'),
+        'BLOCK_GUIDE_MICROBIT_HEART_DESCRIPTION', 'Shows a heart on the micro:bit display.', 'microbitdisplayheart'),
     microbitdisplayhappy: block('BLOCK_GUIDE_MICROBIT_HAPPY', 'Display Happy Face',
-        'BLOCK_DESC_MICROBIT_DISPLAY_HAPPY', 'Shows a happy face on the micro:bit display.', 'microbitdisplayhappy'),
+        'BLOCK_GUIDE_MICROBIT_HAPPY_DESCRIPTION', 'Shows a happy face on the micro:bit display.', 'microbitdisplayhappy'),
     microbitdisplaycustom: block('BLOCK_GUIDE_MICROBIT_CUSTOM', 'Display Custom Pattern',
-        'BLOCK_DESC_MICROBIT_DISPLAY_CUSTOM', 'Shows a custom 5×5 pattern on the micro:bit display.', null,
+        'BLOCK_GUIDE_MICROBIT_CUSTOM_DESCRIPTION', 'Shows a custom 5×5 pattern on the micro:bit display.', null,
         {symbol: '▦'}),
     microbitdisplaytext: block('BLOCK_GUIDE_MICROBIT_TEXT', 'Display Text',
-        'BLOCK_DESC_MICROBIT_DISPLAY_TEXT', 'Scrolls the chosen text across the micro:bit display.',
+        'BLOCK_GUIDE_MICROBIT_TEXT_DESCRIPTION', 'Scrolls the chosen text across the micro:bit display.',
         'microbitdisplaytext'),
     microbitdisplayclear: block('BLOCK_GUIDE_MICROBIT_CLEAR', 'Clear Display',
-        'BLOCK_DESC_MICROBIT_CLEAR_DISPLAY', 'Clears every LED on the micro:bit display.', 'microbitdisplayclear')
+        'BLOCK_GUIDE_MICROBIT_CLEAR_DESCRIPTION', 'Clears every LED on the micro:bit display.', 'microbitdisplayclear')
 };
 
 const CATEGORY_SETS = {

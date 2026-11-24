@@ -39,7 +39,10 @@ vi.mock('@/painteditor/Paint', () => ({ default: {} }));
 vi.mock('@/utils/Events', () => ({ default: {} }));
 vi.mock('@/utils/Localization', () => ({
     default: {
-        localize: key => key,
+        localize: (key, args = {}) => ({
+            A11Y_CONNECT: 'Connect', A11Y_DISCONNECT: 'Disconnect',
+            A11Y_CONNECT_DEVICE: 'Connect ' + args.NAME, A11Y_DISCONNECT_DEVICE: 'Disconnect ' + args.NAME
+        }[key] || key),
         localizeOptional: key => key
     }
 }));
@@ -676,7 +679,7 @@ describe('Marty connection UI', () => {
         expect(window.microBitManager.addMicroBit).toHaveBeenCalledWith(microBit);
         expect(window.microBitManager.wireMicroBitWithBlocks).toHaveBeenCalledWith('microbit-1');
         expect(button.classList.contains('connectButtonConnected')).toBe(true);
-        expect(button.querySelector('.iconButtonContainer').textContent).toBe('DISCONNECT');
+        expect(button.querySelector('.iconButtonContainer').textContent).toBe('Disconnect');
         expect(button.querySelector('.raftNameConnectButton').textContent).toBe('micro:bit One');
         expect(button.attributes.title).toBe('Disconnect micro:bit One');
 

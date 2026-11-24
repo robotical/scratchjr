@@ -182,11 +182,21 @@
     background-repeat: no-repeat;
 }
 .notConnectedButtonContainer {
-    background-image: url('../assets/connection/connect_btn-default.svg');
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 92%;
+    height: auto;
+    min-height: ${css_vh(1.5)};
+    border-radius: ${css_vh(1)};
+    background-color: #ffda61;
+    color: #133c46;
+    font: bold ${css_vh(0.95)} / 1.1 'Lato Regular', sans-serif;
+    text-align: center;
 }
-/* .connectButton:hover .notConnectedButtonContainer {
-    background-image: url('../assets/connection/connect_btn-hover.svg');
-} */
+.notConnectedButtonContainer::after {
+    content: attr(data-label);
+}
 .connectedButtonContainer {
     position: absolute;
     top: -${css_vh(0.9)};

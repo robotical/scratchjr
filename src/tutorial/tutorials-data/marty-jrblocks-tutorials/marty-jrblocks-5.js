@@ -99,7 +99,7 @@ const martyJrBlocksTutorial5 = {
     id: "marty-jr-blocks-5",
     platform: "blocksjr",
     title: Localization.localize("MARTY_JRBLOCKS5_TITLE"),
-    description: "Make a a Marty Goal Shooter game!",
+    description: Localization.localize("MARTY_JRBLOCKS5_DESCRIPTION"),
     tutorialSteps: [
         /* STEP 1 -- intro**/
         {

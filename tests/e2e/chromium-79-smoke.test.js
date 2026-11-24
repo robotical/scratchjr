@@ -45,6 +45,11 @@ async function openPage(pathname) {
   });
   const page = await browser.newPage();
   const errors = [];
+  // The bare editor fixture has no site favicon. Browsers may request one automatically.
+  await page.setRequestInterception(true);
+  page.on("request", request => new URL(request.url()).pathname === "/favicon.ico"
+    ? request.respond({status: 204})
+    : request.continue());
 
   page.on("pageerror", (err) => errors.push(err.message || String(err)));
   page.on("console", (msg) => {
@@ -66,7 +71,7 @@ async function getTutorialFrame(page) {
 
   await page.waitForFunction(() => {
     const iframe = document.getElementById("htmlcontents");
-    const frameLocation = iframe?.contentWindow?.location?.href;
+    const frameLocation = iframe && iframe.contentWindow && iframe.contentWindow.location.href;
     return typeof frameLocation === "string" && frameLocation.includes("/inapp/tutorials.html");
   }, { timeout: 30_000 });
 
@@ -209,6 +214,10 @@ describe("Chromium 79 smoke test", () => {
           { timeout: 30_000 }
         );
 
+        await page.waitForSelector("#microBitConnectionDialogClose", {visible: true});
+        await page.click("#microBitConnectionDialogClose");
+        await page.waitForSelector("#backdrop", {hidden: true});
+
         const enabledState = await page.evaluate(() => {
           const addButton = document.getElementById("addExtensionButton");
           const microBitButton = document.getElementById("microBitConnectionButton");
@@ -224,9 +233,7 @@ describe("Chromium 79 smoke test", () => {
             removeButtonDisplay: window.getComputedStyle(removeButton).display,
             removeButtonAriaHidden: removeButton.getAttribute("aria-hidden"),
             removeButtonDisabled: removeButton.disabled,
-            microBitUsesConnectControl: window.getComputedStyle(microBitAction).backgroundImage.includes(
-              "connect_btn-default.svg"
-            ),
+            microBitUsesConnectControl: microBitAction.getAttribute("data-label") === "Connect",
             microBitActionPosition: window.getComputedStyle(microBitAction).position,
             rightCategoryIds: Array.from(document.querySelectorAll("#selectorsright .category-selector-button")).map(
               (button) => button.id
